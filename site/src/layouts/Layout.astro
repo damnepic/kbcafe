@@ -114,21 +114,24 @@ const canonical = new URL(path, Astro.site).href;
     --paper:#FBF4E9; --paper-2:#F4E9D6; --ink:#1E1813; --ink-soft:#574b3f;
     --coral:#EE4B2B; --coral-deep:#D63E1F; --orange:#F4842A; --gold:#F4B423;
     --cream:#FFFCF5; --line:rgba(30,24,19,.12); --shadow:18px 18px 0 rgba(30,24,19,.06);
+    --bg:#FEFDFB; --header:#F7EEDB;
     --font-display:"Sora",system-ui,sans-serif;
     --font-body:"Hanken Grotesk",system-ui,sans-serif;
     --font-mono:"JetBrains Mono",ui-monospace,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
-  body{font-family:var(--font-body);background:var(--paper);color:var(--ink);
+  body{font-family:var(--font-body);background:var(--bg);color:var(--ink);
     -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
   .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 28px}
   a{color:inherit}
 
-  /* nav */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:24px 0 8px}
+  /* nav (cream header band, full-bleed over the off-white body) */
+  nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 0 16px}
+  nav::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:100vw;
+    background:var(--header);border-bottom:1px solid var(--line);z-index:-1}
   /* brand lockup: the logo IS the "KB", wordmark is just "Cafe" (per v5 mockup) */
   .brand{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);
     font-weight:800;font-size:30px;letter-spacing:-.02em;text-decoration:none;color:var(--ink);transition:transform .15s}
