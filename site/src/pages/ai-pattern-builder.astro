@@ -140,6 +140,7 @@ import ToolPage from '../layouts/ToolPage.astro';
     }).join('');
     if (!pipe.length) flow.insertAdjacentHTML('afterbegin', '');
     genCode();
+    syncUrl();
   }
 
   // ---- code export ----
@@ -202,5 +203,9 @@ import ToolPage from '../layouts/ToolPage.astro';
     setTimeout(() => { b.classList.remove('done'); b.querySelector('.lbl').textContent = 'Copy scaffold'; }, 1600);
   });
 
+  function syncUrl() { history.replaceState(null, '', pipe.length ? location.pathname + '?flow=' + pipe.join(',') : location.pathname); }
+  // hydrate flow from a shared deep link
+  const fp = new URLSearchParams(location.search).get('flow');
+  if (fp) { const ids = fp.split(',').filter(id => BLOCKS[id]); if (ids.length) pipe = ids; }
   renderPalette(); renderFlow();
 </script>

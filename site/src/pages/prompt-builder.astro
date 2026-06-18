@@ -115,7 +115,17 @@ import ToolPage from '../layouts/ToolPage.astro';
     if (extra) p += `\n\nContext: ${extra}`;
     $('out').value = p;
   }
-  ['task', 'subject', 'audience', 'goal', 'tone', 'length', 'format', 'extra'].forEach(id => $(id).addEventListener('input', build));
+  const FIELDS = ['task', 'subject', 'audience', 'goal', 'tone', 'length', 'format', 'extra'];
+  function syncUrl() {
+    const p = new URLSearchParams();
+    FIELDS.forEach(id => { const v = $(id).value.trim(); if (v && !v.startsWith('(')) p.set(id, v); });
+    const qs = p.toString();
+    history.replaceState(null, '', qs ? location.pathname + '?' + qs : location.pathname);
+  }
+  // hydrate from a shared deep link
+  const params = new URLSearchParams(location.search);
+  FIELDS.forEach(id => { if (params.has(id)) $(id).value = params.get(id); });
+  FIELDS.forEach(id => $(id).addEventListener('input', () => { build(); syncUrl(); }));
   $('copy').addEventListener('click', async () => {
     if (!$('out').value) return;
     try { await navigator.clipboard.writeText($('out').value); } catch { return; }
