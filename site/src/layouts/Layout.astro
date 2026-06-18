@@ -1,0 +1,111 @@
+---
+const {
+  title = 'KB Cafe — a developer’s knowledge base',
+  description = 'Fast, clean developer tools and quick references — freshly brewed. Everything runs in your browser: nothing uploaded, nothing tracked.',
+  path = '/',
+} = Astro.props;
+
+const canonical = new URL(path, Astro.site).href;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<!-- favicon = the KB bookmark mark -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M19 6 H45 A4 4 0 0 1 49 10 V58 L32 47 L15 58 V10 A4 4 0 0 1 19 6 Z' fill='%23EE4B2B'/%3E%3Ctext x='32' y='31' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='20' fill='%23FFFCF5' letter-spacing='-1'%3EKB%3C/text%3E%3C/svg%3E" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonical} />
+<meta name="twitter:card" content="summary" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+<!-- reusable marks -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="kb-mark" viewBox="0 0 64 64">
+    <path d="M19 6 H45 A4 4 0 0 1 49 10 V58 L32 47 L15 58 V10 A4 4 0 0 1 19 6 Z" fill="#EE4B2B"/>
+    <text x="32" y="31" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#FFFCF5" letter-spacing="-1">KB</text>
+  </symbol>
+  <symbol id="kb-mark-mini" viewBox="0 0 64 64">
+    <path d="M19 6 H45 A4 4 0 0 1 49 10 V58 L32 47 L15 58 V10 A4 4 0 0 1 19 6 Z" fill="#F4B423"/>
+    <text x="32" y="31" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#1E1813" letter-spacing="-1">KB</text>
+  </symbol>
+  <symbol id="cup" viewBox="0 0 48 48">
+    <path d="M10 19h21v9a7 7 0 0 1-7 7h-7a7 7 0 0 1-7-7v-9Z" fill="none" stroke="#F4B423" stroke-width="2.6"/>
+    <path d="M31 21h3.5a4 4 0 0 1 0 8H31" fill="none" stroke="#F4B423" stroke-width="2.6"/>
+    <path d="M16 14q-2-2.4 0-4.8q2-2.4 0-4.8" fill="none" stroke="#FFFCF5" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+    <path d="M22 14q2-2.4 0-4.8q-2-2.4 0-4.8" fill="none" stroke="#FFFCF5" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+  </symbol>
+</defs></svg>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="/">
+      <svg class="mark"><use href="#kb-mark"/></svg>
+      <span><span class="kb">KB</span>&nbsp;<span class="cf">Cafe</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="/#menu">Tools</a>
+      <a href="/#menu">Reference</a>
+      <a href="/#menu">Feeds</a>
+      <a class="since" href="/">est. 1998</a>
+    </div>
+  </nav>
+
+  <slot />
+
+  <footer>
+    <a class="foot-brand" href="/"><span class="kb">KB</span> Cafe</a>
+    <div class="foot-note">A developer&rsquo;s knowledge base on the web since 1998 &middot; part of the family with <a href="https://yank.info">yank.info</a></div>
+  </footer>
+</div>
+</body>
+</html>
+
+<style is:global>
+  :root{
+    --paper:#FBF4E9; --paper-2:#F4E9D6; --ink:#1E1813; --ink-soft:#574b3f;
+    --coral:#EE4B2B; --coral-deep:#D63E1F; --orange:#F4842A; --gold:#F4B423;
+    --cream:#FFFCF5; --line:rgba(30,24,19,.12); --shadow:18px 18px 0 rgba(30,24,19,.06);
+    --font-display:"Bricolage Grotesque",system-ui,sans-serif;
+    --font-body:"Hanken Grotesk",system-ui,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-body);background:var(--paper);color:var(--ink);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 28px}
+  a{color:inherit}
+
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:24px 0 8px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--font-display);
+    font-weight:800;font-size:25px;letter-spacing:-.02em;text-decoration:none}
+  .brand .mark{height:36px;width:auto;filter:drop-shadow(2px 2px 0 rgba(30,24,19,.18))}
+  .brand .kb{color:var(--coral)} .brand .cf{color:var(--ink)}
+  .nav-links{display:flex;align-items:center;gap:26px;font-weight:600;font-size:15px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:color .15s}
+  .nav-links a:hover{color:var(--coral)}
+  .since{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:20px;padding:5px 11px}
+
+  footer{border-top:1px solid var(--line);margin-top:60px;padding:30px 0 56px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
+  .foot-brand{font-family:var(--font-display);font-weight:700;font-size:16px;text-decoration:none}
+  .foot-brand .kb{color:var(--coral)}
+  .foot-note{font-size:13px;color:var(--ink-soft)}
+  .foot-note a{color:var(--coral);text-decoration:none;font-weight:600}
+  .foot-note a:hover{text-decoration:underline}
+
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:520px){.nav-links a:not(.since){display:none}}
+</style>

@@ -1,0 +1,240 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Cron Generator &amp; Explainer — build and read crontab expressions | KB Cafe"
+  description="Build a crontab schedule with simple controls and read any cron expression in plain English. Free, fast, client-side. See the next run times instantly."
+  path="/cron-generator"
+  eyebrow="Time &amp; Cron · Scheduling"
+  h1="Cron Generator"
+  tagline="Build a schedule with simple controls, or paste a cron expression to read it in plain English — with the next run times. Runs entirely in your browser."
+>
+  <div class="pane" style="margin-bottom:14px">
+    <div class="pane-label"><span>Cron expression</span><span id="valid-flag" class="vflag"></span></div>
+    <input id="expr" class="ta cron-input" style="min-height:auto;height:auto" spellcheck="false" value="0 9 * * 1-5" />
+  </div>
+
+  <p class="english" id="english"></p>
+
+  <div class="presets row" id="presets">
+    <button class="chip" data-e="* * * * *">every minute</button>
+    <button class="chip" data-e="*/5 * * * *">every 5 min</button>
+    <button class="chip" data-e="0 * * * *">hourly</button>
+    <button class="chip" data-e="0 0 * * *">daily midnight</button>
+    <button class="chip" data-e="0 9 * * 1-5">weekdays 9am</button>
+    <button class="chip" data-e="0 0 * * 0">weekly (Sun)</button>
+    <button class="chip" data-e="0 0 1 * *">monthly</button>
+    <button class="chip" data-e="0 0 1 1 *">yearly</button>
+  </div>
+
+  <div class="builder" id="builder">
+    <div class="field"><label>Minute</label><input data-i="0" value="0" /><span class="hint">0–59</span></div>
+    <div class="field"><label>Hour</label><input data-i="1" value="9" /><span class="hint">0–23</span></div>
+    <div class="field"><label>Day of month</label><input data-i="2" value="*" /><span class="hint">1–31</span></div>
+    <div class="field"><label>Month</label><input data-i="3" value="*" /><span class="hint">1–12</span></div>
+    <div class="field"><label>Day of week</label><input data-i="4" value="1-5" /><span class="hint">0–6 (Sun=0)</span></div>
+  </div>
+
+  <div class="nextruns" id="nextruns"></div>
+
+  <Fragment slot="explainer">
+    <h2>The five cron fields</h2>
+    <p>A standard cron expression is five fields separated by spaces, each controlling one unit of time:</p>
+    <ul>
+      <li><code>minute</code> (0–59)</li>
+      <li><code>hour</code> (0–23)</li>
+      <li><code>day of month</code> (1–31)</li>
+      <li><code>month</code> (1–12)</li>
+      <li><code>day of week</code> (0–6, where 0 and 7 are both Sunday)</li>
+    </ul>
+    <p>Read together, <code>0 9 * * 1-5</code> means &ldquo;at 09:00, Monday through Friday.&rdquo;</p>
+
+    <h3>The operators</h3>
+    <ul>
+      <li><code>*</code> — every value (&ldquo;every minute&rdquo;, &ldquo;every day&rdquo;).</li>
+      <li><code>,</code> — a list, e.g. <code>1,15,30</code>.</li>
+      <li><code>-</code> — a range, e.g. <code>1-5</code> (Mon–Fri).</li>
+      <li><code>/</code> — a step, e.g. <code>*/15</code> (every 15 units) or <code>0-30/10</code>.</li>
+    </ul>
+
+    <h3>A subtle gotcha: day-of-month vs day-of-week</h3>
+    <p>
+      When <em>both</em> day-of-month and day-of-week are restricted (neither is <code>*</code>),
+      classic cron runs the job when <strong>either</strong> matches — an OR, not an AND. So
+      <code>0 0 13 * 5</code> fires on the 13th <em>and</em> every Friday, not just Friday the 13th.
+      Keep one field as <code>*</code> to avoid surprises.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Is this standard cron or the 6-field variant?</summary>
+      <p>This tool uses the classic 5-field crontab format used by Linux cron, most CI schedulers, and Vercel Cron. Some systems (Quartz, some Kubernetes setups) add a seconds field for 6 fields.</p>
+    </details>
+    <details class="faq"><summary>What timezone do the next run times use?</summary>
+      <p>The preview next-run times are computed in <em>your</em> local timezone for readability. Real cron runs in the server&rsquo;s timezone — check your platform&rsquo;s docs (many CI systems default to UTC).</p>
+    </details>
+    <details class="faq"><summary>Does anything get uploaded?</summary>
+      <p>No. Parsing and the next-run preview are computed in your browser, so it works offline.</p>
+    </details>
+
+    <h3>Related references</h3>
+    <p>Scheduling a job that emits JSON? Type it with <a href="/json-to-typescript">JSON → TypeScript</a>. Refreshing auth on a schedule? Inspect tokens with the <a href="/jwt-decoder">JWT decoder</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .cron-input{font-size:22px !important;font-weight:700;letter-spacing:.04em;padding:14px 16px !important;text-align:left}
+  .vflag{font-family:var(--font-mono);font-size:11px;font-weight:700}
+  .vflag.ok{color:#2f7d32} .vflag.bad{color:var(--coral-deep)}
+  .english{font-family:var(--font-display);font-weight:700;font-size:clamp(20px,3vw,28px);line-height:1.25;
+    color:var(--ink);margin:16px 0 6px;min-height:1.2em}
+  .english b{color:var(--coral)}
+  .presets{margin:14px 0 4px}
+  .builder{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:22px 0 6px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .field input{font-family:var(--font-mono);font-size:16px;font-weight:700;text-align:center;border:1.5px solid var(--ink);
+    border-radius:11px;background:var(--cream);color:var(--ink);padding:11px 6px;outline:0;width:100%}
+  .field input:focus{box-shadow:5px 5px 0 var(--coral)}
+  .field input.bad{border-color:var(--coral-deep);color:var(--coral-deep)}
+  .field .hint{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);opacity:.7;text-align:center}
+  .nextruns{margin-top:22px;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+  .nextruns h3{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);margin-bottom:9px}
+  .nextruns ol{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .nextruns li{padding:8px 12px;background:var(--cream);border:1px solid var(--line);border-radius:9px}
+  @media(max-width:620px){.builder{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const exprEl = $('expr'), englishEl = $('english'), flagEl = $('valid-flag'),
+        nextEl = $('nextruns'), builderInputs = [...document.querySelectorAll('#builder input')];
+  const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MON = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const RANGES = [[0,59],[0,23],[1,31],[1,12],[0,7]];
+
+  // Parse one field into a sorted set of allowed integers; throw on invalid.
+  function parseField(field, idx){
+    const [lo, hi] = RANGES[idx];
+    const out = new Set();
+    for(const part of field.split(',')){
+      let m;
+      if(part === '*'){ for(let i=lo;i<=hi;i++) out.add(i); continue; }
+      if((m = part.match(/^\*\/(\d+)$/))){
+        const step = +m[1]; if(step<1) throw 0;
+        for(let i=lo;i<=hi;i+=step) out.add(i); continue;
+      }
+      if((m = part.match(/^(\d+)-(\d+)\/(\d+)$/))){
+        const a=+m[1], b=+m[2], step=+m[3]; if(step<1||a>b||a<lo||b>hi) throw 0;
+        for(let i=a;i<=b;i+=step) out.add(i); continue;
+      }
+      if((m = part.match(/^(\d+)-(\d+)$/))){
+        const a=+m[1], b=+m[2]; if(a>b||a<lo||b>hi) throw 0;
+        for(let i=a;i<=b;i++) out.add(i); continue;
+      }
+      if((m = part.match(/^(\d+)$/))){
+        const v=+m[1]; if(v<lo||v>hi) throw 0; out.add(v); continue;
+      }
+      throw 0;
+    }
+    // normalize Sunday 7 -> 0 for day-of-week
+    if(idx === 4 && out.has(7)){ out.add(0); out.delete(7); }
+    return out;
+  }
+
+  function describeField(field, idx, names){
+    if(field === '*') return null;
+    let m;
+    if((m = field.match(/^\*\/(\d+)$/))) return `every ${ordinalStep(+m[1])}`;
+    const parts = field.split(',').map(p => {
+      let mm;
+      if((mm = p.match(/^(\d+)-(\d+)$/))) return names ? `${names[+mm[1]]} through ${names[+mm[2]]}` : `${mm[1]}–${mm[2]}`;
+      if((mm = p.match(/^(\d+)$/))) return names ? names[+mm[1]] : mm[1];
+      return p;
+    });
+    return joinList(parts);
+  }
+  function ordinalStep(n){ return n === 1 ? 'unit' : n + (n===2?'nd':n===3?'rd':'th'); }
+  function joinList(a){ return a.length <= 1 ? a[0] : a.slice(0,-1).join(', ') + ' and ' + a[a.length-1]; }
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function toEnglish(fields){
+    const [min, hr, dom, mon, dow] = fields;
+    let timePart;
+    // exact time vs minute patterns
+    if(/^\d+$/.test(min) && /^\d+$/.test(hr)) timePart = `at <b>${pad(+hr)}:${pad(+min)}</b>`;
+    else if(min === '*' && hr === '*') timePart = 'every minute';
+    else {
+      const mm = min === '*' ? 'every minute' : (min.match(/^\*\/(\d+)$/) ? `every ${min.match(/^\*\/(\d+)$/)[1]} minutes` : `at minute ${describeField(min,0)||min}`);
+      const hh = hr === '*' ? '' : ` past hour ${describeField(hr,1)||hr}`;
+      timePart = mm + hh;
+    }
+    const monStr = describeField(mon, 3, MON);
+    const domStr = describeField(dom, 2);
+    const dowStr = describeField(dow, 4, DOW);
+
+    let dayPart = '';
+    if(domStr && dowStr) dayPart = ` on day-of-month ${domStr} <b>and</b> on ${dowStr}`;
+    else if(domStr) dayPart = ` on the ${domStr}${/^\d+$/.test(dom)?'th':''} of the month`;
+    else if(dowStr) dayPart = ` on <b>${dowStr}</b>`;
+    const monPart = monStr ? ` in ${monStr}` : '';
+    return `Runs ${timePart}${dayPart}${monPart}.`;
+  }
+
+  // compute next N run times in local tz by brute-force minute scan
+  function nextRuns(sets, n){
+    const res = [];
+    const d = new Date(); d.setSeconds(0,0); d.setMinutes(d.getMinutes()+1);
+    const [mins, hrs, doms, mons, dows] = sets;
+    const domRestricted = doms.size < 31, dowRestricted = dows.size < 7;
+    let guard = 0;
+    while(res.length < n && guard++ < 366*24*60){
+      const dayOk = (domRestricted && dowRestricted)
+        ? (doms.has(d.getDate()) || dows.has(d.getDay()))
+        : (doms.has(d.getDate()) && dows.has(d.getDay()));
+      if(mins.has(d.getMinutes()) && hrs.has(d.getHours()) && mons.has(d.getMonth()+1) && dayOk){
+        res.push(new Date(d));
+      }
+      d.setMinutes(d.getMinutes()+1);
+    }
+    return res;
+  }
+
+  function run(){
+    const fields = exprEl.value.trim().split(/\s+/);
+    builderInputs.forEach(inp => inp.classList.remove('bad'));
+    if(fields.length !== 5){
+      flagEl.className = 'vflag bad'; flagEl.textContent = '✕ need 5 fields';
+      englishEl.innerHTML = `<span style="color:var(--coral-deep)">A cron expression needs exactly 5 fields.</span>`;
+      nextEl.innerHTML = ''; return;
+    }
+    let sets;
+    try { sets = fields.map((f,i) => parseField(f,i)); }
+    catch {
+      flagEl.className = 'vflag bad'; flagEl.textContent = '✕ invalid';
+      englishEl.innerHTML = `<span style="color:var(--coral-deep)">One or more fields are out of range or malformed.</span>`;
+      nextEl.innerHTML = ''; return;
+    }
+    flagEl.className = 'vflag ok'; flagEl.textContent = '✓ valid';
+    englishEl.innerHTML = toEnglish(fields);
+    // sync builder inputs
+    builderInputs.forEach(inp => { inp.value = fields[+inp.dataset.i]; });
+    // next runs
+    const runs = nextRuns(sets, 5);
+    nextEl.innerHTML = `<h3>Next ${runs.length} runs (your local time)</h3><ol>` +
+      runs.map(r => `<li>${r.toLocaleString(undefined,{weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</li>`).join('') +
+      `</ol>`;
+  }
+
+  function fromBuilder(){
+    exprEl.value = builderInputs.map(i => i.value.trim() || '*').join(' ');
+    run();
+  }
+
+  exprEl.addEventListener('input', run);
+  builderInputs.forEach(inp => inp.addEventListener('input', fromBuilder));
+  $('presets').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if(!b) return;
+    exprEl.value = b.dataset.e; run();
+  });
+  run();
+</script>

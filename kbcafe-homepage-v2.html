@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KB Cafe — a developer's knowledge base</title>
+<!-- favicon = the KB bookmark mark -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M19 6 H45 A4 4 0 0 1 49 10 V58 L32 47 L15 58 V10 A4 4 0 0 1 19 6 Z' fill='%23EE4B2B'/%3E%3Ctext x='32' y='31' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='20' fill='%23FFFCF5' letter-spacing='-1'%3EKB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF4E9; --paper-2:#F4E9D6; --ink:#1E1813; --ink-soft:#574b3f;
+    --coral:#EE4B2B; --coral-deep:#D63E1F; --orange:#F4842A; --gold:#F4B423;
+    --cream:#FFFCF5; --line:rgba(30,24,19,.12); --shadow:18px 18px 0 rgba(30,24,19,.06);
+    --font-display:"Bricolage Grotesque",system-ui,sans-serif;
+    --font-body:"Hanken Grotesk",system-ui,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-body);background:var(--paper);color:var(--ink);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
+  body::after{content:"";position:absolute;top:-220px;left:50%;transform:translateX(-50%);
+    width:1100px;height:680px;z-index:0;pointer-events:none;
+    background:radial-gradient(ellipse at center,rgba(244,180,35,.30),rgba(244,132,42,.12) 42%,transparent 70%);filter:blur(8px)}
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 28px}
+
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:24px 0 8px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--font-display);
+    font-weight:800;font-size:25px;letter-spacing:-.02em}
+  .brand .mark{height:36px;width:auto;filter:drop-shadow(2px 2px 0 rgba(30,24,19,.18))}
+  .brand .kb{color:var(--coral)} .brand .cf{color:var(--ink)}
+  .nav-links{display:flex;align-items:center;gap:26px;font-weight:600;font-size:15px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:color .15s}
+  .nav-links a:hover{color:var(--coral)}
+  .since{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:20px;padding:5px 11px}
+
+  /* hero */
+  header{text-align:center;padding:54px 0 18px}
+  .eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:700;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--coral);margin-bottom:22px;opacity:0;animation:rise .7s .05s forwards}
+  h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.035em;line-height:.96;
+    font-size:clamp(44px,7.4vw,86px);color:var(--ink)}
+  h1 .l1{display:block;opacity:0;animation:rise .8s .12s forwards}
+  h1 .l2{display:block;opacity:0;animation:rise .8s .22s forwards}
+  .mk{position:relative;white-space:nowrap;z-index:1}
+  .mk::before{content:"";position:absolute;inset:6% -3% 8% -3%;z-index:-1;background:var(--gold);transform:rotate(-1.6deg);border-radius:6px}
+  .sub{margin:26px auto 0;max-width:560px;font-size:18px;color:var(--ink-soft);line-height:1.5;opacity:0;animation:rise .8s .32s forwards}
+
+  /* today's pick — coffee cup flavor accent lives here */
+  .pick{max-width:580px;margin:34px auto 0;background:var(--ink);color:var(--cream);border-radius:18px;
+    padding:14px 20px 14px 16px;display:flex;align-items:center;gap:15px;text-align:left;
+    box-shadow:var(--shadow);opacity:0;animation:rise .8s .4s forwards}
+  .pick .cup{flex-shrink:0}
+  .pick .cup svg{width:42px;height:42px;display:block}
+  .pick .body{flex:1}
+  .pick .tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--gold);display:block;margin-bottom:3px}
+  .pick .txt{font-size:14.5px;line-height:1.35}
+  .pick .txt b{font-family:var(--font-mono);color:var(--gold);font-weight:700}
+  .pick .go{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--cream);text-decoration:none;white-space:nowrap}
+  .pick .go:hover{color:var(--gold)}
+
+  /* finder */
+  .finder{max-width:600px;margin:18px auto 0;background:var(--cream);border:1.5px solid var(--ink);
+    border-radius:18px;padding:9px 9px 9px 18px;display:flex;align-items:center;gap:12px;
+    box-shadow:var(--shadow);opacity:0;animation:rise .8s .48s forwards;transition:box-shadow .2s,transform .2s}
+  .finder:focus-within{box-shadow:10px 10px 0 var(--coral);transform:translateY(-1px)}
+  .finder .ic{color:var(--coral);flex-shrink:0;display:grid;place-items:center}
+  .finder input{flex:1;border:0;outline:0;background:transparent;font-family:var(--font-body);
+    font-size:16.5px;font-weight:500;color:var(--ink);padding:10px 0}
+  .finder input::placeholder{color:#b3a48f}
+  .finder button{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--cream);
+    background:var(--coral);border:0;border-radius:12px;padding:13px 20px;cursor:pointer;display:flex;
+    align-items:center;gap:7px;transition:background .15s,transform .12s}
+  .finder button:hover{background:var(--coral-deep)}
+  .finder button:active{transform:scale(.96)}
+
+  /* categories */
+  .cats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:26px auto 0;max-width:680px;opacity:0;animation:rise .8s .56s forwards}
+  .cat{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--ink-soft);
+    background:transparent;border:1px solid var(--line);border-radius:20px;padding:8px 15px;cursor:pointer;transition:all .15s;text-transform:uppercase}
+  .cat:hover{border-color:var(--ink);color:var(--ink)}
+  .cat.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+
+  /* menu / grid */
+  .menu-head{display:flex;align-items:baseline;justify-content:space-between;margin:64px 0 22px}
+  .menu-head h2{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:-.02em}
+  .menu-head h2 i{color:var(--coral);font-style:normal}
+  .menu-head .count{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-bottom:30px}
+  .card{border-radius:18px;padding:20px 19px 17px;min-height:178px;display:flex;flex-direction:column;
+    cursor:pointer;border:1.5px solid transparent;text-decoration:none;
+    transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .18s;position:relative;overflow:hidden}
+  .card:hover{transform:translateY(-5px) rotate(-.5deg);box-shadow:10px 12px 0 rgba(30,24,19,.12)}
+  .card .ct{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;opacity:.7;margin-bottom:auto}
+  .card .nm{font-family:var(--font-mono);font-weight:700;font-size:18px;letter-spacing:-.01em;margin:14px 0 7px;line-height:1.1}
+  .card .ds{font-size:13.5px;line-height:1.4;opacity:.85}
+  .card .dm{font-family:var(--font-mono);font-size:10.5px;margin-top:13px;opacity:.55}
+  .c-coral{background:var(--coral);color:var(--cream)} .c-coral .ct{color:var(--gold);opacity:1}
+  .c-gold{background:var(--gold);color:var(--ink)}
+  .c-ink{background:var(--ink);color:var(--cream)} .c-ink .ct{color:var(--gold);opacity:1} .c-ink .nm{color:var(--gold)}
+  .c-cream{background:var(--cream);color:var(--ink);border-color:var(--line)} .c-cream .ct{color:var(--coral);opacity:1}
+  .heritage{position:absolute;top:12px;right:13px;width:17px;height:17px;opacity:.9}
+  .none{grid-column:1/-1;text-align:center;font-family:var(--font-mono);color:var(--ink-soft);font-size:14px;padding:30px 0;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .none svg{width:46px;height:46px;opacity:.75}
+
+  footer{border-top:1px solid var(--line);margin-top:30px;padding:30px 0 56px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
+  .foot-brand{font-family:var(--font-display);font-weight:700;font-size:16px}
+  .foot-brand .kb{color:var(--coral)}
+  .foot-note{font-size:13px;color:var(--ink-soft)}
+  .foot-note a{color:var(--coral);text-decoration:none;font-weight:600}
+  .foot-note a:hover{text-decoration:underline}
+
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .card{opacity:0;animation:rise .6s forwards}
+  @media(max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.nav-links .since{display:none}}
+  @media(max-width:520px){.grid{grid-template-columns:1fr}.nav-links a:not(.since){display:none}
+    .pick{flex-direction:row}.pick .cup svg{width:34px;height:34px}h1{font-size:clamp(38px,11vw,52px)}}
+</style>
+</head>
+<body>
+<!-- reusable marks -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="kb-mark" viewBox="0 0 64 64">
+    <path d="M19 6 H45 A4 4 0 0 1 49 10 V58 L32 47 L15 58 V10 A4 4 0 0 1 19 6 Z" fill="#EE4B2B"/>
+    <text x="32" y="31" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#FFFCF5" letter-spacing="-1">KB</text>
+  </symbol>
+  <symbol id="kb-mark-mini" viewBox="0 0 64 64">
+    <path d="M19 6 H45 A4 4 0 0 1 49 10 V58 L32 47 L15 58 V10 A4 4 0 0 1 19 6 Z" fill="#F4B423"/>
+    <text x="32" y="31" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#1E1813" letter-spacing="-1">KB</text>
+  </symbol>
+  <!-- café cup (flavor accent, gold/cream on dark) -->
+  <symbol id="cup" viewBox="0 0 48 48">
+    <path d="M10 19h21v9a7 7 0 0 1-7 7h-7a7 7 0 0 1-7-7v-9Z" fill="none" stroke="#F4B423" stroke-width="2.6"/>
+    <path d="M31 21h3.5a4 4 0 0 1 0 8H31" fill="none" stroke="#F4B423" stroke-width="2.6"/>
+    <path d="M16 14q-2-2.4 0-4.8q2-2.4 0-4.8" fill="none" stroke="#FFFCF5" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+    <path d="M22 14q2-2.4 0-4.8q-2-2.4 0-4.8" fill="none" stroke="#FFFCF5" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+  </symbol>
+</defs></svg>
+
+<div class="wrap">
+
+  <nav>
+    <div class="brand">
+      <svg class="mark"><use href="#kb-mark"/></svg>
+      <span><span class="kb">KB</span>&nbsp;<span class="cf">Cafe</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#menu">Tools</a>
+      <a href="#">Reference</a>
+      <a href="#">Feeds</a>
+      <a class="since" href="#">est. 1998</a>
+    </div>
+  </nav>
+
+  <header>
+    <div class="eyebrow">☕ the developer's knowledge base</div>
+    <h1>
+      <span class="l1">Tools &amp; references,</span>
+      <span class="l2"><span class="mk">freshly brewed.</span></span>
+    </h1>
+    <p class="sub">Fast, clean developer tools and quick references — all in one place. Everything runs in your browser: nothing uploaded, nothing tracked.</p>
+
+    <div class="pick">
+      <span class="cup"><svg><use href="#cup"/></svg></span>
+      <div class="body">
+        <span class="tag">Today's pick</span>
+        <span class="txt">Turn any JSON into a typed <b>TypeScript</b> interface in one paste.</span>
+      </div>
+      <a class="go" href="#">open →</a>
+    </div>
+
+    <form class="finder" onsubmit="return false">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+      <input id="q" type="text" placeholder="What do you need?  try “json to typescript”, “cron”, “jwt”…" autocomplete="off">
+      <button type="submit">Brew →</button>
+    </form>
+
+    <div class="cats" id="cats">
+      <button class="cat active" data-c="all">All</button>
+      <button class="cat" data-c="json">JSON</button>
+      <button class="cat" data-c="encoding">Encoding</button>
+      <button class="cat" data-c="time">Time &amp; Cron</button>
+      <button class="cat" data-c="convert">Converters</button>
+      <button class="cat" data-c="text">Text</button>
+      <button class="cat" data-c="feeds">Feeds</button>
+    </div>
+  </header>
+
+  <section id="menu">
+    <div class="menu-head">
+      <h2>On the <i>menu</i></h2>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer>
+    <div class="foot-brand"><span class="kb">KB</span> Cafe</div>
+    <div class="foot-note">A developer's knowledge base on the web since 1998 · part of the family with <a href="https://yank.info">yank.info</a></div>
+  </footer>
+
+</div>
+
+<script>
+  const TOOLS = [
+    {cat:"json",     ctl:"JSON",        nm:"json → typescript", ds:"Paste JSON, get a typed TS interface.",        color:"c-coral"},
+    {cat:"time",     ctl:"Time & Cron", nm:"cron generator",    ds:"Build & read crontab expressions, timezone-aware.", color:"c-gold"},
+    {cat:"encoding", ctl:"Encoding",    nm:"jwt decoder",       ds:"Decode & verify JSON Web Tokens.",              color:"c-ink"},
+    {cat:"convert",  ctl:"Converters",  nm:"csv ⇄ json",        ds:"Convert tabular data both ways, instantly.",    color:"c-cream"},
+    {cat:"json",     ctl:"JSON",        nm:"json → go",         ds:"Generate Go structs from any JSON payload.",    color:"c-cream"},
+    {cat:"convert",  ctl:"Apache",      nm:".htaccess gen",     ds:"Redirects & rewrite rules, the easy way.",      color:"c-ink", heritage:true},
+    {cat:"convert",  ctl:"Converters",  nm:"curl → code",       ds:"Turn a cURL command into fetch, axios, or Python.", color:"c-gold"},
+    {cat:"convert",  ctl:"Converters",  nm:"yaml ⇄ json",       ds:"Swap between YAML and JSON cleanly.",            color:"c-coral"},
+    {cat:"text",     ctl:"Text",        nm:"sql formatter",     ds:"Beautify and standardize messy SQL.",           color:"c-coral"},
+    {cat:"text",     ctl:"Text",        nm:"case converter",    ds:"camelCase, snake_case, kebab, PascalCase.",     color:"c-cream"},
+    {cat:"feeds",    ctl:"Feeds",       nm:"rss validator",     ds:"Check any feed against the spec.",              color:"c-gold", heritage:true},
+    {cat:"feeds",    ctl:"Feeds",       nm:"opml converter",    ds:"Import, view & convert OPML subscription lists.", color:"c-ink", heritage:true},
+  ];
+
+  const grid=document.getElementById('grid'), countEl=document.getElementById('count');
+  let activeCat="all", query="";
+
+  function render(){
+    const q=query.trim().toLowerCase();
+    const list=TOOLS.filter(t=>{
+      const catOk=activeCat==="all"||t.cat===activeCat;
+      const qOk=!q||(t.nm+" "+t.ds+" "+t.ctl).toLowerCase().includes(q);
+      return catOk&&qOk;
+    });
+    grid.innerHTML="";
+    if(!list.length){
+      grid.innerHTML=`<div class="none"><svg><use href="#kb-mark-mini"/></svg>No tool for that yet — but it could be next on the menu. ☕</div>`;
+      countEl.textContent="0 tools"; return;
+    }
+    list.forEach((t,i)=>{
+      const a=document.createElement('a');
+      a.href="#"; a.className="card "+t.color; a.style.animationDelay=(i*0.04)+"s";
+      a.innerHTML=`${t.heritage?'<svg class="heritage"><use href="#cup"/></svg>':''}
+        <div class="ct">${t.ctl}</div><div class="nm">${t.nm}</div>
+        <div class="ds">${t.ds}</div><div class="dm">kbcafe.com</div>`;
+      grid.appendChild(a);
+    });
+    countEl.textContent=list.length+" tool"+(list.length>1?"s":"");
+  }
+  document.getElementById('q').addEventListener('input',e=>{query=e.target.value;render();});
+  document.getElementById('cats').addEventListener('click',e=>{
+    const btn=e.target.closest('.cat'); if(!btn)return;
+    document.querySelectorAll('.cat').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); activeCat=btn.dataset.c; render();
+  });
+  render();
+</script>
+</body>
+</html>

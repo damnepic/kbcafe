@@ -1,0 +1,14 @@
+# dependencies & build output
+node_modules/
+site/node_modules/
+site/dist/
+site/.astro/
+.vercel/
+
+# loose design-phase artifacts (kept locally, not in repo)
+*.zip
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log

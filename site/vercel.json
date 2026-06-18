@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/rss", "destination": "/#menu", "permanent": true },
+    { "source": "/rss/:path*", "destination": "/#menu", "permanent": true },
+    { "source": "/Rmail.aspx", "destination": "/", "permanent": true },
+    { "source": "/iBLOGthere4iM", "destination": "/", "permanent": true },
+    { "source": "/iBLOGthere4iM/:path*", "destination": "/", "permanent": true },
+    { "source": "/network.aspx", "destination": "/", "permanent": true },
+    { "source": "/search.aspx", "destination": "/", "permanent": true }
+  ]
+}
