@@ -7,6 +7,7 @@ export const TOOLS = [
   { cat:"time",     ctl:"Time & Cron", nm:"cron generator",    ds:"Build & read crontab expressions, in plain English.", color:"c-gold", href:"/cron-generator" },
   { cat:"ai",       ctl:"AI",          nm:"token counter",     ds:"Count tokens with the real OpenAI tokenizers.",    color:"c-coral", href:"/token-counter" },
   { cat:"ai",       ctl:"AI",          nm:"context window viz", ds:"See what fills a model's context budget.",         color:"c-ink",   href:"/context-window-visualizer" },
+  { cat:"ai",       ctl:"AI",          nm:"context budget analyzer", ds:"Find which files eat your context window.",   color:"c-gold",  href:"/context-budget-analyzer" },
   { cat:"ai",       ctl:"AI",          nm:"structured output builder", ds:"Schemas for OpenAI, Anthropic, Gemini & JSON Schema.", color:"c-coral", href:"/structured-output-builder" },
   { cat:"ai",       ctl:"AI",          nm:"ai pattern explorer", ds:"Compare agent design patterns side by side.",       color:"c-gold",  href:"/ai-pattern-explorer" },
   { cat:"ai",       ctl:"AI",          nm:"rag chunking visualizer", ds:"See how a document splits into RAG chunks.",   color:"c-cream", href:"/rag-chunking-visualizer" },

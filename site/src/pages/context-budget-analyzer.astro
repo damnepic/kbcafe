@@ -1,0 +1,196 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Context Budget Analyzer — what's eating your context window | KB Cafe"
+  description="Paste your prompt and the files or docs you send to an LLM and see exactly what fills the context window, the biggest offenders, and what to drop first. Real tokenizer, client-side."
+  path="/context-budget-analyzer"
+  eyebrow="AI Explained · Tool"
+  h1="Context Budget Analyzer"
+  tagline="Paste your prompt plus the files and docs you stuff into an LLM, and see what actually fills the context window, ranked by the biggest offenders, with a clear recommendation on what to cut first."
+>
+  <div class="row" style="margin-bottom:16px">
+    <label class="opt">Context budget
+      <select id="budget"></select>
+    </label>
+    <label class="opt" id="custom-wrap" style="display:none">Custom tokens
+      <input id="custom" type="number" min="1" value="128000" />
+    </label>
+  </div>
+
+  <div id="files"></div>
+  <div class="row" style="margin:6px 0 18px"><button class="btn ghost" id="add">+ Add file / doc</button></div>
+
+  <div class="meter-wrap">
+    <div class="meter-head"><span id="used-pct">0%</span><span id="used-abs"></span></div>
+    <div class="meter" id="meter"></div>
+  </div>
+  <p class="cb-verdict" id="verdict"></p>
+
+  <div class="cb-offenders" id="offenders"></div>
+
+  <Fragment slot="explainer">
+    <h2>Why context fills up faster than you think</h2>
+    <p>
+      Every file, doc, and message you send shares one <a href="/what-is-a-context-window">context window</a>, and
+      your app re-sends most of it on every turn. A couple of large source files or a pasted API doc can quietly
+      eat the budget you needed for retrieved context and the answer itself. This analyzer counts each input with
+      the real <code>o200k_base</code> tokenizer (the GPT-4o family), ranks the biggest offenders, and tells you
+      what to drop first, the same idea as the <a href="/context-window-visualizer">Context Window Visualizer</a>,
+      but file by file.
+    </p>
+    <h3>How to use it</h3>
+    <ul>
+      <li>Pick the <strong>budget</strong> for your model (a tier, or a custom number).</li>
+      <li>Add each input, your system prompt, the source files, the pasted docs, with a name so you can spot it.</li>
+      <li>Read the <strong>offenders</strong> list: the few inputs doing most of the damage, and how much you&rsquo;d
+        free by cutting each.</li>
+    </ul>
+    <p class="note">
+      Counts are <strong>exact for the o200k_base tokenizer</strong>; other model families tokenize a little
+      differently, so treat cross-model numbers as close estimates. Everything runs in your browser, your code and
+      docs never leave the page.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Is this different from the Context Window Visualizer?</summary>
+      <p>Same idea, different lens. The visualizer splits context by role (system, history, docs, output). This one is file-oriented: paste the actual files you send and see which individual ones to cut.</p>
+    </details>
+    <details class="faq"><summary>Which tokenizer does it use?</summary>
+      <p>The real <code>o200k_base</code> encoding used by the GPT-4o family, run locally. For Claude or Gemini the count is a close estimate, since those tokenizers aren&rsquo;t public.</p>
+    </details>
+    <details class="faq"><summary>Is my code uploaded?</summary>
+      <p>No. Tokenizing and ranking happen entirely in your browser, so nothing you paste is sent anywhere.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Count a single block with the <a href="/token-counter">Token Counter</a>, trim retrieval with <a href="/rag-chunking-visualizer">RAG chunking</a>, or read <a href="/what-is-a-context-window">what a context window is</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;flex-direction:column;gap:6px}
+  .opt select,.opt input{font-family:var(--font-mono);font-size:13px;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--cream);color:var(--ink);outline:0}
+  .opt select{min-width:320px}.opt select:focus,.opt input:focus{border-color:var(--ink)}
+  .cbf{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:13px 14px;margin-bottom:12px}
+  .cbf-top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .cbf-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+  .cbf-name{flex:1;min-width:0;font-family:var(--font-mono);font-size:13.5px;font-weight:700;border:1.5px solid var(--line);border-radius:9px;padding:7px 10px;background:var(--paper);color:var(--ink);outline:0}
+  .cbf-name:focus{border-color:var(--ink)}
+  .cbf-tok{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);white-space:nowrap}
+  .cbf-tok b{color:var(--ink)}
+  .cbf-rm{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--coral-deep);background:none;border:0;cursor:pointer}
+  .cbf-rm:hover{text-decoration:underline}
+  .cbf textarea{width:100%;min-height:74px;resize:vertical;font-family:var(--font-mono);font-size:12.5px;line-height:1.5;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;background:var(--paper);color:var(--ink);outline:0}
+  .cbf textarea:focus{border-color:var(--ink)}
+
+  .meter-wrap{margin-top:6px}
+  .meter-head{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);margin-bottom:8px}
+  #used-pct{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:-.02em}
+  #used-abs{font-size:13px;color:var(--ink-soft)}
+  .meter{height:42px;border-radius:12px;border:1.5px solid var(--ink);overflow:hidden;display:flex;background:var(--paper-2)}
+  .meter .fill{height:100%;transition:width .2s}.meter .free{flex:1}
+  .meter.over{border-color:var(--coral-deep);box-shadow:6px 6px 0 rgba(214,62,31,.25)}
+  .cb-verdict{font-family:var(--font-mono);font-size:13px;line-height:1.5;margin:14px 0 0;padding:12px 14px;border-radius:11px;background:var(--paper-2);color:var(--ink)}
+  .cb-verdict.over{background:rgba(214,62,31,.1);color:var(--coral-deep)}
+  .cb-offenders{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+  .off{display:grid;grid-template-columns:14px 1fr auto;gap:11px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:10px 13px;background:var(--cream);font-family:var(--font-mono);font-size:13px}
+  .off .dot{width:12px;height:12px;border-radius:3px}
+  .off .bar{height:7px;border-radius:4px;background:var(--paper-2);overflow:hidden;margin-top:5px}
+  .off .bar i{display:block;height:100%}
+  .off .nm{color:var(--ink);font-weight:700}
+  .off .pct{color:var(--ink-soft);white-space:nowrap}
+  @media(max-width:620px){.opt select{min-width:0;width:100%}}
+</style>
+
+<script>
+  import { encode } from 'gpt-tokenizer/encoding/o200k_base';
+  import { CONTEXT_TIERS } from '../data/aiModels.js';
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n.toLocaleString('en-US');
+  const PALETTE = ['#ee4b2b', '#f4b423', '#3478f6', '#0f9f82', '#7657ff', '#e0911a', '#6F4E37', '#d63e1f'];
+
+  let files = [], seed = 0;
+  function add(f) { files.push(Object.assign({ id: ++seed, name: '', body: '' }, f || {})); renderFiles(); calc(); }
+  function renderFiles() {
+    const box = $('files'); box.innerHTML = '';
+    files.forEach((f, i) => {
+      const color = PALETTE[i % PALETTE.length];
+      const el = document.createElement('div'); el.className = 'cbf';
+      el.innerHTML = `<div class="cbf-top"><span class="cbf-dot" style="background:${color}"></span>
+        <input class="cbf-name" placeholder="name (e.g. auth.ts)" value="${(f.name || '').replace(/"/g, '&quot;')}" />
+        <span class="cbf-tok" data-tok>0 tokens</span><button class="cbf-rm">remove</button></div>
+        <textarea spellcheck="false" placeholder="Paste this file or doc…"></textarea>`;
+      el.querySelector('textarea').value = f.body;
+      el.querySelector('.cbf-name').addEventListener('input', (e) => { f.name = e.target.value; calc(); });
+      el.querySelector('textarea').addEventListener('input', (e) => { f.body = e.target.value; calc(); });
+      el.querySelector('.cbf-rm').addEventListener('click', () => { files = files.filter(x => x.id !== f.id); renderFiles(); calc(); });
+      box.appendChild(el);
+    });
+  }
+
+  function budget() { return $('budget').value === 'custom' ? Math.max(1, parseInt($('custom').value) || 0) : parseInt($('budget').value); }
+
+  function calc() {
+    const rows = [...$('files').children];
+    const counts = files.map((f, i) => {
+      const t = f.body ? encode(f.body).length : 0;
+      const tokEl = rows[i] && rows[i].querySelector('[data-tok]'); if (tokEl) tokEl.innerHTML = `<b>${fmt(t)}</b> tokens`;
+      return { name: f.name.trim() || `block ${i + 1}`, tokens: t, color: PALETTE[i % PALETTE.length] };
+    });
+    const used = counts.reduce((a, c) => a + c.tokens, 0);
+    const bud = budget();
+    const pct = bud ? (used / bud) * 100 : 0;
+    const over = used > bud;
+
+    const meter = $('meter'); meter.innerHTML = ''; meter.classList.toggle('over', over);
+    counts.forEach(c => { if (c.tokens <= 0) return; const d = document.createElement('div'); d.className = 'fill'; d.style.width = Math.min(100, (c.tokens / bud) * 100) + '%'; d.style.background = over ? 'var(--coral-deep)' : c.color; d.title = `${c.name}: ${fmt(c.tokens)}`; meter.appendChild(d); });
+    if (!over) { const free = document.createElement('div'); free.className = 'free'; meter.appendChild(free); }
+
+    $('used-pct').textContent = Math.round(pct) + '%';
+    $('used-pct').style.color = over ? 'var(--coral-deep)' : (pct > 85 ? 'var(--orange)' : 'var(--ink)');
+    $('used-abs').textContent = `${fmt(used)} / ${fmt(bud)} tokens` + (over ? '' : ` · ${fmt(bud - used)} free`);
+
+    // offenders, ranked
+    const ranked = counts.filter(c => c.tokens > 0).sort((a, b) => b.tokens - a.tokens);
+    $('offenders').innerHTML = ranked.map(c => {
+      const share = used ? Math.round(c.tokens / used * 100) : 0;
+      return `<div class="off"><span class="dot" style="background:${c.color}"></span>
+        <span><span class="nm">${(c.name).replace(/</g, '&lt;')}</span><span class="bar"><i style="width:${share}%;background:${c.color}"></i></span></span>
+        <span class="pct"><b>${fmt(c.tokens)}</b> · ${share}%</span></div>`;
+    }).join('');
+
+    // verdict
+    const v = $('verdict');
+    if (!used) { v.className = 'cb-verdict'; v.textContent = 'Add your prompt and the files you send to see what fills the window.'; return; }
+    const top = ranked[0];
+    if (over) {
+      const need = used - bud;
+      let freed = 0, cut = [];
+      for (const c of ranked) { if (freed >= need) break; freed += c.tokens; cut.push(c.name); }
+      v.className = 'cb-verdict over';
+      v.textContent = `Over budget by ${fmt(need)} tokens. Dropping ${cut.join(', ')} would free ${fmt(freed)} and get you under.`;
+    } else {
+      v.className = 'cb-verdict';
+      const note = pct > 85 ? ' That leaves little room for retrieved context or the answer.' : ` ${fmt(bud - used)} tokens free for retrieval and output.`;
+      v.textContent = `Using ${Math.round(pct)}% of the window.${note}` + (top ? ` Biggest single input: ${top.name} (${Math.round(top.tokens / used * 100)}%).` : '');
+    }
+  }
+
+  // budget dropdown
+  const sel = $('budget');
+  CONTEXT_TIERS.forEach(t => { const o = document.createElement('option'); o.value = t.tokens; o.textContent = t.label; sel.appendChild(o); });
+  const c = document.createElement('option'); c.value = 'custom'; c.textContent = 'Custom…'; sel.appendChild(c);
+  sel.value = CONTEXT_TIERS.find(t => t.id === '128k').tokens;
+  sel.addEventListener('change', () => { $('custom-wrap').style.display = sel.value === 'custom' ? 'flex' : 'none'; calc(); });
+  $('custom').addEventListener('input', calc);
+  $('add').addEventListener('click', () => add());
+
+  // seed with a small realistic example
+  files = [
+    { id: ++seed, name: 'system prompt', body: 'You are a senior engineer. Answer with code, cite file paths, never invent APIs.' },
+    { id: ++seed, name: 'auth.ts', body: `export async function authenticate(req) {\n  const token = req.headers.authorization?.split(' ')[1];\n  if (!token) throw new Error('missing token');\n  return verifyJwt(token);\n}` },
+    { id: ++seed, name: 'api-reference.md', body: `# API Reference\nGET /users — list users\nPOST /users — create a user\nGET /users/:id — fetch one user\nPATCH /users/:id — update fields\nDELETE /users/:id — remove a user` },
+  ];
+  renderFiles(); calc();
+</script>
