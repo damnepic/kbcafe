@@ -40,7 +40,7 @@ export const TOOL_GRAPH = {
   },
   '/prompt-linter': {
     learn: ['/what-are-structured-outputs'],
-    related: ['/prompt-x-ray', '/prompt-diff'],
+    related: ['/prompt-x-ray', '/prompt-diff', '/prompt-builder'],
     next: '/prompt-diff',
   },
   '/prompt-diff': {
@@ -50,8 +50,23 @@ export const TOOL_GRAPH = {
   },
   '/prompt-x-ray': {
     learn: ['/what-are-structured-outputs'],
-    related: ['/prompt-linter', '/prompt-diff'],
+    related: ['/prompt-linter', '/prompt-diff', '/prompt-simulator'],
     next: '/prompt-linter',
+  },
+  '/prompt-simulator': {
+    learn: ['/what-are-structured-outputs', '/what-is-a-context-window'],
+    related: ['/prompt-builder', '/prompt-x-ray', '/good-vs-bad-prompts'],
+    next: '/prompt-builder',
+  },
+  '/prompt-builder': {
+    learn: ['/what-are-structured-outputs'],
+    related: ['/prompt-simulator', '/prompt-linter', '/good-vs-bad-prompts'],
+    next: '/good-vs-bad-prompts',
+  },
+  '/good-vs-bad-prompts': {
+    learn: ['/what-are-structured-outputs'],
+    related: ['/prompt-simulator', '/prompt-builder', '/prompt-linter'],
+    next: '/prompt-simulator',
   },
   '/llm-vram-calculator': {
     learn: ['/what-is-a-context-window'],

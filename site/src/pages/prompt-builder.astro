@@ -1,0 +1,120 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Prompt Builder, turn a vague idea into a clear prompt | KB Cafe"
+  description="Answer a few questions, task, audience, goal, tone, length, format, and get a structured prompt that actually works. Beginner-friendly, deterministic, client-side. Nothing uploaded."
+  path="/prompt-builder"
+  eyebrow="AI Explained · Tool"
+  h1="Prompt Builder"
+  tagline="Stop typing vague one-liners. Fill in the six things every good prompt needs and watch a clear, structured prompt assemble itself. No prompt-engineering jargon required."
+>
+  <div class="pb-form">
+    <div class="pb-field"><label>1 · What do you want it to do?</label>
+      <div class="pb-row">
+        <select id="task"></select>
+        <input id="subject" type="text" placeholder="a landing page for a yoga studio" />
+      </div>
+    </div>
+    <div class="pb-field"><label>2 · Who is it for? <span class="pb-opt">(audience)</span></label>
+      <input id="audience" type="text" placeholder="busy parents who are new to yoga" /></div>
+    <div class="pb-field"><label>3 · What should it accomplish? <span class="pb-opt">(goal)</span></label>
+      <input id="goal" type="text" placeholder="get them to book a free intro class" /></div>
+    <div class="pb-grid">
+      <div class="pb-field"><label>4 · Tone</label><select id="tone"></select></div>
+      <div class="pb-field"><label>5 · Length</label><select id="length"></select></div>
+      <div class="pb-field"><label>6 · Format</label><select id="format"></select></div>
+    </div>
+    <div class="pb-field"><label>Extra context or an example <span class="pb-opt">(optional)</span></label>
+      <textarea id="extra" rows="2" placeholder="e.g. our studio focuses on gentle, beginner-friendly classes"></textarea></div>
+  </div>
+
+  <div class="pane" style="margin-top:8px">
+    <div class="pane-label"><span>Your prompt</span><button class="link-btn" id="copy">copy</button></div>
+    <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+  </div>
+  <p class="pb-note">Assembled from your answers, nothing invented. Tweak any field and the prompt updates live. Paste it into any AI chat.</p>
+
+  <Fragment slot="explainer">
+    <h2>A good prompt is just answered questions</h2>
+    <p>
+      Beginners type <em>&ldquo;write me a landing page&rdquo;</em> and get mush, because they left every important
+      decision blank. A strong prompt isn&rsquo;t a magic formula; it&rsquo;s simply one that answers the questions
+      the model would otherwise have to guess: what to do, who for, why, in what tone, how long, and in what shape.
+      This builder asks those questions and assembles the answer into a clean, structured prompt, so you learn the
+      shape by filling it in.
+    </p>
+    <p class="note">
+      The builder doesn&rsquo;t call an AI and doesn&rsquo;t invent anything, it just structures what <em>you</em>
+      provide into the format models respond to best. Everything runs in your browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Will this write the prompt for me?</summary>
+      <p>It structures your answers into a well-formed prompt. The substance is yours; the builder handles the shape, the part beginners usually miss.</p>
+    </details>
+    <details class="faq"><summary>Why these six fields?</summary>
+      <p>They&rsquo;re the decisions a vague prompt leaves to chance. See exactly what gets guessed when they&rsquo;re missing in the <a href="/prompt-simulator">Prompt Simulator</a>.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No. Assembly is entirely client-side, so your inputs stay on your device.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>See why blanks hurt in the <a href="/prompt-simulator">Prompt Simulator</a>, check your draft with the <a href="/prompt-linter">Prompt Linter</a>, or take the <a href="/learn-prompting">Learn Prompting</a> course.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .pb-form{display:flex;flex-direction:column;gap:15px}
+  .pb-field{display:flex;flex-direction:column;gap:7px}
+  .pb-field label{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink)}
+  .pb-opt{color:var(--ink-soft);font-weight:500;text-transform:none}
+  .pb-row{display:grid;grid-template-columns:180px 1fr;gap:10px}
+  .pb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .pb-field input,.pb-field select,.pb-field textarea{font-family:var(--font-body);font-size:14.5px;border:1.5px solid var(--line);border-radius:11px;padding:11px 13px;background:var(--cream);color:var(--ink);outline:0;width:100%}
+  .pb-field select{font-family:var(--font-mono);font-size:13.5px}
+  .pb-field input:focus,.pb-field select:focus,.pb-field textarea:focus{border-color:var(--ink)}
+  .ta{min-height:160px}
+  .pb-note{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);margin-top:8px;opacity:.9}
+  @media(max-width:560px){.pb-row{grid-template-columns:1fr}.pb-grid{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const TASKS = [
+    { v: 'Write', role: 'expert copywriter' }, { v: 'Code', role: 'senior software engineer' },
+    { v: 'Research', role: 'thorough research analyst' }, { v: 'Analyze', role: 'sharp analyst' },
+    { v: 'Brainstorm', role: 'creative strategist' }, { v: 'Summarize', role: 'concise editor' },
+    { v: 'Explain', role: 'patient teacher' }, { v: 'Rewrite', role: 'skilled editor' },
+  ];
+  const TONES = ['(no preference)', 'professional', 'friendly', 'playful', 'authoritative', 'warm', 'neutral', 'witty', 'persuasive'];
+  const LENGTHS = ['(no preference)', 'one line', 'a short paragraph', 'about 150 words', 'about 300 words', 'comprehensive'];
+  const FORMATS = ['(no preference)', 'prose', 'bullet points', 'numbered steps', 'a table', 'markdown with headings', 'JSON'];
+
+  function fill(sel, arr) { $(sel).innerHTML = arr.map(o => `<option value="${typeof o === 'string' ? o : o.v}">${typeof o === 'string' ? o : o.v}</option>`).join(''); }
+  fill('task', TASKS); fill('tone', TONES); fill('length', LENGTHS); fill('format', FORMATS);
+
+  function build() {
+    const task = $('task').value, role = (TASKS.find(t => t.v === task) || {}).role || 'expert';
+    const subject = $('subject').value.trim(), audience = $('audience').value.trim(), goal = $('goal').value.trim();
+    const tone = $('tone').value, length = $('length').value, format = $('format').value, extra = $('extra').value.trim();
+    const none = (v) => !v || v.startsWith('(');
+
+    let p = `You are an ${role}.`;
+    p += ` ${task} ${subject || '[describe what you want]'}`;
+    if (audience) p += ` for ${audience}`;
+    p += '.';
+    if (goal) p += ` The goal is to ${goal}.`;
+    if (!none(tone)) p += ` Use a ${tone} tone.`;
+    if (!none(length)) p += ` Keep it ${length}.`;
+    if (!none(format)) p += ` Return the result as ${format}.`;
+    if (extra) p += `\n\nContext: ${extra}`;
+    $('out').value = p;
+  }
+  ['task', 'subject', 'audience', 'goal', 'tone', 'length', 'format', 'extra'].forEach(id => $(id).addEventListener('input', build));
+  $('copy').addEventListener('click', async () => { if (!$('out').value) return; try { await navigator.clipboard.writeText($('out').value); } catch {} });
+  build();
+</script>

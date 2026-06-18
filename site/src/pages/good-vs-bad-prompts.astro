@@ -1,0 +1,113 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const EXAMPLES = [
+  { cat: 'Writing', weak: 'write a homepage',
+    better: 'Write the hero section for a meal-prep startup’s homepage, aimed at busy professionals. Goal: start a free trial. Confident, warm tone. ~80 words: a headline, a one-sentence subhead, and a CTA button label.',
+    why: ['Named the audience (busy professionals)', 'Stated the goal (start a free trial)', 'Set tone and length', 'Specified the exact structure'] },
+  { cat: 'Coding', weak: 'fix my code',
+    better: 'This Python function throws a KeyError on line 12 when the input dict has no "price" key. Explain the cause, then give a corrected version that defaults a missing price to 0. Keep my variable names.',
+    why: ['Described the actual bug and symptom', 'Said what fix you want', 'Added a constraint (keep names)', 'Asked for cause + correction, not just code'] },
+  { cat: 'Research', weak: 'tell me about electric cars',
+    better: 'Summarize the 3 biggest factors in electric-car total cost of ownership vs gas, for a first-time US buyer in 2025. Bullet points, one sentence each. Note where figures vary by state.',
+    why: ['Scoped a vague topic to a real question', 'Set the audience and context', 'Fixed the format', 'Asked it to flag uncertainty honestly'] },
+  { cat: 'Analysis', weak: 'analyze this data',
+    better: 'Here is monthly revenue for 2024 [paste]. Identify the 2 months with the biggest swings, suggest one plausible cause for each, and flag any figure that looks suspect. Answer in 3 short bullets.',
+    why: ['Provided the actual data', 'Asked specific questions', 'Capped the output length', 'Invited it to question the data'] },
+  { cat: 'Email', weak: 'write an email',
+    better: 'Write a 4-sentence follow-up email to a client who hasn’t replied in a week about an overdue invoice. Polite but firm. End with a clear next step.',
+    why: ['Set length and recipient', 'Gave the situation', 'Set the tone precisely', 'Required a specific ending'] },
+  { cat: 'Summarize', weak: 'summarize this',
+    better: 'Summarize the article below for someone who hasn’t read it: 3 bullets covering the main claim, the key evidence, and the takeaway. Avoid jargon.',
+    why: ['Named the reader', 'Defined each bullet’s job', 'Set the exact structure', 'Added a constraint (no jargon)'] },
+  { cat: 'Brainstorm', weak: 'give me ideas',
+    better: 'Give me 8 name ideas for a cozy neighborhood coffee shop, mixing warm and slightly unexpected words. Avoid anything with "bean" or "brew". One line each, no explanations.',
+    why: ['Set a count (8)', 'Described the vibe', 'Added an exclusion list', 'Fixed the output format'] },
+  { cat: 'Explain', weak: 'explain quantum computing',
+    better: 'Explain what a qubit is to a curious 15-year-old, using one everyday analogy, in under 120 words. No math.',
+    why: ['Pinned the audience and level', 'Required a concrete analogy', 'Capped the length', 'Set a hard constraint (no math)'] },
+];
+const cats = [...new Set(EXAMPLES.map(e => e.cat))];
+---
+<ToolPage
+  title="Good vs Bad AI Prompts, before & after examples | KB Cafe"
+  description="A gallery of weak prompts rewritten into strong ones, with exactly what changed and why. Learn to prompt by example, across writing, coding, research, and more. Free."
+  path="/good-vs-bad-prompts"
+  eyebrow="AI Explained · Tool"
+  h1="Good vs Bad Prompts"
+  tagline="The fastest way to learn prompting is to see it. Each card takes a weak, everyday prompt and rewrites it into one that works, with exactly what changed and why."
+>
+  <div class="row gp-filter" id="filter">
+    <button class="chip active" data-c="all">All</button>
+    {cats.map(c => <button class="chip" data-c={c}>{c}</button>)}
+  </div>
+
+  <div class="gp-list" id="list">
+    {EXAMPLES.map(e => (
+      <div class="gp-card" data-cat={e.cat}>
+        <span class="gp-tag">{e.cat}</span>
+        <div class="gp-pair">
+          <div class="gp-side weak"><span class="gp-lbl">Weak</span><p>{e.weak}</p></div>
+          <div class="gp-arrow" aria-hidden="true">→</div>
+          <div class="gp-side good"><span class="gp-lbl">Strong</span><p>{e.better}</p></div>
+        </div>
+        <div class="gp-why"><span class="gp-why-h">What changed</span><ul>{e.why.map(w => <li>{w}</li>)}</ul></div>
+      </div>
+    ))}
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>Learn the pattern, not the prompt</h2>
+    <p>
+      You don&rsquo;t need a library of a thousand templates. Look across these rewrites and the same moves repeat
+      every time: name the <strong>audience</strong>, state the <strong>goal</strong>, set the <strong>tone and
+      length</strong>, fix the <strong>format</strong>, and add a <strong>constraint or two</strong>. Once you see
+      the pattern, you can apply it to any prompt, on any topic, forever. That&rsquo;s why examples beat templates:
+      they teach the move, not the words.
+    </p>
+    <p class="note">
+      Every &ldquo;strong&rdquo; prompt here just answers the questions the weak one left blank. See those blanks
+      live in the <a href="/prompt-simulator">Prompt Simulator</a>, or fill them in with the <a href="/prompt-builder">Prompt Builder</a>.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why not just give me templates to copy?</summary>
+      <p>Templates break the moment your task is slightly different. The five moves shown here transfer to anything, which is what actually makes you better at prompting.</p>
+    </details>
+    <details class="faq"><summary>Are the &ldquo;strong&rdquo; prompts the only right answer?</summary>
+      <p>No, there are many good versions. They&rsquo;re examples of the pattern: specific audience, goal, tone, length, format, and constraints. Adapt freely.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Diagnose a vague prompt in the <a href="/prompt-simulator">Prompt Simulator</a>, build a strong one with the <a href="/prompt-builder">Prompt Builder</a>, or take the <a href="/learn-prompting">Learn Prompting</a> course.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .gp-filter{margin-bottom:20px}
+  .gp-list{display:flex;flex-direction:column;gap:16px}
+  .gp-card{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:18px}
+  .gp-card[hidden]{display:none}
+  .gp-tag{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);background:#ffe5dd;padding:3px 9px;border-radius:999px}
+  .gp-pair{display:grid;grid-template-columns:1fr 28px 1fr;gap:12px;align-items:center;margin:13px 0}
+  .gp-side{border-radius:12px;padding:13px 15px}
+  .gp-side.weak{background:rgba(214,62,31,.06);border:1.5px solid rgba(214,62,31,.25)}
+  .gp-side.good{background:rgba(15,159,130,.07);border:1.5px solid rgba(15,159,130,.3)}
+  .gp-lbl{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .gp-side.weak .gp-lbl{color:var(--coral-deep)}.gp-side.good .gp-lbl{color:#0f7d68}
+  .gp-side p{margin:6px 0 0;font-size:14px;line-height:1.5;color:var(--ink)}
+  .gp-arrow{text-align:center;font-family:var(--font-display);font-weight:800;color:var(--ink-soft);font-size:20px}
+  .gp-why-h{font-family:var(--font-mono);font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+  .gp-why ul{margin:8px 0 0;padding-left:20px;display:grid;grid-template-columns:1fr 1fr;gap:3px 18px}
+  .gp-why li{font-size:13px;color:var(--ink-soft);line-height:1.4}
+  @media(max-width:600px){.gp-pair{grid-template-columns:1fr}.gp-arrow{transform:rotate(90deg)}.gp-why ul{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const filter = document.getElementById('filter');
+  filter.addEventListener('click', (e) => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    document.querySelectorAll('#filter .chip').forEach(c => c.classList.remove('active')); b.classList.add('active');
+    const c = b.dataset.c;
+    document.querySelectorAll('.gp-card').forEach(card => { card.hidden = c !== 'all' && card.dataset.cat !== c; });
+  });
+</script>

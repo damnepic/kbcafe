@@ -22,6 +22,7 @@ const get = (h) => resolve[h] || EXTRA[h] || { href: h, label: h, ds: '', kind: 
       <div class="eyebrow">☕ Learn</div>
       <h1>Learn AI, <span class="mk">end to end.</span></h1>
       <p class="lede">Three guided paths through the cafe. Each step pairs a concept you can read with a tool you can play with, so the idea sticks. Self-paced, free, and entirely in your browser.</p>
+      <p class="lede" style="margin-top:10px;font-size:15.5px">New to AI? Start with <a href="/learn-prompting" style="color:var(--coral);font-weight:700;text-decoration:none">Learn Prompting</a>, a plain-English course on getting good answers out of AI.</p>
       <div class="lp-jump">{PATHS.map(p => <a href={`#${p.id}`}>{p.title}</a>)}</div>
     </header>
 

@@ -24,4 +24,4 @@ export const CAT_META = {
 export const CAT_ORDER = ['ai', 'json', 'encoding', 'convert', 'text', 'time', 'feeds'];
 
 // tools that get a "New" badge
-export const NEW_TOOLS = ['/token-counter', '/context-budget-analyzer', '/rag-chunking-visualizer', '/mcp-config-generator', '/prompt-linter', '/prompt-diff', '/llm-vram-calculator', '/llm-cost-calculator', '/agent-memory-simulator', '/ai-pattern-builder', '/ai-stack-explainer', '/tool-call-visualizer', '/prompt-x-ray', '/embedding-explorer', '/claim-checker', '/scope-sorter', '/launch-rubric', '/ai-architecture-generator'];
+export const NEW_TOOLS = ['/token-counter', '/context-budget-analyzer', '/rag-chunking-visualizer', '/mcp-config-generator', '/prompt-linter', '/prompt-diff', '/llm-vram-calculator', '/llm-cost-calculator', '/agent-memory-simulator', '/ai-pattern-builder', '/ai-stack-explainer', '/tool-call-visualizer', '/prompt-x-ray', '/embedding-explorer', '/claim-checker', '/scope-sorter', '/launch-rubric', '/ai-architecture-generator', '/prompt-simulator', '/prompt-builder', '/good-vs-bad-prompts'];

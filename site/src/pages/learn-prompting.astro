@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+const LESSONS = [
+  { n: 1, title: 'Why AI misunderstands you', tool: ['Prompt Simulator', '/prompt-simulator'],
+    body: 'A model can&rsquo;t read your mind. Every detail you leave out, who it&rsquo;s for, what it&rsquo;s for, how long, it guesses, and guesses differently each time. Most &ldquo;bad AI answers&rdquo; are really just under-specified prompts. Start by seeing what your prompt leaves to chance.' },
+  { n: 2, title: 'Start with a goal', tool: ['Prompt Builder', '/prompt-builder'],
+    body: 'Before anything else, say what success looks like. &ldquo;Write a homepage&rdquo; has no goal; &ldquo;write a homepage that gets visitors to start a free trial&rdquo; does. A goal turns vague output into output that&rsquo;s trying to do something.' },
+  { n: 3, title: 'Name your audience', tool: ['Prompt Builder', '/prompt-builder'],
+    body: 'The same request needs opposite answers for a beginner and an expert. Tell the model who it&rsquo;s writing for and the depth, vocabulary, and tone fall into place on their own.' },
+  { n: 4, title: 'Give it context', tool: ['Prompt X-Ray', '/prompt-x-ray'],
+    body: 'The model only knows what&rsquo;s in the prompt. Paste the article, the code, the data, the brand voice, whatever it needs to work from. Without context it fills the gap with generic filler. X-ray your prompt to see if the context is actually there.' },
+  { n: 5, title: 'Add constraints', tool: ['Prompt Linter', '/prompt-linter'],
+    body: 'Constraints are where quality lives: length, what to avoid, what to include, the rules. &ldquo;In 3 bullets, no jargon&rdquo; beats &ldquo;keep it short.&rdquo; Watch out for conflicting ones (&ldquo;detailed but brief&rdquo;), the linter catches those.' },
+  { n: 6, title: 'Specify the output format', tool: ['Good vs Bad Prompts', '/good-vs-bad-prompts'],
+    body: 'Say exactly what you want back: prose, bullets, a table, JSON, a specific shape. Unspecified format is the number-one cause of &ldquo;it almost worked.&rdquo; The before/after gallery shows the difference a format line makes.' },
+];
+---
+<Layout
+  title="Learn Prompting, how to talk to AI so it actually helps | KB Cafe"
+  description="A short, plain-English course on prompting: not 1000 templates, but the few moves that make AI useful. Why prompts fail, and how to fix them, each lesson paired with a hands-on tool."
+  path="/learn-prompting"
+>
+  <section class="cp">
+    <header class="cp-head">
+      <div class="eyebrow">☕ Course</div>
+      <h1>Learn to talk to AI, <span class="mk">properly.</span></h1>
+      <p class="lede">Not a thousand templates you&rsquo;ll never remember. Six short lessons on <em>why</em> AI gives bad answers and how to fix it, each one paired with a tool you can try right now. By the end, you&rsquo;ll prompt better on any topic, forever.</p>
+    </header>
+
+    <ol class="lessons">
+      {LESSONS.map(l => (
+        <li class="lesson">
+          <div class="lesson-n">{l.n}</div>
+          <div class="lesson-body">
+            <h2>{l.title}</h2>
+            <p set:html={l.body} />
+            <a class="lesson-try" href={l.tool[1]}>Try it: {l.tool[0]} <span aria-hidden="true">→</span></a>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="cp-foot">
+      <h2>That&rsquo;s the whole method</h2>
+      <p>Goal, audience, context, constraints, format. Answer those and you&rsquo;ve written a strong prompt, no formula required. When you&rsquo;re iterating, compare versions with <a href="/prompt-diff">Prompt Diff</a>, and when you&rsquo;re ready to go deeper, the <a href="/learn">full learning paths</a> and <a href="/map">knowledge map</a> cover how the models work underneath.</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .cp{max-width:820px;margin:0 auto;padding:40px 0 20px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .cp-head h1{font-family:var(--font-display);font-weight:700;letter-spacing:-.03em;line-height:1.04;font-size:clamp(36px,5vw,56px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.12em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:98% .42em}
+  .lede{margin-top:18px;font-size:18px;line-height:1.6;color:var(--ink-soft)}
+  .lessons{list-style:none;margin:40px 0 0;padding:0;counter-reset:none}
+  .lesson{display:grid;grid-template-columns:54px 1fr;gap:18px;padding:24px 0;border-top:1px solid var(--line)}
+  .lesson-n{font-family:var(--font-display);font-weight:800;font-size:26px;color:#fff;background:var(--ink);width:46px;height:46px;border-radius:13px;display:grid;place-items:center}
+  .lesson-body h2{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.02em;margin:0 0 8px}
+  .lesson-body p{font-size:16px;line-height:1.6;color:var(--ink-soft);margin:0 0 12px}
+  .lesson-try{display:inline-block;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--coral);text-decoration:none;background:#ffe5dd;border-radius:10px;padding:8px 14px}
+  .lesson-try:hover{background:var(--coral);color:#fff}
+  .cp-foot{margin-top:36px;border-top:1px solid var(--line);padding-top:26px}
+  .cp-foot h2{font-family:var(--font-display);font-weight:800;font-size:24px;margin:0 0 10px}
+  .cp-foot p{font-size:16px;line-height:1.65;color:var(--ink-soft)}
+  .cp-foot a{color:var(--coral);font-weight:600;text-decoration:none}.cp-foot a:hover{text-decoration:underline}
+  @media(max-width:560px){.lesson{grid-template-columns:1fr}.lesson-n{width:40px;height:40px;font-size:22px}}
+</style>

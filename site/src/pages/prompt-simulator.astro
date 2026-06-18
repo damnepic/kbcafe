@@ -1,0 +1,124 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const SAMPLE = `write me a landing page`;
+---
+<ToolPage
+  title="Prompt Simulator, see why vague prompts fail | KB Cafe"
+  description="Paste a prompt and see every decision it forces the AI to guess: audience, goal, tone, length, format. Understand why vague prompts give inconsistent, disappointing results. Client-side."
+  path="/prompt-simulator"
+  eyebrow="AI Explained · Tool"
+  h1="Prompt Simulator"
+  tagline="Paste a prompt and watch what the AI is forced to guess. Every blank you leave, audience, goal, tone, length, format, the model fills in for you, differently each time. This is why vague prompts disappoint."
+>
+  <div class="pane">
+    <div class="pane-label"><span>Your prompt</span><span class="ps-actions"><button class="link-btn" id="sample">sample</button><button class="link-btn" id="clear">clear</button></span></div>
+    <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="Try a vague one, like “write me a landing page”…"></textarea>
+  </div>
+
+  <div class="ps-meter"><div class="ps-meter-h"><span id="ps-pin">0</span><small>of 6 decisions you made</small></div><div class="ps-bar" id="ps-bar"></div></div>
+  <div class="ps-decisions" id="decisions"></div>
+  <p class="ps-verdict" id="verdict"></p>
+
+  <Fragment slot="explainer">
+    <h2>The AI isn&rsquo;t reading your mind</h2>
+    <p>
+      When you type <em>&ldquo;write me a landing page,&rdquo;</em> you know exactly what you mean, who it&rsquo;s
+      for, what it should achieve, how long, what tone. The model knows none of that. So it <strong>guesses</strong>,
+      and it guesses differently every time. That&rsquo;s why the output feels generic and why two runs of the same
+      prompt give different results. This tool makes the invisible guessing visible: every decision you didn&rsquo;t
+      make, the model made for you.
+    </p>
+    <h3>The six decisions in every prompt</h3>
+    <ul>
+      <li><strong>Audience</strong>, who is this for? Experts and beginners need opposite answers.</li>
+      <li><strong>Goal</strong>, what should it accomplish? Inform, sell, persuade, entertain?</li>
+      <li><strong>Tone</strong>, formal or playful? Confident or cautious?</li>
+      <li><strong>Length</strong>, a sentence or an essay?</li>
+      <li><strong>Format</strong>, prose, bullets, a table, JSON?</li>
+      <li><strong>Depth</strong>, a quick overview or a thorough deep dive?</li>
+    </ul>
+    <p class="note">
+      Leave a decision blank and the model picks one, and you don&rsquo;t control which. Pin them down and the
+      output gets sharp and repeatable. This runs entirely in your browser; nothing is uploaded.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does this run my prompt through an AI?</summary>
+      <p>No. It detects which of the six decisions your prompt specifies and shows the ones it leaves open, using pattern matching, not a model. The &ldquo;guesses&rdquo; are illustrations of how differently a model could interpret the gap.</p>
+    </details>
+    <details class="faq"><summary>So how do I fix a vague prompt?</summary>
+      <p>Make the blanks explicit. The <a href="/prompt-builder">Prompt Builder</a> walks you through each decision, and the <a href="/good-vs-bad-prompts">before/after gallery</a> shows the difference it makes.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No. Detection is entirely client-side, so your prompt stays on your device.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Fix the gaps with the <a href="/prompt-builder">Prompt Builder</a>, see the prompt&rsquo;s structure with <a href="/prompt-x-ray">Prompt X-Ray</a>, or start the <a href="/learn-prompting">Learn Prompting</a> course.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .ps-actions{display:flex;gap:14px}.ta{min-height:120px}
+  .ps-meter{margin:20px 0 16px}
+  .ps-meter-h{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+  #ps-pin{font-family:var(--font-display);font-weight:800;font-size:30px;color:var(--ink)}
+  .ps-meter-h small{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  .ps-bar{height:10px;border-radius:6px;background:var(--paper-2);overflow:hidden;display:flex;gap:2px}
+  .ps-bar i{flex:1;background:var(--line);border-radius:2px}.ps-bar i.on{background:#0f9f82}
+  .ps-decisions{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .dec{border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;background:var(--cream)}
+  .dec.guess{border-color:rgba(214,62,31,.4);background:rgba(214,62,31,.04)}
+  .dec-h{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .dec-ic{font-family:var(--font-mono);font-weight:800;font-size:13px}
+  .dec.set .dec-ic{color:#2f7d32}.dec.guess .dec-ic{color:var(--coral-deep)}
+  .dec-nm{font-family:var(--font-display);font-weight:800;font-size:15px}
+  .dec-state{margin-left:auto;font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .dec.set .dec-state{color:#2f7d32}.dec.guess .dec-state{color:var(--coral-deep)}
+  .dec-body{font-size:13px;color:var(--ink-soft);line-height:1.45}
+  .dec-guesses{margin-top:6px;font-family:var(--font-mono);font-size:12px;color:var(--ink)}
+  .dec-guesses b{color:var(--coral-deep)}
+  .ps-verdict{margin-top:18px;font-family:var(--font-mono);font-size:13.5px;line-height:1.55;padding:13px 15px;border-radius:11px;background:var(--paper-2);color:var(--ink)}
+  .ps-verdict.bad{background:rgba(214,62,31,.1);color:var(--coral-deep)}.ps-verdict.good{background:rgba(15,159,130,.1);color:#0f7d68}
+  @media(max-width:560px){.ps-decisions{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const inEl = $('in');
+  const SAMPLE = inEl.getAttribute('data-sample') || '';
+  const DECISIONS = [
+    { key: 'audience', name: 'Audience', re: /\b(for (a|an|my|the|beginners?|experts?|developers?|kids|students|executives?|customers?|users?)|audience|aimed at|target)\b/i, q: 'Who is it for?', guesses: 'total beginners? seasoned pros? executives?' },
+    { key: 'goal', name: 'Goal', re: /\b(to (increase|drive|convert|explain|sell|teach|reduce|persuade|inform|grow|boost)|goal|purpose|so that|in order to|that (sells|converts|explains))\b/i, q: 'What should it accomplish?', guesses: 'inform? sell? persuade? entertain?' },
+    { key: 'tone', name: 'Tone', re: /\b(tone|voice|formal|casual|friendly|professional|playful|funny|serious|neutral|confident|warm|witty)\b/i, q: 'What voice should it use?', guesses: 'buttoned-up corporate? playful and casual?' },
+    { key: 'length', name: 'Length', re: /\b(\d+\s*(words?|sentences?|paragraphs?|bullets?|chars?|lines?)|short|brief|concise|long|detailed|one[- ]?(line|sentence)|tweet|a paragraph)\b/i, q: 'How long?', guesses: 'one line? a paragraph? a full essay?' },
+    { key: 'format', name: 'Format', re: /\b(json|markdown|bullet|numbered|table|list|sections?|headings?|steps|format|as a|csv|outline)\b/i, q: 'How should it be structured?', guesses: 'prose? bullets? a table? sections?' },
+    { key: 'depth', name: 'Depth', re: /\b(step.by.step|in[- ]depth|high[- ]level|overview|comprehensive|thorough|brief overview|with examples?|deep dive|detailed)\b/i, q: 'How much detail?', guesses: 'a quick overview? an exhaustive deep dive?' },
+  ];
+
+  function run() {
+    const t = inEl.value;
+    let pinned = 0;
+    $('decisions').innerHTML = DECISIONS.map(d => {
+      const set = d.re.test(t) && t.trim().length > 0;
+      if (set) pinned++;
+      return `<div class="dec ${set ? 'set' : 'guess'}">
+        <div class="dec-h"><span class="dec-ic">${set ? '✓' : '✗'}</span><span class="dec-nm">${d.name}</span><span class="dec-state">${set ? 'you set it' : 'AI guesses'}</span></div>
+        <div class="dec-body">${d.q}${set ? '' : `<div class="dec-guesses">model will assume one of: <b>${d.guesses}</b></div>`}</div>
+      </div>`;
+    }).join('');
+    const guessing = 6 - pinned;
+    $('ps-pin').textContent = pinned;
+    $('ps-bar').innerHTML = Array.from({ length: 6 }, (_, i) => `<i class="${i < pinned ? 'on' : ''}"></i>`).join('');
+    const v = $('verdict');
+    if (!t.trim()) { v.className = 'ps-verdict'; v.textContent = 'Paste a prompt to see what it leaves the model to guess.'; return; }
+    if (guessing === 0) { v.className = 'ps-verdict good'; v.textContent = 'You pinned all six decisions. The model has little left to guess, so the output should be sharp and repeatable.'; }
+    else { v.className = 'ps-verdict bad'; v.textContent = `Your prompt leaves ${guessing} of 6 decisions to the model. It guesses each one, differently each run, which is exactly why the result feels generic and changes every time.`; }
+  }
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; run(); });
+  $('clear').addEventListener('click', () => { inEl.value = ''; run(); inEl.focus(); });
+  inEl.value = SAMPLE; run();
+</script>
