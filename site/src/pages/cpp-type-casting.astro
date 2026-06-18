@@ -1,0 +1,74 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="Type casting in C++ — static_cast, dynamic_cast, const_cast, reinterpret_cast | KB Cafe"
+  description="A clear reference on C++ casts: what static_cast, dynamic_cast, const_cast and reinterpret_cast each do, when to use which, and why to avoid C-style casts."
+  path="/cpp-type-casting"
+  eyebrow="Reference · C++"
+  h1="Type casting in C++"
+  tagline="C++ has four named casts, each with a precise job. Knowing which to reach for — and why the old C-style cast hides danger — is core C++ literacy."
+>
+  <h2>Why four casts instead of one</h2>
+  <p>
+    A C-style cast — <code>(Type)value</code> — will attempt almost any conversion and tells you nothing about
+    <em>which</em> kind it performed. C++ replaced it with four named casts so your intent is explicit and the
+    compiler can reject conversions you didn&rsquo;t actually mean. Each one is searchable, each one means a
+    specific thing, and each one fails loudly when misused.
+  </p>
+
+  <h2>static_cast — the everyday conversion</h2>
+  <p>
+    <code>static_cast&lt;T&gt;(v)</code> performs well-defined conversions the compiler can check at compile time:
+    numeric conversions (<code>double</code> → <code>int</code>), <code>void*</code> back to a typed pointer, and
+    casts up or down a class hierarchy <em>when you already know</em> the runtime type. It does <strong>no
+    runtime check</strong> on downcasts — so it&rsquo;s fast, but a wrong downcast is undefined behavior.
+  </p>
+
+  <h2>dynamic_cast — the checked downcast</h2>
+  <p>
+    <code>dynamic_cast&lt;T&gt;(v)</code> safely converts within a <strong>polymorphic</strong> hierarchy (one with
+    at least one virtual function) and <strong>checks at runtime</strong> that the object really is the target type.
+    On a pointer it returns <code>nullptr</code> if the cast is invalid; on a reference it throws
+    <code>std::bad_cast</code>. Use it when you have a base pointer and genuinely need to ask &ldquo;is this actually
+    a <code>Derived</code>?&rdquo; It costs a runtime lookup, which is the price of safety.
+  </p>
+
+  <h2>const_cast — add or remove const</h2>
+  <p>
+    <code>const_cast&lt;T&gt;(v)</code> is the only cast that can strip (or add) <code>const</code>/<code>volatile</code>.
+    Its honest use is narrow: calling a legacy API that isn&rsquo;t const-correct but won&rsquo;t actually modify
+    your object. <strong>Actually writing through a pointer to an originally-const object is undefined behavior.</strong>
+    Reach for it rarely, and treat its presence as a smell worth a comment.
+  </p>
+
+  <h2>reinterpret_cast — reinterpret the bits</h2>
+  <p>
+    <code>reinterpret_cast&lt;T&gt;(v)</code> tells the compiler &ldquo;treat these bits as this other type&rdquo; with
+    essentially no conversion — pointer-to-integer, or between unrelated pointer types. It is the bluntest, least
+    portable cast and the easiest to get wrong (alignment, aliasing, endianness). Confine it to low-level code that
+    truly needs it, like hardware interfaces or serialization.
+  </p>
+
+  <h2>Which one, in one line each</h2>
+  <ul>
+    <li>Ordinary, checkable conversion → <strong>static_cast</strong>.</li>
+    <li>Safe downcast in a polymorphic hierarchy → <strong>dynamic_cast</strong>.</li>
+    <li>Add/remove const for an API → <strong>const_cast</strong> (sparingly).</li>
+    <li>Reinterpret raw bits → <strong>reinterpret_cast</strong> (rarely, carefully).</li>
+  </ul>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Why avoid C-style casts?</summary>
+    <p>A single <code>(Type)x</code> may silently perform any of the four conversions — including a dangerous reinterpret — with no signal of intent and no way to grep for the risky ones. The named casts make intent explicit and reviewable.</p>
+  </details>
+  <details class="faq"><summary>When does dynamic_cast return null vs throw?</summary>
+    <p>On a <em>pointer</em> a failed cast returns <code>nullptr</code>; on a <em>reference</em> (which can&rsquo;t be null) it throws <code>std::bad_cast</code>.</p>
+  </details>
+  <details class="faq"><summary>Does dynamic_cast work on any class?</summary>
+    <p>Only polymorphic ones — the type needs at least one virtual function so the runtime has type information to check against.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>See <a href="/smart-pointers-explained">smart pointers &amp; RAII</a> and <a href="/memory-leaks-explained">memory leaks</a>, or the full <a href="/reference">Reference</a>.</p>
+</ReferencePage>

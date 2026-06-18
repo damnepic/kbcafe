@@ -1,0 +1,121 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { PATTERNS, patternBySlug } from '../../data/patterns.js';
+
+export function getStaticPaths() {
+  return PATTERNS.map(p => ({ params: { slug: p.slug }, props: { p } }));
+}
+const { p } = Astro.props;
+const path = `/ai-patterns/${p.slug}`;
+const related = (p.related || []).map(patternBySlug).filter(Boolean);
+const more = PATTERNS.filter(x => x.slug !== p.slug).slice(0, 4);
+---
+<Layout
+  title={`${p.name} Pattern — ${p.tagline} | KB Cafe`}
+  description={`The ${p.name} pattern for AI systems: ${p.tagline} How it works, its strengths and weaknesses, when to use it, and an example prompt.`}
+  path={path}
+>
+  <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/ai">AI Explained</a> <span>/</span> <a href="/ai-patterns">Patterns</a> <span>/</span> <em>{p.name}</em></nav>
+
+  <article class="pat">
+    <header class="pat-head">
+      <div class="eyebrow">AI Pattern · {p.tag}</div>
+      <h1>{p.name} Pattern</h1>
+      <p class="tagline">{p.tagline}</p>
+    </header>
+
+    <p class="lead">{p.whatItIs}</p>
+
+    <h2>How it works</h2>
+    <ol class="flow">
+      {p.flow.map((step, i) => (
+        <li><span class="n">{i + 1}</span><span class="s">{step}</span></li>
+      ))}
+    </ol>
+
+    <div class="sw">
+      <div class="sw-col good">
+        <h3>Strengths</h3>
+        <ul>{p.strengths.map(s => <li>{s}</li>)}</ul>
+      </div>
+      <div class="sw-col bad">
+        <h3>Watch-outs</h3>
+        <ul>{p.weaknesses.map(s => <li>{s}</li>)}</ul>
+      </div>
+    </div>
+
+    <h2>When to use it</h2>
+    <p class="when">{p.whenToUse}</p>
+
+    <h2>Example prompt</h2>
+    <pre class="prompt">{p.examplePrompt}</pre>
+
+    {related.length > 0 && (
+      <nav class="kgraph">
+        <div class="kg-title">Related patterns</div>
+        <span class="kg-links">{related.map(r => <a href={`/ai-patterns/${r.slug}`}>{r.name}</a>)}</span>
+      </nav>
+    )}
+  </article>
+
+  <aside class="more">
+    <h2>More patterns</h2>
+    <div class="more-grid">
+      {more.map(m => (
+        <a class="mcard" href={`/ai-patterns/${m.slug}`}>
+          <span class="mc-tag">{m.tag}</span>
+          <span class="mc-nm">{m.name}</span>
+          <span class="mc-ds">{m.tagline}</span>
+        </a>
+      ))}
+    </div>
+    <p class="explore"><a href="/ai-pattern-explorer">Compare patterns side by side in the Pattern Explorer →</a></p>
+  </aside>
+</Layout>
+
+<style>
+  .crumb{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);padding:20px 0 0;display:flex;gap:8px;flex-wrap:wrap}
+  .crumb a{color:var(--ink-soft);text-decoration:none}.crumb a:hover{color:var(--coral)}
+  .crumb em{color:var(--ink);font-style:normal}.crumb span{opacity:.5}
+  .pat{max-width:740px}
+  .pat-head{padding:26px 0 18px}
+  .pat-head .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:12px}
+  .pat-head h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(34px,5.4vw,52px)}
+  .pat-head .tagline{margin-top:14px;font-size:19px;color:var(--ink-soft);line-height:1.45}
+  .lead{font-size:16.5px;line-height:1.7;color:var(--ink-soft);margin:10px 0 6px}
+  h2{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:30px 0 14px}
+  h3{font-family:var(--font-display);font-weight:700;font-size:17px;margin:0 0 10px}
+
+  .flow{list-style:none;display:flex;flex-direction:column;gap:0;counter-reset:f}
+  .flow li{display:flex;gap:15px;align-items:flex-start;padding:0 0 18px;position:relative}
+  .flow li:not(:last-child)::before{content:"";position:absolute;left:15px;top:32px;bottom:0;width:2px;background:var(--line)}
+  .flow .n{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--cream);font-family:var(--font-mono);font-weight:700;font-size:14px;display:grid;place-items:center;z-index:1}
+  .flow .s{font-size:16.5px;line-height:1.5;color:var(--ink);padding-top:4px}
+
+  .sw{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:8px 0}
+  .sw-col{border:1.5px solid var(--line);border-radius:14px;padding:16px 18px;background:var(--cream)}
+  .sw-col.good{border-color:rgba(47,125,50,.4)} .sw-col.bad{border-color:rgba(214,62,31,.35)}
+  .sw-col.good h3{color:#2f7d32} .sw-col.bad h3{color:var(--coral-deep)}
+  .sw-col ul{margin:0;padding-left:18px}
+  .sw-col li{font-size:14.5px;line-height:1.5;color:var(--ink-soft);margin-bottom:7px}
+  .when{font-size:16.5px;line-height:1.7;color:var(--ink-soft)}
+  .prompt{font-family:var(--font-mono);font-size:13px;line-height:1.6;background:var(--ink);color:#f4e9d6;border-radius:12px;padding:16px 18px;white-space:pre-wrap;overflow:auto}
+
+  .kgraph{margin-top:30px;background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+  .kg-title{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+  .kg-links{display:flex;flex-wrap:wrap;gap:8px 16px}
+  .kg-links a{font-family:var(--font-mono);font-size:13.5px;font-weight:600;color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--gold)}
+  .kg-links a:hover{color:var(--coral);border-color:var(--coral)}
+
+  .more{padding:36px 0 10px;border-top:1px solid var(--line);margin-top:34px}
+  .more h2{margin:0 0 16px}
+  .more-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .mcard{display:flex;flex-direction:column;gap:5px;text-decoration:none;color:inherit;background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:14px 15px 16px;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .mcard:hover{transform:translateY(-3px);box-shadow:7px 8px 0 rgba(30,24,19,.08);border-color:var(--ink)}
+  .mc-tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+  .mc-nm{font-family:var(--font-display);font-weight:800;font-size:16px}
+  .mc-ds{font-size:12.5px;color:var(--ink-soft);line-height:1.4}
+  .explore{margin-top:18px}
+  .explore a{color:var(--coral);font-weight:600;text-decoration:none}.explore a:hover{text-decoration:underline}
+  @media(max-width:680px){.sw{grid-template-columns:1fr}.more-grid{grid-template-columns:1fr 1fr}}
+</style>

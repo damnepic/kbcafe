@@ -1,0 +1,144 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="RSS Feed Validator — check RSS &amp; Atom against the spec | KB Cafe"
+  description="Paste an RSS or Atom feed and validate it: required elements, item structure, and common mistakes — with a parsed summary. Free, fast, fully client-side."
+  path="/rss-validator"
+  eyebrow="Feeds"
+  h1="RSS / Atom Validator"
+  tagline="Paste a feed&rsquo;s XML and check it against the RSS 2.0 and Atom specs — required elements, item structure, and the usual gotchas. Runs in your browser."
+>
+  <div class="pane" style="margin-bottom:14px">
+    <div class="pane-label"><span>Feed XML</span><button class="link-btn" id="sample">load sample</button></div>
+    <textarea id="in" class="ta" style="min-height:200px" spellcheck="false" placeholder="Paste RSS or Atom XML here…"></textarea>
+  </div>
+  <div id="report" class="report"></div>
+
+  <Fragment slot="explainer">
+    <h2>Catch feed problems before your readers do</h2>
+    <p>
+      A feed that almost-validates will silently break in some readers and not others. This validator parses your
+      XML, detects whether it&rsquo;s <strong>RSS 2.0</strong> or <strong>Atom</strong>, and checks the structural
+      rules each spec requires — then lists <strong>errors</strong> (real violations), <strong>warnings</strong>
+      (recommended-but-missing), and a parsed summary so you can see exactly what a reader would.
+    </p>
+
+    <h3>What it checks</h3>
+    <ul>
+      <li><strong>RSS 2.0</strong> — an <code>&lt;rss&gt;</code> root, a <code>&lt;channel&gt;</code>, and the required
+        <code>title</code>, <code>link</code>, and <code>description</code>; each <code>&lt;item&gt;</code> needs a
+        title or description.</li>
+      <li><strong>Atom</strong> — a <code>&lt;feed&gt;</code> root with <code>id</code>, <code>title</code>, and
+        <code>updated</code>; each <code>&lt;entry&gt;</code> needs the same three.</li>
+      <li><strong>Well-formedness</strong> — unescaped <code>&amp;</code>, mismatched tags, and other XML parse errors.</li>
+    </ul>
+    <p>Because it runs in your browser, you paste the XML directly (cross-origin fetching is blocked by browsers) — grab it with <em>View Source</em> on the feed URL.</p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why paste XML instead of a URL?</summary>
+      <p>Browsers block reading most cross-origin URLs (CORS), so a purely client-side tool can&rsquo;t fetch an arbitrary feed. Pasting the XML keeps everything local and private.</p>
+    </details>
+    <details class="faq"><summary>What&rsquo;s the most common feed bug?</summary>
+      <p>An unescaped <code>&amp;</code> in a title or URL — it must be <code>&amp;amp;</code> in XML. That single character breaks the whole document.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Convert a subscription list with the <a href="/opml-converter">OPML converter</a>, or learn <a href="/what-is-rss">what RSS is</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .report{display:flex;flex-direction:column;gap:10px}
+  .verdict{font-family:var(--font-display);font-weight:800;font-size:22px;display:flex;align-items:center;gap:10px}
+  .verdict.ok{color:#2f7d32}.verdict.bad{color:var(--coral-deep)}
+  .summary{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:12px 14px;line-height:1.6}
+  .issue{font-family:var(--font-mono);font-size:13px;border-radius:10px;padding:9px 13px;display:flex;gap:9px;align-items:flex-start}
+  .issue.err{background:rgba(214,62,31,.08);color:var(--coral-deep)}
+  .issue.warn{background:rgba(244,180,35,.16);color:#8a6d12}
+  .issue b{flex-shrink:0}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), report = $('report');
+  const SAMPLE = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>KB Cafe Blog</title>
+    <link>https://kbcafe.com/blog</link>
+    <description>Notes from KB Cafe.</description>
+    <item>
+      <title>The Return of KB Cafe</title>
+      <link>https://kbcafe.com/blog/the-return-of-kb-cafe</link>
+      <pubDate>Wed, 18 Jun 2026 00:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <description>An item with no title — still valid in RSS 2.0.</description>
+    </item>
+  </channel>
+</rss>`;
+
+  function text(el, tag){ const n = el.getElementsByTagName(tag)[0]; return n ? n.textContent.trim() : null; }
+
+  function validate(){
+    const raw = inEl.value.trim();
+    report.innerHTML = '';
+    if(!raw) return;
+    const errors = [], warnings = [];
+    const doc = new DOMParser().parseFromString(raw, 'application/xml');
+    const perr = doc.querySelector('parsererror');
+    if(perr){
+      errors.push('XML is not well-formed: ' + perr.textContent.replace(/\s+/g, ' ').trim().slice(0, 140));
+      return show('Unknown', 0, errors, warnings);
+    }
+    const root = doc.documentElement;
+    const name = root.nodeName.toLowerCase();
+    let type = 'Unknown', items = 0;
+
+    if(name === 'rss'){
+      type = 'RSS ' + (root.getAttribute('version') || '?');
+      const ch = root.getElementsByTagName('channel')[0];
+      if(!ch){ errors.push('<rss> has no <channel> element.'); }
+      else {
+        ['title','link','description'].forEach(t => { if(!text(ch, t)) errors.push(`<channel> is missing required <${t}>.`); });
+        const its = ch.getElementsByTagName('item');
+        items = its.length;
+        if(!items) warnings.push('Channel has no <item> elements.');
+        [...its].forEach((it, i) => {
+          if(!text(it, 'title') && !text(it, 'description')) errors.push(`Item ${i+1} has neither <title> nor <description> (RSS 2.0 requires one).`);
+          if(!text(it, 'guid')) warnings.push(`Item ${i+1} has no <guid> (recommended so readers can dedupe).`);
+          if(!text(it, 'pubDate')) warnings.push(`Item ${i+1} has no <pubDate>.`);
+        });
+      }
+    } else if(name === 'feed'){
+      type = 'Atom 1.0';
+      ['id','title','updated'].forEach(t => { if(!text(root, t)) errors.push(`<feed> is missing required <${t}>.`); });
+      const entries = root.getElementsByTagName('entry');
+      items = entries.length;
+      if(!items) warnings.push('Feed has no <entry> elements.');
+      [...entries].forEach((e, i) => {
+        ['id','title','updated'].forEach(t => { if(!text(e, t)) errors.push(`Entry ${i+1} is missing required <${t}>.`); });
+      });
+    } else {
+      errors.push(`Root element is <${name}> — expected <rss> or <feed>.`);
+    }
+    show(type, items, errors, warnings);
+  }
+
+  function show(type, items, errors, warnings){
+    const ok = errors.length === 0;
+    const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    let html = `<div class="verdict ${ok?'ok':'bad'}">${ok?'✓ Valid':'✕ '+errors.length+' error'+(errors.length>1?'s':'')}</div>`;
+    html += `<div class="summary">Type: <b>${type}</b> · ${items} item${items!==1?'s':''} · ${errors.length} error${errors.length!==1?'s':''}, ${warnings.length} warning${warnings.length!==1?'s':''}</div>`;
+    errors.forEach(e => html += `<div class="issue err"><b>ERROR</b> ${esc(e)}</div>`);
+    warnings.forEach(w => html += `<div class="issue warn"><b>WARN</b> ${esc(w)}</div>`);
+    report.innerHTML = html;
+  }
+
+  inEl.addEventListener('input', validate);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; validate(); });
+  inEl.value = SAMPLE; validate();
+</script>

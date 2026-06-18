@@ -1,0 +1,112 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="SQL Formatter — beautify &amp; standardize SQL online | KB Cafe"
+  description="Format and beautify messy SQL with proper indentation and keyword casing. Supports Postgres, MySQL, SQLite, T-SQL and more. Free, fast, fully client-side."
+  path="/sql-formatter"
+  eyebrow="Text · SQL"
+  h1="SQL Formatter"
+  tagline="Paste messy SQL and get it cleanly indented and consistently cased — for Postgres, MySQL, SQLite, T-SQL and more. Formats in your browser; nothing is uploaded."
+>
+  <div class="row" style="margin-bottom:12px">
+    <label class="opt">Dialect
+      <select id="lang">
+        <option value="sql">Standard SQL</option>
+        <option value="postgresql">PostgreSQL</option>
+        <option value="mysql">MySQL</option>
+        <option value="mariadb">MariaDB</option>
+        <option value="sqlite">SQLite</option>
+        <option value="transactsql">T-SQL (SQL Server)</option>
+        <option value="plsql">Oracle PL/SQL</option>
+        <option value="bigquery">BigQuery</option>
+        <option value="snowflake">Snowflake</option>
+        <option value="spark">Spark</option>
+      </select>
+    </label>
+    <label class="opt">Keywords
+      <select id="kw"><option value="upper">UPPER</option><option value="lower">lower</option><option value="preserve">preserve</option></select>
+    </label>
+    <label class="opt">Indent
+      <select id="tab"><option value="2">2</option><option value="4">4</option></select>
+    </label>
+  </div>
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-label"><span>SQL in</span><button class="link-btn" id="sample">load sample</button></div>
+      <textarea id="in" class="ta" spellcheck="false" placeholder="Paste SQL here…"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-label"><span>Formatted</span><button class="link-btn" id="copy">copy</button></div>
+      <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>Readable SQL in one paste</h2>
+    <p>
+      Long queries arrive as one unbroken line from a log or an ORM and are miserable to read. This formatter
+      re-indents the query — clauses on their own lines, joins and conditions aligned, lists broken out — and
+      normalizes keyword casing so <code>select</code> and <code>SELECT</code> stop coexisting in the same file.
+      It&rsquo;s built on a real SQL tokenizer, so it understands subqueries, CTEs, window functions, and
+      dialect-specific syntax rather than just inserting newlines.
+    </p>
+
+    <h3>Pick your dialect</h3>
+    <p>
+      SQL isn&rsquo;t one language. Choosing PostgreSQL, MySQL, T-SQL, BigQuery, Snowflake, and the rest tells the
+      formatter which keywords and operators are valid so it lays your query out correctly instead of mangling
+      dialect-specific syntax.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it change what my query does?</summary>
+      <p>No — formatting only adds whitespace and adjusts keyword case. The query&rsquo;s logic and identifiers are untouched.</p>
+    </details>
+    <details class="faq"><summary>Which dialects are supported?</summary>
+      <p>Standard SQL plus PostgreSQL, MySQL, MariaDB, SQLite, T-SQL, Oracle PL/SQL, BigQuery, Snowflake, and Spark.</p>
+    </details>
+    <details class="faq"><summary>Is my SQL uploaded?</summary>
+      <p>No. Formatting runs in your browser, so queries with real table and column names stay local and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Turning rows into objects? <a href="/csv-to-json">CSV ⇄ JSON</a>. Naming columns consistently? The <a href="/case-converter">case converter</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:7px}
+  .opt select{font-family:var(--font-mono);font-size:12.5px;border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--cream);color:var(--ink)}
+</style>
+
+<script>
+  import { format } from 'sql-formatter';
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+  const SAMPLE = `select u.id, u.name, count(o.id) as orders from users u left join orders o on o.user_id = u.id where u.active = true and u.created_at > '2026-01-01' group by u.id, u.name having count(o.id) > 3 order by orders desc limit 20;`;
+
+  function run(){
+    const raw = inEl.value; statusEl.className='status'; statusEl.textContent=''; inEl.classList.remove('err');
+    if(!raw.trim()){ outEl.value=''; return; }
+    try {
+      outEl.value = format(raw, {
+        language: $('lang').value,
+        keywordCase: $('kw').value,
+        tabWidth: parseInt($('tab').value),
+      });
+      statusEl.className='status ok'; statusEl.textContent='Formatted.';
+    } catch(e){
+      inEl.classList.add('err'); outEl.value=''; statusEl.className='status bad';
+      statusEl.textContent = 'Could not parse: ' + (e.message||'').split('\n')[0];
+    }
+  }
+  ['lang','kw','tab'].forEach(id => $(id).addEventListener('change', run));
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', ()=>{ inEl.value = SAMPLE; run(); });
+  $('copy').addEventListener('click', async ()=>{ if(!outEl.value) return; try{ await navigator.clipboard.writeText(outEl.value); statusEl.className='status ok'; statusEl.textContent='Copied.'; }catch{ outEl.select(); document.execCommand('copy'); } });
+  inEl.value = SAMPLE; run();
+</script>

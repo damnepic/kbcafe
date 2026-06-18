@@ -1,0 +1,153 @@
+---
+const {
+  title = 'KB Cafe — a developer’s knowledge base',
+  description = 'Fast, clean developer tools and quick references — freshly brewed. Everything runs in your browser: nothing uploaded, nothing tracked.',
+  path = '/',
+  bodyClass = '',
+} = Astro.props;
+
+const canonical = new URL(path, Astro.site).href;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<!-- favicon = the KB cup mark (generated from logo.png via scripts/gen-favicon.cjs) -->
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content="KB Cafe" />
+<meta property="og:image" content={new URL('/og.png', Astro.site).href} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="KB Cafe — a developer’s knowledge base" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content={new URL('/og.png', Astro.site).href} />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body class={bodyClass}>
+<!-- reusable marks -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="kb-mark" viewBox="0 0 64 64">
+    <path d="M19 6 H45 A4 4 0 0 1 49 10 V58 L32 47 L15 58 V10 A4 4 0 0 1 19 6 Z" fill="#EE4B2B"/>
+    <text x="32" y="31" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#FFFCF5" letter-spacing="-1">KB</text>
+  </symbol>
+  <symbol id="kb-mark-mini" viewBox="0 0 64 64">
+    <path d="M19 6 H45 A4 4 0 0 1 49 10 V58 L32 47 L15 58 V10 A4 4 0 0 1 19 6 Z" fill="#F4B423"/>
+    <text x="32" y="31" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#1E1813" letter-spacing="-1">KB</text>
+  </symbol>
+  <symbol id="cup" viewBox="0 0 48 48">
+    <path d="M10 19h21v9a7 7 0 0 1-7 7h-7a7 7 0 0 1-7-7v-9Z" fill="none" stroke="#F4B423" stroke-width="2.6"/>
+    <path d="M31 21h3.5a4 4 0 0 1 0 8H31" fill="none" stroke="#F4B423" stroke-width="2.6"/>
+    <path d="M16 14q-2-2.4 0-4.8q2-2.4 0-4.8" fill="none" stroke="#FFFCF5" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+    <path d="M22 14q2-2.4 0-4.8q-2-2.4 0-4.8" fill="none" stroke="#FFFCF5" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+  </symbol>
+</defs></svg>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="/" aria-label="KB Cafe — home">
+      <img class="mark" src="/logo.png" width="50" height="50" alt="KB Cafe — a coffee cup with an open book inside" />
+      <span class="cf">Cafe</span>
+    </a>
+    <div class="nav-links">
+      <a href="/#menu">Tools</a>
+      <a class="nav-ai" href="/ai">AI Explained <span class="nav-new">New</span></a>
+      <a href="/reference">Reference</a>
+      <a href="/feeds">Feeds</a>
+      <a href="/blog">Blog</a>
+      <a class="since" href="/">est. 1999</a>
+    </div>
+  </nav>
+
+  <slot />
+
+  <footer>
+    <a class="foot-brand" href="/" aria-label="KB Cafe — home">
+      <img class="foot-mark" src="/logo.png" width="28" height="28" alt="" />
+      <span>Cafe</span>
+    </a>
+    <nav class="foot-links">
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/damnepic/kbcafe">Contact</a>
+    </nav>
+    <div class="foot-social">
+      <a href="https://github.com/damnepic/kbcafe" aria-label="GitHub" title="GitHub"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 8.84 21.5c.5.08.66-.22.66-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.1-1.47-1.1-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.9-1.29 2.74-1.02 2.74-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.16.57.67.48A10 10 0 0 0 12 2Z"/></svg></a>
+      <a href="https://x.com/" aria-label="X" title="X"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.3 8.3L23 22h-6.6l-5.2-6.8L5.3 22H2l7.8-8.9L1.7 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.2 3.8H5.3L17.7 20Z"/></svg></a>
+      <a href="/feeds" aria-label="Feeds" title="Feeds"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="19" r="2.2"/><path d="M3 11a10 10 0 0 1 10 10h-3A7 7 0 0 0 3 14v-3Zm0-6a16 16 0 0 1 16 16h-3A13 13 0 0 0 3 8V5Z"/></svg></a>
+    </div>
+    <div class="foot-copy">&copy; 1999&ndash;2026 KB Cafe &middot; part of the family with <a href="https://yank.info">yank.info</a></div>
+  </footer>
+</div>
+</body>
+</html>
+
+<style is:global>
+  :root{
+    --paper:#FBF4E9; --paper-2:#F4E9D6; --ink:#1E1813; --ink-soft:#574b3f;
+    --coral:#EE4B2B; --coral-deep:#D63E1F; --orange:#F4842A; --gold:#F4B423;
+    --cream:#FFFCF5; --line:rgba(30,24,19,.12); --shadow:18px 18px 0 rgba(30,24,19,.06);
+    --font-display:"Bricolage Grotesque",system-ui,sans-serif;
+    --font-body:"Hanken Grotesk",system-ui,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-body);background:var(--paper);color:var(--ink);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 28px}
+  a{color:inherit}
+
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:24px 0 8px}
+  /* brand lockup: the logo IS the "KB" — wordmark is just "Cafe" (per v5 mockup) */
+  .brand{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);
+    font-weight:800;font-size:30px;letter-spacing:-.02em;text-decoration:none;color:var(--ink);transition:transform .15s}
+  .brand:hover{transform:translateY(-1px)}
+  .brand .mark{height:50px;width:auto;display:block;filter:drop-shadow(2px 3px 0 rgba(30,24,19,.20));transition:transform .15s}
+  .brand:hover .mark{transform:rotate(-3deg)}
+  .brand .cf{color:var(--ink);transition:color .15s}
+  .brand:hover .cf{color:var(--coral)}
+  .nav-links{display:flex;align-items:center;gap:24px;font-weight:600;font-size:14.5px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:color .15s}
+  .nav-links a:hover{color:var(--coral)}
+  .nav-ai{display:inline-flex;align-items:center}
+  .nav-new{display:inline-flex;align-items:center;margin-left:6px;padding:2px 8px;border-radius:999px;
+    background:#ffe5dd;color:var(--coral-deep);font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.02em}
+  .since{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:20px;padding:5px 11px}
+
+  footer{border-top:1px solid var(--line);margin-top:64px;padding:28px 0 52px;display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px}
+  .foot-brand{font-family:var(--font-display);font-weight:800;font-size:18px;display:inline-flex;
+    align-items:center;gap:7px;text-decoration:none;color:var(--ink)}
+  .foot-brand .foot-mark{height:28px;width:auto;display:block;filter:drop-shadow(1px 2px 0 rgba(30,24,19,.18))}
+  .foot-brand:hover span{color:var(--coral)}
+  .foot-links{display:flex;gap:22px;font-size:13.5px;font-weight:600;margin:0 auto}
+  .foot-links a{color:var(--ink-soft);text-decoration:none}
+  .foot-links a:hover{color:var(--coral)}
+  .foot-social{display:flex;gap:14px;align-items:center}
+  .foot-social a{color:var(--ink-soft);display:grid;place-items:center;transition:color .15s}
+  .foot-social a:hover{color:var(--coral)}
+  .foot-copy{flex-basis:100%;font-size:12.5px;color:var(--ink-soft);opacity:.9}
+  .foot-copy a{color:var(--coral);text-decoration:none;font-weight:600}
+  .foot-copy a:hover{text-decoration:underline}
+  @media(max-width:680px){.foot-links{margin:0;order:3;flex-basis:100%}}
+
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:520px){.nav-links a:not(.since){display:none}}
+</style>

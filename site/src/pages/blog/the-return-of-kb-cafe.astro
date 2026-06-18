@@ -1,0 +1,70 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="The Return of KB Cafe"
+  description="kbcafe.com was a go-to developer resource in the early 2000s. Here's what it is now — and why a 25-year-old domain was worth bringing back."
+  slug="the-return-of-kb-cafe"
+  tag="News"
+  date="2026-06-18"
+>
+  <p>
+    For a stretch of the early 2000s, <code>kbcafe.com</code> was one of those bookmarks every working
+    developer seemed to have. It ran practical how-tos on C++, C#, and COM, an early feed validator,
+    RMail (RSS delivered to your inbox before that was normal), and one of the original RSS blogs.
+    Then, like a lot of great independent dev sites, it went quiet.
+  </p>
+  <p>
+    We brought it back. Not as a museum piece — as a working developer&rsquo;s knowledge base, the way
+    it was meant to be used.
+  </p>
+
+  <h2>What&rsquo;s here now</h2>
+  <p>KB Cafe is one site with a few clear sections:</p>
+  <ul>
+    <li><strong><a href="/#menu">Tools</a></strong> — fast, private developer utilities that run entirely
+      in your browser. JSON&nbsp;→&nbsp;TypeScript, a <a href="/jwt-decoder">JWT decoder</a>, a
+      <a href="/cron-generator">cron generator</a>, a <a href="/base64">Base64 encoder</a>. Nothing is
+      uploaded; paste freely.</li>
+    <li><strong><a href="/reference">Reference</a></strong> — clear explainers on the fundamentals:
+      <a href="/object-oriented-programming-concepts">OOP</a>,
+      <a href="/multithreading-explained">concurrency</a>,
+      <a href="/memory-leaks-explained">memory leaks</a>,
+      <a href="/http-explained">HTTP</a>,
+      <a href="/how-smtp-works">SMTP</a>, and more. Several are modern rewrites of the originals.</li>
+    <li><strong><a href="/feeds">Feeds</a></strong> — the RSS/Atom/OPML corner, honoring where this site
+      came from.</li>
+  </ul>
+
+  <h2>What we kept, and what we didn&rsquo;t</h2>
+  <p>
+    Restoring an old domain well means being honest about what aged well. The evergreen technical
+    content — how Base64 works, how threads race, what a memory leak actually is — we rewrote for how we
+    build today. The dated stuff — 2005 news about which feed reader just launched — we left in the past.
+    Every old link still resolves to somewhere useful, but we didn&rsquo;t resurrect a thousand stale posts
+    just because they once existed.
+  </p>
+
+  <h2>Built fast, and private</h2>
+  <p>
+    One thing has changed for the better since the original. The tools here run <strong>entirely in your
+    browser</strong> — paste a JSON blob, a token, a cron line, and it never leaves your machine. There&rsquo;s
+    no account, no telemetry, no &ldquo;sign in to continue,&rdquo; and the pages keep working offline once
+    they&rsquo;ve loaded. That wasn&rsquo;t really practical in 2003; today it&rsquo;s the right default for a
+    developer utility, and it&rsquo;s the one we picked.
+  </p>
+
+  <h2>Why bother with a 25-year-old domain?</h2>
+  <p>
+    Because the web rewards continuity, and good reference material doesn&rsquo;t expire the way news does.
+    The questions developers brought here two decades ago — how do I send mail in code, what&rsquo;s the
+    difference between these casts, why is my memory climbing — are the same questions today, asked by people
+    who weren&rsquo;t born when the first version shipped. That&rsquo;s worth keeping a light on for.
+  </p>
+  <p>
+    Pull up a chair. The <a href="/#menu">menu</a> is open.
+  </p>
+
+  <h3>Related</h3>
+  <p>Browse the <a href="/reference">Reference</a>, try the <a href="/#menu">tools</a>, or read more on <a href="/blog">the blog</a>.</p>
+</BlogPost>

@@ -1,0 +1,66 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="How SMTP works — the protocol that sends email | KB Cafe"
+  description="A clear reference on SMTP: the conversation that sends every email, the envelope vs the headers, MX lookups, and why legitimate mail gets blocked (SPF, DKIM, DMARC)."
+  path="/how-smtp-works"
+  eyebrow="Reference · Email"
+  h1="How SMTP works (sending email)"
+  tagline="SMTP is the protocol that moves email from sender to server to inbox. Here&rsquo;s the actual conversation it has, and why mail you send sometimes never arrives."
+>
+  <h2>What SMTP is</h2>
+  <p>
+    <strong>SMTP — the Simple Mail Transfer Protocol</strong> — is how email is <em>sent</em> and relayed
+    between servers. It is a push protocol: a client hands a message to a server, which relays it toward the
+    recipient&rsquo;s mail server. (Getting mail back <em>out</em> of a mailbox is a different job — see
+    <a href="/pop3-vs-imap">POP3 vs IMAP</a>.) SMTP normally runs on port 25 for server-to-server relay, and
+    ports 587 or 465 for an authenticated client submitting outgoing mail.
+  </p>
+
+  <h2>The SMTP conversation</h2>
+  <p>
+    SMTP is a line-based, human-readable exchange of commands and numeric replies. A simplified send looks like:
+  </p>
+  <ul>
+    <li><code>HELO</code> / <code>EHLO</code> — the client greets the server and discovers its capabilities.</li>
+    <li><code>MAIL FROM:</code> — declares the envelope sender (the return-path).</li>
+    <li><code>RCPT TO:</code> — declares each recipient; repeated once per address.</li>
+    <li><code>DATA</code> — everything after this is the message itself (headers, a blank line, then the body), terminated by a line containing only a dot.</li>
+    <li><code>QUIT</code> — ends the session.</li>
+  </ul>
+  <p>The server answers each command with a status code: <code>2xx</code> success, <code>4xx</code> temporary failure (try again later), <code>5xx</code> permanent rejection.</p>
+
+  <h2>Envelope vs headers — the part that confuses everyone</h2>
+  <p>
+    The <code>MAIL FROM</code>/<code>RCPT TO</code> you send in the conversation are the <strong>envelope</strong> —
+    that&rsquo;s what actually routes the mail. The <code>From:</code> and <code>To:</code> lines <em>inside</em>
+    the <code>DATA</code> block are just headers the mail client displays. They don&rsquo;t have to match the
+    envelope, which is exactly why email spoofing was easy for decades and why the anti-spoofing checks below exist.
+  </p>
+
+  <h2>Why your mail gets blocked</h2>
+  <p>
+    Deliverability now depends on three records that prove a message is legitimately from your domain:
+  </p>
+  <ul>
+    <li><strong>SPF</strong> — a DNS record listing which servers may send for your domain.</li>
+    <li><strong>DKIM</strong> — a cryptographic signature on the message, verified against a public key in DNS.</li>
+    <li><strong>DMARC</strong> — a policy that ties SPF/DKIM to the visible <code>From:</code> domain and tells receivers what to do on failure.</li>
+  </ul>
+  <p>Miss these and even genuine mail lands in spam or is rejected outright with a <code>5xx</code>.</p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Does SMTP receive mail too?</summary>
+    <p>Servers receive over SMTP when relaying, but end users read mail with POP3 or IMAP. SMTP&rsquo;s job is moving mail toward the destination, not serving a mailbox.</p>
+  </details>
+  <details class="faq"><summary>Why port 587 instead of 25?</summary>
+    <p>Port 25 is for server-to-server relay and is widely blocked for clients to curb spam. Authenticated submission from an app or mail client uses 587 (STARTTLS) or 465 (implicit TLS).</p>
+  </details>
+  <details class="faq"><summary>What&rsquo;s a 4xx vs 5xx reply?</summary>
+    <p><code>4xx</code> is temporary — the sender should retry later. <code>5xx</code> is permanent — the message is rejected and won&rsquo;t be retried.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Reading mail uses <a href="/pop3-vs-imap">POP3 or IMAP</a>. SMTP rides on TCP like <a href="/http-explained">HTTP</a>; encode attachments with <a href="/base64">Base64</a>.</p>
+</ReferencePage>

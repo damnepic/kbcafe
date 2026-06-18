@@ -1,0 +1,141 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Base64 Encoder / Decoder — encode &amp; decode text online | KB Cafe"
+  description="Encode text to Base64 or decode Base64 back to text, instantly. Supports standard and URL-safe Base64. Free, fast, fully client-side — nothing is uploaded."
+  path="/base64"
+  eyebrow="Encoding"
+  h1="Base64 Encoder / Decoder"
+  tagline="Encode text to Base64 or decode it back — including URL-safe Base64. Runs entirely in your browser, so whatever you paste never leaves your machine."
+>
+  <div class="row" style="margin-bottom:12px">
+    <button class="chip active" id="mode-encode">Encode →</button>
+    <button class="chip" id="mode-decode">← Decode</button>
+    <label class="opt"><input type="checkbox" id="urlsafe" /> URL-safe (<code>-_</code>, no padding)</label>
+  </div>
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-label"><span id="in-label">Text in</span><button class="link-btn" id="sample">load sample</button></div>
+      <textarea id="in" class="ta" spellcheck="false" placeholder="Type or paste here…"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-label"><span id="out-label">Base64 out</span><button class="link-btn" id="copy">copy</button></div>
+      <textarea id="out" class="ta" readonly spellcheck="false" placeholder="Result appears here…"></textarea>
+    </div>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>What is Base64?</h2>
+    <p>
+      Base64 is a way to represent <strong>binary data using only 64 printable ASCII characters</strong>
+      (<code>A–Z</code>, <code>a–z</code>, <code>0–9</code>, <code>+</code>, <code>/</code>). It exists
+      because many systems — email headers, URLs, JSON, HTTP basic auth — were built for text and will
+      mangle raw bytes. Encoding to Base64 lets binary travel safely through a text-only channel.
+    </p>
+
+    <h3>How it works</h3>
+    <p>
+      Base64 takes <strong>3 bytes (24 bits) at a time and splits them into 4 groups of 6 bits</strong>.
+      Each 6-bit group (0–63) maps to one character in the Base64 alphabet. Because 3 input bytes become
+      4 output characters, Base64 is always about <strong>33% larger</strong> than the original. When the
+      input isn&rsquo;t a multiple of 3 bytes, the output is padded with <code>=</code> so its length stays
+      a multiple of 4.
+    </p>
+
+    <h3>Standard vs URL-safe</h3>
+    <ul>
+      <li><strong>Standard</strong> uses <code>+</code> and <code>/</code> and pads with <code>=</code>.</li>
+      <li><strong>URL-safe</strong> (RFC 4648 §5) swaps <code>+→-</code> and <code>/→_</code> and usually drops the
+        <code>=</code> padding, so the string is safe inside a URL or filename. Toggle it above.</li>
+    </ul>
+
+    <h2 style="color:var(--coral-deep)">Base64 is encoding, not encryption</h2>
+    <p>
+      Anyone can decode Base64 — this page does it with one click. It provides <strong>no
+      confidentiality</strong>. Never use Base64 to &ldquo;hide&rdquo; secrets; use real encryption for that.
+      Its job is safe <em>transport</em> of bytes, not security.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why is my Base64 longer than the input?</summary>
+      <p>Every 3 bytes become 4 characters, so the encoded form is ~33% larger. That overhead is the cost of being text-safe.</p>
+    </details>
+    <details class="faq"><summary>What are the <code>=</code> signs at the end?</summary>
+      <p>Padding. They keep the output length a multiple of 4 when the input length isn&rsquo;t a multiple of 3. URL-safe Base64 often omits them.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No — encoding and decoding run in your browser, so your text stays local and the tool works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Decoding a token? A JWT is three Base64URL parts — use the <a href="/jwt-decoder">JWT decoder</a>. Learn more in the <a href="/reference">Reference</a>, including <a href="/memory-leaks-explained">memory leaks</a> and <a href="/object-oriented-programming-concepts">OOP concepts</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:7px;cursor:pointer;margin-left:auto}
+  .opt code{font-size:12px}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+  let mode = 'encode';
+  const SAMPLE_TEXT = 'KB Cafe ☕ — knowledge base, freshly brewed.';
+  const SAMPLE_B64 = 'S0IgQ2FmZSAtIGtub3dsZWRnZSBiYXNlLCBmcmVzaGx5IGJyZXdlZC4=';
+
+  function toUrlSafe(s){ return s.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function fromUrlSafe(s){ s = s.replace(/-/g, '+').replace(/_/g, '/'); while(s.length % 4) s += '='; return s; }
+
+  function run(){
+    const raw = inEl.value;
+    statusEl.className = 'status'; statusEl.textContent = ''; inEl.classList.remove('err');
+    if(!raw){ outEl.value = ''; return; }
+    try {
+      if(mode === 'encode'){
+        const bytes = new TextEncoder().encode(raw);
+        let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
+        let out = btoa(bin);
+        if($('urlsafe').checked) out = toUrlSafe(out);
+        outEl.value = out;
+        statusEl.className = 'status ok';
+        statusEl.textContent = `Encoded · ${bytes.length} bytes → ${out.length} chars`;
+      } else {
+        let s = raw.trim();
+        if($('urlsafe').checked || /[-_]/.test(s)) s = fromUrlSafe(s);
+        const bin = atob(s);
+        const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+        outEl.value = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+        statusEl.className = 'status ok';
+        statusEl.textContent = `Decoded · ${s.length} chars → ${bytes.length} bytes`;
+      }
+    } catch(e){
+      inEl.classList.add('err'); outEl.value = '';
+      statusEl.className = 'status bad';
+      statusEl.textContent = mode === 'decode' ? 'Not valid Base64 — check for stray characters.' : 'Could not encode that input.';
+    }
+  }
+  function setMode(m){
+    mode = m;
+    $('mode-encode').classList.toggle('active', m === 'encode');
+    $('mode-decode').classList.toggle('active', m === 'decode');
+    $('in-label').textContent = m === 'encode' ? 'Text in' : 'Base64 in';
+    $('out-label').textContent = m === 'encode' ? 'Base64 out' : 'Text out';
+    run();
+  }
+  $('mode-encode').addEventListener('click', () => setMode('encode'));
+  $('mode-decode').addEventListener('click', () => setMode('decode'));
+  $('urlsafe').addEventListener('change', run);
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', () => { inEl.value = mode === 'encode' ? SAMPLE_TEXT : SAMPLE_B64; run(); });
+  $('copy').addEventListener('click', async () => {
+    if(!outEl.value) return;
+    try { await navigator.clipboard.writeText(outEl.value); statusEl.className = 'status ok'; statusEl.textContent = 'Copied to clipboard.'; }
+    catch { outEl.select(); document.execCommand('copy'); }
+  });
+  inEl.value = SAMPLE_TEXT; run();
+</script>

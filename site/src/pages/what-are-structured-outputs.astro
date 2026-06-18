@@ -1,0 +1,86 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What are structured outputs? — JSON schemas &amp; JSON mode | KB Cafe"
+  description="A clear explainer of structured outputs: making a model return JSON that matches a schema every time, how it differs from JSON mode, and why it underpins extraction and tool calling."
+  path="/what-are-structured-outputs"
+  eyebrow="AI Explained · Concept"
+  h1="What are structured outputs?"
+  tagline="Structured outputs make a model return data in a shape you define — valid JSON matching a schema — so your code can parse it reliably instead of wrestling freeform text."
+>
+  <h2>The problem they solve</h2>
+  <p>
+    Asking a model to &ldquo;return JSON&rdquo; in the prompt mostly works — until it doesn&rsquo;t. You get a
+    chatty preamble, a markdown <code>```json</code> fence, a trailing comma, or a field renamed on a whim.
+    Then your parser throws and you&rsquo;re writing fragile regex to clean it up. <strong>Structured
+    outputs</strong> fix this at the source: you give the model a <strong>schema</strong>, and the API
+    constrains generation so the result <em>always</em> conforms — right field names, right types, valid JSON.
+  </p>
+
+  <h2>JSON mode vs structured outputs</h2>
+  <p>
+    These get conflated. <strong>JSON mode</strong> guarantees the output is <em>valid JSON</em> — but not
+    that it matches any particular shape. <strong>Structured outputs</strong> (schema-constrained) guarantee
+    it matches <em>your</em> schema: the exact fields, types, and required keys you specified. If you need to
+    reliably read <code>result.price</code> as a number, you want schema-constrained structured outputs, not
+    just JSON mode.
+  </p>
+
+  <h2>How it works across providers</h2>
+  <p>
+    The idea is the same everywhere — supply a <strong>JSON Schema</strong>, get conforming output — but the
+    API surface differs:
+  </p>
+  <ul>
+    <li><strong>OpenAI</strong> — a <code>response_format</code> of type <code>json_schema</code> with
+      <code>strict: true</code>.</li>
+    <li><strong>Anthropic</strong> — commonly via a <strong>tool</strong> whose <code>input_schema</code> is
+      your JSON Schema; the model &ldquo;calls&rdquo; it with the structured data.</li>
+    <li><strong>Gemini</strong> — a <code>responseSchema</code> plus <code>responseMimeType:
+      application/json</code>.</li>
+  </ul>
+  <p>The <a href="/structured-output-builder">Structured Output Builder</a> generates all of these from one visual schema, so you don&rsquo;t have to hand-write each provider&rsquo;s flavor.</p>
+
+  <h2>Why it matters</h2>
+  <ul>
+    <li><strong>Reliable parsing.</strong> No defensive string-munging; the shape is guaranteed.</li>
+    <li><strong>Fewer retries.</strong> You stop re-prompting because the JSON came back malformed.</li>
+    <li><strong>It powers real features.</strong> Data extraction, classification, form-filling, and
+      <a href="/what-is-tool-calling">tool-call arguments</a> are all structured-output problems.</li>
+  </ul>
+
+  <h2>Getting good results</h2>
+  <ul>
+    <li><strong>Describe your fields.</strong> A short <code>description</code> per property steers the model
+      far better than the field name alone.</li>
+    <li><strong>Use enums for closed sets.</strong> If a status is one of three values, say so — don&rsquo;t
+      hope.</li>
+    <li><strong>Mark what&rsquo;s required</strong> and set <code>additionalProperties: false</code> to keep
+      the model from inventing extra keys.</li>
+    <li><strong>Keep it focused.</strong> Deeply nested, sprawling schemas are harder for the model and
+      easier to get subtly wrong.</li>
+  </ul>
+
+  <h2 style="color:var(--coral-deep)">Valid shape isn&rsquo;t correct content</h2>
+  <p>
+    Structured outputs guarantee the <em>form</em> — that <code>price</code> is a number and
+    <code>status</code> is one of your enums. They do <strong>not</strong> guarantee the <em>value</em> is
+    right; the model can still extract the wrong number into a perfectly valid field. Validate business rules
+    yourself; the schema handles structure, not truth.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Is this the same as tool calling?</summary>
+    <p>Closely related — a tool call&rsquo;s arguments <em>are</em> a structured output (JSON matching the tool&rsquo;s parameter schema). Structured outputs are the general mechanism; tool calling is one big use of it.</p>
+  </details>
+  <details class="faq"><summary>Does every model support it?</summary>
+    <p>Most current major models support either JSON mode, schema-constrained outputs, or tool-based schemas — but the exact API and strictness differ by provider, so check the current docs for the model you&rsquo;re using.</p>
+  </details>
+  <details class="faq"><summary>Will it stop hallucinations?</summary>
+    <p>It removes <em>format</em> errors entirely. It doesn&rsquo;t remove <em>content</em> errors — the model can still put a wrong but well-typed value in a field.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Build schemas with the <a href="/structured-output-builder">Structured Output Builder</a>; see <a href="/what-is-tool-calling">tool calling</a> and <a href="/ai">AI Explained</a>.</p>
+</AiPage>

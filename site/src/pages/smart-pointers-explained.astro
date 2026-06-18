@@ -1,0 +1,67 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="Smart pointers &amp; RAII — unique_ptr, shared_ptr, and reference counting | KB Cafe"
+  description="A clear reference on smart pointers and RAII: how ownership, reference counting, unique_ptr and shared_ptr stop memory leaks, plus the weak_ptr cycle trap."
+  path="/smart-pointers-explained"
+  eyebrow="Reference · Memory"
+  h1="Smart pointers &amp; RAII"
+  tagline="Smart pointers tie an object&rsquo;s lifetime to a scope, so memory frees itself. Here&rsquo;s RAII, ownership, reference counting, and the cycle trap to avoid."
+>
+  <h2>The idea: lifetime tied to scope (RAII)</h2>
+  <p>
+    Manual <code>new</code>/<code>delete</code> leaks whenever a <code>delete</code> is skipped — an early return,
+    a thrown exception, an unclear owner. <strong>RAII — Resource Acquisition Is Initialization</strong> — fixes
+    this by tying a resource to an object&rsquo;s lifetime: acquire in the constructor, release in the destructor.
+    When the object goes out of scope, the destructor runs automatically, even when an exception unwinds the stack.
+    A <strong>smart pointer</strong> is RAII applied to heap memory — it owns a pointer and frees it for you.
+  </p>
+
+  <h2>unique_ptr — single ownership</h2>
+  <p>
+    <code>std::unique_ptr</code> models <strong>exactly one owner</strong>. It cannot be copied, only
+    <strong>moved</strong>, so ownership transfers explicitly and there&rsquo;s never ambiguity about who frees the
+    memory. It has essentially zero overhead over a raw pointer. This is the default — reach for <code>unique_ptr</code>
+    first and only upgrade if you genuinely need shared ownership.
+  </p>
+
+  <h2>shared_ptr — reference-counted ownership</h2>
+  <p>
+    <code>std::shared_ptr</code> lets <strong>several owners</strong> share an object. It keeps a
+    <strong>reference count</strong>: each copy increments it, each destruction decrements it, and when the count
+    hits zero the object is deleted. That convenience costs an atomic counter per copy and a heap control block, so
+    use it only when ownership is truly shared — not as a lazy default.
+  </p>
+
+  <h2>The cycle trap — and weak_ptr</h2>
+  <p>
+    Reference counting has one classic failure: <strong>a cycle</strong>. If object A holds a
+    <code>shared_ptr</code> to B and B holds one back to A, their counts never reach zero and neither is ever freed —
+    a leak that reference counting alone can&rsquo;t solve. The fix is <code>std::weak_ptr</code>: a non-owning
+    reference that observes a <code>shared_ptr</code> without incrementing the count. Make the
+    &ldquo;back-pointer&rdquo; in a parent/child or observer relationship a <code>weak_ptr</code> and the cycle breaks.
+  </p>
+
+  <h2>Rules of thumb</h2>
+  <ul>
+    <li><strong>Prefer <code>unique_ptr</code></strong>; reach for <code>shared_ptr</code> only when ownership is genuinely shared.</li>
+    <li>Create with <code>make_unique</code> / <code>make_shared</code> — exception-safe and (for shared) one allocation.</li>
+    <li>Use <code>weak_ptr</code> for back-references to break cycles.</li>
+    <li>Pass a raw pointer or reference when a function only <em>uses</em> an object without taking ownership.</li>
+  </ul>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Do smart pointers exist outside C++?</summary>
+    <p>The exact types are C++, but the idea — tying resource lifetime to scope (RAII) — appears as <code>using</code>/<code>try-with-resources</code> in C#/Java and context managers in Python. Reference counting also underlies many garbage collectors.</p>
+  </details>
+  <details class="faq"><summary>Is shared_ptr thread-safe?</summary>
+    <p>The reference count is atomic, so copying/destroying a <code>shared_ptr</code> across threads is safe. The <em>object it points to</em> is not automatically protected — you still need synchronization for that.</p>
+  </details>
+  <details class="faq"><summary>Can smart pointers still leak?</summary>
+    <p>Yes — through reference cycles of <code>shared_ptr</code>. That&rsquo;s exactly what <code>weak_ptr</code> is for.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>See <a href="/memory-leaks-explained">memory leaks</a> and <a href="/cpp-type-casting">C++ type casting</a>, or the full <a href="/reference">Reference</a>.</p>
+</ReferencePage>

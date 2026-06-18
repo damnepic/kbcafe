@@ -1,0 +1,172 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title=".htaccess Generator — redirects, HTTPS, caching &amp; more | KB Cafe"
+  description="Generate a clean Apache .htaccess file: force HTTPS, www/non-www, 301 redirects, gzip, browser caching, custom error pages, and directory protection. Free, client-side."
+  path="/htaccess-generator"
+  eyebrow="Apache"
+  h1=".htaccess Generator"
+  tagline="Toggle the rules you need — HTTPS, www, redirects, caching, compression — and get a clean, commented Apache .htaccess file. Built in your browser."
+>
+  <div class="htform">
+    <div class="opt-card">
+      <label class="sw"><input type="checkbox" id="https" /> <span>Force <strong>HTTPS</strong></span></label>
+      <p>Redirect all http traffic to https.</p>
+    </div>
+    <div class="opt-card">
+      <div class="sw-label">WWW</div>
+      <div class="seg" id="www">
+        <button class="seg-b active" data-w="none">leave as-is</button>
+        <button class="seg-b" data-w="www">force www</button>
+        <button class="seg-b" data-w="root">force non-www</button>
+      </div>
+    </div>
+    <div class="opt-card">
+      <label class="sw"><input type="checkbox" id="gzip" checked /> <span>Enable <strong>gzip compression</strong></span></label>
+      <p>Compress text, CSS, JS, JSON, SVG.</p>
+    </div>
+    <div class="opt-card">
+      <label class="sw"><input type="checkbox" id="cache" checked /> <span>Browser <strong>caching</strong> for assets</span></label>
+      <p>Far-future expiry for images, fonts, CSS, JS.</p>
+    </div>
+    <div class="opt-card">
+      <label class="sw"><input type="checkbox" id="nolist" checked /> <span>Disable <strong>directory browsing</strong></span></label>
+      <p>Stop Apache listing folder contents.</p>
+    </div>
+    <div class="opt-card">
+      <label class="sw" for="err404"><span>Custom <strong>404</strong> page</span></label>
+      <input id="err404" class="t-in" placeholder="/404.html" />
+    </div>
+  </div>
+
+  <div class="pane" style="margin-top:8px">
+    <div class="pane-label"><span>301/302 redirects — one per line: <code>/old /new [301|302]</code></span></div>
+    <textarea id="redirects" class="ta" style="min-height:90px" spellcheck="false" placeholder="/old-page /new-page 301
+/blog/(.*) /articles/$1 301"></textarea>
+  </div>
+
+  <div class="pane" style="margin-top:14px">
+    <div class="pane-label"><span>your .htaccess</span><button class="link-btn" id="copy">copy</button></div>
+    <textarea id="out" class="ta" readonly spellcheck="false" style="min-height:280px"></textarea>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>A correct .htaccess without the guesswork</h2>
+    <p>
+      The Apache <code>.htaccess</code> file controls redirects, HTTPS, caching, and access rules per-directory — and
+      a single misplaced <code>RewriteRule</code> can take a site down. This generator assembles the common rules from
+      toggles into one clean, commented file, in the right order, with the <code>mod_rewrite</code> and
+      <code>mod_headers</code> blocks set up correctly.
+    </p>
+
+    <h3>What it can build</h3>
+    <ul>
+      <li><strong>Force HTTPS</strong> and a canonical <strong>www / non-www</strong> host (do pick one — split hosts hurt SEO).</li>
+      <li><strong>301/302 redirects</strong> — plain paths use <code>Redirect</code>; patterns with <code>(.*)</code> and <code>$1</code> become <code>RewriteRule</code>s.</li>
+      <li><strong>gzip compression</strong> and far-future <strong>browser caching</strong> for static assets.</li>
+      <li><strong>Disable directory browsing</strong> and set a <strong>custom 404</strong>.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Where does the file go?</summary>
+      <p>In the directory you want it to govern — usually your site root. Rules cascade to subdirectories unless overridden. Apache must have <code>AllowOverride</code> enabled for it to take effect.</p>
+    </details>
+    <details class="faq"><summary>301 or 302?</summary>
+      <p><code>301</code> is permanent — use it when a URL has moved for good, so search engines transfer ranking. <code>302</code> is temporary. Default here is 301.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No — the file is generated in your browser from your toggles. Nothing is sent anywhere.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Building redirect patterns? The <a href="/case-converter">case converter</a> helps slug URLs; test JSON configs with <a href="/json-to-typescript">JSON → TypeScript</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .htform{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+  .opt-card{background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:14px 15px}
+  .opt-card p{font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.4}
+  .sw{display:flex;align-items:center;gap:9px;font-size:15px;cursor:pointer}
+  .sw input{width:16px;height:16px;accent-color:var(--coral)}
+  .sw-label{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px}
+  .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg-b{font-family:var(--font-mono);font-size:12px;background:transparent;border:0;border-right:1px solid var(--line);padding:7px 11px;cursor:pointer;color:var(--ink-soft)}
+  .seg-b:last-child{border-right:0}
+  .seg-b.active{background:var(--ink);color:var(--cream)}
+  .t-in{font-family:var(--font-mono);font-size:13px;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--paper);color:var(--ink);outline:0;width:100%;margin-top:8px}
+  .t-in:focus{border-color:var(--ink)}
+  @media(max-width:600px){.htform{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const out = $('out'), statusEl = $('status');
+  let www = 'none';
+
+  function build(){
+    const L = [];
+    const push = (...x) => L.push(...x);
+    push('# Generated by KB Cafe — kbcafe.com/htaccess-generator', '');
+
+    // split redirect lines into simple (path->path) and regex patterns
+    const simple = [], patterns = [];
+    $('redirects').value.split('\n').map(l => l.trim()).filter(Boolean).forEach(l => {
+      const parts = l.split(/\s+/);
+      const from = parts[0], to = parts[1] || '', code = parts[2] || '301';
+      if(!from || !to) return;
+      if(/[()\[\].*+?]/.test(from) || /\$\d/.test(to)) patterns.push({ from, to, code });
+      else simple.push({ from, to, code });
+    });
+
+    // assemble the mod_rewrite block (indented), only emit if it has rules
+    const rw = [];
+    if($('https').checked) rw.push('  # Force HTTPS', '  RewriteCond %{HTTPS} off', '  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]', '');
+    if(www === 'www') rw.push('  # Force www', '  RewriteCond %{HTTP_HOST} !^www\\. [NC]', '  RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]', '');
+    else if(www === 'root') rw.push('  # Force non-www', '  RewriteCond %{HTTP_HOST} ^www\\.(.+)$ [NC]', '  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]', '');
+    if(patterns.length){ rw.push('  # Pattern redirects'); patterns.forEach(p => rw.push(`  RewriteRule ^${p.from.replace(/^\//,'')}$ ${p.to} [R=${p.code},L]`)); rw.push(''); }
+    if(rw.length){
+      while(rw[rw.length - 1] === '') rw.pop();
+      push('<IfModule mod_rewrite.c>', '  RewriteEngine On', '', ...rw, '</IfModule>', '');
+    }
+
+    if(simple.length){
+      push('# Redirects');
+      simple.forEach(s => push(`Redirect ${s.code} ${s.from} ${s.to}`));
+      push('');
+    }
+    if($('gzip').checked){
+      push('# Gzip compression', '<IfModule mod_deflate.c>',
+        '  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml \\',
+        '    application/javascript application/json application/xml image/svg+xml',
+        '</IfModule>', '');
+    }
+    if($('cache').checked){
+      push('# Browser caching', '<IfModule mod_expires.c>', '  ExpiresActive On',
+        '  ExpiresByType image/jpg "access plus 1 year"',
+        '  ExpiresByType image/png "access plus 1 year"',
+        '  ExpiresByType image/svg+xml "access plus 1 year"',
+        '  ExpiresByType image/webp "access plus 1 year"',
+        '  ExpiresByType text/css "access plus 1 month"',
+        '  ExpiresByType application/javascript "access plus 1 month"',
+        '  ExpiresByType font/woff2 "access plus 1 year"',
+        '</IfModule>', '');
+    }
+    if($('nolist').checked){ push('# Disable directory browsing', 'Options -Indexes', ''); }
+    const e404 = $('err404').value.trim();
+    if(e404){ push('# Custom error page', `ErrorDocument 404 ${e404}`, ''); }
+
+    while(L.length && L[L.length - 1] === '') L.pop();
+    out.value = L.join('\n');
+    statusEl.className = 'status ok'; statusEl.textContent = 'Updated.';
+  }
+
+  $('www').addEventListener('click', e => { const b = e.target.closest('.seg-b'); if(!b) return; document.querySelectorAll('#www .seg-b').forEach(x => x.classList.remove('active')); b.classList.add('active'); www = b.dataset.w; build(); });
+  ['https','gzip','cache','nolist','err404','redirects'].forEach(id => { $(id).addEventListener('input', build); $(id).addEventListener('change', build); });
+  $('copy').addEventListener('click', async () => { if(!out.value) return; try { await navigator.clipboard.writeText(out.value); statusEl.className = 'status ok'; statusEl.textContent = 'Copied.'; } catch { out.select(); document.execCommand('copy'); } });
+  $('https').checked = true; build();
+</script>

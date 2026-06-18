@@ -1,0 +1,32 @@
+# ── INTERNAL — never publish (kept locally only) ───────────────────
+# strategy / SEO playbook / acquisition notes / AI prompts
+architecture.md
+RESTORATION-PLAN.md
+COLLABORATOR-BRIEF.md
+CLAUDE.md
+*.csv
+_private/
+research/
+strategy/
+notes/
+# loose design-phase artifacts
+concepts-*.html
+kbcafe-homepage-v*.html
+kbcafe-logo.png
+kbcafe.svg
+kbtrans.png
+
+# ── build output & deps ────────────────────────────────────────────
+node_modules/
+site/node_modules/
+site/dist/
+site/.astro/
+.vercel/
+site/.vercel/
+site/.env*
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+*.zip

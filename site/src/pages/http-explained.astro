@@ -1,0 +1,66 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="HTTP explained — methods, status codes, and the request/response cycle | KB Cafe"
+  description="A clear reference on HTTP: the request/response cycle, the methods (GET, POST, PUT, DELETE), status code families, headers, and what makes a request idempotent."
+  path="/http-explained"
+  eyebrow="Reference · Networking"
+  h1="HTTP explained"
+  tagline="Every web page, API call, and image load is an HTTP request and response. Here&rsquo;s the cycle, the methods, and the status codes you&rsquo;ll actually deal with."
+>
+  <h2>The request/response cycle</h2>
+  <p>
+    <strong>HTTP — the HyperText Transfer Protocol</strong> — is a request/response protocol over TCP. A
+    <strong>client</strong> (browser, app, <code>curl</code>) sends a request to a <strong>server</strong>, which
+    returns a response. HTTP is <strong>stateless</strong>: each request stands alone, carrying everything the
+    server needs. Anything that feels like a &ldquo;session&rdquo; is layered on top with cookies or tokens.
+  </p>
+  <p>A request has a <strong>method</strong>, a <strong>path</strong>, <strong>headers</strong>, and an optional <strong>body</strong>. A response has a <strong>status code</strong>, headers, and usually a body.</p>
+
+  <h2>The methods</h2>
+  <ul>
+    <li><code>GET</code> — retrieve a resource. Should have no side effects (safe).</li>
+    <li><code>POST</code> — submit data; create something or trigger an action. Not idempotent.</li>
+    <li><code>PUT</code> — replace a resource at a known URL. Idempotent.</li>
+    <li><code>PATCH</code> — partially update a resource.</li>
+    <li><code>DELETE</code> — remove a resource. Idempotent.</li>
+    <li><code>HEAD</code> / <code>OPTIONS</code> — fetch just headers / ask what&rsquo;s allowed.</li>
+  </ul>
+  <p>
+    <strong>Idempotent</strong> means making the same call repeatedly leaves the server in the same state — which
+    is why clients can safely retry a <code>PUT</code> or <code>DELETE</code> but must be careful retrying a
+    <code>POST</code>.
+  </p>
+
+  <h2>Status code families</h2>
+  <ul>
+    <li><strong>1xx</strong> — informational (rare; e.g. <code>101 Switching Protocols</code>).</li>
+    <li><strong>2xx</strong> — success (<code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code>).</li>
+    <li><strong>3xx</strong> — redirection (<code>301</code> permanent, <code>302/307</code> temporary, <code>304 Not Modified</code>).</li>
+    <li><strong>4xx</strong> — the client&rsquo;s fault (<code>400</code>, <code>401</code> unauthenticated, <code>403</code> forbidden, <code>404</code> not found, <code>429</code> too many requests).</li>
+    <li><strong>5xx</strong> — the server&rsquo;s fault (<code>500</code> internal error, <code>502/503/504</code> gateway/availability).</li>
+  </ul>
+
+  <h2>Headers do the real work</h2>
+  <p>
+    Headers carry the metadata that makes HTTP flexible: <code>Content-Type</code> describes the body,
+    <code>Authorization</code> carries credentials, <code>Cache-Control</code> governs caching, and
+    <code>Accept</code> negotiates the format the client wants. Most API behavior you debug — auth, caching,
+    CORS, content negotiation — lives in the headers, not the body.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>What&rsquo;s the difference between 301 and 302?</summary>
+    <p><code>301</code> is a permanent move (clients and search engines update their links); <code>302</code>/<code>307</code> are temporary. Use <code>301</code>/<code>308</code> when a URL has genuinely moved for good.</p>
+  </details>
+  <details class="faq"><summary>Is HTTPS a different protocol?</summary>
+    <p>No — HTTPS is HTTP carried inside a TLS-encrypted connection. Same methods, same status codes, with confidentiality and integrity added.</p>
+  </details>
+  <details class="faq"><summary>Why is &ldquo;stateless&rdquo; a big deal?</summary>
+    <p>Because the server doesn&rsquo;t remember you between requests, you can scale horizontally — any server can handle any request — and sessions must be carried explicitly via cookies or tokens.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>API tokens are often <a href="/jwt-decoder">JWTs</a>; auth headers use <a href="/base64">Base64</a>. Email rides similar TCP plumbing — see <a href="/how-smtp-works">SMTP</a>.</p>
+</ReferencePage>

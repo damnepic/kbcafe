@@ -1,0 +1,110 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="YAML to JSON Converter (and back) — online &amp; client-side | KB Cafe"
+  description="Convert YAML to JSON or JSON to YAML instantly, with full multi-document and type support. Free, fast, fully client-side — your config never leaves the browser."
+  path="/yaml-to-json"
+  eyebrow="Converters"
+  h1="YAML ⇄ JSON"
+  tagline="Convert YAML to JSON or JSON back to YAML — full spec support via a real parser. Paste a config; it&rsquo;s converted in your browser and never uploaded."
+>
+  <div class="row" style="margin-bottom:12px">
+    <button class="chip active" id="m-y2j">YAML → JSON</button>
+    <button class="chip" id="m-j2y">JSON → YAML</button>
+    <label class="opt" id="indent-wrap">Indent
+      <select id="indent"><option value="2">2 spaces</option><option value="4">4 spaces</option></select>
+    </label>
+  </div>
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-label"><span id="in-label">YAML in</span><button class="link-btn" id="sample">load sample</button></div>
+      <textarea id="in" class="ta" spellcheck="false" placeholder="Paste YAML here…"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-label"><span id="out-label">JSON out</span><button class="link-btn" id="copy">copy</button></div>
+      <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>YAML and JSON, both ways</h2>
+    <p>
+      YAML is what humans write — config files, CI pipelines, Kubernetes manifests; JSON is what machines and APIs
+      prefer. This converter goes both directions using a full YAML parser, so anchors, multi-line strings, typed
+      scalars (numbers, booleans, null, dates), and nested structures all convert correctly — not just the simple
+      key/value cases.
+    </p>
+
+    <h3>Notes that trip people up</h3>
+    <ul>
+      <li><strong>JSON is valid YAML.</strong> YAML is a superset, which is why a <code>.json</code> file usually parses as YAML too.</li>
+      <li><strong>Types matter.</strong> Unquoted <code>yes</code>, <code>no</code>, <code>on</code>, <code>off</code>, and bare numbers become booleans/numbers. Quote them if you meant strings.</li>
+      <li><strong>Indentation is structure</strong> in YAML — tabs are not allowed for indentation; use spaces.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it support all YAML features?</summary>
+      <p>It uses a complete YAML 1.1 parser, so anchors/aliases, block and flow styles, multi-line scalars, and typed values are all handled.</p>
+    </details>
+    <details class="faq"><summary>Is my config uploaded?</summary>
+      <p>No — conversion runs entirely in your browser, so secrets in a config stay local and the tool works offline.</p>
+    </details>
+    <details class="faq"><summary>Why did my <code>on:</code> key become <code>true</code>?</summary>
+      <p>YAML reads bare <code>on</code>/<code>off</code>/<code>yes</code>/<code>no</code> as booleans. Wrap them in quotes (<code>"on"</code>) to keep them as strings — a classic gotcha in GitHub Actions files.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>From a spreadsheet instead? <a href="/csv-to-json">CSV ⇄ JSON</a>. Type the result with <a href="/json-to-typescript">JSON → TypeScript</a> or <a href="/json-to-go">JSON → Go</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:7px;margin-left:auto}
+  .opt select{font-family:var(--font-mono);font-size:12.5px;border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--cream);color:var(--ink)}
+</style>
+
+<script>
+  import yaml from 'js-yaml';
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+  let mode = 'y2j';
+  const SAMPLE_YAML = `name: KB Cafe\nlive: true\nversion: 2\ntools:\n  - json-to-typescript\n  - jwt-decoder\n  - base64\nbrand:\n  coral: "#EE4B2B"\n  coffee: "#6F4E37"`;
+  const SAMPLE_JSON = `{\n  "name": "KB Cafe",\n  "live": true,\n  "version": 2,\n  "tools": ["json-to-typescript", "jwt-decoder", "base64"],\n  "brand": { "coral": "#EE4B2B", "coffee": "#6F4E37" }\n}`;
+
+  function run(){
+    const raw = inEl.value; statusEl.className='status'; statusEl.textContent=''; inEl.classList.remove('err');
+    if(!raw.trim()){ outEl.value=''; return; }
+    try {
+      if(mode === 'y2j'){
+        const data = yaml.load(raw);
+        outEl.value = JSON.stringify(data, null, parseInt($('indent').value));
+        statusEl.className='status ok'; statusEl.textContent='Converted YAML → JSON.';
+      } else {
+        const data = JSON.parse(raw);
+        outEl.value = yaml.dump(data, { indent: parseInt($('indent').value), lineWidth: 100, noRefs: true });
+        statusEl.className='status ok'; statusEl.textContent='Converted JSON → YAML.';
+      }
+    } catch(e){
+      inEl.classList.add('err'); outEl.value=''; statusEl.className='status bad';
+      statusEl.textContent = (mode==='y2j' ? 'Invalid YAML: ' : 'Invalid JSON: ') + (e.message||'').split('\n')[0];
+    }
+  }
+  function setMode(m){
+    mode = m;
+    $('m-y2j').classList.toggle('active', m==='y2j'); $('m-j2y').classList.toggle('active', m==='j2y');
+    $('in-label').textContent = m==='y2j' ? 'YAML in' : 'JSON in';
+    $('out-label').textContent = m==='y2j' ? 'JSON out' : 'YAML out';
+    inEl.value = m==='y2j' ? SAMPLE_YAML : SAMPLE_JSON; run();
+  }
+  $('m-y2j').addEventListener('click', ()=>setMode('y2j'));
+  $('m-j2y').addEventListener('click', ()=>setMode('j2y'));
+  $('indent').addEventListener('change', run);
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', ()=>{ inEl.value = mode==='y2j'?SAMPLE_YAML:SAMPLE_JSON; run(); });
+  $('copy').addEventListener('click', async ()=>{ if(!outEl.value) return; try{ await navigator.clipboard.writeText(outEl.value); statusEl.className='status ok'; statusEl.textContent='Copied.'; }catch{ outEl.select(); document.execCommand('copy'); } });
+  inEl.value = SAMPLE_YAML; run();
+</script>

@@ -1,0 +1,162 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="cURL to Code — convert curl to fetch, axios, Python, Go | KB Cafe"
+  description="Paste a cURL command and get equivalent code for JavaScript fetch, axios, Python requests, or Go. Free, fast, fully client-side — nothing is uploaded."
+  path="/curl-to-code"
+  eyebrow="Converters"
+  h1="cURL → Code"
+  tagline="Paste a cURL command and get the equivalent in fetch, axios, Python requests, or Go — method, headers, body, and auth carried over. Runs in your browser."
+>
+  <div class="pane" style="margin-bottom:14px">
+    <div class="pane-label"><span>cURL command</span><button class="link-btn" id="sample">load sample</button></div>
+    <textarea id="in" class="ta" style="min-height:120px" spellcheck="false" placeholder="Paste a curl command…"></textarea>
+  </div>
+  <div class="row" id="langs" style="margin-bottom:10px">
+    <button class="chip active" data-l="fetch">fetch</button>
+    <button class="chip" data-l="axios">axios</button>
+    <button class="chip" data-l="python">Python</button>
+    <button class="chip" data-l="go">Go</button>
+  </div>
+  <div class="pane">
+    <div class="pane-label"><span id="out-label">fetch</span><button class="link-btn" id="copy">copy</button></div>
+    <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>From a copied cURL to working code</h2>
+    <p>
+      Browser dev tools and API docs hand you requests as <code>curl</code> commands. This tool parses one — URL,
+      method, every <code>-H</code> header, the request body (<code>-d</code>/<code>--data</code>/<code>--data-raw</code>),
+      and basic auth (<code>-u</code>) — and rewrites it as idiomatic code in the language you actually use. It handles
+      quoted arguments and backslash line-continuations, so pasting a multi-line curl works as-is.
+    </p>
+
+    <h3>Targets</h3>
+    <ul>
+      <li><strong>fetch</strong> — the browser/Node standard, no dependencies.</li>
+      <li><strong>axios</strong> — the popular JS HTTP client.</li>
+      <li><strong>Python</strong> — the <code>requests</code> library, with <code>json=</code> used automatically when the body is JSON.</li>
+      <li><strong>Go</strong> — <code>net/http</code> with the body and headers set up for you.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it handle headers and JSON bodies?</summary>
+      <p>Yes — every <code>-H</code> becomes a header, and a JSON body with a JSON content-type is emitted in the idiomatic way for each language (e.g. Python&rsquo;s <code>json=</code>).</p>
+    </details>
+    <details class="faq"><summary>What about <code>-u</code> basic auth?</summary>
+      <p>It&rsquo;s converted to the right mechanism per language — an <code>Authorization</code> header or the client&rsquo;s auth option.</p>
+    </details>
+    <details class="faq"><summary>Is my command uploaded?</summary>
+      <p>No — parsing runs in your browser, so tokens and secrets in the command stay local and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Decode a bearer token with the <a href="/jwt-decoder">JWT decoder</a>; type a JSON response with <a href="/json-to-typescript">JSON → TypeScript</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+  let lang = 'fetch';
+  const SAMPLE = `curl -X POST https://api.example.com/v1/users \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer abc123" \\
+  -d '{"name":"Ada","role":"admin"}'`;
+
+  function tokenize(s){
+    s = s.replace(/\\\r?\n/g, ' ');
+    const t = []; let i = 0;
+    while(i < s.length){
+      while(i < s.length && /\s/.test(s[i])) i++;
+      if(i >= s.length) break;
+      let tok = '';
+      while(i < s.length && !/\s/.test(s[i])){
+        const c = s[i];
+        if(c === '"' || c === "'"){ const q = c; i++; while(i < s.length && s[i] !== q){ if(s[i] === '\\' && q === '"' && i+1 < s.length){ tok += s[i+1]; i += 2; } else { tok += s[i]; i++; } } i++; }
+        else { tok += c; i++; }
+      }
+      t.push(tok);
+    }
+    return t;
+  }
+  function parse(cmd){
+    const tk = tokenize(cmd.trim());
+    const r = { method: null, url: '', headers: [], data: null, auth: null };
+    for(let i = 0; i < tk.length; i++){
+      const a = tk[i];
+      if(a === 'curl') continue;
+      else if(a === '-X' || a === '--request') r.method = tk[++i];
+      else if(a === '-H' || a === '--header') r.headers.push(tk[++i]);
+      else if(a === '-u' || a === '--user') r.auth = tk[++i];
+      else if(a === '--url') r.url = tk[++i];
+      else if(/^(-d|--data|--data-raw|--data-ascii|--data-binary|--data-urlencode)$/.test(a)) r.data = (r.data ? r.data + '&' : '') + tk[++i];
+      else if(a[0] === '-'){ /* skip unknown flags */ }
+      else if(!r.url) r.url = a;
+    }
+    if(!r.method) r.method = (r.data != null) ? 'POST' : 'GET';
+    return r;
+  }
+  function headerObj(r){ const o = {}; r.headers.forEach(h => { const idx = h.indexOf(':'); if(idx > 0) o[h.slice(0, idx).trim()] = h.slice(idx + 1).trim(); }); if(r.auth) o['Authorization'] = 'Basic <base64 ' + r.auth + '>'; return o; }
+  function isJSON(r){ const o = headerObj(r); const ct = Object.keys(o).find(k => k.toLowerCase() === 'content-type'); return ct && /json/i.test(o[ct]) && r.data; }
+  const q = s => "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+  const ind = (o, n) => JSON.stringify(o, null, 2).split('\n').map((l, i) => i ? ' '.repeat(n) + l : l).join('\n');
+
+  function gen(r){
+    const h = headerObj(r), hasH = Object.keys(h).length;
+    if(lang === 'fetch'){
+      const lines = [`fetch(${q(r.url)}, {`, `  method: ${q(r.method)},`];
+      if(hasH) lines.push(`  headers: ${ind(h, 2)},`);
+      if(r.data != null) lines.push(`  body: ${q(r.data)},`);
+      lines.push(`})`, `  .then((res) => res.json())`, `  .then(console.log);`);
+      return lines.join('\n');
+    }
+    if(lang === 'axios'){
+      const cfg = { method: r.method.toLowerCase(), url: r.url };
+      if(hasH) cfg.headers = h;
+      if(r.data != null) cfg.data = isJSON(r) ? JSON.parse(r.data) : r.data;
+      return `import axios from 'axios';\n\nconst res = await axios(${ind(cfg, 0)});\nconsole.log(res.data);`;
+    }
+    if(lang === 'python'){
+      const lines = [`import requests`, ``];
+      const args = [q(r.url).replace(/^'|'$/g, '"').replace(/"/g, '"')];
+      let s = `resp = requests.${r.method.toLowerCase()}(\n    "${r.url}",`;
+      if(hasH) s += `\n    headers=${JSON.stringify(h, null, 4).replace(/\n/g, '\n    ')},`;
+      if(r.data != null) s += isJSON(r) ? `\n    json=${JSON.stringify(JSON.parse(r.data), null, 4).replace(/\n/g, '\n    ')},` : `\n    data=${JSON.stringify(r.data)},`;
+      s += `\n)`;
+      lines.push(s, `print(resp.json())`);
+      return lines.join('\n');
+    }
+    if(lang === 'go'){
+      const body = r.data != null ? `strings.NewReader(${JSON.stringify(r.data)})` : 'nil';
+      const lines = [`package main`, ``, `import (`, `\t"fmt"`, `\t"io"`, `\t"net/http"`];
+      if(r.data != null) lines.push(`\t"strings"`);
+      lines.push(`)`, ``, `func main() {`, `\treq, _ := http.NewRequest(${JSON.stringify(r.method)}, ${JSON.stringify(r.url)}, ${body})`);
+      Object.entries(h).forEach(([k, v]) => lines.push(`\treq.Header.Set(${JSON.stringify(k)}, ${JSON.stringify(v)})`));
+      lines.push(`\tres, err := http.DefaultClient.Do(req)`, `\tif err != nil { panic(err) }`, `\tdefer res.Body.Close()`, `\tbody, _ := io.ReadAll(res.Body)`, `\tfmt.Println(string(body))`, `}`);
+      return lines.join('\n');
+    }
+  }
+
+  function run(){
+    const raw = inEl.value.trim();
+    statusEl.className = 'status'; statusEl.textContent = ''; inEl.classList.remove('err');
+    if(!raw){ outEl.value = ''; return; }
+    if(!/curl/.test(raw)){ inEl.classList.add('err'); statusEl.className = 'status bad'; statusEl.textContent = 'Doesn\\'t look like a curl command.'; return; }
+    try { const r = parse(raw); if(!r.url){ throw new Error('no URL found'); } outEl.value = gen(r); statusEl.className = 'status ok'; statusEl.textContent = `${r.method} ${r.url}`; }
+    catch(e){ inEl.classList.add('err'); outEl.value = ''; statusEl.className = 'status bad'; statusEl.textContent = 'Could not parse: ' + e.message; }
+  }
+  $('langs').addEventListener('click', e => { const b = e.target.closest('.chip'); if(!b) return; document.querySelectorAll('#langs .chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); lang = b.dataset.l; $('out-label').textContent = b.textContent; run(); });
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; run(); });
+  $('copy').addEventListener('click', async () => { if(!outEl.value) return; try { await navigator.clipboard.writeText(outEl.value); statusEl.className = 'status ok'; statusEl.textContent = 'Copied.'; } catch { outEl.select(); document.execCommand('copy'); } });
+  inEl.value = SAMPLE; run();
+</script>

@@ -1,0 +1,152 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="CSV to JSON Converter (and back) — online &amp; client-side | KB Cafe"
+  description="Convert CSV to JSON or JSON to CSV instantly. Handles quoted fields, custom delimiters, and headers. Free, fast, fully client-side — your data never leaves the browser."
+  path="/csv-to-json"
+  eyebrow="Converters"
+  h1="CSV ⇄ JSON"
+  tagline="Convert CSV to a JSON array of objects, or JSON back to CSV — with proper handling of quotes, commas-in-fields, and custom delimiters. All in your browser."
+>
+  <div class="row" style="margin-bottom:12px">
+    <button class="chip active" id="m-c2j">CSV → JSON</button>
+    <button class="chip" id="m-j2c">JSON → CSV</button>
+    <label class="opt">Delimiter
+      <select id="delim"><option value=",">comma ,</option><option value=";">semicolon ;</option><option value="\t">tab</option><option value="|">pipe |</option></select>
+    </label>
+    <label class="opt"><input type="checkbox" id="header" checked /> First row is header</label>
+  </div>
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-label"><span id="in-label">CSV in</span><button class="link-btn" id="sample">load sample</button></div>
+      <textarea id="in" class="ta" spellcheck="false" placeholder="Paste CSV here…"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-label"><span id="out-label">JSON out</span><button class="link-btn" id="copy">copy</button></div>
+      <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>CSV and JSON, both directions</h2>
+    <p>
+      CSV is compact and spreadsheet-friendly; JSON is what your code wants. This converter goes both ways. The CSV
+      parser is spec-aware: it handles <strong>quoted fields</strong>, <strong>commas and newlines inside quotes</strong>,
+      and <strong>escaped quotes</strong> (<code>""</code>), so a messy export from Excel or a database doesn&rsquo;t
+      break it. Numbers and <code>true</code>/<code>false</code>/<code>null</code> are detected and converted to real
+      JSON types rather than left as strings.
+    </p>
+
+    <h3>Options</h3>
+    <ul>
+      <li><strong>Delimiter</strong> — comma, semicolon, tab, or pipe, for European exports and TSV files.</li>
+      <li><strong>First row is header</strong> — on, each row becomes an object keyed by the header; off, rows become arrays.</li>
+    </ul>
+    <p>Going JSON → CSV, an array of objects is flattened to columns (the union of all keys), and any value containing the delimiter, a quote, or a newline is safely quoted.</p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it handle commas inside a field?</summary>
+      <p>Yes — fields wrapped in double quotes can contain commas, newlines, and escaped quotes. That&rsquo;s the part naive split-on-comma converters get wrong.</p>
+    </details>
+    <details class="faq"><summary>Are numbers kept as numbers?</summary>
+      <p>Yes. Values that look like numbers, booleans, or null become real JSON types. Anything ambiguous stays a string.</p>
+    </details>
+    <details class="faq"><summary>Is my data uploaded?</summary>
+      <p>No — parsing runs in your browser, so it&rsquo;s safe for private exports and works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Type the result with <a href="/json-to-typescript">JSON → TypeScript</a> or <a href="/json-to-go">JSON → Go</a>; swap formats with <a href="/yaml-to-json">YAML ⇄ JSON</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:7px}
+  .opt select{font-family:var(--font-mono);font-size:12.5px;border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--cream);color:var(--ink)}
+  .opt:last-of-type{margin-left:auto}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+  let mode = 'c2j';
+  const SAMPLE_CSV = 'id,name,role,active\n1,"Ada, Countess",pioneer,true\n2,Linus,maintainer,true\n3,"Grace ""Amazing"" Hopper",admiral,false';
+  const SAMPLE_JSON = '[\n  { "id": 1, "name": "Ada, Countess", "role": "pioneer", "active": true },\n  { "id": 2, "name": "Linus", "role": "maintainer", "active": true }\n]';
+
+  function delim(){ const v = $('delim').value; return v === '\\t' ? '\t' : v; }
+
+  function parseCSV(text, d){
+    const rows = []; let row = [], cur = '', q = false;
+    for(let i=0;i<text.length;i++){
+      const c = text[i];
+      if(q){ if(c === '"'){ if(text[i+1] === '"'){ cur+='"'; i++; } else q=false; } else cur+=c; }
+      else { if(c === '"') q=true; else if(c === d){ row.push(cur); cur=''; }
+        else if(c === '\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+        else if(c === '\r'){} else cur+=c; }
+    }
+    if(cur.length || row.length){ row.push(cur); rows.push(row); }
+    return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ''));
+  }
+  function coerce(v){
+    if(v === '') return '';
+    if(v === 'true') return true; if(v === 'false') return false; if(v === 'null') return null;
+    if(/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(v)) return Number(v);
+    return v;
+  }
+  function csvField(v){
+    const s = v === null || v === undefined ? '' : String(v);
+    return /[",\n\r]/.test(s) || s.includes(delim()) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }
+
+  function run(){
+    const raw = inEl.value; statusEl.className='status'; statusEl.textContent=''; inEl.classList.remove('err');
+    if(!raw.trim()){ outEl.value=''; return; }
+    try {
+      if(mode === 'c2j'){
+        const rows = parseCSV(raw, delim());
+        if(!rows.length){ outEl.value='[]'; return; }
+        let result;
+        if($('header').checked){
+          const head = rows[0];
+          result = rows.slice(1).map(r => { const o={}; head.forEach((k,i)=>o[k]=coerce(r[i] ?? '')); return o; });
+        } else { result = rows.map(r => r.map(coerce)); }
+        outEl.value = JSON.stringify(result, null, 2);
+        statusEl.className='status ok'; statusEl.textContent = `${result.length} row${result.length!==1?'s':''} → JSON`;
+      } else {
+        const data = JSON.parse(raw);
+        const arr = Array.isArray(data) ? data : [data];
+        const objs = arr.every(x => x && typeof x === 'object' && !Array.isArray(x));
+        let lines;
+        if(objs){
+          const keys = [...new Set(arr.flatMap(o => Object.keys(o)))];
+          lines = [keys.map(csvField).join(delim())].concat(arr.map(o => keys.map(k => csvField(o[k])).join(delim())));
+        } else {
+          lines = arr.map(r => (Array.isArray(r)?r:[r]).map(csvField).join(delim()));
+        }
+        outEl.value = lines.join('\n');
+        statusEl.className='status ok'; statusEl.textContent = `${arr.length} row${arr.length!==1?'s':''} → CSV`;
+      }
+    } catch(e){
+      inEl.classList.add('err'); outEl.value=''; statusEl.className='status bad';
+      statusEl.textContent = mode==='j2c' ? 'Invalid JSON: ' + e.message : 'Could not parse CSV.';
+    }
+  }
+  function setMode(m){
+    mode = m;
+    $('m-c2j').classList.toggle('active', m==='c2j'); $('m-j2c').classList.toggle('active', m==='j2c');
+    $('in-label').textContent = m==='c2j' ? 'CSV in' : 'JSON in';
+    $('out-label').textContent = m==='c2j' ? 'JSON out' : 'CSV out';
+    inEl.value = m==='c2j' ? SAMPLE_CSV : SAMPLE_JSON; run();
+  }
+  $('m-c2j').addEventListener('click', ()=>setMode('c2j'));
+  $('m-j2c').addEventListener('click', ()=>setMode('j2c'));
+  ['delim','header'].forEach(id=>$(id).addEventListener('change', run));
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', ()=>{ inEl.value = mode==='c2j'?SAMPLE_CSV:SAMPLE_JSON; run(); });
+  $('copy').addEventListener('click', async ()=>{ if(!outEl.value) return; try{ await navigator.clipboard.writeText(outEl.value); statusEl.className='status ok'; statusEl.textContent='Copied.'; }catch{ outEl.select(); document.execCommand('copy'); } });
+  inEl.value = SAMPLE_CSV; run();
+</script>

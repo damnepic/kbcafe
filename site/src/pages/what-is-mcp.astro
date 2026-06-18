@@ -1,0 +1,79 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What is MCP (Model Context Protocol)? — explained simply | KB Cafe"
+  description="A clear explainer of MCP, the Model Context Protocol: the open standard for connecting AI apps to tools and data, how it works (clients, servers, tools/resources/prompts), and why it matters."
+  path="/what-is-mcp"
+  eyebrow="AI Explained · Protocol"
+  h1="What is MCP (Model Context Protocol)?"
+  tagline="MCP is an open standard for connecting AI applications to external tools and data — a common plug so every app and every integration don't have to be wired together by hand."
+>
+  <h2>The problem MCP solves</h2>
+  <p>
+    An AI assistant is far more useful when it can <em>do</em> things — read your files, query a database,
+    call an API, search a wiki. But before MCP, every one of those connections was bespoke: each AI app
+    integrated each tool in its own way. With <em>M</em> apps and <em>N</em> tools you faced
+    <strong>M&times;N</strong> custom integrations. <strong>MCP — the Model Context Protocol</strong> —
+    introduced by Anthropic in late 2024 and since adopted across the ecosystem, turns that into
+    <strong>M&nbsp;+&nbsp;N</strong>: build one MCP server for your tool, and any MCP-compatible app can use
+    it. It&rsquo;s often described as <strong>&ldquo;USB-C for AI tools&rdquo;</strong> — one standard
+    connector instead of a drawer full of adapters.
+  </p>
+
+  <h2>How it works</h2>
+  <p>MCP is a client&ndash;server protocol (built on JSON-RPC, over local stdio or HTTP transports):</p>
+  <ul>
+    <li><strong>Host / client</strong> — the AI app (an IDE assistant, a chat client, an agent). It speaks
+      MCP and connects to one or more servers.</li>
+    <li><strong>Server</strong> — a small program that exposes a capability. You can run servers for a
+      filesystem, a database, GitHub, a SaaS API, your internal docs — anything.</li>
+  </ul>
+  <p>Each server can offer three kinds of things:</p>
+  <ul>
+    <li><strong>Tools</strong> — actions the model can call (e.g. <code>search_issues</code>,
+      <code>run_query</code>). This is where MCP meets <strong>tool/function calling</strong>.</li>
+    <li><strong>Resources</strong> — data the app can read (files, records, documents) to put in context.</li>
+    <li><strong>Prompts</strong> — reusable prompt templates the server provides.</li>
+  </ul>
+
+  <h2>MCP vs function calling</h2>
+  <p>
+    They&rsquo;re complementary, not competing. <strong>Function (tool) calling</strong> is the model
+    deciding, mid-response, that it wants to invoke a tool and with what arguments. <strong>MCP</strong> is
+    the standard way that tool is <em>described, discovered, and connected</em> in the first place. Function
+    calling is the model raising its hand; MCP is the wiring that lets any tool be on the other end of it.
+  </p>
+
+  <h2>Why it matters</h2>
+  <ul>
+    <li><strong>A reusable ecosystem.</strong> A growing catalog of open MCP servers means an agent can plug
+      into new capabilities without custom glue each time.</li>
+    <li><strong>Portability.</strong> Write an integration once; it works across any MCP-compatible host.</li>
+    <li><strong>It&rsquo;s how agents reach the real world.</strong> Most &ldquo;agentic&rdquo; behavior
+      comes down to calling tools and reading resources — exactly what MCP standardizes.</li>
+  </ul>
+
+  <h2 style="color:var(--coral-deep)">A security note worth its own paragraph</h2>
+  <p>
+    An MCP server can be powerful — it may read your files, hit your database, or take actions. Connecting one
+    is granting it real access, and a server&rsquo;s tool descriptions enter the model&rsquo;s context, which
+    opens the door to <strong>prompt injection</strong> (a malicious server or document steering the model).
+    Run servers you trust, review the permissions and actions each one exposes, and prefer least-privilege
+    access. (A &ldquo;review an MCP config before you run it&rdquo; tool is on the KB Cafe bench.)
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Is MCP tied to one company or model?</summary>
+    <p>No — it&rsquo;s an open protocol. It originated at Anthropic but is implemented across many apps and works with different models; the point is a shared standard rather than a vendor lock-in.</p>
+  </details>
+  <details class="faq"><summary>Do I need MCP to use tool calling?</summary>
+    <p>No. You can wire tools directly into a single app. MCP matters when you want those tools to be reusable across apps, or to plug into the wider ecosystem of existing servers.</p>
+  </details>
+  <details class="faq"><summary>Is an MCP server safe to install?</summary>
+    <p>Treat it like installing software with access to your data. Use trusted sources, read what tools and permissions it exposes, and apply least-privilege — an MCP server can act on your behalf.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>See <a href="/what-is-a-context-window">context windows</a> (tool descriptions live there) and <a href="/what-is-rag">RAG</a>, or browse <a href="/ai">AI Explained</a>.</p>
+</AiPage>

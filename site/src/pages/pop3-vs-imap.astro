@@ -1,0 +1,66 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="POP3 vs IMAP — the two ways to read email, compared | KB Cafe"
+  description="POP3 vs IMAP explained: how each retrieves mail, where messages actually live, how they handle multiple devices, and which protocol you should use."
+  path="/pop3-vs-imap"
+  eyebrow="Reference · Email"
+  h1="POP3 vs IMAP (reading email)"
+  tagline="Both protocols fetch mail from a server, but they treat your inbox completely differently. Here&rsquo;s how each works and which one you actually want."
+>
+  <h2>The job they share</h2>
+  <p>
+    <a href="/how-smtp-works">SMTP</a> moves mail <em>to</em> a server. <strong>POP3 and IMAP move it from the
+    server to your mail client</strong> so you can read it. They are retrieval protocols — and the difference
+    between them comes down to one question: where do your messages actually live?
+  </p>
+
+  <h2>POP3 — download and (usually) delete</h2>
+  <p>
+    The <strong>Post Office Protocol (POP3, port 110 / 995 for TLS)</strong> was designed for one device on an
+    intermittent connection. The client connects, <strong>downloads new messages to local storage, and by default
+    removes them from the server</strong>. Mail then lives on that one device. It&rsquo;s simple and storage-light
+    on the server, but it predates the idea that you&rsquo;d check the same inbox from a phone, a laptop, and a
+    browser.
+  </p>
+
+  <h2>IMAP — the server is the source of truth</h2>
+  <p>
+    The <strong>Internet Message Access Protocol (IMAP, port 143 / 993 for TLS)</strong> keeps messages
+    <strong>on the server</strong> and lets clients view and manipulate them in place. Folders, read/unread state,
+    flags, and deletions all sync back to the server, so every device sees the same inbox. Clients typically cache
+    messages locally for speed and offline reading, but the server holds the canonical copy.
+  </p>
+
+  <h2>Head to head</h2>
+  <ul>
+    <li><strong>Where mail lives:</strong> POP3 — on your device. IMAP — on the server.</li>
+    <li><strong>Multiple devices:</strong> POP3 — messy and out of sync. IMAP — consistent everywhere.</li>
+    <li><strong>Server storage:</strong> POP3 — minimal. IMAP — you need enough quota to hold everything.</li>
+    <li><strong>Offline access:</strong> POP3 — full, it&rsquo;s all local. IMAP — whatever the client has cached.</li>
+    <li><strong>Folders &amp; state sync:</strong> POP3 — none. IMAP — yes.</li>
+  </ul>
+
+  <h2>Which should you use?</h2>
+  <p>
+    For almost everyone today, <strong>IMAP</strong> — you check mail from more than one device and expect a
+    consistent inbox. Reach for <strong>POP3</strong> only in narrow cases: a single device, a deliberate desire
+    to pull mail off the server entirely, or a strict local-archive workflow. (Most modern providers also offer
+    proprietary sync APIs, but IMAP remains the open standard.)
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Does POP3 always delete from the server?</summary>
+    <p>No — most clients offer a &ldquo;leave a copy on the server&rdquo; option. But it&rsquo;s still single-device thinking; state isn&rsquo;t synced back the way IMAP does it.</p>
+  </details>
+  <details class="faq"><summary>Do POP3/IMAP send mail?</summary>
+    <p>No. They only retrieve. Sending always goes through <a href="/how-smtp-works">SMTP</a> — which is why mail clients ask you to configure both an incoming and an outgoing server.</p>
+  </details>
+  <details class="faq"><summary>Are they encrypted?</summary>
+    <p>Use the TLS ports — 995 for POP3 and 993 for IMAP — so credentials and messages aren&rsquo;t sent in the clear.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Sending mail is <a href="/how-smtp-works">SMTP</a>. See the full <a href="/reference">Reference</a> for more protocol explainers.</p>
+</ReferencePage>

@@ -1,0 +1,72 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What is a vector database? — similarity search for embeddings | KB Cafe"
+  description="A clear explainer of vector databases: how they store embeddings and find nearest neighbours fast with ANN indexes, how they differ from regular databases, and where they fit in RAG."
+  path="/what-is-a-vector-database"
+  eyebrow="AI Explained · Infra"
+  h1="What is a vector database?"
+  tagline="A vector database stores embeddings and finds the closest ones to a query — fast, at scale. It's the storage-and-search layer that makes semantic search and RAG practical."
+>
+  <h2>What it&rsquo;s for</h2>
+  <p>
+    Once you turn content into <a href="/what-are-embeddings">embeddings</a>, you need somewhere to keep those
+    vectors and a way to ask <strong>&ldquo;which stored items are most similar to this one?&rdquo;</strong> A
+    <strong>vector database</strong> is built for exactly that: store millions of vectors, and given a query
+    vector, return its <strong>nearest neighbours</strong> in milliseconds. It&rsquo;s the engine under semantic
+    search, recommendations, and <a href="/what-is-rag">RAG</a>.
+  </p>
+
+  <h2>Why a regular database isn&rsquo;t enough</h2>
+  <p>
+    A normal database is great at exact matches and ranges — <code>WHERE price &lt; 50</code>. But embeddings
+    aren&rsquo;t looked up by equality; you want the <em>closest</em> vectors by meaning, across a huge,
+    high-dimensional space. Comparing a query against every stored vector (an exact search) is accurate but
+    slow at scale. Vector databases solve this with specialized indexes that make similarity search fast.
+  </p>
+
+  <h2>How it works</h2>
+  <ul>
+    <li><strong>Store</strong> each item as <code>&#123; id, vector, metadata &#125;</code> — the embedding plus fields
+      you can filter on (author, date, type).</li>
+    <li><strong>Index</strong> the vectors with an <strong>ANN (Approximate Nearest Neighbour)</strong>
+      algorithm — commonly <strong>HNSW</strong> (a navigable graph) or <strong>IVF</strong> (clustering). ANN
+      trades a tiny bit of accuracy for a huge speed-up, which is what makes million-scale search feel instant.</li>
+    <li><strong>Query</strong> by embedding your input the same way, then asking the index for the top-<em>k</em>
+      nearest by <strong>cosine similarity</strong> (or dot product / Euclidean distance).</li>
+    <li><strong>Filter</strong> with metadata — &ldquo;closest chunks <em>from these docs, since January</em>&rdquo;
+      — combining semantic and structured constraints.</li>
+  </ul>
+
+  <h2>Where it fits in RAG</h2>
+  <p>
+    In a <a href="/what-is-rag">RAG</a> pipeline, the vector database is the <strong>retrieval</strong> step.
+    You index your chunks once; at query time you embed the question, pull the top matching chunks from the
+    vector store, and hand them to the model. Better recall here matters more than a bigger model — if the
+    right chunk isn&rsquo;t retrieved, the model never sees it.
+  </p>
+
+  <h2>Your options</h2>
+  <p>
+    There are <strong>dedicated</strong> vector databases and <strong>extensions</strong> that add vector search
+    to a database you already run (for example, the <code>pgvector</code> extension for PostgreSQL, or vector
+    features in Redis and Elasticsearch). For a small project, an extension on your existing database is often
+    enough; at large scale or with heavy filtering, a purpose-built vector database earns its keep. Evaluate
+    current options against your scale, latency, and filtering needs rather than a remembered shortlist.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Do I actually need a vector database?</summary>
+    <p>For a handful of vectors, no — you can compare them in memory. Once you have thousands to millions of chunks and need fast filtered search, a vector index is what keeps it usable.</p>
+  </details>
+  <details class="faq"><summary>What does &ldquo;approximate&rdquo; nearest neighbour mean?</summary>
+    <p>Exact search checks every vector and is slow at scale. ANN indexes find <em>almost</em> the exact nearest neighbours far faster, with accuracy high enough that the tiny miss rarely matters.</p>
+  </details>
+  <details class="faq"><summary>Is hybrid search worth it?</summary>
+    <p>Often yes — combining keyword (exact-term) and vector (semantic) search catches both the precise matches and the meaning-based ones, which neither does alone.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>It stores <a href="/what-are-embeddings">embeddings</a> and powers <a href="/what-is-rag">RAG</a>. More in <a href="/ai">AI Explained</a>.</p>
+</AiPage>

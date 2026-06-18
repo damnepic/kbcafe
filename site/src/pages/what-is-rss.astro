@@ -1,0 +1,70 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="What is RSS? — feeds, readers, and how syndication works | KB Cafe"
+  description="A clear reference on RSS: what a feed is, the orange XML buttons, how RSS and Atom differ, what a feed reader does, and why feeds still matter."
+  path="/what-is-rss"
+  eyebrow="Reference · Feeds"
+  h1="What is RSS?"
+  tagline="RSS is how a website offers its content as a structured, subscribable feed. Here's what a feed actually is, how readers use it, and how RSS and Atom relate."
+>
+  <h2>The short version</h2>
+  <p>
+    <strong>RSS — Really Simple Syndication</strong> — is a standard way for a website to publish its content
+    as a machine-readable <strong>feed</strong>. Instead of visiting ten sites to see what&rsquo;s new, you
+    subscribe to their feeds in a <strong>feed reader</strong>, and new posts come to you, in order, with no
+    algorithm deciding what you see. Those <em>orange XML buttons</em> you used to spot everywhere were the
+    invitation: &ldquo;here&rsquo;s my feed — subscribe.&rdquo;
+  </p>
+
+  <h2>What a feed actually is</h2>
+  <p>
+    A feed is an <strong>XML document</strong> the site keeps up to date. At the top it describes the
+    <strong>channel</strong> (the site&rsquo;s title, link, and description); below that is a list of
+    <strong>items</strong>, each with a title, a link, a publish date, and the content or a summary. A reader
+    fetches that document on a schedule, compares it to what it saw last time, and shows you what&rsquo;s new.
+    That&rsquo;s the whole mechanism — a structured list a program can poll.
+  </p>
+
+  <h2>RSS vs Atom</h2>
+  <p>
+    You&rsquo;ll see two feed formats in the wild, and they do the same job:
+  </p>
+  <ul>
+    <li><strong>RSS 2.0</strong> — the classic, widely-published format using <code>&lt;channel&gt;</code> and
+      <code>&lt;item&gt;</code> elements. Simple and everywhere.</li>
+    <li><strong>Atom</strong> — a later IETF standard using <code>&lt;feed&gt;</code> and <code>&lt;entry&gt;</code>.
+      It&rsquo;s stricter and more precisely specified (proper dates, explicit content types, namespacing).</li>
+  </ul>
+  <p>A good feed reader handles both, so as a subscriber you rarely need to care which one a site uses.</p>
+
+  <h2>How you use it</h2>
+  <ul>
+    <li><strong>Find the feed</strong> — many sites still link one, and browsers/readers can auto-discover it from a
+      tag in the page&rsquo;s <code>&lt;head&gt;</code>.</li>
+    <li><strong>Subscribe</strong> in a feed reader (a dedicated app, or any tool that speaks RSS).</li>
+    <li><strong>Read</strong> — the reader polls each feed and collects new items into one chronological place you control.</li>
+  </ul>
+
+  <h2>Why it still matters</h2>
+  <p>
+    A feed is a standing offer of <strong>portable, chronological, un-gatekept</strong> access to a source you chose
+    — no ranking, no engagement farming, no app lock-in. That&rsquo;s why podcasts, newsletters, and the fediverse
+    all quietly run on the same idea. Feeds are less visible than they were, but more load-bearing.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Is RSS dead?</summary>
+    <p>No — it became infrastructure. Every podcast subscription is an RSS feed, and the &ldquo;follow a source, get its updates&rdquo; model underpins newsletters and the fediverse. It lost its consumer face, not its role.</p>
+  </details>
+  <details class="faq"><summary>What were the orange XML buttons?</summary>
+    <p>The web&rsquo;s old universal &ldquo;subscribe to my feed&rdquo; icon. Clicking one handed your reader the feed URL to subscribe to.</p>
+  </details>
+  <details class="faq"><summary>Do I need RSS and Atom both?</summary>
+    <p>As a reader, no — your app handles either. As a publisher, pick one; most use RSS 2.0, while Atom is the stricter choice.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>See the <a href="/feeds">Feeds tools</a>, why <a href="/blog/rss-and-the-open-web-in-2026">RSS didn&rsquo;t die</a>, and how <a href="/blog/rss-and-ai">feeds feed AI</a>.</p>
+</ReferencePage>

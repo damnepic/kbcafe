@@ -1,0 +1,216 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const sample = `{
+  "id": 42,
+  "name": "Flat White",
+  "inStock": true,
+  "price": 4.5,
+  "tags": ["coffee", "espresso"],
+  "origin": { "country": "Ethiopia", "altitude_m": 1900 },
+  "reviews": [
+    { "user": "ada", "stars": 5 },
+    { "user": "linus", "stars": 4 }
+  ]
+}`;
+---
+<ToolPage
+  title="JSON to TypeScript — generate typed interfaces | KB Cafe"
+  description="Paste JSON and instantly get clean, typed TypeScript interfaces. Free, fast, and fully client-side — your data never leaves the browser."
+  path="/json-to-typescript"
+  eyebrow="JSON · Converters"
+  h1="JSON → TypeScript"
+  tagline="Paste any JSON payload and get clean, ready-to-use TypeScript interfaces. Runs entirely in your browser — nothing is uploaded."
+>
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-label"><span>JSON in</span>
+        <button class="link-btn" id="sample">load sample</button>
+      </div>
+      <textarea id="in" class="ta" spellcheck="false" placeholder="Paste JSON here…"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-label"><span>TypeScript out</span>
+        <button class="link-btn" id="copy">copy</button>
+      </div>
+      <textarea id="out" class="ta" readonly spellcheck="false" placeholder="Typed interfaces appear here…"></textarea>
+    </div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <label class="pane-label" for="rootname" style="text-transform:none;letter-spacing:0">Root interface name</label>
+    <input id="rootname" class="rootname" value="Root" spellcheck="false" />
+    <button class="chip" id="opt-optional" style="margin-left:auto">All fields optional</button>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>Turn JSON into TypeScript interfaces, instantly</h2>
+    <p>
+      Paste a JSON object or array on the left and KB Cafe walks the structure to produce
+      matching <code>interface</code> declarations on the right. Nested objects become their own
+      named interfaces, arrays are typed by their elements, and mixed primitives collapse into
+      union types like <code>string | number</code>. It all happens in your browser — no request
+      is ever sent, so it is safe to paste API responses or config you would rather not upload.
+    </p>
+
+    <h3>How type inference works here</h3>
+    <ul>
+      <li><strong>Objects</strong> become an <code>interface</code>; nested objects get a named child interface based on the key.</li>
+      <li><strong>Arrays</strong> are typed by merging every element — <code>[1, 2]</code> is <code>number[]</code>, and an array of objects merges their keys (missing keys become optional).</li>
+      <li><strong>null</strong> values widen a field to <code>… | null</code> rather than guessing.</li>
+      <li><strong>Empty arrays / objects</strong> fall back to <code>unknown[]</code> and <code>Record&lt;string, unknown&gt;</code> so nothing is silently wrong.</li>
+    </ul>
+
+    <h3>Example</h3>
+    <p>
+      Given a coffee record with an <code>origin</code> object and a list of <code>reviews</code>,
+      you get a root <code>interface</code> plus an <code>Origin</code> and <code>Review</code>
+      interface — drop them straight into your <code>.ts</code> file. Click <em>load sample</em>
+      above to try it.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Is my JSON sent to a server?</summary>
+      <p>No. The converter is plain JavaScript that runs on this page. Your input never leaves your browser, which is why it works offline once the page has loaded.</p>
+    </details>
+    <details class="faq"><summary>Why are some fields marked optional with <code>?</code>?</summary>
+      <p>When an array contains objects that don&rsquo;t all share the same keys, the keys that are missing from some elements are marked optional. You can also force every field optional with the toggle above.</p>
+    </details>
+    <details class="faq"><summary>Does it handle deeply nested JSON?</summary>
+      <p>Yes — nesting is unlimited. Each distinct object shape becomes its own interface, named after the key that holds it.</p>
+    </details>
+
+    <h3>Related references</h3>
+    <p>Reading an API token alongside your JSON? Try the <a href="/jwt-decoder">JWT decoder</a>. Scheduling a job that emits this payload? See the <a href="/cron-generator">cron generator</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .rootname{font-family:var(--font-mono);font-size:13px;border:1.5px solid var(--line);border-radius:10px;
+    padding:8px 11px;background:var(--cream);color:var(--ink);outline:0;width:150px}
+  .rootname:focus{border-color:var(--ink)}
+</style>
+
+<script is:inline define:vars={{ sample }}>
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+  let allOptional = false;
+
+  function pascal(s){
+    const c = String(s).replace(/[^a-zA-Z0-9]+/g, ' ').trim().split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+    return /^[0-9]/.test(c) || !c ? '_' + c : c;
+  }
+  function safeKey(k){ return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(k) ? k : JSON.stringify(k); }
+
+  // merge an array of values into a single type description
+  function unify(values, name, interfaces, usedNames){
+    const objs = values.filter(v => v && typeof v === 'object' && !Array.isArray(v));
+    const nonObjs = values.filter(v => !(v && typeof v === 'object' && !Array.isArray(v)));
+    const parts = new Set();
+
+    if(objs.length){
+      // merge keys across all object elements
+      const keyVals = {}; const keyCount = {};
+      objs.forEach(o => { Object.keys(o).forEach(k => { (keyVals[k] = keyVals[k] || []).push(o[k]); keyCount[k] = (keyCount[k]||0)+1; }); });
+      const iName = uniqueName(pascal(name), usedNames);
+      const lines = [];
+      for(const k of Object.keys(keyVals)){
+        const optional = allOptional || keyCount[k] < objs.length || keyVals[k].some(v => v === undefined);
+        const t = typeOf(keyVals[k], k, interfaces, usedNames);
+        lines.push(`  ${safeKey(k)}${optional ? '?' : ''}: ${t};`);
+      }
+      interfaces.push(`interface ${iName} {\n${lines.join('\n')}\n}`);
+      parts.add(iName);
+    }
+    nonObjs.forEach(v => parts.add(primitive(v)));
+    if(!parts.size) parts.add('unknown');
+    return [...parts].join(' | ');
+  }
+
+  function primitive(v){
+    if(v === null) return 'null';
+    const t = typeof v;
+    if(t === 'string' || t === 'number' || t === 'boolean') return t;
+    return 'unknown';
+  }
+
+  // produce a type for a list of sample values held under `name`
+  function typeOf(values, name, interfaces, usedNames){
+    const arrays = values.filter(v => Array.isArray(v));
+    const others = values.filter(v => !Array.isArray(v));
+    const parts = new Set();
+
+    if(arrays.length){
+      const elems = [].concat(...arrays);
+      parts.add(elems.length ? `${wrapUnion(unify(elems, singular(name), interfaces, usedNames))}[]` : 'unknown[]');
+    }
+    if(others.length){
+      const objs = others.filter(v => v && typeof v === 'object');
+      const prims = others.filter(v => !(v && typeof v === 'object'));
+      if(objs.length) parts.add(unify(objs, name, interfaces, usedNames));
+      prims.forEach(v => parts.add(primitive(v)));
+    }
+    if(!parts.size) parts.add('unknown');
+    return [...parts].join(' | ');
+  }
+
+  function wrapUnion(t){ return t.includes('|') ? `(${t})` : t; }
+  function singular(n){ return n.replace(/ies$/, 'y').replace(/s$/, '') || n; }
+
+  function uniqueName(base, used){
+    let n = base, i = 2;
+    while(used.has(n)){ n = base + i++; }
+    used.add(n); return n;
+  }
+
+  function convert(){
+    const raw = inEl.value.trim();
+    statusEl.className = 'status'; statusEl.textContent = '';
+    inEl.classList.remove('err');
+    if(!raw){ outEl.value = ''; return; }
+    let data;
+    try { data = JSON.parse(raw); }
+    catch(e){
+      inEl.classList.add('err');
+      statusEl.className = 'status bad';
+      statusEl.textContent = 'Invalid JSON: ' + e.message;
+      return;
+    }
+    const rootName = pascal($('rootname').value || 'Root');
+    const interfaces = [];
+    const used = new Set();
+    let result;
+    if(Array.isArray(data)){
+      const t = typeOf([data], rootName, interfaces, used);
+      result = `type ${uniqueName(rootName, used)} = ${t};`;
+    } else if(data && typeof data === 'object'){
+      unify([data], rootName, interfaces, used); // pushes root interface last
+    } else {
+      result = `type ${rootName} = ${primitive(data)};`;
+    }
+    // interfaces are pushed children-first; reverse so root sits on top
+    const out = (result ? [result] : []).concat(interfaces.slice().reverse()).join('\n\n');
+    outEl.value = out;
+    statusEl.className = 'status ok';
+    const n = interfaces.length + (result ? 1 : 0);
+    statusEl.textContent = `Generated ${n} type${n === 1 ? '' : 's'}.`;
+  }
+
+  inEl.addEventListener('input', convert);
+  $('rootname').addEventListener('input', convert);
+  $('sample').addEventListener('click', () => { inEl.value = sample; convert(); });
+  $('opt-optional').addEventListener('click', e => {
+    allOptional = !allOptional; e.target.classList.toggle('active', allOptional); convert();
+  });
+  $('copy').addEventListener('click', async () => {
+    if(!outEl.value) return;
+    try { await navigator.clipboard.writeText(outEl.value);
+      statusEl.className = 'status ok'; statusEl.textContent = 'Copied to clipboard.';
+    } catch { outEl.select(); document.execCommand('copy'); }
+  });
+
+  inEl.value = sample; convert();
+</script>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@500;600&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{ --paper:#FBF4E9; --ink:#1E1813; --ink-soft:#574b3f; --coral:#EE4B2B; --gold:#F4B423; --coffee:#6F4E37; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px;overflow:hidden}
+  body{background:var(--paper);font-family:"Hanken Grotesk",sans-serif;position:relative}
+  /* paper grain */
+  body::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
+  /* gold glow */
+  body::after{content:"";position:absolute;top:-260px;left:50%;transform:translateX(-50%);
+    width:1200px;height:720px;pointer-events:none;
+    background:radial-gradient(ellipse at center,rgba(244,180,35,.32),rgba(244,132,42,.12) 42%,transparent 70%);filter:blur(8px)}
+  .card{position:relative;z-index:1;width:100%;height:100%;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:48px 70px;gap:6px}
+  .logo{height:188px;width:auto;display:block;filter:drop-shadow(3px 5px 0 rgba(30,24,19,.16));margin-bottom:18px}
+  .wordmark{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:96px;letter-spacing:-.03em;line-height:1}
+  .wordmark .kb{color:var(--coral)} .wordmark .cf{color:var(--ink)}
+  .tag{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:40px;letter-spacing:-.02em;color:var(--ink);margin-top:20px}
+  .mk{position:relative;white-space:nowrap;padding-bottom:.18em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .34em}
+  .chips{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:18px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--ink-soft);margin-top:34px}
+  .chips b{color:var(--coral);font-weight:700;margin:0 4px}
+  .url{position:absolute;bottom:34px;left:0;right:0;text-align:center;font-family:"JetBrains Mono",monospace;
+    font-weight:600;font-size:18px;color:var(--ink-soft)}
+  .url b{color:var(--coral);font-weight:700}
+</style>
+</head>
+<body>
+  <div class="card">
+    <img class="logo" src="file:///C:/KBCafe/site/public/logo.png" alt="" />
+    <div class="wordmark"><span class="kb">KB</span> <span class="cf">Cafe</span></div>
+    <div class="tag">Tools &amp; references, <span class="mk">freshly brewed.</span></div>
+    <div class="chips">Tools<b>·</b>Reference<b>·</b>Feeds<b>·</b>Blog</div>
+  </div>
+  <div class="url">a developer&rsquo;s knowledge base &nbsp;·&nbsp; <b>kbcafe.com</b></div>
+</body>
+</html>

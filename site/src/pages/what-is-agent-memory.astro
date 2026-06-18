@@ -1,0 +1,80 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What is agent memory? — why AI remembers or forgets | KB Cafe"
+  description="A clear explainer of AI agent memory: why models are stateless, the difference between the context window and long-term memory, and how persistent memory actually works."
+  path="/what-is-agent-memory"
+  eyebrow="AI Explained · Concept"
+  h1="What is agent memory?"
+  tagline="Why does one assistant 'remember' you and another forgets everything? The answer is that the model itself remembers nothing — memory is something the app builds around it."
+>
+  <h2>The thing nobody tells you: the model is stateless</h2>
+  <p>
+    A language model has <strong>no memory between calls</strong>. Each request is processed from scratch; the
+    model doesn&rsquo;t carry anything over from the last one. So when an assistant seems to &ldquo;remember&rdquo;
+    your name or last week&rsquo;s conversation, that isn&rsquo;t the model recalling — it&rsquo;s the
+    <strong>application storing information and feeding it back in</strong>. Whether an assistant remembers depends
+    on whether the <em>product</em> has a memory feature, not on the model.
+  </p>
+
+  <h2>Three layers people call &ldquo;memory&rdquo;</h2>
+  <ul>
+    <li><strong>Context (working memory).</strong> The <a href="/what-is-a-context-window">context window</a> —
+      everything in the current request. It&rsquo;s short-term and ephemeral; when the request ends, it&rsquo;s
+      gone.</li>
+    <li><strong>Conversation memory.</strong> The app re-sends previous turns each request so the chat feels
+      continuous. This still lives <em>inside</em> the context window — which is why a very long chat eventually
+      &ldquo;forgets&rdquo; the start: the oldest turns get trimmed to fit.</li>
+    <li><strong>Long-term memory.</strong> Information saved <em>outside</em> any single request — in a database
+      or vector store — and pulled back in when relevant. This is the part that persists across sessions, and
+      it&rsquo;s a feature the application implements.</li>
+  </ul>
+
+  <h2>How long-term memory actually works</h2>
+  <p>
+    The common pattern is <a href="/what-is-rag">RAG</a> pointed at your own history. The app
+    <strong>extracts</strong> things worth keeping (&ldquo;the user prefers metric units&rdquo;),
+    <strong>stores</strong> them — often as <a href="/what-are-embeddings">embeddings</a> in a
+    <a href="/what-is-a-vector-database">vector database</a> — and at the start of a later session
+    <strong>retrieves</strong> the memories relevant to what you&rsquo;re doing now and adds them to the context.
+    The model then answers as if it &ldquo;remembered,&rdquo; when really it was handed the right notes at the
+    right moment.
+  </p>
+
+  <h2>Kinds of memory worth distinguishing</h2>
+  <ul>
+    <li><strong>Episodic</strong> — what happened in past interactions (&ldquo;last time you asked about X&rdquo;).</li>
+    <li><strong>Semantic</strong> — durable facts and preferences (&ldquo;you work in Miami&rdquo;).</li>
+    <li><strong>Procedural</strong> — how to carry out a task the way you like it done.</li>
+  </ul>
+
+  <h2>Is memory part of the context window?</h2>
+  <p>
+    No — but they meet there. Memory is <strong>storage</strong>; the context window is the <strong>working
+    set</strong>. Memory only influences an answer when something <em>retrieves</em> it and places it into the
+    context for that request. Confusing the two is the root of most &ldquo;why did it forget?&rdquo; questions:
+    if a fact wasn&rsquo;t in the context for this call, the model couldn&rsquo;t use it.
+  </p>
+
+  <h2>Where it goes wrong</h2>
+  <ul>
+    <li><strong>Memory bloat.</strong> Saving everything makes retrieval noisy and context expensive — be selective.</li>
+    <li><strong>Stale memories.</strong> Old facts that are no longer true get retrieved and mislead the model.</li>
+    <li><strong>Privacy.</strong> Long-term memory is a record of the user — it needs the same care as any stored personal data.</li>
+  </ul>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Why does the assistant forget the start of a long chat?</summary>
+    <p>The conversation outgrew the context window, so the app trimmed the oldest turns to fit. The model only sees what was sent this request.</p>
+  </details>
+  <details class="faq"><summary>Does the model learn from my conversations?</summary>
+    <p>Not in real time. &ldquo;Memory&rdquo; is the app storing and re-injecting information, not the model updating its weights. Training is a separate, offline process.</p>
+  </details>
+  <details class="faq"><summary>Why does one product remember and another doesn&rsquo;t?</summary>
+    <p>Because memory is a feature the product builds. Same underlying models, different memory implementations.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Memory is retrieved into the <a href="/what-is-a-context-window">context window</a> via <a href="/what-is-rag">RAG</a>. More in <a href="/ai">AI Explained</a>.</p>
+</AiPage>

@@ -1,0 +1,114 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Case Converter — camelCase, snake_case, kebab-case &amp; more | KB Cafe"
+  description="Convert text between camelCase, PascalCase, snake_case, CONSTANT_CASE, kebab-case, Title Case and more — all at once, copy any. Free, fast, client-side."
+  path="/case-converter"
+  eyebrow="Text"
+  h1="Case Converter"
+  tagline="Type anything and get it in every case at once — camelCase, snake_case, kebab-case, CONSTANT_CASE and more. Copy any line. Runs entirely in your browser."
+>
+  <div class="pane" style="margin-bottom:18px">
+    <div class="pane-label"><span>Your text</span><button class="link-btn" id="sample">load sample</button></div>
+    <textarea id="in" class="ta" style="min-height:96px" spellcheck="false" placeholder="Type a phrase, variable name, or heading…"></textarea>
+  </div>
+  <div class="cases" id="out"></div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>Every naming convention, one paste</h2>
+    <p>
+      Paste a phrase or an identifier and this tool re-tokenizes it — splitting on spaces, hyphens, underscores,
+      and the boundaries inside <code>camelCase</code> and <code>PascalCase</code> — then re-joins it in each common
+      convention. It detects word boundaries intelligently, so <code>getUserID</code>, <code>get_user_id</code>, and
+      <code>get user id</code> all produce the same set of outputs.
+    </p>
+
+    <h3>The conventions</h3>
+    <ul>
+      <li><code>camelCase</code> — first word lower, the rest capitalized. Common for JS/Java variables.</li>
+      <li><code>PascalCase</code> — every word capitalized. Types, classes, React components.</li>
+      <li><code>snake_case</code> — lowercase, underscores. Python, Ruby, SQL columns.</li>
+      <li><code>CONSTANT_CASE</code> — uppercase snake. Constants and env vars.</li>
+      <li><code>kebab-case</code> — lowercase, hyphens. URLs, CSS classes, file names.</li>
+      <li><code>Title Case</code> / <code>Sentence case</code> — for headings and prose.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>How are word boundaries detected?</summary>
+      <p>It splits on spaces, <code>-</code>, <code>_</code>, <code>.</code>, and <code>/</code>, and also on lower-to-upper transitions (<code>userName</code> → <code>user</code> + <code>name</code>) and acronym edges (<code>parseJSONData</code> → <code>parse</code> + <code>JSON</code> + <code>data</code>).</p>
+    </details>
+    <details class="faq"><summary>Is my text uploaded?</summary>
+      <p>No — conversion runs in your browser, so it works offline and nothing is sent anywhere.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Generating types? Try <a href="/json-to-typescript">JSON → TypeScript</a>. Slugging URLs for redirects? See the <a href="/htaccess-generator">.htaccess generator</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .cases{display:flex;flex-direction:column;gap:8px}
+  .case-row{display:flex;align-items:center;gap:12px;background:var(--cream);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px 10px 15px}
+  .case-row .lbl{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);width:140px;flex-shrink:0}
+  .case-row .val{font-family:var(--font-mono);font-size:14.5px;color:var(--ink);flex:1;overflow:auto;white-space:nowrap}
+  .case-row .cp{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--coral);background:none;border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer;flex-shrink:0}
+  .case-row .cp:hover{border-color:var(--ink);color:var(--ink)}
+  .case-row .cp.done{color:#2f7d32;border-color:#2f7d32}
+  @media(max-width:560px){.case-row{flex-wrap:wrap}.case-row .lbl{width:auto}.case-row .val{width:100%;order:3}}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), out = $('out'), statusEl = $('status');
+  const SAMPLE = 'KB Cafe — freshly brewed dev tools';
+
+  function words(s){
+    return String(s)
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')        // camel boundary
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')      // acronym boundary
+      .replace(/[^a-zA-Z0-9]+/g, ' ')
+      .trim().split(/\s+/).filter(Boolean).map(w => w.toLowerCase());
+  }
+  const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
+  const FORMATS = [
+    ['camelCase',     w => w.map((x,i)=>i?cap(x):x).join('')],
+    ['PascalCase',    w => w.map(cap).join('')],
+    ['snake_case',    w => w.join('_')],
+    ['CONSTANT_CASE', w => w.map(x=>x.toUpperCase()).join('_')],
+    ['kebab-case',    w => w.join('-')],
+    ['Train-Case',    w => w.map(cap).join('-')],
+    ['dot.case',      w => w.join('.')],
+    ['path/case',     w => w.join('/')],
+    ['Title Case',    w => w.map(cap).join(' ')],
+    ['Sentence case', w => w.length ? cap(w.join(' ')) : ''],
+    ['lower case',    w => w.join(' ')],
+    ['UPPER CASE',    w => w.map(x=>x.toUpperCase()).join(' ')],
+  ];
+
+  function render(){
+    const w = words(inEl.value);
+    out.innerHTML = '';
+    if(!w.length){ statusEl.textContent=''; return; }
+    FORMATS.forEach(([label, fn]) => {
+      const val = fn(w);
+      const row = document.createElement('div'); row.className = 'case-row';
+      row.innerHTML = `<span class="lbl">${label}</span><span class="val"></span><button class="cp">copy</button>`;
+      row.querySelector('.val').textContent = val;
+      const btn = row.querySelector('.cp');
+      btn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(val); } catch {}
+        btn.textContent = 'copied'; btn.classList.add('done');
+        setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('done'); }, 1100);
+      });
+      out.appendChild(row);
+    });
+    statusEl.className = 'status ok'; statusEl.textContent = `${w.length} word${w.length>1?'s':''} · ${FORMATS.length} formats`;
+  }
+  inEl.addEventListener('input', render);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; render(); });
+  inEl.value = SAMPLE; render();
+</script>

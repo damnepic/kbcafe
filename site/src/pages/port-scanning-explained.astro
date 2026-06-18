@@ -1,0 +1,66 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="Port scanning explained — ports, scan types, and what they reveal | KB Cafe"
+  description="A clear reference on port scanning: what a network port is, how a TCP scan works, the common scan types (SYN, connect, UDP), and what open/closed/filtered mean."
+  path="/port-scanning-explained"
+  eyebrow="Reference · Networking"
+  h1="Port scanning explained"
+  tagline="A port scan asks a host &ldquo;which doors are open?&rdquo; Here&rsquo;s what a port actually is, how scans work, and how to read open vs closed vs filtered."
+>
+  <h2>What a port is</h2>
+  <p>
+    An IP address identifies a <em>machine</em>; a <strong>port</strong> identifies a <em>service</em> on it. Ports
+    are 16-bit numbers (0&ndash;65535) that let one host run many services at once — a web server on 443, SSH on 22,
+    a database on 5432. When a packet arrives, the operating system uses the destination port to decide which
+    program receives it. A <strong>port scan</strong> simply checks which ports have something listening.
+  </p>
+
+  <h2>How a TCP scan works</h2>
+  <p>
+    TCP connections begin with a three-way handshake: the client sends <code>SYN</code>, an open port replies
+    <code>SYN-ACK</code>, and the client completes with <code>ACK</code>. A scanner exploits this:
+  </p>
+  <ul>
+    <li><strong>SYN-ACK back</strong> → the port is <strong>open</strong> (a service is listening).</li>
+    <li><strong>RST back</strong> → the port is <strong>closed</strong> (nothing listening, but the host is up).</li>
+    <li><strong>no response</strong> → <strong>filtered</strong> (a firewall is silently dropping the probe).</li>
+  </ul>
+
+  <h2>Common scan types</h2>
+  <ul>
+    <li><strong>TCP connect scan</strong> — completes the full handshake. Reliable, needs no special privileges, but easy to log.</li>
+    <li><strong>SYN (half-open) scan</strong> — sends <code>SYN</code>, reads the reply, then sends <code>RST</code> instead of finishing. Faster and quieter; needs raw-socket privileges.</li>
+    <li><strong>UDP scan</strong> — slower and ambiguous, because UDP is connectionless: silence can mean open <em>or</em> filtered, so scanners infer state from ICMP &ldquo;port unreachable&rdquo; replies.</li>
+  </ul>
+
+  <h2>Open vs closed vs filtered</h2>
+  <p>
+    These three states are the whole point. <strong>Open</strong> means a service answered.
+    <strong>Closed</strong> means the host is reachable but nothing is on that port. <strong>Filtered</strong> means
+    a firewall ate the probe, so you can&rsquo;t tell — which is itself information about the network&rsquo;s defenses.
+  </p>
+
+  <h2>Use it on what you&rsquo;re allowed to</h2>
+  <p>
+    Port scanning is a core, legitimate tool for inventorying your own infrastructure, verifying firewall rules,
+    and authorized security testing. Scanning networks you don&rsquo;t own or have permission to test can be
+    unlawful and is treated as hostile reconnaissance — keep it to your own systems or engagements you&rsquo;re
+    authorized for.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>What&rsquo;s the difference between closed and filtered?</summary>
+    <p><strong>Closed</strong> = the host actively refused (sent <code>RST</code>); nothing is listening. <strong>Filtered</strong> = no answer at all, because a firewall dropped the probe.</p>
+  </details>
+  <details class="faq"><summary>Why is UDP scanning unreliable?</summary>
+    <p>UDP has no handshake, so an open port often just stays silent. Scanners infer state from ICMP errors and timeouts, which is slow and easily blocked.</p>
+  </details>
+  <details class="faq"><summary>Does an open port mean I&rsquo;m vulnerable?</summary>
+    <p>No — it means a service is reachable. Risk depends on what that service is, whether it&rsquo;s patched, and whether it should be exposed at all.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Reachability and latency is <a href="/how-ping-works">ping &amp; ICMP</a>; the web&rsquo;s port-443 protocol is <a href="/http-explained">HTTP</a>.</p>
+</ReferencePage>

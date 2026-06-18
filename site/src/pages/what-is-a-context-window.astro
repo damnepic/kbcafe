@@ -1,0 +1,82 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What is a context window? — tokens, limits &amp; how to manage it | KB Cafe"
+  description="A clear explainer of the AI context window: what tokens are, what fills the window (system prompt, history, retrieved docs, output), why it runs out, and how to manage it."
+  path="/what-is-a-context-window"
+  eyebrow="AI Explained · Concept"
+  h1="What is a context window?"
+  tagline="A model's context window is its working memory — the total amount of text it can consider at once. Understanding it explains most of why AI apps behave the way they do."
+>
+  <h2>The short version</h2>
+  <p>
+    A <strong>context window</strong> is the maximum amount of text — measured in <strong>tokens</strong>
+    — that a language model can take into account at one time. It covers <em>everything</em> in a single
+    request: the system prompt, the conversation so far, any documents you&rsquo;ve pasted or retrieved,
+    <em>and</em> the response the model is generating. If the total would exceed the window, something has
+    to give — older text gets dropped, or the request is rejected. The window is the model&rsquo;s
+    short-term memory, and it is finite.
+  </p>
+
+  <h2>What&rsquo;s a token?</h2>
+  <p>
+    Models don&rsquo;t read characters or words — they read <strong>tokens</strong>, chunks of text the
+    model&rsquo;s tokenizer produces. A token is roughly <strong>¾ of a word</strong>, or about
+    <strong>4 characters</strong> of English, but it varies: common words may be one token, rare words and
+    code split into several, and non-English text often uses more. &ldquo;Context window = 128,000
+    tokens&rdquo; means about 90,000&ndash;100,000 words of working space — shared across input and output.
+  </p>
+
+  <h2>What fills the window</h2>
+  <p>Every request packs several things into the same budget:</p>
+  <ul>
+    <li><strong>System prompt</strong> — the instructions that set the model&rsquo;s role and rules.</li>
+    <li><strong>Conversation history</strong> — every previous turn the app sends back for continuity. This
+      grows with every message and is usually the first thing to overflow a long chat.</li>
+    <li><strong>Retrieved context</strong> — documents you paste, or chunks pulled in by
+      <a href="/what-is-rag">RAG</a>. This can dominate the budget.</li>
+    <li><strong>The output</strong> — the model&rsquo;s reply is generated <em>into</em> the same window, so
+      the longer the input, the less room is left to answer.</li>
+  </ul>
+  <p>See it laid out interactively with the <a href="/context-window-visualizer">Context Window Visualizer</a>.</p>
+
+  <h2>Why it matters</h2>
+  <ul>
+    <li><strong>Things get dropped.</strong> Exceed the window and apps truncate — usually the middle or
+      oldest turns — so the model silently &ldquo;forgets&rdquo; what it can no longer see.</li>
+    <li><strong>Cost and latency scale with tokens.</strong> A bigger context isn&rsquo;t free: you pay per
+      token and wait longer. Stuffing the window &ldquo;just in case&rdquo; is expensive and slower.</li>
+    <li><strong>&ldquo;Lost in the middle.&rdquo;</strong> Models attend best to the start and end of a long
+      context; facts buried in the middle of a huge prompt are more likely to be missed. Bigger is not
+      automatically better.</li>
+  </ul>
+
+  <h2>How context limits are managed</h2>
+  <ul>
+    <li><strong>Summarize</strong> old conversation turns instead of resending them verbatim.</li>
+    <li><strong>Retrieve, don&rsquo;t stuff</strong> — use <a href="/what-is-rag">RAG</a> to pull only the
+      relevant chunks instead of pasting whole documents.</li>
+    <li><strong>Chunk and rank</strong> — break sources into pieces and include only the top matches.</li>
+    <li><strong>Reserve output space</strong> — leave enough room for the answer; the reply competes for the
+      same budget.</li>
+  </ul>
+
+  <p class="note">Context-window sizes range from a few thousand tokens on small/older models to 1&ndash;2
+    million on long-context models. Exact limits change often and vary by model — check your provider&rsquo;s
+    current docs rather than trusting a remembered number.</p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Is the context window the same as the model&rsquo;s memory?</summary>
+    <p>It&rsquo;s the <em>short-term</em> memory for one request. Anything outside the window — earlier in a long chat, or not retrieved — the model simply can&rsquo;t see. Long-term memory across sessions is a separate feature an app builds on top.</p>
+  </details>
+  <details class="faq"><summary>Does a bigger context window mean better answers?</summary>
+    <p>Not necessarily. It lets you include more, but cost, latency, and the &ldquo;lost in the middle&rdquo; effect all push the other way. Relevant-and-concise usually beats large-and-noisy.</p>
+  </details>
+  <details class="faq"><summary>What happens when I exceed it?</summary>
+    <p>Depending on the app, the request errors out or older/middle content is trimmed to fit — so the model answers without the part that was dropped.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Try the <a href="/context-window-visualizer">Context Window Visualizer</a>, or read about <a href="/what-is-rag">RAG</a> and <a href="/what-is-mcp">MCP</a>.</p>
+</AiPage>

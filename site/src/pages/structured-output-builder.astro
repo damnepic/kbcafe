@@ -1,0 +1,187 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Structured Output Builder — JSON schemas for OpenAI, Anthropic &amp; Gemini | KB Cafe"
+  description="Visually build a schema and generate structured-output / function-calling schemas for OpenAI, Anthropic, Gemini, and plain JSON Schema. Free, fast, fully client-side."
+  path="/structured-output-builder"
+  eyebrow="AI Explained · Tool"
+  h1="Structured Output Builder"
+  tagline="Define your fields once and generate the structured-output schema for OpenAI, Anthropic, Gemini, or plain JSON Schema. No more hand-writing each provider's flavor. Runs in your browser."
+>
+  <div class="sb-top row">
+    <label class="opt">Schema name <input id="root" value="extracted_data" spellcheck="false" /></label>
+    <label class="opt grow">Description (optional) <input id="desc" placeholder="What this object represents" spellcheck="false" /></label>
+  </div>
+
+  <div class="fields-head">
+    <span>Field</span><span>Type</span><span>Description</span><span class="req">Req</span><span></span>
+  </div>
+  <div id="fields"></div>
+  <button class="btn ghost" id="add" style="margin-top:10px">+ Add field</button>
+
+  <div class="row" id="tabs" style="margin:22px 0 10px">
+    <button class="chip active" data-t="jsonschema">JSON Schema</button>
+    <button class="chip" data-t="openai">OpenAI</button>
+    <button class="chip" data-t="anthropic">Anthropic</button>
+    <button class="chip" data-t="gemini">Gemini</button>
+  </div>
+  <div class="pane">
+    <div class="pane-label"><span id="out-label">JSON Schema</span><button class="link-btn" id="copy">copy</button></div>
+    <textarea id="out" class="ta" readonly spellcheck="false" style="min-height:300px"></textarea>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>One schema, every provider</h2>
+    <p>
+      <a href="/what-are-structured-outputs">Structured outputs</a> and
+      <a href="/what-is-tool-calling">tool calling</a> both come down to one thing: a JSON Schema the model
+      must conform to. But every provider wraps that schema differently. Define your fields once here and get
+      the right shape for each:
+    </p>
+    <ul>
+      <li><strong>JSON Schema</strong> — the portable base (draft 2020-12), <code>additionalProperties: false</code>.</li>
+      <li><strong>OpenAI</strong> — a <code>response_format</code> of type <code>json_schema</code> with <code>strict: true</code>.</li>
+      <li><strong>Anthropic</strong> — a tool whose <code>input_schema</code> is your schema (the model &ldquo;calls&rdquo; it with the data).</li>
+      <li><strong>Gemini</strong> — a <code>responseSchema</code> (uppercase OpenAPI types) plus <code>responseMimeType</code>.</li>
+    </ul>
+    <p class="note">Tip for OpenAI strict mode: it expects <em>every</em> property to be listed as required. For a
+      genuinely optional field, make its type nullable rather than dropping it from <code>required</code>.</p>
+
+    <h3>Field types</h3>
+    <p>string, number, integer, boolean, an <strong>enum</strong> (comma-separated values → a closed set),
+      and typed <strong>arrays</strong>. Add a <code>description</code> to each field — it steers the model far
+      more than the field name alone.</p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does a schema guarantee correct data?</summary>
+      <p>It guarantees the <em>shape</em> — right fields and types. It can&rsquo;t guarantee the model put the <em>right value</em> in a field; validate business rules yourself.</p>
+    </details>
+    <details class="faq"><summary>Is this the same as function calling?</summary>
+      <p>A tool/function call&rsquo;s arguments are a structured output — the same JSON Schema, wrapped as a tool. The Anthropic tab shows exactly that form.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No — schema generation runs in your browser, so your field names and structure stay local and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Read <a href="/what-are-structured-outputs">structured outputs</a> and <a href="/what-is-tool-calling">tool calling</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;flex-direction:column;gap:6px}
+  .opt.grow{flex:1}
+  .opt input{font-family:var(--font-mono);font-size:13px;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--cream);color:var(--ink);outline:0}
+  .opt input:focus{border-color:var(--ink)}
+  .sb-top{gap:14px;margin-bottom:18px;align-items:flex-end}
+  .fields-head{display:grid;grid-template-columns:1.1fr 1fr 1.4fr 44px 36px;gap:9px;font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:0 4px 8px}
+  .fields-head .req{text-align:center}
+  .frow{display:grid;grid-template-columns:1.1fr 1fr 1.4fr 44px 36px;gap:9px;margin-bottom:9px;align-items:center}
+  .frow input,.frow select{font-family:var(--font-mono);font-size:13px;border:1.5px solid var(--line);border-radius:9px;padding:9px 10px;background:var(--cream);color:var(--ink);outline:0;width:100%}
+  .frow input:focus,.frow select:focus{border-color:var(--ink)}
+  .frow .chk{display:grid;place-items:center}
+  .frow .chk input{width:17px;height:17px;accent-color:var(--coral)}
+  .frow .del{font-family:var(--font-mono);font-size:16px;color:var(--ink-soft);background:none;border:1.5px solid var(--line);border-radius:9px;cursor:pointer;padding:6px 0}
+  .frow .del:hover{border-color:var(--coral-deep);color:var(--coral-deep)}
+  .frow .enum{grid-column:1/-1;margin-top:-2px}
+  @media(max-width:640px){.fields-head{display:none}.frow{grid-template-columns:1fr 1fr;gap:8px}.frow .del{grid-column:2}}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const TYPES = ['string','number','integer','boolean','enum','string[]','number[]'];
+  let fields = [
+    { name:'name',  type:'string',  description:'Full name',            required:true,  enumv:'' },
+    { name:'age',   type:'integer', description:'Age in years',         required:false, enumv:'' },
+    { name:'role',  type:'enum',    description:'Account role',         required:true,  enumv:'admin, editor, viewer' },
+    { name:'tags',  type:'string[]',description:'Labels for this user', required:false, enumv:'' },
+  ];
+  let tab = 'jsonschema';
+
+  function rowEl(f){
+    const r = document.createElement('div'); r.className = 'frow';
+    r.innerHTML = `
+      <input class="f-name" placeholder="field_name" value="${esc(f.name)}" spellcheck="false" />
+      <select class="f-type">${TYPES.map(t=>`<option ${t===f.type?'selected':''}>${t}</option>`).join('')}</select>
+      <input class="f-desc" placeholder="description" value="${esc(f.description)}" spellcheck="false" />
+      <span class="chk"><input type="checkbox" class="f-req" ${f.required?'checked':''} title="required" /></span>
+      <button class="del" title="remove">&times;</button>
+      <input class="f-enum enum" placeholder="comma, separated, values" value="${esc(f.enumv)}" spellcheck="false" style="display:${f.type==='enum'?'block':'none'}" />`;
+    r.querySelector('.del').addEventListener('click', () => { const i = [...$('fields').children].indexOf(r); fields.splice(i,1); render(); });
+    r.querySelector('.f-type').addEventListener('change', e => { r.querySelector('.f-enum').style.display = e.target.value==='enum'?'block':'none'; sync(); });
+    r.addEventListener('input', sync);
+    return r;
+  }
+  function esc(s){ return String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+  function sync(){
+    fields = [...$('fields').children].map(r => ({
+      name: r.querySelector('.f-name').value.trim(),
+      type: r.querySelector('.f-type').value,
+      description: r.querySelector('.f-desc').value.trim(),
+      required: r.querySelector('.f-req').checked,
+      enumv: r.querySelector('.f-enum').value,
+    }));
+    regen();
+  }
+  function render(){
+    const c = $('fields'); c.innerHTML = '';
+    fields.forEach(f => c.appendChild(rowEl(f)));
+    regen();
+  }
+
+  function propOf(f){
+    const p = {};
+    switch(f.type){
+      case 'string': case 'number': case 'integer': case 'boolean': p.type = f.type; break;
+      case 'enum': p.type = 'string'; p.enum = f.enumv.split(',').map(s=>s.trim()).filter(Boolean); break;
+      case 'string[]': p.type = 'array'; p.items = { type:'string' }; break;
+      case 'number[]': p.type = 'array'; p.items = { type:'number' }; break;
+      default: p.type = 'string';
+    }
+    if(f.description) p.description = f.description;
+    return p;
+  }
+  function buildSchema(){
+    const properties = {}, required = [];
+    fields.forEach(f => { if(!f.name) return; properties[f.name] = propOf(f); if(f.required) required.push(f.name); });
+    return { type:'object', properties, required, additionalProperties:false };
+  }
+  // Gemini wants UPPERCASE OpenAPI types and no additionalProperties
+  function toGemini(s){
+    if(Array.isArray(s)) return s.map(toGemini);
+    if(s && typeof s === 'object'){
+      const o = {};
+      for(const [k,v] of Object.entries(s)){
+        if(k === 'additionalProperties') continue;
+        if(k === 'type' && typeof v === 'string') o.type = v.toUpperCase();
+        else o[k] = (v && typeof v === 'object') ? toGemini(v) : v;
+      }
+      return o;
+    }
+    return s;
+  }
+  function regen(){
+    const schema = buildSchema();
+    const name = ($('root').value || 'extracted_data').trim();
+    const desc = $('desc').value.trim();
+    let out;
+    if(tab === 'jsonschema') out = schema;
+    else if(tab === 'openai') out = { type:'json_schema', json_schema: { name, ...(desc?{description:desc}:{}), strict:true, schema } };
+    else if(tab === 'anthropic') out = { name, ...(desc?{description:desc}:{}), input_schema: schema };
+    else out = { responseMimeType:'application/json', responseSchema: toGemini(schema) };
+    $('out').value = JSON.stringify(out, null, 2);
+    const n = Object.keys(schema.properties).length;
+    $('status').className = 'status ok'; $('status').textContent = `${n} field${n!==1?'s':''} · ${tab === 'jsonschema' ? 'JSON Schema' : tab[0].toUpperCase()+tab.slice(1)}`;
+  }
+
+  $('add').addEventListener('click', () => { fields.push({ name:'', type:'string', description:'', required:false, enumv:'' }); render(); });
+  ['root','desc'].forEach(id => $(id).addEventListener('input', regen));
+  $('tabs').addEventListener('click', e => { const b = e.target.closest('.chip'); if(!b) return; document.querySelectorAll('#tabs .chip').forEach(c=>c.classList.remove('active')); b.classList.add('active'); tab = b.dataset.t; $('out-label').textContent = b.textContent; regen(); });
+  $('copy').addEventListener('click', async () => { if(!$('out').value) return; try{ await navigator.clipboard.writeText($('out').value); $('status').className='status ok'; $('status').textContent='Copied.'; }catch{ $('out').select(); document.execCommand('copy'); } });
+  render();
+</script>

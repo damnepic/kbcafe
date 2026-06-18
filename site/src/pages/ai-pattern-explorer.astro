@@ -1,0 +1,114 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+import { PATTERNS } from '../data/patterns.js';
+---
+<ToolPage
+  title="AI Pattern Explorer — compare agent design patterns | KB Cafe"
+  description="An interactive explorer for AI design patterns — Reflection, Router, Judge, Verification, Human-in-the-Loop. See each pattern's flow, strengths, watch-outs, and an example prompt."
+  path="/ai-pattern-explorer"
+  eyebrow="AI Explained · Tool"
+  h1="AI Pattern Explorer"
+  tagline="Pick an AI design pattern and see how it works at a glance — its flow, strengths, watch-outs, and an example prompt. The patterns behind modern agents, side by side."
+>
+  <div class="px">
+    <nav class="px-list" id="list"></nav>
+    <div class="px-panel" id="panel"></div>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>The patterns behind modern agents</h2>
+    <p>
+      Building with AI is settling into a small set of recurring shapes — the same way classic software did with
+      <a href="/software-design-patterns">design patterns</a>. This explorer puts them side by side: select a
+      pattern to see its <strong>flow</strong>, what it&rsquo;s <strong>good and bad at</strong>, when to reach
+      for it, and a <strong>prompt</strong> you can adapt. Each links to a full write-up in the
+      <a href="/ai-patterns">AI Patterns Library</a>.
+    </p>
+    <h3>The starter set</h3>
+    <ul>
+      <li><strong>Reflection</strong> — the model critiques and improves its own output.</li>
+      <li><strong>Router</strong> — classify the request and route it to the right path.</li>
+      <li><strong>Judge</strong> — one model evaluates another&rsquo;s output against a rubric.</li>
+      <li><strong>Verification</strong> — check the claims before responding.</li>
+      <li><strong>Human-in-the-Loop</strong> — request approval before acting.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Are these official patterns?</summary>
+      <p>They&rsquo;re the names the community has converged on across agent frameworks and provider docs. The value is collecting them in one place with honest trade-offs, not coining a standard.</p>
+    </details>
+    <details class="faq"><summary>Can I combine patterns?</summary>
+      <p>Almost always — real systems chain them. A Router picks a path, that path uses Reflection, and a Judge gates the result. The patterns are building blocks, not either/or choices.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No — the explorer is static content rendered in your browser. Nothing is sent anywhere.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Read the full <a href="/ai-patterns">AI Patterns Library</a> or the concepts in <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .px{display:grid;grid-template-columns:212px 1fr;gap:18px;align-items:start}
+  .px-list{display:flex;flex-direction:column;gap:8px}
+  .px-btn{text-align:left;background:var(--cream);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;transition:border-color .14s,transform .14s}
+  .px-btn:hover{border-color:var(--ink);transform:translateX(2px)}
+  .px-btn.active{background:var(--ink);border-color:var(--ink)}
+  .px-btn .b-nm{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink)}
+  .px-btn .b-tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);display:block;margin-top:3px}
+  .px-btn.active .b-nm{color:var(--gold)} .px-btn.active .b-tag{color:var(--cream)}
+  .px-panel{min-height:320px}
+  .pp-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .pp-name{font-family:var(--font-display);font-weight:800;font-size:28px;letter-spacing:-.02em}
+  .pp-full{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--coral);text-decoration:none;white-space:nowrap}
+  .pp-full:hover{text-decoration:underline}
+  .pp-tag{font-size:16px;color:var(--ink-soft);margin:6px 0 16px}
+  .pp-flow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+  .pp-step{font-family:var(--font-mono);font-size:12.5px;background:var(--paper-2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;display:flex;gap:7px;align-items:center}
+  .pp-step b{color:var(--coral)}
+  .pp-arrow{align-self:center;color:var(--ink-soft);opacity:.5}
+  .pp-sw{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+  .pp-sw h4{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .pp-sw .good h4{color:#2f7d32}.pp-sw .bad h4{color:var(--coral-deep)}
+  .pp-sw ul{margin:0;padding-left:17px}.pp-sw li{font-size:13.5px;line-height:1.45;color:var(--ink-soft);margin-bottom:6px}
+  .pp-lbl{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 7px}
+  .pp-when{font-size:15px;line-height:1.55;color:var(--ink-soft);margin-bottom:18px}
+  .pp-prompt{font-family:var(--font-mono);font-size:12.5px;line-height:1.55;background:var(--ink);color:#f4e9d6;border-radius:12px;padding:14px 16px;white-space:pre-wrap;position:relative}
+  .pp-copy{position:absolute;top:10px;right:12px;font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:var(--gold);background:none;border:0;cursor:pointer}
+  @media(max-width:640px){.px{grid-template-columns:1fr}.px-list{flex-direction:row;overflow:auto}.pp-sw{grid-template-columns:1fr}}
+</style>
+
+<script is:inline define:vars={{ PATTERNS }}>
+  const $ = id => document.getElementById(id);
+  const list = $('list'), panel = $('panel');
+  let active = PATTERNS[0].slug;
+
+  list.innerHTML = PATTERNS.map(p =>
+    `<button class="px-btn" data-s="${p.slug}"><span class="b-nm">${p.name}</span><span class="b-tag">${p.tag}</span></button>`
+  ).join('');
+
+  function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+  function render(){
+    const p = PATTERNS.find(x => x.slug === active);
+    [...list.children].forEach(b => b.classList.toggle('active', b.dataset.s === active));
+    const flow = p.flow.map((s, i) => `<span class="pp-step"><b>${i+1}</b>${esc(s)}</span>`).join('<span class="pp-arrow">→</span>');
+    panel.innerHTML = `
+      <div class="pp-head"><span class="pp-name">${p.name}</span><a class="pp-full" href="/ai-patterns/${p.slug}">full write-up →</a></div>
+      <div class="pp-tag">${esc(p.tagline)}</div>
+      <div class="pp-lbl">Flow</div>
+      <div class="pp-flow">${flow}</div>
+      <div class="pp-sw">
+        <div class="good"><h4>Strengths</h4><ul>${p.strengths.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>
+        <div class="bad"><h4>Watch-outs</h4><ul>${p.weaknesses.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>
+      </div>
+      <div class="pp-lbl">When to use</div>
+      <div class="pp-when">${esc(p.whenToUse)}</div>
+      <div class="pp-lbl">Example prompt</div>
+      <div class="pp-prompt"><button class="pp-copy" id="ppc">copy</button>${esc(p.examplePrompt)}</div>`;
+    $('ppc').addEventListener('click', async () => { try{ await navigator.clipboard.writeText(p.examplePrompt); $('ppc').textContent='copied'; setTimeout(()=>$('ppc').textContent='copy',1100); }catch{} });
+  }
+  list.addEventListener('click', e => { const b = e.target.closest('.px-btn'); if(!b) return; active = b.dataset.s; render(); });
+  render();
+</script>

@@ -1,0 +1,50 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { POSTS, fmtDate } from '../data/blog.js';
+---
+<Layout
+  title="Blog — notes from KB Cafe"
+  description="Notes on developer tools, RSS and the open web, and where the craft is heading — from the team rebuilding kbcafe.com."
+  path="/blog"
+>
+  <section class="blog-hub">
+    <div class="eyebrow">☕ on the menu · Blog</div>
+    <h1>Notes from the <span class="mk">counter.</span></h1>
+    <p class="lede">
+      Short, opinionated pieces on developer tools, RSS and the open web, and the occasional bit
+      of KB Cafe history. Fresh writing — not the archive (the old posts live on as
+      <a href="/feeds">Feeds</a> and <a href="/reference">Reference</a>).
+    </p>
+
+    <div class="posts">
+      {POSTS.map(p => (
+        <a class="post-card" href={`/blog/${p.slug}`}>
+          <div class="pc-meta"><span class="pc-tag">{p.tag}</span> · {fmtDate(p.date)}</div>
+          <div class="pc-title">{p.title}</div>
+          <div class="pc-ex">{p.excerpt}</div>
+          <div class="pc-go">read →</div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .blog-hub{padding:40px 0 20px;max-width:780px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:18px}
+  h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(38px,6vw,62px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.14em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .36em}
+  .lede{margin-top:22px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:600px}
+  .lede a{color:var(--coral);text-decoration:none;font-weight:600}.lede a:hover{text-decoration:underline}
+
+  .posts{margin:34px 0 10px;display:flex;flex-direction:column;gap:14px}
+  .post-card{display:block;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:20px 22px;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .post-card:hover{transform:translateY(-3px);box-shadow:9px 10px 0 rgba(30,24,19,.09);border-color:var(--ink)}
+  .pc-meta{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft)}
+  .pc-meta .pc-tag{color:var(--coral);font-weight:700}
+  .pc-title{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.01em;margin:8px 0 7px}
+  .pc-ex{font-size:14.5px;line-height:1.5;color:var(--ink-soft)}
+  .pc-go{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--coral);margin-top:12px}
+</style>

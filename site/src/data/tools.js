@@ -1,0 +1,20 @@
+// The menu. Tools with a real `href` are live; `soon:true` are on the roadmap.
+// Keep cat values in sync with the homepage filter chips.
+export const TOOLS = [
+  { cat:"json",     ctl:"JSON",        nm:"json → typescript", ds:"Paste JSON, get a typed TS interface.",            color:"c-coral", href:"/json-to-typescript" },
+  { cat:"encoding", ctl:"Encoding",    nm:"jwt decoder",       ds:"Decode & inspect JSON Web Tokens.",                color:"c-ink",   href:"/jwt-decoder" },
+  { cat:"encoding", ctl:"Encoding",    nm:"base64 encode/decode", ds:"Encode or decode Base64, incl. URL-safe.",      color:"c-gold",  href:"/base64" },
+  { cat:"time",     ctl:"Time & Cron", nm:"cron generator",    ds:"Build & read crontab expressions, in plain English.", color:"c-gold", href:"/cron-generator" },
+  { cat:"ai",       ctl:"AI",          nm:"context window viz", ds:"See what fills a model's context budget.",         color:"c-ink",   href:"/context-window-visualizer" },
+  { cat:"ai",       ctl:"AI",          nm:"structured output builder", ds:"Schemas for OpenAI, Anthropic, Gemini & JSON Schema.", color:"c-coral", href:"/structured-output-builder" },
+  { cat:"ai",       ctl:"AI",          nm:"ai pattern explorer", ds:"Compare agent design patterns side by side.",       color:"c-gold",  href:"/ai-pattern-explorer" },
+  { cat:"convert",  ctl:"Converters",  nm:"csv ⇄ json",        ds:"Convert tabular data both ways, instantly.",       color:"c-cream", href:"/csv-to-json" },
+  { cat:"json",     ctl:"JSON",        nm:"json → go",         ds:"Generate Go structs from any JSON payload.",       color:"c-cream", href:"/json-to-go" },
+  { cat:"convert",  ctl:"Apache",      nm:".htaccess gen",     ds:"Redirects & rewrite rules, the easy way.",         color:"c-ink",   heritage:true, href:"/htaccess-generator" },
+  { cat:"convert",  ctl:"Converters",  nm:"curl → code",       ds:"Turn a cURL command into fetch, axios, or Python.", color:"c-gold", href:"/curl-to-code" },
+  { cat:"convert",  ctl:"Converters",  nm:"yaml ⇄ json",       ds:"Swap between YAML and JSON cleanly.",              color:"c-coral", href:"/yaml-to-json" },
+  { cat:"text",     ctl:"Text",        nm:"sql formatter",     ds:"Beautify and standardize messy SQL.",             color:"c-coral", href:"/sql-formatter" },
+  { cat:"text",     ctl:"Text",        nm:"case converter",    ds:"camelCase, snake_case, kebab, PascalCase.",       color:"c-cream", href:"/case-converter" },
+  { cat:"feeds",    ctl:"Feeds",       nm:"rss validator",     ds:"Check any feed against the spec.",                color:"c-gold", heritage:true, href:"/rss-validator" },
+  { cat:"feeds",    ctl:"Feeds",       nm:"opml converter",    ds:"Import, view & convert OPML subscription lists.",  color:"c-ink",   heritage:true, href:"/opml-converter" },
+];

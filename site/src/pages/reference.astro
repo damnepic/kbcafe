@@ -1,0 +1,67 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { REFERENCE } from '../data/reference.js';
+---
+<Layout
+  title="Reference — developer cheat-sheets &amp; explainers | KB Cafe"
+  description="Clear, modern references and explainers for working developers — OOP concepts, concurrency, memory leaks, and more. The Knowledge Base half of KB Cafe."
+  path="/reference"
+>
+  <section class="ref-hub">
+    <div class="eyebrow">☕ on the menu · Reference</div>
+    <h1>The <span class="mk">Knowledge Base.</span></h1>
+    <p class="lede">
+      Clear, modern explainers for the fundamentals — written to be read once and remembered.
+      This is the &ldquo;KB&rdquo; in KB Cafe: references that feed straight into the matching
+      <a href="/#menu">tools</a>.
+    </p>
+
+    <div class="grid">
+      {REFERENCE.map(r => (
+        <a class="card" href={r.href}>
+          <div class="ct">{r.tag}</div>
+          <div class="nm">{r.nm}</div>
+          <div class="ds">{r.ds}</div>
+          <div class="go">read →</div>
+        </a>
+      ))}
+    </div>
+
+    <div class="prose">
+      <h2>More on the way</h2>
+      <p>
+        KB Cafe&rsquo;s reference shelf is being rebuilt from its long history as a developer
+        resource — evergreen topics first (encoding, concurrency, memory), each rewritten for how
+        we build today. Need a tool instead? The <a href="/#menu">menu</a> has the
+        <a href="/base64">Base64 encoder</a>, <a href="/json-to-typescript">JSON → TypeScript</a>,
+        <a href="/jwt-decoder">JWT decoder</a>, and <a href="/cron-generator">cron generator</a>.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .ref-hub{padding:40px 0 20px;max-width:860px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:18px}
+  h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(38px,6vw,64px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.14em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .36em}
+  .lede{margin-top:22px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:620px}
+  .lede a{color:var(--coral);text-decoration:none;font-weight:600}.lede a:hover{text-decoration:underline}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 10px}
+  .card{display:flex;flex-direction:column;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;
+    padding:18px 18px 16px;text-decoration:none;color:inherit;min-height:170px;transition:transform .16s,box-shadow .16s,border-color .16s}
+  .card:hover{transform:translateY(-4px);box-shadow:9px 10px 0 rgba(30,24,19,.1);border-color:var(--ink)}
+  .card .ct{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--coral)}
+  .card .nm{font-family:var(--font-mono);font-weight:700;font-size:16px;margin:11px 0 7px;line-height:1.15}
+  .card .ds{font-size:13.5px;line-height:1.45;color:var(--ink-soft);margin-bottom:auto}
+  .card .go{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--coral);margin-top:13px}
+
+  .prose{max-width:680px;padding:28px 0 8px;border-top:1px solid var(--line);margin-top:30px}
+  .prose h2{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:0 0 12px}
+  .prose p{font-size:16px;line-height:1.65;color:var(--ink-soft)}
+  .prose a{color:var(--coral);text-decoration:none;font-weight:600}.prose a:hover{text-decoration:underline}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+</style>

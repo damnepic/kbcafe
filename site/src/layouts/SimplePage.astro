@@ -1,0 +1,23 @@
+---
+import Layout from './Layout.astro';
+const { title, description, path, h1 } = Astro.props;
+---
+<Layout title={title} description={description} path={path}>
+  <article class="simple">
+    <h1>{h1}</h1>
+    <div class="prose"><slot /></div>
+  </article>
+</Layout>
+
+<style is:global>
+  .simple{max-width:680px;padding:40px 0 20px}
+  .simple h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;font-size:clamp(34px,5vw,50px);line-height:1.02}
+  .simple .prose{margin-top:22px}
+  .simple .prose h2{font-family:var(--font-display);font-weight:800;font-size:23px;letter-spacing:-.02em;margin:28px 0 11px}
+  .simple .prose p{font-size:16.5px;line-height:1.7;color:var(--ink-soft);margin:0 0 14px}
+  .simple .prose ul{margin:0 0 16px;padding-left:22px}
+  .simple .prose li{font-size:16.5px;line-height:1.6;color:var(--ink-soft);margin-bottom:7px}
+  .simple .prose strong{color:var(--ink)}
+  .simple .prose a{color:var(--coral);font-weight:600;text-decoration:none}.simple .prose a:hover{text-decoration:underline}
+  .simple .prose .muted{font-size:13.5px;color:var(--ink-soft);opacity:.85;border-top:1px solid var(--line);padding-top:16px;margin-top:24px}
+</style>

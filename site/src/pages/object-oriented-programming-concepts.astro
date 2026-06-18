@@ -1,0 +1,85 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="Object-Oriented Programming concepts — the 4 pillars explained | KB Cafe"
+  description="A clear reference on object-oriented programming: classes vs objects, and the four pillars — encapsulation, abstraction, inheritance, and polymorphism — with practical examples."
+  path="/object-oriented-programming-concepts"
+  eyebrow="Reference · Concepts"
+  h1="Object-Oriented Programming concepts"
+  tagline="Classes, objects, and the four pillars of OOP — encapsulation, abstraction, inheritance, and polymorphism — explained plainly, with when (and when not) to use them."
+>
+  <h2>Classes and objects</h2>
+  <p>
+    Object-oriented programming (OOP) organizes code around <strong>objects</strong> — bundles of
+    data (state) and the functions that operate on it (behavior). A <strong>class</strong> is the
+    blueprint; an <strong>object</strong> is a concrete instance of it. A <code>BankAccount</code>
+    class might define a <code>balance</code> and methods like <code>deposit()</code> and
+    <code>withdraw()</code>; each open account is an object with its own balance.
+  </p>
+  <p>
+    The goal is to keep related state and behavior together, so the rest of your program talks to a
+    small, well-defined surface instead of juggling loose variables. The four ideas below are how OOP
+    delivers that.
+  </p>
+
+  <h2>1. Encapsulation</h2>
+  <p>
+    Encapsulation means <strong>bundling data with the methods that use it, and hiding the internals</strong>.
+    Callers go through a public interface (<code>deposit()</code>), not the raw fields. The class can
+    enforce its own rules — reject a negative deposit, keep <code>balance</code> consistent — because
+    nothing outside can reach in and corrupt its state. Practically: make fields private, expose
+    intent-revealing methods.
+  </p>
+
+  <h2>2. Abstraction</h2>
+  <p>
+    Abstraction is <strong>exposing what something does while hiding how it does it</strong>. You call
+    <code>account.transfer(other, 100)</code> without knowing whether it writes to a database, calls a
+    network service, or updates memory. Good abstractions let you change the implementation without
+    touching the callers. Encapsulation is the mechanism; abstraction is the design goal it serves.
+  </p>
+
+  <h2>3. Inheritance</h2>
+  <p>
+    Inheritance lets a class <strong>derive from another</strong>, reusing its state and behavior and
+    extending or overriding parts. A <code>SavingsAccount</code> can inherit from <code>BankAccount</code>
+    and add interest. It models an &ldquo;is-a&rdquo; relationship — a savings account <em>is a</em> bank account.
+  </p>
+  <p>
+    Use it sparingly. Deep inheritance trees are brittle, and a subclass is tightly coupled to its parent.
+    The modern guidance is <strong>&ldquo;favor composition over inheritance&rdquo;</strong>: build behavior by
+    combining small objects (a &ldquo;has-a&rdquo; relationship) rather than inheriting from a tall hierarchy.
+  </p>
+
+  <h2>4. Polymorphism</h2>
+  <p>
+    Polymorphism (&ldquo;many forms&rdquo;) means <strong>one interface, many implementations</strong>. If
+    <code>Circle</code> and <code>Square</code> both implement an <code>area()</code> method, code can loop
+    over a list of <code>Shape</code> and call <code>area()</code> on each without knowing the concrete
+    type. Add a new shape later and the loop doesn&rsquo;t change. This is what makes OOP code extensible.
+  </p>
+
+  <h2>When OOP helps — and when it doesn&rsquo;t</h2>
+  <ul>
+    <li><strong>Good fit:</strong> domains with clear entities and rules (orders, users, accounts), large
+      codebases where boundaries matter, and frameworks built around objects.</li>
+    <li><strong>Poor fit:</strong> simple data transformations and pipelines, where a functional style
+      (pure functions over plain data) is often clearer. Many modern languages mix both — use the tool
+      that fits the problem rather than forcing everything into a class.</li>
+  </ul>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>What&rsquo;s the difference between a class and an object?</summary>
+    <p>A class is the definition (the blueprint); an object is a specific instance created from it, with its own state.</p>
+  </details>
+  <details class="faq"><summary>Are the four pillars language-specific?</summary>
+    <p>No — encapsulation, abstraction, inheritance, and polymorphism appear across Java, C#, C++, Python, Ruby, and more, though each language expresses them differently.</p>
+  </details>
+  <details class="faq"><summary>Why &ldquo;composition over inheritance&rdquo;?</summary>
+    <p>Inheritance couples a subclass tightly to its parent and gets fragile as hierarchies deepen. Composing small, focused objects is more flexible and easier to change.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>See <a href="/multithreading-explained">multithreading &amp; concurrency</a> and <a href="/memory-leaks-explained">memory leaks</a>, or browse the full <a href="/reference">Reference</a> and the <a href="/#menu">tools menu</a>.</p>
+</ReferencePage>

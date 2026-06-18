@@ -1,0 +1,110 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { AI } from '../data/ai.js';
+const explainers = AI.filter(a => a.type === 'explainer');
+const tools = AI.filter(a => a.type === 'tool');
+---
+<Layout
+  title="AI Explained — how modern AI systems actually work | KB Cafe"
+  description="Clear, no-hype explainers and tools for the infrastructure of modern AI: context windows, MCP, RAG, embeddings, tool calling, and structured outputs. Built for developers and curious newcomers."
+  path="/ai"
+>
+  <section class="ai-hub">
+    <div class="eyebrow">☕ on the menu · AI Explained</div>
+    <h1>How modern AI <span class="mk">actually works.</span></h1>
+    <p class="lede">
+      Not &ldquo;what is ChatGPT&rdquo; and not a list of prompts. The <strong>infrastructure</strong> —
+      context windows, MCP, RAG, embeddings, tool calling — explained clearly enough to build on, and
+      simply enough to learn from. These are the SMTP and POP3 of the AI era: foundational concepts
+      you&rsquo;ll still be looking up in 2030.
+    </p>
+
+    <h2 class="sect">Explainers</h2>
+    <div class="grid">
+      {explainers.map(a => (
+        <a class="card" href={a.href}>
+          <div class="ct">{a.tag}</div>
+          <div class="nm" set:html={a.nm} />
+          <div class="ds">{a.ds}</div>
+          <div class="go">read →</div>
+        </a>
+      ))}
+    </div>
+
+    <h2 class="sect">Tools</h2>
+    <div class="grid">
+      {tools.map(a => (
+        <a class="card c-tool" href={a.href}>
+          <div class="ct">{a.tag}</div>
+          <div class="nm" set:html={a.nm} />
+          <div class="ds">{a.ds}</div>
+          <div class="go">open →</div>
+        </a>
+      ))}
+    </div>
+
+    <a class="pat-feature" href="/ai-patterns">
+      <div class="pf-body">
+        <div class="pf-eyebrow">Library</div>
+        <div class="pf-title">AI Patterns Library</div>
+        <p class="pf-desc">Design patterns for AI systems — Reflection, Router, Judge, Verification, Human-in-the-Loop. How each works, when to use it, and an example prompt.</p>
+      </div>
+      <span class="pf-go">Browse patterns →</span>
+    </a>
+
+    <div class="prose">
+      <h2>What&rsquo;s coming</h2>
+      <p>
+        This pillar is built infrastructure-first, and the core cluster is live — context windows,
+        embeddings, vector databases, RAG, agent memory, MCP, tool calling, and structured outputs, all
+        cross-linked so each concept leads to the next. Next on the bench: more patterns and more
+        client-side tools. Everything runs in your browser; nothing is uploaded. Read the
+        <a href="/blog">blog</a> for the thinking, or start with a
+        <a href="/what-is-a-context-window">context window</a>.
+      </p>
+      <p class="note">A note on numbers: AI capabilities and limits change fast. Anywhere we cite a
+        model-specific figure, it&rsquo;s dated and kept in one place you can verify — we don&rsquo;t
+        assert specs from memory.</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .ai-hub{padding:40px 0 20px;max-width:880px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:18px}
+  h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(38px,6vw,64px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.14em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .36em}
+  .lede{margin-top:22px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:660px}
+  .sect{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.02em;margin:34px 0 16px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{display:flex;flex-direction:column;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;
+    padding:18px 18px 16px;text-decoration:none;color:inherit;min-height:172px;transition:transform .16s,box-shadow .16s,border-color .16s}
+  .card:hover{transform:translateY(-4px);box-shadow:9px 10px 0 rgba(30,24,19,.1);border-color:var(--ink)}
+  .card.c-tool{background:var(--ink);color:var(--cream)}
+  .card.c-tool .ct{color:var(--gold)}.card.c-tool .nm{color:var(--gold)}.card.c-tool .ds{color:rgba(255,252,245,.82)}.card.c-tool .go{color:var(--cream)}
+  .card .ct{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--coral)}
+  .card .nm{font-family:var(--font-mono);font-weight:700;font-size:15.5px;margin:11px 0 7px;line-height:1.2}
+  .card .ds{font-size:13px;line-height:1.45;color:var(--ink-soft);margin-bottom:auto}
+  .card .go{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--coral);margin-top:13px}
+
+  .pat-feature{display:flex;align-items:center;gap:24px;margin-top:30px;background:var(--coral);color:var(--cream);
+    border-radius:18px;padding:24px 28px;text-decoration:none;box-shadow:var(--shadow);transition:transform .16s,box-shadow .16s}
+  .pat-feature:hover{transform:translateY(-3px);box-shadow:12px 14px 0 rgba(30,24,19,.1)}
+  .pf-body{flex:1}
+  .pf-eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .pf-title{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:-.02em}
+  .pf-desc{font-size:14.5px;line-height:1.5;color:rgba(255,252,245,.92);margin-top:9px;max-width:600px}
+  .pf-go{font-family:var(--font-display);font-weight:800;font-size:16px;white-space:nowrap;flex-shrink:0}
+  .pat-feature:hover .pf-go{color:var(--gold)}
+  @media(max-width:680px){.pat-feature{flex-direction:column;align-items:flex-start;gap:16px}}
+
+  .prose{max-width:700px;padding:30px 0 8px;border-top:1px solid var(--line);margin-top:34px}
+  .prose h2{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:0 0 12px}
+  .prose p{font-size:16px;line-height:1.65;color:var(--ink-soft);margin:0 0 14px}
+  .prose a{color:var(--coral);text-decoration:none;font-weight:600}.prose a:hover{text-decoration:underline}
+  .prose .note{font-size:13.5px;background:var(--paper-2);border-radius:10px;padding:11px 14px}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+</style>

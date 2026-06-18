@@ -1,0 +1,82 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="Memory leaks explained — causes, detection &amp; prevention | KB Cafe"
+  description="A practical reference on memory leaks: what they are, the common causes across managed and unmanaged languages, how to detect them, and how to prevent them."
+  path="/memory-leaks-explained"
+  eyebrow="Reference · Memory"
+  h1="Memory leaks explained"
+  tagline="What a memory leak actually is, why they happen even in garbage-collected languages, and how to find and prevent them."
+>
+  <h2>What is a memory leak?</h2>
+  <p>
+    A <strong>memory leak</strong> is memory a program has allocated but can no longer use <em>and</em> never
+    releases. The memory stays reserved for the life of the process, so usage climbs over time until the program
+    slows, gets killed by the OS, or crashes with an out-of-memory error. Leaks are especially dangerous in
+    long-running processes — servers, daemons, mobile apps — where a slow drip eventually exhausts everything.
+  </p>
+
+  <h2>Two worlds: manual vs garbage-collected</h2>
+  <p>
+    In <strong>unmanaged languages</strong> (C, C++) you allocate and free memory yourself. A leak is the simple
+    case: you <code>malloc</code>/<code>new</code> and never <code>free</code>/<code>delete</code> — often on an
+    error path that skips the cleanup, or because ownership of a pointer was unclear.
+  </p>
+  <p>
+    In <strong>garbage-collected languages</strong> (Java, C#, JavaScript, Python, Go) the runtime frees memory
+    that is no longer <em>reachable</em>. But the GC can only collect what nothing references — so a leak here is
+    really an <strong>unintended reference</strong>: something still points at an object you&rsquo;re done with, so
+    the GC keeps it alive forever. &ldquo;Garbage collected&rdquo; does not mean &ldquo;leak-proof.&rdquo;
+  </p>
+
+  <h2>Common causes</h2>
+  <ul>
+    <li><strong>Unfreed allocations</strong> (manual languages) — early returns and exceptions that skip the free.</li>
+    <li><strong>Growing collections</strong> — a cache, list, or map you keep adding to but never evict from. The
+      single most common leak in managed languages.</li>
+    <li><strong>Forgotten event listeners / callbacks</strong> — registering a handler and never removing it keeps
+      the listener (and everything it closes over) alive. Common in UI and browser code.</li>
+    <li><strong>Closures capturing too much</strong> — a closure that captures a large object keeps it referenced
+      for as long as the closure lives.</li>
+    <li><strong>Static / global references</strong> — anything hung off a global or static field never becomes
+      unreachable on its own.</li>
+    <li><strong>Unclosed resources</strong> — file handles, sockets, and DB connections leak their backing memory
+      (and OS handles) if never closed.</li>
+  </ul>
+
+  <h2>How to detect them</h2>
+  <ul>
+    <li><strong>Watch the trend:</strong> a leak shows as memory that rises and never comes back down across a
+      steady workload. Graph process memory over time first — confirm there&rsquo;s actually a leak.</li>
+    <li><strong>Heap snapshots / profilers:</strong> capture two snapshots and diff them — objects that keep
+      growing between them are your suspects. (Browser DevTools, Java&rsquo;s VisualVM/heap dumps, .NET memory
+      profilers, Go&rsquo;s pprof.)</li>
+    <li><strong>Leak detectors for native code:</strong> Valgrind, AddressSanitizer (ASan), and similar tools
+      flag allocations that were never freed.</li>
+  </ul>
+
+  <h2>How to prevent them</h2>
+  <ul>
+    <li><strong>Tie lifetime to scope:</strong> RAII / smart pointers in C++, <code>using</code>/<code>try-with-resources</code>
+      in C#/Java, context managers in Python — release on scope exit, even on errors.</li>
+    <li><strong>Always unregister</strong> what you register — pair every listener add with a remove.</li>
+    <li><strong>Bound your caches</strong> — set a max size or TTL and evict; use weak references for caches that
+      should not keep objects alive on their own.</li>
+    <li><strong>Be deliberate with global/static state</strong> — it lives forever by definition.</li>
+  </ul>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Can a garbage-collected language leak memory?</summary>
+    <p>Yes. The GC only frees unreachable objects, so any lingering reference — a growing cache, a forgotten listener, a static field — keeps memory alive indefinitely.</p>
+  </details>
+  <details class="faq"><summary>What&rsquo;s the most common leak?</summary>
+    <p>An unbounded collection — a cache or list you keep adding to but never clear. It looks innocent and grows quietly under load.</p>
+  </details>
+  <details class="faq"><summary>How do I confirm it&rsquo;s a leak and not normal usage?</summary>
+    <p>Run a steady, repeating workload and graph memory over time. Normal usage plateaus; a leak keeps climbing and never returns to baseline.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>See <a href="/multithreading-explained">multithreading &amp; concurrency</a> and <a href="/object-oriented-programming-concepts">OOP concepts</a>, or browse the full <a href="/reference">Reference</a>.</p>
+</ReferencePage>

@@ -1,0 +1,155 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const sample = `{
+  "id": 42,
+  "user_name": "ada",
+  "is_admin": true,
+  "score": 9.5,
+  "tags": ["go", "json"],
+  "profile": { "city": "London", "verified": true },
+  "posts": [
+    { "title": "Hello", "views": 10 },
+    { "title": "World", "views": 20, "pinned": true }
+  ]
+}`;
+---
+<ToolPage
+  title="JSON to Go — generate typed structs with tags | KB Cafe"
+  description="Paste JSON and get clean Go structs with json tags, including nested types and slices. Free, fast, fully client-side — your data never leaves the browser."
+  path="/json-to-go"
+  eyebrow="JSON · Converters"
+  h1="JSON → Go"
+  tagline="Paste any JSON and get ready-to-use Go structs — with json tags, nested types, slices, and exported field names. Runs entirely in your browser."
+>
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-label"><span>JSON in</span><button class="link-btn" id="sample">load sample</button></div>
+      <textarea id="in" class="ta" spellcheck="false" placeholder="Paste JSON here…"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-label"><span>Go out</span><button class="link-btn" id="copy">copy</button></div>
+      <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <label class="pane-label" for="rootname" style="text-transform:none;letter-spacing:0">Root type name</label>
+    <input id="rootname" class="rootname" value="Root" spellcheck="false" />
+    <button class="chip" id="opt-omit" style="margin-left:auto">Add ,omitempty</button>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>JSON into Go structs, instantly</h2>
+    <p>
+      Paste a JSON object and this tool walks it to produce matching Go <code>struct</code> definitions, complete
+      with <code>json:"..."</code> tags so unmarshalling round-trips your original keys. Nested objects become their
+      own named structs, arrays become slices, and field names are converted to <strong>exported PascalCase</strong>
+      with Go&rsquo;s common initialisms handled — <code>id</code> → <code>ID</code>, <code>url</code> → <code>URL</code>,
+      <code>api</code> → <code>API</code>.
+    </p>
+
+    <h3>How types are inferred</h3>
+    <ul>
+      <li><strong>Numbers</strong> become <code>int</code> when every sample is whole, otherwise <code>float64</code>.</li>
+      <li><strong>Arrays</strong> become a slice of the merged element type; arrays of objects merge their keys.</li>
+      <li><strong>Mixed or null-only</strong> values fall back to <code>interface{}</code> rather than guessing.</li>
+      <li><strong>Keys missing from some objects</strong> in an array become <code>*pointer</code> fields (optional), so a zero value is distinguishable from absent.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why are some fields pointers?</summary>
+      <p>When a key appears in only some objects of an array, it&rsquo;s emitted as a pointer with <code>omitempty</code>, so an absent value is <code>nil</code> rather than a misleading zero.</p>
+    </details>
+    <details class="faq"><summary>Does it handle nested JSON?</summary>
+      <p>Yes — each distinct object shape becomes its own named struct, referenced from the parent. Nesting is unlimited.</p>
+    </details>
+    <details class="faq"><summary>Is my JSON uploaded?</summary>
+      <p>No. It&rsquo;s parsed in your browser, so it&rsquo;s safe to paste private payloads and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Prefer TypeScript? Use <a href="/json-to-typescript">JSON → TypeScript</a>. Coming from a spreadsheet? See <a href="/csv-to-json">CSV ⇄ JSON</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .rootname{font-family:var(--font-mono);font-size:13px;border:1.5px solid var(--line);border-radius:10px;padding:8px 11px;background:var(--cream);color:var(--ink);outline:0;width:150px}
+  .rootname:focus{border-color:var(--ink)}
+</style>
+
+<script is:inline define:vars={{ sample }}>
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+  let omit = false;
+  const INITIALISMS = new Set(['id','url','api','json','html','http','https','uri','uuid','ip','db','sql','css','xml','ssh','tcp','ttl','dns','cpu','ascii','utf8','jwt','os','io']);
+
+  function pascal(s){
+    const parts = String(s).replace(/[^a-zA-Z0-9]+/g,' ').trim().split(/\s+/);
+    let out = parts.map(p => INITIALISMS.has(p.toLowerCase()) ? p.toUpperCase() : p.charAt(0).toUpperCase()+p.slice(1)).join('');
+    if(/^[0-9]/.test(out) || !out) out = 'F'+out;
+    return out;
+  }
+  function singular(n){ return n.replace(/ies$/,'y').replace(/s$/,'') || n; }
+  function uniqueName(base, used){ let n=base, i=2; while(used.has(n)){ n=base+i++; } used.add(n); return n; }
+  function jsType(v){ if(v===null) return 'null'; if(Array.isArray(v)) return 'array'; return typeof v; }
+
+  function classify(values, name, structs, used){
+    const nonNull = values.filter(v => v !== null && v !== undefined);
+    if(!nonNull.length) return 'interface{}';
+    const types = new Set(nonNull.map(jsType));
+    if(types.size > 1) return 'interface{}';
+    const t = [...types][0];
+    if(t === 'string') return 'string';
+    if(t === 'boolean') return 'bool';
+    if(t === 'number') return nonNull.every(Number.isInteger) ? 'int' : 'float64';
+    if(t === 'array'){
+      const elems = [].concat(...nonNull);
+      return '[]' + (elems.length ? classify(elems, singular(name), structs, used) : 'interface{}');
+    }
+    // object → struct
+    const keyVals = {}, keyCount = {};
+    nonNull.forEach(o => Object.keys(o).forEach(k => { (keyVals[k]=keyVals[k]||[]).push(o[k]); keyCount[k]=(keyCount[k]||0)+1; }));
+    const sName = uniqueName(pascal(name), used);
+    const fields = [];
+    for(const k of Object.keys(keyVals)){
+      const optional = keyCount[k] < nonNull.length;
+      let ft = classify(keyVals[k], k, structs, used);
+      let tag = k + (optional || omit ? ',omitempty' : '');
+      if(optional && !ft.startsWith('[]') && !ft.startsWith('*') && ft !== 'interface{}') ft = '*' + ft;
+      fields.push(`\t${pascal(k)} ${ft} \`json:"${tag}"\``);
+    }
+    structs.push(`type ${sName} struct {\n${fields.join('\n')}\n}`);
+    return sName;
+  }
+
+  function convert(){
+    const raw = inEl.value.trim();
+    statusEl.className='status'; statusEl.textContent=''; inEl.classList.remove('err');
+    if(!raw){ outEl.value=''; return; }
+    let data;
+    try { data = JSON.parse(raw); }
+    catch(e){ inEl.classList.add('err'); statusEl.className='status bad'; statusEl.textContent='Invalid JSON: '+e.message; return; }
+    const structs = [], used = new Set();
+    const rootName = pascal($('rootname').value || 'Root');
+    let pre = '';
+    if(Array.isArray(data)){
+      const t = classify([data], rootName, structs, used);
+      pre = `type ${uniqueName(rootName, used)} ${t}\n\n`;
+    } else if(data && typeof data === 'object'){
+      classify([data], rootName, structs, used);
+    } else {
+      pre = `type ${rootName} ${classify([data], rootName, structs, used)}\n\n`;
+    }
+    outEl.value = pre + structs.slice().reverse().join('\n\n');
+    const n = structs.length + (pre?1:0);
+    statusEl.className='status ok'; statusEl.textContent = `Generated ${n} type${n===1?'':'s'}.`;
+  }
+  inEl.addEventListener('input', convert);
+  $('rootname').addEventListener('input', convert);
+  $('sample').addEventListener('click', ()=>{ inEl.value = sample; convert(); });
+  $('opt-omit').addEventListener('click', e=>{ omit=!omit; e.target.classList.toggle('active', omit); convert(); });
+  $('copy').addEventListener('click', async ()=>{ if(!outEl.value) return; try{ await navigator.clipboard.writeText(outEl.value); statusEl.className='status ok'; statusEl.textContent='Copied.'; }catch{ outEl.select(); document.execCommand('copy'); } });
+  inEl.value = sample; convert();
+</script>

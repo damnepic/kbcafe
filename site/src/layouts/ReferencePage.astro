@@ -1,0 +1,70 @@
+---
+import Layout from './Layout.astro';
+import { REFERENCE } from '../data/reference.js';
+
+const { title, description, path, eyebrow, h1, tagline, updated = '2026' } = Astro.props;
+const others = REFERENCE.filter(r => r.href !== path).slice(0, 3);
+---
+<Layout title={title} description={description} path={path}>
+  <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/reference">Reference</a> <span>/</span> <em>{h1}</em></nav>
+
+  <article class="ref-article">
+    <header class="ref-head">
+      <div class="eyebrow">{eyebrow}</div>
+      <h1>{h1}</h1>
+      <p class="tagline">{tagline}</p>
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+  </article>
+
+  <aside class="siblings">
+    <h2>More references</h2>
+    <div class="sib-grid">
+      {others.map(r => (
+        <a class="sib" href={r.href}>
+          <span class="sib-ct">{r.tag}</span>
+          <span class="sib-nm">{r.nm}</span>
+          <span class="sib-ds">{r.ds}</span>
+        </a>
+      ))}
+    </div>
+  </aside>
+</Layout>
+
+<style is:global>
+  .ref-article{max-width:740px}
+  .ref-head{padding:28px 0 22px}
+  .ref-head .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:14px}
+  .ref-head h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.02;font-size:clamp(32px,5vw,48px)}
+  .ref-head .tagline{margin-top:16px;font-size:18px;color:var(--ink-soft);line-height:1.5}
+  /* .prose, .crumb, .siblings styles are shared from ToolPage's global block when present;
+     redefine here so reference pages render standalone. */
+  .crumb{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);padding:20px 0 0;display:flex;gap:8px;flex-wrap:wrap}
+  .crumb a{color:var(--ink-soft);text-decoration:none}.crumb a:hover{color:var(--coral)}
+  .crumb em{color:var(--ink);font-style:normal}.crumb span{opacity:.5}
+  .prose h2{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:-.02em;margin:30px 0 12px}
+  .prose h2:first-child{margin-top:4px}
+  .prose h3{font-family:var(--font-display);font-weight:700;font-size:19px;margin:24px 0 9px}
+  .prose p{font-size:16.5px;line-height:1.7;color:var(--ink-soft);margin:0 0 15px}
+  .prose ul,.prose ol{margin:0 0 16px;padding-left:24px}
+  .prose li{font-size:16.5px;line-height:1.65;color:var(--ink-soft);margin-bottom:8px}
+  .prose code{font-family:var(--font-mono);font-size:14px;background:var(--paper-2);padding:2px 6px;border-radius:6px;color:var(--ink)}
+  .prose strong{color:var(--ink)}
+  .prose a{color:var(--coral);font-weight:600;text-decoration:none}.prose a:hover{text-decoration:underline}
+  .prose .faq{border:1px solid var(--line);border-radius:14px;padding:4px 18px;margin-bottom:10px;background:var(--cream)}
+  .prose .faq summary{font-family:var(--font-display);font-weight:700;font-size:16px;padding:14px 0;cursor:pointer;list-style:none}
+  .prose .faq summary::-webkit-details-marker{display:none}
+  .prose .faq[open] summary{color:var(--coral)}
+  .siblings{padding:36px 0 10px;border-top:1px solid var(--line);margin-top:30px}
+  .siblings h2{font-family:var(--font-display);font-weight:800;font-size:22px;margin-bottom:16px}
+  .sib-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .sib{display:flex;flex-direction:column;gap:5px;text-decoration:none;color:inherit;background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:15px 15px 17px;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .sib:hover{transform:translateY(-3px);box-shadow:7px 8px 0 rgba(30,24,19,.08);border-color:var(--ink)}
+  .sib-ct{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+  .sib-nm{font-family:var(--font-mono);font-weight:700;font-size:15px;line-height:1.15}
+  .sib-ds{font-size:12.5px;color:var(--ink-soft);line-height:1.4}
+  @media(max-width:680px){.sib-grid{grid-template-columns:1fr}}
+</style>

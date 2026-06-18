@@ -1,0 +1,83 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="Multithreading &amp; concurrency explained — threads, races, locks, deadlocks | KB Cafe"
+  description="A practical reference on multithreading: threads vs processes, race conditions, locks and mutexes, deadlocks, thread safety, and when to use async instead of threads."
+  path="/multithreading-explained"
+  eyebrow="Reference · Concurrency"
+  h1="Multithreading &amp; concurrency explained"
+  tagline="Threads vs processes, the race conditions that bite you, how locks and deadlocks work, and how to write code that&rsquo;s actually thread-safe."
+>
+  <h2>Threads vs processes</h2>
+  <p>
+    A <strong>process</strong> is a running program with its own isolated memory. A <strong>thread</strong>
+    is a unit of execution <em>inside</em> a process; threads in the same process <strong>share memory</strong>.
+    That shared memory is what makes threads cheap to communicate — and also what makes concurrency hard.
+    Multiple threads reading and writing the same data at the same time is the root of most concurrency bugs.
+  </p>
+
+  <h2>Concurrency vs parallelism</h2>
+  <p>
+    They&rsquo;re different. <strong>Concurrency</strong> is structuring a program as independent tasks that can
+    make progress in overlapping time periods. <strong>Parallelism</strong> is actually running tasks at the
+    same instant on multiple CPU cores. You can have concurrency on a single core (the scheduler interleaves
+    tasks); parallelism needs multiple cores. Concurrency is about design; parallelism is about execution.
+  </p>
+
+  <h2>Race conditions</h2>
+  <p>
+    A <strong>race condition</strong> happens when the result depends on the unpredictable timing of threads.
+    The classic example is two threads incrementing a shared counter: <code>read, add 1, write back</code> is
+    three steps, and if both threads read the same value before either writes, one increment is lost. The bug is
+    intermittent and timing-dependent, which is why concurrency bugs are so hard to reproduce.
+  </p>
+
+  <h2>Locks, mutexes, and critical sections</h2>
+  <p>
+    The fix is to make the dangerous sequence <strong>atomic</strong> — indivisible. A <strong>lock</strong> (or
+    <strong>mutex</strong>, &ldquo;mutual exclusion&rdquo;) ensures only one thread enters a <strong>critical
+    section</strong> at a time; others wait. Hold locks for as <em>short</em> a time as possible: locking too much
+    serializes your program and kills the benefit of threads, while locking too little leaves races open.
+  </p>
+
+  <h2>Deadlocks</h2>
+  <p>
+    A <strong>deadlock</strong> is when threads wait on each other forever: thread A holds lock 1 and wants lock 2,
+    while thread B holds lock 2 and wants lock 1. Neither can proceed. The standard prevention is to
+    <strong>always acquire multiple locks in the same global order</strong>, keep the number of simultaneously
+    held locks small, and use timeouts so a stuck acquisition fails loudly instead of hanging.
+  </p>
+
+  <h2>Writing thread-safe code</h2>
+  <ul>
+    <li><strong>Don&rsquo;t share mutable state</strong> if you can avoid it — the safest shared data is no shared data.</li>
+    <li><strong>Prefer immutability:</strong> data that never changes after creation is automatically thread-safe.</li>
+    <li><strong>Use higher-level tools:</strong> thread-safe collections, atomic types, and message-passing
+      (queues / channels) are easier to get right than hand-rolled locks.</li>
+    <li><strong>Protect every access</strong> to shared mutable data with the same lock — guarding only some accesses still races.</li>
+  </ul>
+
+  <h2>Async vs threads</h2>
+  <p>
+    Not all concurrency needs threads. For <strong>I/O-bound</strong> work — waiting on the network, disk, or a
+    database — <strong>async / non-blocking</strong> models (event loops, <code>async/await</code>) let a single
+    thread juggle thousands of in-flight operations without the overhead and locking of real threads. Reach for
+    <strong>threads (or multiple processes) for CPU-bound</strong> work that needs real parallelism across cores;
+    reach for <strong>async for I/O-bound</strong> work that&rsquo;s mostly waiting.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Why is my concurrency bug so hard to reproduce?</summary>
+    <p>Race conditions depend on exact timing between threads, which varies run to run. Stress tests, thread sanitizers, and adding logging (which itself changes timing) are how you flush them out.</p>
+  </details>
+  <details class="faq"><summary>Is more threads always faster?</summary>
+    <p>No. Past the number of CPU cores, extra threads add scheduling and locking overhead. For I/O-bound work, async usually scales better than piling on threads.</p>
+  </details>
+  <details class="faq"><summary>What&rsquo;s a critical section?</summary>
+    <p>The span of code that accesses shared data and must not run in two threads at once. You protect it with a lock so only one thread is inside at a time.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>See <a href="/object-oriented-programming-concepts">OOP concepts</a> and <a href="/memory-leaks-explained">memory leaks</a>, or browse the full <a href="/reference">Reference</a>.</p>
+</ReferencePage>

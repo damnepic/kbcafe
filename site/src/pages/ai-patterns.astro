@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { PATTERNS } from '../data/patterns.js';
+---
+<Layout
+  title="AI Patterns Library — design patterns for AI systems | KB Cafe"
+  description="A reference library of design patterns for AI systems: Reflection, Router, Judge, Verification, and Human-in-the-Loop. How each works, when to use it, and example prompts."
+  path="/ai-patterns"
+>
+  <section class="ph">
+    <div class="eyebrow">☕ AI Explained · Patterns</div>
+    <h1>Design patterns for <span class="mk">AI systems.</span></h1>
+    <p class="lede">
+      The same way developers learned to talk in patterns — Factory, Observer, Strategy — building with AI is
+      converging on its own. These are the recurring shapes behind agents and LLM apps: what each one does, its
+      strengths and watch-outs, when to reach for it, and an example prompt. The vocabulary, made explicit.
+    </p>
+
+    <div class="grid">
+      {PATTERNS.map(p => (
+        <a class="card" href={`/ai-patterns/${p.slug}`}>
+          <div class="ct">{p.tag}</div>
+          <div class="nm">{p.name}</div>
+          <div class="ds">{p.tagline}</div>
+          <div class="go">read →</div>
+        </a>
+      ))}
+      <a class="card c-explore" href="/ai-pattern-explorer">
+        <div class="ct">Tool</div>
+        <div class="nm">Pattern Explorer</div>
+        <div class="ds">Compare patterns side by side — flow, strengths, watch-outs, prompts.</div>
+        <div class="go">open →</div>
+      </a>
+    </div>
+
+    <div class="prose">
+      <h2>Why a patterns library?</h2>
+      <p>
+        Patterns are how a field shares hard-won structure without re-deriving it every time. AI is early enough
+        that most of these are scattered across framework docs and blog posts under different names. Collecting
+        them — clearly, with the trade-offs honest — is exactly the kind of reference KB Cafe was built to be.
+        More patterns are on the way; start with <a href="/ai-patterns/reflection">Reflection</a> or read the
+        <a href="/ai">AI Explained</a> concepts they build on.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .ph{padding:40px 0 20px;max-width:880px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:18px}
+  h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(38px,6vw,62px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.14em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .36em}
+  .lede{margin-top:22px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:660px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 10px}
+  .card{display:flex;flex-direction:column;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;
+    padding:18px 18px 16px;text-decoration:none;color:inherit;min-height:160px;transition:transform .16s,box-shadow .16s,border-color .16s}
+  .card:hover{transform:translateY(-4px);box-shadow:9px 10px 0 rgba(30,24,19,.1);border-color:var(--ink)}
+  .card.c-explore{background:var(--ink);color:var(--cream)}
+  .card.c-explore .ct{color:var(--gold)}.card.c-explore .nm{color:var(--gold)}.card.c-explore .ds{color:rgba(255,252,245,.82)}.card.c-explore .go{color:var(--cream)}
+  .card .ct{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--coral)}
+  .card .nm{font-family:var(--font-display);font-weight:800;font-size:20px;margin:11px 0 7px}
+  .card .ds{font-size:13.5px;line-height:1.45;color:var(--ink-soft);margin-bottom:auto}
+  .card .go{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--coral);margin-top:13px}
+  .prose{max-width:700px;padding:30px 0 8px;border-top:1px solid var(--line);margin-top:34px}
+  .prose h2{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:0 0 12px}
+  .prose p{font-size:16px;line-height:1.65;color:var(--ink-soft)}
+  .prose a{color:var(--coral);text-decoration:none;font-weight:600}.prose a:hover{text-decoration:underline}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+</style>

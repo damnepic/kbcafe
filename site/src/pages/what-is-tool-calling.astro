@@ -1,0 +1,78 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What is tool calling (function calling)? — explained | KB Cafe"
+  description="A clear explainer of tool calling / function calling: how a model decides to call a function, returns structured arguments, and how your code executes it — the foundation of AI agents."
+  path="/what-is-tool-calling"
+  eyebrow="AI Explained · Concept"
+  h1="What is tool calling (function calling)?"
+  tagline="Tool calling lets a model decide, mid-response, to call one of your functions — returning structured arguments your code runs. It's how a model reaches past text into the real world."
+>
+  <h2>The short version</h2>
+  <p>
+    Out of the box a model can only produce text. <strong>Tool calling</strong> — also called
+    <strong>function calling</strong> (they&rsquo;re the same thing) — gives it a way to <em>act</em>: you
+    describe some functions it&rsquo;s allowed to use, and when one would help, the model stops writing prose
+    and instead returns a <strong>structured request</strong> — a function name and a set of JSON arguments.
+    Your code runs the real function and hands the result back. The model never executes anything itself; it
+    <em>asks</em>, and your program decides whether and how to carry it out.
+  </p>
+
+  <h2>The flow, step by step</h2>
+  <ul>
+    <li><strong>Declare the tools.</strong> You pass the model a list of functions, each with a name, a
+      description, and a <a href="/what-are-structured-outputs">JSON Schema</a> for its parameters.</li>
+    <li><strong>The model decides.</strong> Given the conversation, it either answers normally or emits a
+      <strong>tool call</strong>: <code>get_weather(&#123; "city": "Miami" &#125;)</code>.</li>
+    <li><strong>Your code executes.</strong> You run the actual <code>get_weather</code> function — call an
+      API, query a database, do a calculation.</li>
+    <li><strong>Feed the result back.</strong> You return the function&rsquo;s output to the model, which
+      uses it to write its final answer (or call another tool).</li>
+  </ul>
+  <p>
+    That last loop — call a tool, read the result, decide what&rsquo;s next — repeated until the task is
+    done, is the core of an <strong>agent</strong>.
+  </p>
+
+  <h2>Why it matters</h2>
+  <ul>
+    <li><strong>It connects the model to reality.</strong> Live data, private systems, actions, exact math —
+      all the things a text-only model can&rsquo;t do reliably on its own.</li>
+    <li><strong>It&rsquo;s the basis of agents.</strong> &ldquo;Agentic&rdquo; behavior is mostly a model
+      choosing tools in a loop.</li>
+    <li><strong>The arguments are structured.</strong> Because the model must produce JSON that fits your
+      schema, tool calling is a <a href="/what-are-structured-outputs">structured-outputs</a> problem under
+      the hood.</li>
+  </ul>
+
+  <h2>How it relates to MCP</h2>
+  <p>
+    They fit together. <strong>Tool calling</strong> is the <em>model</em> deciding to invoke a tool.
+    <strong><a href="/what-is-mcp">MCP</a></strong> is the <em>standard</em> for describing and connecting
+    those tools so they&rsquo;re reusable across apps. Function calling is the model raising its hand; MCP is
+    the wiring that lets any tool be on the other end.
+  </p>
+
+  <h2 style="color:var(--coral-deep)">Validate what comes back</h2>
+  <p>
+    The model chooses the arguments, and it can choose wrong — a hallucinated ID, an out-of-range value, a
+    call you didn&rsquo;t expect. Treat a tool call as <strong>untrusted input</strong>: validate arguments
+    against your schema, check permissions, and never let a model trigger a destructive or irreversible
+    action without a guard. The model proposes; your code disposes.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Does the model run my code?</summary>
+    <p>No. It only produces a structured request naming the function and arguments. <em>Your</em> application executes it — which is exactly why you stay in control of what&rsquo;s allowed.</p>
+  </details>
+  <details class="faq"><summary>Is &ldquo;function calling&rdquo; different from &ldquo;tool calling&rdquo;?</summary>
+    <p>No — they&rsquo;re two names for the same mechanism. Providers use slightly different wording, but the idea (model returns a structured call, you execute it) is identical.</p>
+  </details>
+  <details class="faq"><summary>Can a model call several tools at once?</summary>
+    <p>Yes — many models can request multiple (even parallel) tool calls in one turn, and agents commonly chain calls across several turns.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Tools are standardized by <a href="/what-is-mcp">MCP</a>; arguments are <a href="/what-are-structured-outputs">structured outputs</a> — build schemas with the <a href="/structured-output-builder">Structured Output Builder</a>.</p>
+</AiPage>

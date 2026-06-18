@@ -1,0 +1,119 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="OPML Converter — OPML to JSON &amp; feed-URL list | KB Cafe"
+  description="Paste an OPML subscription export and convert it to clean JSON, a flat list of feed URLs, or a readable outline. Free, fast, fully client-side."
+  path="/opml-converter"
+  eyebrow="Feeds"
+  h1="OPML Converter"
+  tagline="Paste an OPML subscription list and turn it into clean JSON, a flat list of feed URLs, or a readable outline. Your export never leaves the browser."
+>
+  <div class="pane" style="margin-bottom:12px">
+    <div class="pane-label"><span>OPML in</span><button class="link-btn" id="sample">load sample</button></div>
+    <textarea id="in" class="ta" style="min-height:170px" spellcheck="false" placeholder="Paste OPML XML here…"></textarea>
+  </div>
+  <div class="row" id="modes" style="margin-bottom:10px">
+    <button class="chip active" data-m="json">JSON</button>
+    <button class="chip" data-m="urls">Feed URLs</button>
+    <button class="chip" data-m="outline">Outline</button>
+  </div>
+  <div class="pane">
+    <div class="pane-label"><span id="out-label">JSON out</span><button class="link-btn" id="copy">copy</button></div>
+    <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>Get your subscriptions out of OPML</h2>
+    <p>
+      <strong>OPML</strong> is the outline format every feed reader uses to export and import subscription lists.
+      It&rsquo;s XML, which is awkward to work with directly. This converter parses it — preserving nested folders —
+      and gives you three views: structured <strong>JSON</strong> for code, a flat <strong>list of feed URLs</strong>
+      (the <code>xmlUrl</code> of every subscription) for importing elsewhere, and a readable indented
+      <strong>outline</strong>.
+    </p>
+
+    <h3>What it pulls out</h3>
+    <ul>
+      <li><strong>Title / text</strong> of each outline node and folder.</li>
+      <li><strong><code>xmlUrl</code></strong> — the actual feed URL (what you usually want).</li>
+      <li><strong><code>htmlUrl</code></strong> — the site&rsquo;s homepage, when present.</li>
+      <li><strong>Folder nesting</strong> — categories are kept as nested structure in JSON and outline views.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>What&rsquo;s the &ldquo;Feed URLs&rdquo; mode for?</summary>
+      <p>It flattens the whole tree to just the list of feed URLs — handy for bulk-importing into another reader, a script, or an RSS-to-JSON pipeline.</p>
+    </details>
+    <details class="faq"><summary>Does it keep my folders?</summary>
+      <p>Yes — the JSON and outline views preserve the nested folder structure. The feed-URL view flattens it intentionally.</p>
+    </details>
+    <details class="faq"><summary>Is my list uploaded?</summary>
+      <p>No — parsing runs in your browser, so your subscription list stays private and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Validate a feed with the <a href="/rss-validator">RSS validator</a>, or read <a href="/what-is-rss">what RSS is</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+</style>
+
+<script is:inline>
+  const $ = id => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+  let mode = 'json';
+  const SAMPLE = `<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head><title>My Subscriptions</title></head>
+  <body>
+    <outline text="Tech">
+      <outline text="The RSS Blog" type="rss" xmlUrl="https://kbcafe.com/blog/rss.xml" htmlUrl="https://kbcafe.com/blog"/>
+      <outline text="Hacker News" type="rss" xmlUrl="https://news.ycombinator.com/rss" htmlUrl="https://news.ycombinator.com"/>
+    </outline>
+    <outline text="Daily Read" type="rss" xmlUrl="https://example.com/feed" htmlUrl="https://example.com"/>
+  </body>
+</opml>`;
+
+  function walk(node){
+    const out = [];
+    [...node.children].filter(c => c.nodeName.toLowerCase() === 'outline').forEach(o => {
+      const item = {};
+      const title = o.getAttribute('text') || o.getAttribute('title');
+      if(title) item.title = title;
+      const xml = o.getAttribute('xmlUrl'); if(xml) item.xmlUrl = xml;
+      const html = o.getAttribute('htmlUrl'); if(html) item.htmlUrl = html;
+      const kids = walk(o);
+      if(kids.length) item.children = kids;
+      out.push(item);
+    });
+    return out;
+  }
+  function flatten(tree, acc){ tree.forEach(n => { if(n.xmlUrl) acc.push(n.xmlUrl); if(n.children) flatten(n.children, acc); }); return acc; }
+  function outline(tree, depth){ let s = ''; tree.forEach(n => { s += '  '.repeat(depth) + (n.children ? '▸ ' : '• ') + (n.title || '(untitled)') + (n.xmlUrl ? '  —  ' + n.xmlUrl : '') + '\n'; if(n.children) s += outline(n.children, depth + 1); }); return s; }
+
+  function run(){
+    const raw = inEl.value.trim();
+    statusEl.className = 'status'; statusEl.textContent = ''; inEl.classList.remove('err');
+    if(!raw){ outEl.value = ''; return; }
+    const doc = new DOMParser().parseFromString(raw, 'application/xml');
+    if(doc.querySelector('parsererror')){ inEl.classList.add('err'); outEl.value = ''; statusEl.className = 'status bad'; statusEl.textContent = 'XML is not well-formed.'; return; }
+    const body = doc.getElementsByTagName('body')[0];
+    if(!body){ inEl.classList.add('err'); outEl.value = ''; statusEl.className = 'status bad'; statusEl.textContent = 'No <body> found — is this OPML?'; return; }
+    const tree = walk(body);
+    const all = flatten(tree, []);
+    if(mode === 'json') outEl.value = JSON.stringify(tree, null, 2);
+    else if(mode === 'urls') outEl.value = all.join('\n');
+    else outEl.value = outline(tree, 0).trimEnd();
+    statusEl.className = 'status ok'; statusEl.textContent = `${all.length} feed${all.length !== 1 ? 's' : ''} found.`;
+  }
+  $('modes').addEventListener('click', e => { const b = e.target.closest('.chip'); if(!b) return; document.querySelectorAll('#modes .chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); mode = b.dataset.m; $('out-label').textContent = b.textContent + (mode === 'urls' ? '' : ' out'); run(); });
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; run(); });
+  $('copy').addEventListener('click', async () => { if(!outEl.value) return; try { await navigator.clipboard.writeText(outEl.value); statusEl.className = 'status ok'; statusEl.textContent = 'Copied.'; } catch { outEl.select(); document.execCommand('copy'); } });
+  inEl.value = SAMPLE; run();
+</script>

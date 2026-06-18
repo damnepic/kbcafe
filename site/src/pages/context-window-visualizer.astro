@@ -1,0 +1,175 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+import { CONTEXT_TIERS, CHARS_PER_TOKEN, AS_OF } from '../data/aiModels.js';
+const SAMPLE = `You are a helpful coding assistant for the ACME app. Always answer concisely, cite file paths, and never invent APIs.`;
+---
+<ToolPage
+  title="Context Window Visualizer — see how your prompt fills the budget | KB Cafe"
+  description="Paste your system prompt, conversation, and retrieved docs and see how they fill an AI model's context window — with token estimates and a visual budget bar. Free, client-side."
+  path="/context-window-visualizer"
+  eyebrow="AI Explained · Tool"
+  h1="Context Window Visualizer"
+  tagline="See how your system prompt, conversation history, retrieved docs, and reserved output fill a model's context window — and how much room is actually left. Runs in your browser."
+>
+  <div class="row" style="margin-bottom:14px">
+    <label class="opt">Model context budget
+      <select id="budget"></select>
+    </label>
+    <label class="opt" id="custom-wrap" style="display:none">Custom tokens
+      <input id="custom" type="number" min="1" value="128000" />
+    </label>
+  </div>
+
+  <div class="seg-inputs">
+    <div class="seg-in">
+      <label class="seg-lbl"><span class="dot s-sys"></span> System prompt <button class="link-btn" id="sample">sample</button></label>
+      <textarea id="t-sys" class="ta small" spellcheck="false" placeholder="Your system / instructions…"></textarea>
+    </div>
+    <div class="seg-in">
+      <label class="seg-lbl"><span class="dot s-conv"></span> Conversation history</label>
+      <textarea id="t-conv" class="ta small" spellcheck="false" placeholder="Prior turns the app re-sends each request…"></textarea>
+    </div>
+    <div class="seg-in">
+      <label class="seg-lbl"><span class="dot s-doc"></span> Retrieved docs (RAG / pasted)</label>
+      <textarea id="t-doc" class="ta small" spellcheck="false" placeholder="Documents or chunks added to context…"></textarea>
+    </div>
+    <div class="seg-in">
+      <label class="seg-lbl"><span class="dot s-out"></span> Reserved for output (tokens)</label>
+      <input id="t-out" type="number" min="0" value="1000" class="num" />
+    </div>
+  </div>
+
+  <div class="meter-wrap">
+    <div class="meter-head"><span id="used-pct">0%</span><span id="used-abs"></span></div>
+    <div class="meter" id="meter"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>Where did all my context go?</h2>
+    <p>
+      A model&rsquo;s <a href="/what-is-a-context-window">context window</a> is shared by everything in a
+      request — your system prompt, the conversation history the app keeps re-sending, any retrieved
+      documents, and the reply itself. This tool estimates the tokens in each part and shows them stacked
+      against a model&rsquo;s budget, so you can see what&rsquo;s actually eating the space and how much is
+      left to answer.
+    </p>
+    <h3>How to read it</h3>
+    <ul>
+      <li>Pick a <strong>context budget</strong> (a size tier, or enter a custom number for your exact model).</li>
+      <li>Paste each part of your prompt; the bar fills proportionally and the percentage updates live.</li>
+      <li>If the total turns <strong>red</strong>, you&rsquo;re over budget — the app would truncate or reject
+        the request. Trim history, retrieve fewer chunks, or reserve less output.</li>
+    </ul>
+    <p class="note">
+      Token counts are <strong>estimates</strong> (~{CHARS_PER_TOKEN} characters per token). Real
+      tokenization varies by model and content — code and non-English text tokenize differently. Size tiers
+      are dated <strong>{AS_OF}</strong>; verify your model&rsquo;s exact limit with its provider.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why is the token count only an estimate?</summary>
+      <p>Every model family tokenizes differently, and the exact split depends on the text. The ~4-chars-per-token rule is a solid ballpark for English prose; treat it as a planning estimate, not an exact bill.</p>
+    </details>
+    <details class="faq"><summary>Why reserve space for output?</summary>
+      <p>The reply is generated <em>into</em> the same window as the input. If you fill the budget with input, there&rsquo;s no room left to answer — so apps reserve a slice for the response.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No — estimation runs entirely in your browser, so prompts and documents stay local and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Read <a href="/what-is-a-context-window">what a context window is</a> and how <a href="/what-is-rag">RAG</a> keeps it lean, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer;margin-left:8px}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;flex-direction:column;gap:6px}
+  .opt select,.opt input{font-family:var(--font-mono);font-size:13px;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--cream);color:var(--ink);outline:0}
+  .opt select{min-width:340px}.opt select:focus,.opt input:focus{border-color:var(--ink)}
+  .seg-inputs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+  .seg-in{display:flex;flex-direction:column;gap:7px}
+  .seg-lbl{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .s-sys{background:var(--coral)} .s-conv{background:var(--gold)} .s-doc{background:#6F4E37} .s-out{background:#9a8a78}
+  .ta.small{min-height:90px}
+  .num{font-family:var(--font-mono);font-size:14px;border:1.5px solid var(--ink);border-radius:11px;padding:11px 13px;background:var(--cream);color:var(--ink);outline:0;width:140px}
+  .num:focus{box-shadow:5px 5px 0 var(--coral)}
+  .meter-wrap{margin-top:6px}
+  .meter-head{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);margin-bottom:8px}
+  #used-pct{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:-.02em}
+  #used-abs{font-size:13px;color:var(--ink-soft)}
+  .meter{height:46px;border-radius:12px;border:1.5px solid var(--ink);overflow:hidden;display:flex;background:var(--paper-2)}
+  .meter .fill{height:100%;transition:width .2s}
+  .meter .free{flex:1}
+  .meter.over{border-color:var(--coral-deep);box-shadow:6px 6px 0 rgba(214,62,31,.25)}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  .legend .li{display:flex;align-items:center;gap:7px}
+  .legend b{color:var(--ink)}
+  @media(max-width:620px){.seg-inputs{grid-template-columns:1fr}.opt select{min-width:0;width:100%}}
+</style>
+
+<script is:inline define:vars={{ CONTEXT_TIERS, CHARS_PER_TOKEN, SAMPLE }}>
+  const $ = id => document.getElementById(id);
+  const est = t => t ? Math.ceil([...t].length / CHARS_PER_TOKEN) : 0;
+  const fmt = n => n.toLocaleString('en-US');
+
+  // populate budget dropdown
+  const sel = $('budget');
+  CONTEXT_TIERS.forEach(t => { const o = document.createElement('option'); o.value = t.tokens; o.textContent = t.label; sel.appendChild(o); });
+  const custom = document.createElement('option'); custom.value = 'custom'; custom.textContent = 'Custom…'; sel.appendChild(custom);
+  sel.value = CONTEXT_TIERS.find(t => t.id === '128k').tokens;
+
+  const SEGS = [
+    { key: 'sys',  label: 'System',   color: 'var(--coral)' },
+    { key: 'conv', label: 'History',  color: 'var(--gold)' },
+    { key: 'doc',  label: 'Docs/RAG', color: '#6F4E37' },
+    { key: 'out',  label: 'Output',   color: '#9a8a78' },
+  ];
+
+  function budget(){ return sel.value === 'custom' ? Math.max(1, parseInt($('custom').value) || 0) : parseInt(sel.value); }
+
+  function render(){
+    const toks = {
+      sys: est($('t-sys').value),
+      conv: est($('t-conv').value),
+      doc: est($('t-doc').value),
+      out: Math.max(0, parseInt($('t-out').value) || 0),
+    };
+    const used = toks.sys + toks.conv + toks.doc + toks.out;
+    const bud = budget();
+    const pct = bud ? (used / bud) * 100 : 0;
+    const over = used > bud;
+
+    const meter = $('meter'); meter.innerHTML = ''; meter.classList.toggle('over', over);
+    SEGS.forEach(s => {
+      const w = bud ? Math.min(100, (toks[s.key] / bud) * 100) : 0;
+      if(toks[s.key] <= 0) return;
+      const d = document.createElement('div'); d.className = 'fill';
+      d.style.width = w + '%'; d.style.background = over ? 'var(--coral-deep)' : s.color;
+      d.title = `${s.label}: ${fmt(toks[s.key])} tokens`;
+      meter.appendChild(d);
+    });
+    if(!over){ const free = document.createElement('div'); free.className = 'free'; meter.appendChild(free); }
+
+    $('used-pct').textContent = Math.round(pct) + '%';
+    $('used-pct').style.color = over ? 'var(--coral-deep)' : (pct > 85 ? 'var(--orange)' : 'var(--ink)');
+    $('used-abs').textContent = `${fmt(used)} / ${fmt(bud)} tokens` + (over ? '' : ` · ${fmt(bud - used)} free`);
+
+    $('legend').innerHTML = SEGS.map(s =>
+      `<span class="li"><span class="dot" style="background:${s.color}"></span>${s.label} <b>${fmt(toks[s.key])}</b></span>`
+    ).join('');
+
+    const st = $('status');
+    if(over){ st.className = 'status bad'; st.textContent = `Over budget by ${fmt(used - bud)} tokens — the request would be truncated or rejected. Trim history or retrieve fewer chunks.`; }
+    else { st.className = 'status ok'; st.textContent = `Estimated ${fmt(used)} tokens used (${Math.round(pct)}% of budget).`; }
+  }
+
+  sel.addEventListener('change', () => { $('custom-wrap').style.display = sel.value === 'custom' ? 'flex' : 'none'; render(); });
+  ['custom','t-sys','t-conv','t-doc','t-out'].forEach(id => $(id).addEventListener('input', render));
+  $('sample').addEventListener('click', e => { e.preventDefault(); $('t-sys').value = SAMPLE; render(); });
+  $('t-sys').value = SAMPLE; render();
+</script>

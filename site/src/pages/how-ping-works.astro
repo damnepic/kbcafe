@@ -1,0 +1,57 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="How ping &amp; ICMP work — what ping really measures | KB Cafe"
+  description="A clear reference on ping and ICMP: the echo request/reply, what round-trip time and TTL mean, why packets are lost, and what ping can and can't tell you."
+  path="/how-ping-works"
+  eyebrow="Reference · Networking"
+  h1="How ping &amp; ICMP work"
+  tagline="Ping is the first tool everyone reaches for — but what is it actually measuring? Here&rsquo;s ICMP, round-trip time, TTL, and how to read the output."
+>
+  <h2>ICMP — the network&rsquo;s status channel</h2>
+  <p>
+    <strong>ICMP, the Internet Control Message Protocol</strong>, is how hosts and routers report network
+    conditions — unreachable destinations, expired packets, and diagnostics. It rides directly on IP, alongside
+    TCP and UDP, but unlike them it carries no application data. <strong>Ping</strong> is just the most famous use
+    of ICMP: a reachability and latency probe.
+  </p>
+
+  <h2>Echo request, echo reply</h2>
+  <p>
+    When you <code>ping</code> a host, your machine sends an <strong>ICMP echo request</strong>. If the host is up,
+    reachable, and willing to answer, it returns an <strong>ICMP echo reply</strong> with the same payload. Ping
+    measures the <strong>round-trip time (RTT)</strong> — how long that there-and-back took — and tracks how many
+    replies came back versus how many requests went out (packet loss).
+  </p>
+
+  <h2>Reading the output</h2>
+  <ul>
+    <li><strong>time=</strong> — the round-trip time in milliseconds. Lower is better; the number is dominated by physical distance and congestion.</li>
+    <li><strong>TTL (Time To Live)</strong> — a counter decremented by each router (hop) the packet crosses. It exists to kill packets stuck in routing loops. The value you see hints at how many hops away the host is and which OS it likely runs (common starting values are 64, 128, 255).</li>
+    <li><strong>packet loss</strong> — replies missing. Steady loss means a real problem; occasional loss can be normal deprioritization of ICMP.</li>
+  </ul>
+
+  <h2>What ping can&rsquo;t tell you</h2>
+  <p>
+    A successful ping proves IP reachability and gives you latency — nothing more. Plenty of hosts
+    <strong>deliberately drop ICMP</strong>, so &ldquo;no reply&rdquo; does not mean &ldquo;down&rdquo;; the service
+    you actually care about may be running fine on its TCP port. And a fast ping says nothing about whether an
+    application is healthy — only that packets reach the machine. For path-level detail, <code>traceroute</code>
+    (which uses TTL deliberately) shows each hop; for service health, test the actual port.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Why does a host not respond to ping but the website works?</summary>
+    <p>Many firewalls drop ICMP while allowing TCP on ports 80/443. The site is up; ICMP is just filtered. Test the port, not ping.</p>
+  </details>
+  <details class="faq"><summary>What does the TTL value tell me?</summary>
+    <p>It started at a round number (often 64, 128, or 255) and was decremented once per router. The gap from that start estimates the hop count; the start value hints at the remote OS.</p>
+  </details>
+  <details class="faq"><summary>Is high ping the same as low bandwidth?</summary>
+    <p>No. Ping measures latency (delay), not throughput (bandwidth). A link can be high-bandwidth and high-latency at once.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Probing TCP ports instead is <a href="/port-scanning-explained">port scanning</a>; the web&rsquo;s request layer is <a href="/http-explained">HTTP</a>.</p>
+</ReferencePage>

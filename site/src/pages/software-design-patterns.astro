@@ -1,0 +1,70 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+---
+<ReferencePage
+  title="Software design patterns — the Gang of Four, explained | KB Cafe"
+  description="A clear reference on software design patterns: the creational, structural, and behavioral categories, the most-used patterns in each, and when a pattern helps vs hurts."
+  path="/software-design-patterns"
+  eyebrow="Reference · Concepts"
+  h1="Software design patterns"
+  tagline="Design patterns are named, reusable solutions to recurring design problems. Here are the three categories, the ones you&rsquo;ll actually use, and when not to."
+>
+  <h2>What a design pattern is</h2>
+  <p>
+    A <strong>design pattern</strong> is a named, reusable solution to a problem that comes up again and again in
+    software design. Patterns aren&rsquo;t code you copy — they&rsquo;re <em>shapes</em> you recognize and a shared
+    vocabulary for talking about structure. The classic catalog is the 23 patterns from the 1994
+    &ldquo;Gang of Four&rdquo; book, grouped into three categories by what they&rsquo;re about: creating objects,
+    composing them, or coordinating their behavior.
+  </p>
+
+  <h2>Creational — how objects are made</h2>
+  <ul>
+    <li><strong>Factory Method</strong> — defer which concrete class to instantiate to a subclass or a function.</li>
+    <li><strong>Abstract Factory</strong> — create families of related objects without naming concrete types.</li>
+    <li><strong>Builder</strong> — assemble a complex object step by step, separating construction from representation.</li>
+    <li><strong>Singleton</strong> — guarantee one instance with a global access point. (Useful occasionally; often overused — it&rsquo;s global state in disguise.)</li>
+    <li><strong>Prototype</strong> — create new objects by cloning an existing one.</li>
+  </ul>
+
+  <h2>Structural — how objects are composed</h2>
+  <ul>
+    <li><strong>Adapter</strong> — wrap an interface so two incompatible types can work together.</li>
+    <li><strong>Decorator</strong> — add behavior to an object by wrapping it, without subclassing.</li>
+    <li><strong>Facade</strong> — present one simple interface over a complex subsystem.</li>
+    <li><strong>Composite</strong> — treat individual objects and groups of them uniformly (trees).</li>
+    <li><strong>Proxy</strong> — stand in for another object to control access, add caching, or defer work.</li>
+  </ul>
+
+  <h2>Behavioral — how objects coordinate</h2>
+  <ul>
+    <li><strong>Observer</strong> — notify dependents automatically when something changes (the heart of event systems).</li>
+    <li><strong>Strategy</strong> — make an algorithm interchangeable by encapsulating it behind an interface.</li>
+    <li><strong>Command</strong> — turn a request into an object you can queue, log, or undo.</li>
+    <li><strong>Iterator</strong> — traverse a collection without exposing its internals.</li>
+    <li><strong>State</strong> — let an object change behavior when its internal state changes.</li>
+  </ul>
+
+  <h2>When a pattern helps — and when it hurts</h2>
+  <p>
+    A pattern earns its keep when it names a structure your code already needs and makes intent obvious to the next
+    reader. It hurts when you reach for it first and bend the problem to fit — that&rsquo;s how a three-line need
+    becomes five interfaces and a factory. The honest rule: <strong>let patterns emerge from the problem</strong>.
+    Solve it plainly, and when you notice you&rsquo;ve reinvented Observer or Strategy, adopt the name. Many patterns
+    also relax in modern languages — first-class functions make Strategy and Command nearly free, for instance.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Do I need to memorize all 23?</summary>
+    <p>No. Know the handful you&rsquo;ll actually use — Factory, Builder, Adapter, Decorator, Facade, Observer, Strategy — and recognize the rest when you see them.</p>
+  </details>
+  <details class="faq"><summary>Why is Singleton controversial?</summary>
+    <p>It&rsquo;s global mutable state with a friendly name — convenient, but it hides dependencies and makes testing and concurrency harder. Use it deliberately, not by default.</p>
+  </details>
+  <details class="faq"><summary>Are design patterns language-specific?</summary>
+    <p>The catalog came from C++/Smalltalk, but the patterns are language-agnostic shapes. Their <em>weight</em> varies — features like closures and interfaces make some patterns trivial in modern languages.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Patterns build on <a href="/object-oriented-programming-concepts">OOP concepts</a>; see also <a href="/multithreading-explained">concurrency</a> and the full <a href="/reference">Reference</a>.</p>
+</ReferencePage>

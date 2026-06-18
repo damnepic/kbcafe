@@ -1,0 +1,61 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="Feeds for Machines: RSS as the Structured Layer for AI"
+  description="LLMs are starving for clean, structured, permissioned content. A 25-year-old syndication format turns out to be a surprisingly good answer."
+  slug="rss-and-ai"
+  tag="AI"
+  date="2026-06-16"
+>
+  <p>
+    Most of what an AI system reads about the world, it reads by scraping HTML — fighting through nav bars,
+    cookie banners, ad slots, and markup that was written for a browser, not a model. It works, badly. There
+    is a cleaner path that has been sitting in plain sight: the feed.
+  </p>
+
+  <h2>What a feed gives a model</h2>
+  <p>An RSS or Atom feed is content with the chrome already removed:</p>
+  <ul>
+    <li><strong>Structure</strong> — title, author, timestamp, and body in labeled fields, not guessed at from
+      <code>&lt;div&gt;</code> soup.</li>
+    <li><strong>Freshness</strong> — feeds are ordered and timestamped, so &ldquo;what changed since I last
+      looked&rdquo; is a trivial question instead of a re-crawl.</li>
+    <li><strong>Intent</strong> — a publisher who offers a feed is explicitly saying &ldquo;here is my content,
+      meant to be consumed by software.&rdquo; That&rsquo;s a permission signal scraping never has.</li>
+  </ul>
+
+  <h2>The permission problem</h2>
+  <p>
+    The tension between AI crawlers and publishers is, at bottom, about consent and structure. Scraping takes
+    without asking and guesses at meaning. A feed is the opposite: a publisher deciding what to syndicate, in a
+    format that says what each part <em>is</em>. As the relationship between models and the open web gets
+    renegotiated, feeds are a natural unit — granular, opt-in, and machine-clean.
+  </p>
+  <blockquote>If you were designing &ldquo;structured, permissioned, time-ordered content for machines&rdquo; from scratch, you&rsquo;d land somewhere close to RSS.</blockquote>
+
+  <h2>What feeds don&rsquo;t solve</h2>
+  <p>
+    Feeds aren&rsquo;t a silver bullet, and it&rsquo;s worth being honest about the gaps. Not every site offers
+    one. Full-text feeds are rarer than they should be — plenty publish only a summary. And a feed still
+    can&rsquo;t capture everything a rich, interactive page does. But as the default unit for &ldquo;give a
+    model clean, recent, opt-in content,&rdquo; a feed beats scraping on every axis that matters: structure,
+    freshness, cost, and consent. It puts the publisher back in charge of what gets shared.
+  </p>
+
+  <h2>Where this goes</h2>
+  <p>
+    The practical near-term version is unglamorous and useful: point a model at a set of feeds instead of a set
+    of URLs to scrape, and let RSS-to-JSON do the parsing so the content arrives clean. Retrieval pipelines,
+    monitoring agents, and &ldquo;summarize what&rsquo;s new&rdquo; tools all get simpler when the source already
+    speaks a structured dialect.
+  </p>
+  <p>
+    It&rsquo;s a nice irony. The format everyone wrote off a decade ago turns out to be well-suited to the most
+    hyped technology of this one. KB Cafe is building its <a href="/feeds">feed tools</a> with that in mind — and
+    an <a href="/#menu">AI-tools</a> corner alongside them.
+  </p>
+
+  <h3>Related</h3>
+  <p>See <a href="/what-is-rss">what RSS is</a>, why <a href="/blog/rss-and-the-open-web-in-2026">RSS didn&rsquo;t die</a>, and the <a href="/feeds">Feeds</a> section.</p>
+</BlogPost>
