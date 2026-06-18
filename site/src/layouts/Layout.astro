@@ -48,7 +48,7 @@ const canonical = new URL(path, Astro.site).href;
 <div class="wrap">
   <nav>
     <a class="brand" href="/">
-      <svg class="mark"><use href="#kb-mark"/></svg>
+      <img class="mark" src="/logo.png" width="44" height="44" alt="KB Cafe logo — a coffee cup with an open book inside" />
       <span><span class="kb">KB</span>&nbsp;<span class="cf">Cafe</span></span>
     </a>
     <div class="nav-links">
@@ -91,7 +91,7 @@ const canonical = new URL(path, Astro.site).href;
   nav{display:flex;align-items:center;justify-content:space-between;padding:24px 0 8px}
   .brand{display:flex;align-items:center;gap:11px;font-family:var(--font-display);
     font-weight:800;font-size:25px;letter-spacing:-.02em;text-decoration:none}
-  .brand .mark{height:36px;width:auto;filter:drop-shadow(2px 2px 0 rgba(30,24,19,.18))}
+  .brand .mark{height:44px;width:auto;display:block;filter:drop-shadow(0 2px 3px rgba(30,24,19,.18))}
   .brand .kb{color:var(--coral)} .brand .cf{color:var(--ink)}
   .nav-links{display:flex;align-items:center;gap:26px;font-weight:600;font-size:15px}
   .nav-links a{color:var(--ink-soft);text-decoration:none;transition:color .15s}
