@@ -13,6 +13,7 @@ export const TOOLS = [
   { cat:"ai",       ctl:"AI",          nm:"rag chunking visualizer", ds:"See how a document splits into RAG chunks.",   color:"c-cream", href:"/rag-chunking-visualizer" },
   { cat:"ai",       ctl:"AI",          nm:"mcp config generator", ds:"Build & validate an MCP server config.",         color:"c-ink",   href:"/mcp-config-generator" },
   { cat:"ai",       ctl:"AI",          nm:"prompt linter",     ds:"Catch vague, conflicting, or unclear prompts.",    color:"c-gold",  href:"/prompt-linter" },
+  { cat:"ai",       ctl:"AI",          nm:"prompt diff",       ds:"Compare two prompts and see what changed.",        color:"c-ink",   href:"/prompt-diff" },
   { cat:"ai",       ctl:"AI",          nm:"llm vram calculator", ds:"Estimate VRAM to run a model locally.",          color:"c-coral", href:"/llm-vram-calculator" },
   { cat:"ai",       ctl:"AI",          nm:"llm cost calculator", ds:"Estimate API cost from token usage.",            color:"c-cream", href:"/llm-cost-calculator" },
   { cat:"convert",  ctl:"Converters",  nm:"csv ⇄ json",        ds:"Convert tabular data both ways, instantly.",       color:"c-cream", href:"/csv-to-json" },

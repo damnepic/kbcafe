@@ -1,0 +1,181 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const A = `Please write a good summary of the article below. Make it nice and return JSON.`;
+const B = `You are a tech editor. Summarize the article below in exactly 3 bullet points, then a one-line headline. Return JSON: { "bullets": string[], "headline": string }.`;
+---
+<ToolPage
+  title="Prompt Diff — compare two prompts, see what changed | KB Cafe"
+  description="Paste two prompts and see a real word-level diff plus honest observations on what changed: specificity, output format, vague wording, and token delta. Client-side, nothing uploaded."
+  path="/prompt-diff"
+  eyebrow="AI Explained · Tool"
+  h1="Prompt Diff"
+  tagline="Paste two versions of a prompt and see exactly what changed, word by word, plus structural observations on what each edit does. Git diff for prompts. Runs in your browser."
+>
+  <div class="pd-ins">
+    <div class="pane"><div class="pane-label"><span>Prompt A (before)</span></div>
+      <textarea id="a" class="ta" spellcheck="false" data-sample={A} placeholder="Paste the first version…"></textarea></div>
+    <div class="pane"><div class="pane-label"><span>Prompt B (after)</span><button class="link-btn" id="sample">sample</button></div>
+      <textarea id="b" class="ta" spellcheck="false" data-sample={B} placeholder="Paste the revised version…"></textarea></div>
+  </div>
+
+  <div class="pd-stats" id="stats"></div>
+  <div class="pane" style="margin-top:6px">
+    <div class="pane-label"><span>Diff</span><span class="pd-key"><span class="k del">removed</span><span class="k ins">added</span></span></div>
+    <div class="pd-diff" id="diff"></div>
+  </div>
+
+  <h3 class="pd-h">What changed</h3>
+  <div class="pd-obs" id="obs"></div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>Iterating prompts without guessing</h2>
+    <p>
+      Most prompt work is editing the same prompt over and over, but it&rsquo;s hard to see what actually changed
+      between two versions and why the output moved. This shows a real <strong>word-level diff</strong> (like a code
+      diff) and then reads the structural <strong>observations</strong>: did you add an output format, remove a vague
+      word, resolve a conflicting instruction, change the token count? It uses the real <code>o200k_base</code>
+      tokenizer for the counts and the same checks as the <a href="/prompt-linter">Prompt Linter</a>.
+    </p>
+    <p class="note">
+      These are <strong>observations, not a verdict.</strong> The tool won&rsquo;t tell you which prompt is
+      &ldquo;better&rdquo;, only a real model on your real inputs can, and the honest move is to test both. What it
+      does is surface the kinds of changes that usually matter, so you know what you changed. Nothing is uploaded.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it tell me which prompt is better?</summary>
+      <p>No, and that&rsquo;s deliberate. &ldquo;Better&rdquo; depends on your task and real outputs. It reports what changed (added format, removed vagueness, token delta) so you can judge, and run an A/B test yourself.</p>
+    </details>
+    <details class="faq"><summary>What counts as a change?</summary>
+      <p>The diff is word-level: matching runs stay neutral, removed words are struck through, added words are highlighted. The observations look at structure, format, role, vague terms, conflicts, examples, and length.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No. Diffing and analysis run entirely in your browser, so both prompts stay on your device.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Lint a single prompt with the <a href="/prompt-linter">Prompt Linter</a>, count tokens with the <a href="/token-counter">Token Counter</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .pd-ins{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .pane{display:flex;flex-direction:column;gap:9px}
+  .pane-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .ta{min-height:130px}
+  .pd-stats{display:flex;flex-wrap:wrap;gap:16px;margin:18px 0 8px;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+  .pd-stats b{color:var(--ink);font-weight:800}
+  .pd-stats .up{color:#2f7d32}.pd-stats .down{color:var(--coral-deep)}
+  .pd-key{display:flex;gap:10px}
+  .k{font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
+  .k.del{background:rgba(214,62,31,.14);color:var(--coral-deep)} .k.ins{background:rgba(47,125,50,.14);color:#2f7d32}
+  .pd-diff{border:1.5px solid var(--line);border-radius:14px;background:var(--paper-2);padding:14px 15px;min-height:60px;
+    font-family:var(--font-mono);font-size:13.5px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:var(--ink)}
+  .pd-diff del{background:rgba(214,62,31,.16);color:var(--coral-deep);text-decoration:line-through;text-decoration-thickness:1px;border-radius:3px;padding:1px 0}
+  .pd-diff ins{background:rgba(47,125,50,.16);color:#236b27;text-decoration:none;border-radius:3px;padding:1px 0}
+  .pd-h{font-family:var(--font-display);font-weight:800;font-size:20px;margin:26px 0 12px}
+  .pd-obs{display:flex;flex-direction:column;gap:8px}
+  .ob{display:flex;gap:11px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;background:var(--cream);font-size:14px;line-height:1.45}
+  .ob .ic{font-family:var(--font-mono);font-weight:800;flex-shrink:0}
+  .ob.add{border-color:rgba(47,125,50,.4)}.ob.add .ic{color:#2f7d32}
+  .ob.rem .ic{color:var(--orange)} .ob.neutral .ic{color:var(--ink-soft)}
+  .ob b{color:var(--ink)}
+  @media(max-width:620px){.pd-ins{grid-template-columns:1fr}}
+</style>
+
+<script>
+  import { encode } from 'gpt-tokenizer/encoding/o200k_base';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const words = (t) => { const m = t.trim().match(/\S+/g); return m ? m.length : 0; };
+  const CAP = 2000;
+
+  function toksOf(s) { return s.split(/(\s+)/).filter(x => x !== ''); }
+  function lcsDiff(a, b) {
+    let trunc = false;
+    if (a.length > CAP) { a = a.slice(0, CAP); trunc = true; }
+    if (b.length > CAP) { b = b.slice(0, CAP); trunc = true; }
+    const n = a.length, m = b.length;
+    const dp = Array.from({ length: n + 1 }, () => new Int32Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+      dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    const ops = []; let i = 0, j = 0;
+    while (i < n && j < m) {
+      if (a[i] === b[j]) { ops.push(['=', a[i]]); i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) { ops.push(['-', a[i]]); i++; }
+      else { ops.push(['+', b[j]]); j++; }
+    }
+    while (i < n) ops.push(['-', a[i++]]);
+    while (j < m) ops.push(['+', b[j++]]);
+    return { ops, trunc };
+  }
+
+  // honest structural checks (shared spirit with the Prompt Linter)
+  function profile(t) {
+    const l = t.toLowerCase();
+    return {
+      tokens: t.trim() ? encode(t).length : 0,
+      words: words(t),
+      hasFormat: /(format|as (a )?(list|bullet|table|json|markdown|csv)|bullet|numbered|steps|markdown|table|schema|response_format)/i.test(l),
+      hasRole: /(^|\n)\s*(you are|act as|you'?re a|as an? |role:)/i.test(l),
+      vague: (l.match(/\b(good|nice|better|appropriate|reasonable|relevant|properly|correctly|engaging|compelling)\b/g) || []).length,
+      jsonNoSchema: /\bjson\b/.test(l) && !/(schema|fields?|keys?|properties|format|shape|structure|example|response_format|\{)/i.test(l),
+      conflictLen: /\b(detailed|comprehensive|thorough|in[- ]depth|exhaustive)\b/i.test(l) && /\b(concise|brief|short|succinct|terse)\b/i.test(l),
+      negations: (l.match(/\b(don'?t|do not|never|avoid)\b/g) || []).length,
+      examples: /(example|e\.g\.|for instance|sample)/i.test(l),
+    };
+  }
+
+  function render() {
+    const A = $('a').value, B = $('b').value;
+    const { ops, trunc } = lcsDiff(toksOf(A), toksOf(B));
+    let added = 0, removed = 0, html = '';
+    ops.forEach(([op, w]) => {
+      if (op === '=') html += esc(w);
+      else if (op === '-') { html += `<del>${esc(w)}</del>`; if (w.trim()) removed++; }
+      else { html += `<ins>${esc(w)}</ins>`; if (w.trim()) added++; }
+    });
+    $('diff').innerHTML = html || '<span style="opacity:.5">Paste two prompts to compare.</span>';
+
+    const pa = profile(A), pb = profile(B);
+    const dTok = pb.tokens - pa.tokens, dWord = pb.words - pa.words;
+    const sign = (n) => n > 0 ? `<span class="up">+${n}</span>` : n < 0 ? `<span class="down">${n}</span>` : '0';
+    $('stats').innerHTML = (A || B)
+      ? `<span>tokens <b>${pa.tokens}</b> → <b>${pb.tokens}</b> (${sign(dTok)})</span><span>words <b>${pa.words}</b> → <b>${pb.words}</b> (${sign(dWord)})</span><span class="up">+${added} added</span><span class="down">−${removed} removed</span>`
+      : '';
+
+    // observations (changes only), framed neutrally
+    const obs = [];
+    const add = (cls, msg) => obs.push({ cls, msg });
+    if (!pa.hasFormat && pb.hasFormat) add('add', '<b>Adds an output format.</b> B specifies how the answer should be shaped, usually the biggest reliability win.');
+    if (pa.hasFormat && !pb.hasFormat) add('rem', '<b>Drops the output format</b> that A specified, the result may be less predictable.');
+    if (pa.jsonNoSchema && !pb.jsonNoSchema) add('add', '<b>Pins down the JSON shape.</b> A asked for JSON without a schema; B specifies it.');
+    if (!pa.jsonNoSchema && pb.jsonNoSchema) add('rem', '<b>Asks for JSON without a shape.</b> B requests JSON but no longer says what keys.');
+    if (!pa.hasRole && pb.hasRole) add('add', '<b>Adds a role.</b> B opens with a persona, which anchors tone and expertise.');
+    if (pa.hasRole && !pb.hasRole) add('rem', '<b>Removes the role</b> A had set.');
+    if (pb.vague < pa.vague) add('add', `<b>Removes ${pa.vague - pb.vague} vague word(s)</b> like &ldquo;good&rdquo;/&ldquo;nice&rdquo;.`);
+    if (pb.vague > pa.vague) add('rem', `<b>Adds ${pb.vague - pa.vague} vague word(s).</b>`);
+    if (pa.conflictLen && !pb.conflictLen) add('add', '<b>Resolves a conflicting length instruction</b> (e.g. &ldquo;detailed&rdquo; vs &ldquo;concise&rdquo;).');
+    if (!pa.conflictLen && pb.conflictLen) add('rem', '<b>Introduces a conflicting length instruction.</b>');
+    if (pb.negations < pa.negations && pa.negations >= 2) add('add', '<b>Trades prohibitions for positive instructions</b> (models follow &ldquo;do X&rdquo; more reliably).');
+    if (!pa.examples && pb.examples) add('add', '<b>Adds an example.</b> Few-shot examples sharpen consistency.');
+    if (Math.abs(dTok) >= 15) add('neutral', `<b>${dTok > 0 ? 'Longer' : 'Shorter'} by ${Math.abs(dTok)} tokens.</b> ${dTok > 0 ? 'More context, more cost.' : 'Leaner prompt.'}`);
+
+    const box = $('obs');
+    if (!A && !B) { box.innerHTML = ''; }
+    else if (!added && !removed) box.innerHTML = `<div class="ob neutral"><span class="ic">=</span><span>The two prompts are identical.</span></div>`;
+    else if (!obs.length) box.innerHTML = `<div class="ob neutral"><span class="ic">~</span><span>Wording changed, but no structural shift detected (format, role, vagueness, examples, conflicts all unchanged). Test both on real inputs.</span></div>`;
+    else box.innerHTML = obs.map(o => `<div class="ob ${o.cls}"><span class="ic">${o.cls === 'add' ? '+' : o.cls === 'rem' ? '!' : '~'}</span><span>${o.msg}</span></div>`).join('');
+
+    $('status').className = 'status';
+    $('status').textContent = trunc ? `Long prompts truncated to ${CAP} words for the diff.` : '';
+  }
+
+  ['a', 'b'].forEach(id => $(id).addEventListener('input', render));
+  $('sample').addEventListener('click', () => { $('a').value = $('a').getAttribute('data-sample'); $('b').value = $('b').getAttribute('data-sample'); render(); });
+  $('a').value = $('a').getAttribute('data-sample'); $('b').value = $('b').getAttribute('data-sample');
+  render();
+</script>
