@@ -47,6 +47,8 @@ const popular = popularDefs.map(d => ({ ...d, ...toolBy[d.href] }));
 const toolCount = TOOLS.filter(t => t.href).length;
 // honest, data-derived counts for the social-proof strip
 const refCount = REFERENCE.length + AI.length; // evergreen references + AI explainers
+const aiCount = TOOLS.filter(t => t.href && t.cat === 'ai').length; // AI tools
+const explainerCount = AI.filter(a => a.type === 'explainer').length; // concept explainers
 
 // goal-first workflows: bundle tools by what you're trying to do (vs browsing 34 tools)
 const WORKFLOWS = [
@@ -62,47 +64,33 @@ const WORKFLOWS = [
 ];
 ---
 <Layout
-  title="KB Cafe, a developer’s knowledge base"
-  description="Fast, clean developer tools, deep references, and clear AI explainers, freshly brewed. Everything runs in your browser: nothing uploaded, nothing tracked."
+  title="KB Cafe, the interactive AI knowledge base"
+  description="Learn and build with modern AI: clear explainers, hands-on tools, and guided paths, plus fast developer references. Everything runs in your browser, nothing uploaded, nothing tracked."
   path="/"
   bodyClass="home"
 >
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-left">
-      <div class="eyebrow">✦ The developer&rsquo;s knowledge base</div>
-      <h1 class="hero-title">Tools &amp; references,<br /><span class="ul">freshly brewed.</span></h1>
-      <p class="hero-copy">A fast, no-nonsense toolbox for developers: format, convert, decode, and learn, all in one place. Every tool runs entirely in your browser, so nothing you paste is ever uploaded or tracked.</p>
-      <div class="hero-actions">
-        <a class="btn-primary" href="/tools">Explore tools <span aria-hidden="true">→</span></a>
-        <a class="btn-secondary" href="/reference">Browse references</a>
-      </div>
-      <ul class="proof">
-        <li><strong>{toolCount}</strong> tools</li>
-        <li><strong>{refCount}</strong> references</li>
-        <li><strong>100%</strong> client-side</li>
-        <li>Built since <strong>1999</strong></li>
-      </ul>
+  <!-- HERO (outcome-first, wrapped in identity) -->
+  <section class="hero-o">
+    <div class="eyebrow">✦ The interactive AI knowledge base</div>
+    <h1 class="hero-q">What are you trying to do with <span class="ul">AI?</span></h1>
+    <p class="o-sub">Pick a goal. KB Cafe turns it into a guided path through clear explainers, hands-on tools, and developer references, all running in your browser. Nothing uploaded, nothing tracked.</p>
+    <div class="o-grid">
+      {WORKFLOWS.map(w => (
+        <a class="o-card" href={w.path} style={`--ac:${w.accent}`}>
+          <h2>{w.title}</h2>
+          <p>{w.blurb}</p>
+          <div class="o-tools">{w.tools.slice(0, 3).map(([nm]) => <span class="o-chip">{nm}</span>)}</div>
+          <span class="o-go">Start the path <span aria-hidden="true">→</span></span>
+        </a>
+      ))}
     </div>
-
-    <a class="hero-ai" href="/ai">
-      <div class="hai-glow" aria-hidden="true">
-        <svg viewBox="0 0 120 150" width="150" height="180"><g opacity=".95">
-          <path d="M60 8 110 36 60 64 10 36Z" fill="#ff5a2c"/><path d="M10 36 60 64 60 90 10 62Z" fill="#c2381a"/><path d="M110 36 60 64 60 90 110 62Z" fill="#e8481f"/>
-          <path d="M60 70 100 93 60 116 20 93Z" fill="#f4842a" opacity=".82"/><path d="M20 93 60 116 60 134 20 111Z" fill="#9a3416" opacity=".82"/><path d="M100 93 60 116 60 134 100 111Z" fill="#c2381a" opacity=".82"/>
-        </g></svg>
-      </div>
-      <div class="hai-body">
-        <div class="hai-kicker">AI Explained <span class="badge-new">New</span></div>
-        <div class="hai-title">How modern AI<br />actually works.</div>
-        <p class="hai-copy">Context windows, MCP, RAG, embeddings &amp; more, explained clearly, with tools.</p>
-        <div class="hai-links">
-          <span class="hai-link"><span>{aiCards[0] && '☕'} Context Window Visualizer</span> <span aria-hidden="true">→</span></span>
-          <span class="hai-link"><span>⚙ Structured Output Builder</span> <span aria-hidden="true">→</span></span>
-        </div>
-        <span class="hai-cta">Start learning <span aria-hidden="true">→</span></span>
-      </div>
-    </a>
+    <p class="hero-quick">Not sure where to start? <a href="/search">Search every tool, concept &amp; lesson</a>, <a href="/skill-tree">take the skill tree</a>, or <a href="/tools">browse all {toolCount} tools</a>.</p>
+    <ul class="proof o-proof">
+      <li><strong>{aiCount}</strong> AI tools</li>
+      <li><strong>{explainerCount}</strong> explainers</li>
+      <li><strong>{WORKFLOWS.length}</strong> learning paths</li>
+      <li><strong>100%</strong> client-side, no tracking</li>
+    </ul>
   </section>
 
   <!-- SEARCH -->
@@ -155,28 +143,6 @@ const WORKFLOWS = [
       </div>
     </section>
 
-    <!-- WORKFLOWS -->
-    <section class="home-sec">
-      <div class="sec-head">
-        <div class="sec-title">
-          <span class="kicker">What are you trying to do?</span>
-          <p class="sec-sub">Pick a goal, not one of {toolCount} tools. We&rsquo;ll route you to the right path.</p>
-        </div>
-        <a class="sec-link" href="/learn">See learning paths →</a>
-      </div>
-      <div class="wf-grid">
-        {WORKFLOWS.map(w => (
-          <div class="wf-card">
-            <h3 style={`--wf:${w.accent}`}>{w.title}</h3>
-            <p>{w.blurb}</p>
-            <div class="wf-tools">
-              {w.tools.map(([nm, href]) => <a class="wf-tool" href={href}><span class="wf-dot" style={`background:${w.accent}`}></span>{nm}</a>)}
-            </div>
-            <a class="wf-path" href={w.path}>Follow the path <span aria-hidden="true">→</span></a>
-          </div>
-        ))}
-      </div>
-    </section>
 
     <!-- POPULAR TOOLS -->
     <section class="home-sec" id="menu">
@@ -235,7 +201,31 @@ const WORKFLOWS = [
 </style>
 
 <style>
-  /* HERO */
+  /* HERO (outcome-first) */
+  .hero-o{margin:48px 0 0}
+  .hero-q{font-family:var(--font-display);font-weight:700;font-size:clamp(33px,4.4vw,54px);line-height:1.04;letter-spacing:-.035em;color:var(--ink);max-width:740px}
+  .hero-q .ul{position:relative;display:inline-block;padding-bottom:.16em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .42em}
+  .o-sub{max-width:600px;color:var(--ink-soft);font-size:18px;line-height:1.55;margin:20px 0 30px}
+  .o-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .o-card{position:relative;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);
+    background:rgba(255,255,255,.62);border:1.2px solid var(--line);border-radius:20px;padding:24px 22px 22px;
+    box-shadow:0 8px 24px rgba(40,24,12,.05);transition:transform .16s,box-shadow .16s,border-color .16s}
+  .o-card::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:var(--ac)}
+  .o-card:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(40,24,12,.1);border-color:var(--ac)}
+  .o-card h2{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.02em;line-height:1.15;margin:6px 0 8px}
+  .o-card>p{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 14px}
+  .o-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .o-chip{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--ink-soft);background:var(--paper-2);border-radius:7px;padding:4px 8px}
+  .o-go{margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ac)}
+  .hero-quick{margin:24px 0 0;font-size:14.5px;color:var(--ink-soft)}
+  .hero-quick a{color:var(--coral);font-weight:600;text-decoration:none}
+  .hero-quick a:hover{text-decoration:underline}
+  .o-proof{margin-top:18px}
+  @media(max-width:760px){.o-grid{grid-template-columns:1fr}}
+
+  /* HERO (legacy two-col, retained for reference) */
   .hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr);gap:54px;align-items:center;margin:50px 0 0}
   .hero-left{min-width:0}
   .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--coral);margin-bottom:20px}
