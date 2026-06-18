@@ -1,6 +1,9 @@
 ---
 import Layout from './Layout.astro';
 import { AI, titleFor } from '../data/ai.js';
+import { TOOLS } from '../data/tools.js';
+import { TOOL_GRAPH } from '../data/toolGraph.js';
+import { pathsWith } from '../data/learningPaths.js';
 
 const { title, description, path, eyebrow, h1, tagline } = Astro.props;
 const others = AI.filter(a => a.href !== path && a.type === 'explainer').slice(0, 3);
@@ -11,6 +14,11 @@ const graphRows = [
   { label: 'Related', items: rel.related || [] },
   { label: 'Next', items: rel.next || [] },
 ].filter(r => r.items.length);
+
+// reverse edges: tools that teach/use this concept, and paths it appears in
+const toolLabel = Object.fromEntries(TOOLS.filter(t => t.href).map(t => [t.href, t.nm]));
+const tryTools = Object.keys(TOOL_GRAPH).filter(h => (TOOL_GRAPH[h].learn || []).includes(path));
+const appearsIn = pathsWith(path);
 ---
 <Layout title={title} description={description} path={path}>
   <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/ai">AI Explained</a> <span>/</span> <em>{h1}</em></nav>
@@ -37,6 +45,25 @@ const graphRows = [
           </span>
         </div>
       ))}
+    </nav>
+  )}
+
+  {(tryTools.length > 0 || appearsIn.length > 0) && (
+    <nav class="kgraph practice" aria-label="Put it into practice">
+      <div class="kg-title kg-practice">Put it into practice</div>
+      {tryTools.length > 0 && (
+        <div class="kg-row">
+          <span class="kg-lbl">Try it</span>
+          <span class="kg-links tools">{tryTools.map(h => <a href={h}>{toolLabel[h] || h}</a>)}</span>
+        </div>
+      )}
+      {appearsIn.length > 0 && (
+        <div class="kg-row">
+          <span class="kg-lbl">Appears in</span>
+          <span class="kg-links paths">{appearsIn.map(p => <a href={`/learn#${p.id}`}>{p.title} path</a>)}</span>
+        </div>
+      )}
+      <a class="kg-map" href="/map">See the whole knowledge map →</a>
     </nav>
   )}
 
@@ -86,6 +113,11 @@ const graphRows = [
   .kg-links{display:flex;flex-wrap:wrap;gap:8px 16px}
   .kg-links a{font-family:var(--font-mono);font-size:13.5px;font-weight:600;color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--gold)}
   .kg-links a:hover{color:var(--coral);border-color:var(--coral)}
+  .kgraph.practice{margin-top:14px}
+  .kg-practice{color:#0f9f82}
+  .kg-links.tools a{border-color:var(--coral)} .kg-links.paths a{border-color:var(--ink)}
+  .kg-map{display:inline-block;margin-top:14px;font-family:var(--font-display);font-weight:800;font-size:13px;color:var(--ink);text-decoration:none}
+  .kg-map:hover{color:var(--coral)}
   .siblings{padding:36px 0 10px;border-top:1px solid var(--line);margin-top:30px}
   .siblings h2{font-family:var(--font-display);font-weight:800;font-size:22px;margin-bottom:16px}
   .sib-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}

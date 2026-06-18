@@ -2,28 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import { TOOLS } from '../data/tools.js';
 import { AI } from '../data/ai.js';
+import { LEARNING_PATHS as PATHS } from '../data/learningPaths.js';
 
 const resolve = {};
 TOOLS.forEach(t => { if (t.href) resolve[t.href] = { href: t.href, label: t.nm, ds: t.ds, kind: 'Tool' }; });
 AI.forEach(a => { resolve[a.href] = { href: a.href, label: a.nm, ds: a.ds, kind: 'Concept' }; });
 
-const PATHS = [
-  {
-    id: 'infra', title: 'AI Infrastructure', tag: 'Foundations',
-    blurb: 'The plumbing behind every AI feature: how text becomes tokens and vectors, and how models are grounded in real data.',
-    steps: ['/what-is-a-context-window', '/token-counter', '/what-are-embeddings', '/embedding-explorer', '/what-is-a-vector-database', '/what-is-rag', '/rag-chunking-visualizer'],
-  },
-  {
-    id: 'agents', title: 'Build AI Agents', tag: 'Applied',
-    blurb: 'From a model that can only talk to a system that can act: tools, structured calls, patterns, memory, and how to architect it.',
-    steps: ['/what-is-tool-calling', '/tool-call-visualizer', '/what-are-structured-outputs', '/structured-output-builder', '/ai-patterns', '/ai-pattern-builder', '/what-is-agent-memory', '/agent-memory-simulator', '/what-is-mcp', '/mcp-config-generator', '/ai-architecture-generator'],
-  },
-  {
-    id: 'prompting', title: 'Master Prompting', tag: 'Craft',
-    blurb: 'Write prompts that behave: understand their anatomy, catch the smells, compare versions, and respect the context budget.',
-    steps: ['/what-are-structured-outputs', '/prompt-x-ray', '/prompt-linter', '/prompt-diff', '/what-is-a-context-window', '/context-budget-analyzer'],
-  },
-];
 // label for the hubs that aren't tools or single explainers
 const EXTRA = { '/ai-patterns': { label: 'AI Patterns Library', ds: 'Reflection, Router, Judge, Verification, Human-in-the-loop.', kind: 'Concept' } };
 const get = (h) => resolve[h] || EXTRA[h] || { href: h, label: h, ds: '', kind: 'Concept' };
@@ -66,7 +50,7 @@ const get = (h) => resolve[h] || EXTRA[h] || { href: h, label: h, ds: '', kind: 
       </section>
     ))}
 
-    <p class="lp-foot">Prefer to wander? Browse <a href="/tools?cat=ai">all AI tools</a> or the <a href="/ai">AI Explained</a> hub.</p>
+    <p class="lp-foot">Prefer to wander? Explore the <a href="/map">knowledge map</a>, browse <a href="/tools?cat=ai">all AI tools</a>, or the <a href="/ai">AI Explained</a> hub.</p>
   </section>
 </Layout>
 

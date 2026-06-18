@@ -1,0 +1,214 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { AI } from '../data/ai.js';
+import { TOOLS } from '../data/tools.js';
+import { TOOL_GRAPH } from '../data/toolGraph.js';
+import { LEARNING_PATHS } from '../data/learningPaths.js';
+
+// short label for a concept ("What is a context window?" -> "Context window")
+const shortConcept = (nm) => {
+  let s = nm.replace(/^What (is|are) (an?\s|the\s)?/i, '').replace(/\?$/, '').trim();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+const concepts = AI.filter(a => a.type === 'explainer');
+const conceptIds = new Set(concepts.map(c => c.href));
+const aiTools = TOOLS.filter(t => t.href && t.cat === 'ai');
+
+const nodes = [
+  ...concepts.map(c => ({ id: c.href, label: shortConcept(c.nm), type: 'concept' })),
+  ...aiTools.map(t => ({ id: t.href, label: t.nm, type: 'tool' })),
+];
+const idSet = new Set(nodes.map(n => n.id));
+
+// edges: concept->concept (from rel next/prereq), concept<->tool (tool teaches concept)
+const edgeSet = new Set();
+const edges = [];
+const addEdge = (a, b, kind) => {
+  if (!idSet.has(a) || !idSet.has(b) || a === b) return;
+  const key = [a, b].sort().join('|');
+  if (edgeSet.has(key)) return; edgeSet.add(key); edges.push({ s: a, t: b, kind });
+};
+concepts.forEach(c => {
+  const r = c.rel || {};
+  [...(r.next || []), ...(r.prereq || []), ...(r.related || [])].forEach(o => { if (conceptIds.has(o)) addEdge(c.href, o, 'cc'); });
+});
+Object.entries(TOOL_GRAPH).forEach(([tool, g]) => (g.learn || []).forEach(c => addEdge(tool, c, 'ct')));
+
+// crawlable groupings
+const conceptList = concepts.map(c => ({ href: c.href, label: shortConcept(c.nm),
+  tools: Object.keys(TOOL_GRAPH).filter(h => (TOOL_GRAPH[h].learn || []).includes(c.href)),
+}));
+const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
+---
+<Layout
+  title="AI Knowledge Map, how every concept and tool connects | KB Cafe"
+  description="An interactive map of KB Cafe's AI knowledge base: concepts, the tools that demonstrate them, and the learning paths that tie them together. Drag, zoom, and explore."
+  path="/map"
+>
+  <section class="km">
+    <header class="km-head">
+      <div class="eyebrow">☕ Knowledge map</div>
+      <h1>The whole <span class="mk">graph.</span></h1>
+      <p class="lede">Every AI concept, the tools that demonstrate it, and how they connect. Drag a node, scroll to zoom, click to dive in. The same idea as a Wikipedia category map, for how modern AI actually works.</p>
+    </header>
+
+    <div class="km-legend">
+      <span class="lg"><span class="dot c"></span>Concept (read)</span>
+      <span class="lg"><span class="dot t"></span>Tool (try)</span>
+      <span class="km-hint">drag · scroll to zoom · click a node</span>
+    </div>
+    <div class="km-stage"><svg id="graph" role="img" aria-label="Knowledge graph of AI concepts and tools"></svg></div>
+
+    <!-- crawlable / no-JS index -->
+    <div class="km-index">
+      <h2>Concepts &amp; their tools</h2>
+      <div class="km-cols">
+        {conceptList.map(c => (
+          <div class="km-c">
+            <a class="km-c-nm" href={c.href}>{c.label}</a>
+            <div class="km-c-tools">
+              {c.tools.length ? c.tools.map(h => <a href={h}>{toolLabel[h] || h}</a>) : <span class="km-none">explainer</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+      <h2 style="margin-top:30px">Learning paths</h2>
+      <div class="km-paths">
+        {LEARNING_PATHS.map(p => <a class="km-path" href={`/learn#${p.id}`}>{p.title} <span aria-hidden="true">→</span></a>)}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .km{max-width:1040px;margin:0 auto;padding:40px 0 20px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .km-head h1{font-family:var(--font-display);font-weight:700;letter-spacing:-.03em;line-height:1.02;font-size:clamp(38px,5vw,58px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.12em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:98% .42em}
+  .lede{margin-top:18px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:640px}
+  .km-legend{display:flex;align-items:center;gap:18px;margin:24px 0 10px;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);flex-wrap:wrap}
+  .lg{display:flex;align-items:center;gap:7px}
+  .dot{width:12px;height:12px;border-radius:50%}.dot.c{background:#7657ff}.dot.t{background:#ee4b2b}
+  .km-hint{margin-left:auto;opacity:.7}
+  .km-stage{border:1.5px solid var(--line);border-radius:18px;background:
+    radial-gradient(circle at 30% 20%,rgba(118,87,255,.06),transparent 40%),
+    radial-gradient(circle at 80% 80%,rgba(238,75,43,.05),transparent 40%),var(--paper-2);
+    overflow:hidden;touch-action:none}
+  #graph{display:block;width:100%;height:600px;cursor:grab}
+  #graph.grabbing{cursor:grabbing}
+  #graph .edge{stroke:var(--line);stroke-width:1.4}
+  #graph .edge.ct{stroke:rgba(238,75,43,.28)}
+  #graph .node circle{cursor:pointer;transition:opacity .12s}
+  #graph .node text{font-family:var(--font-mono);font-size:11px;fill:var(--ink);pointer-events:none}
+  #graph .node.concept circle{fill:#7657ff}
+  #graph .node.tool circle{fill:#ee4b2b}
+  #graph.dim .node:not(.hi) circle{opacity:.22} #graph.dim .node:not(.hi) text{opacity:.25}
+  #graph.dim .edge:not(.hi){opacity:.08}
+
+  .km-index{margin-top:36px;border-top:1px solid var(--line);padding-top:26px}
+  .km-index h2{font-family:var(--font-display);font-weight:800;font-size:22px;margin:0 0 16px}
+  .km-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
+  .km-c{border-bottom:1px solid var(--line);padding-bottom:11px}
+  .km-c-nm{font-family:var(--font-display);font-weight:800;font-size:15.5px;color:var(--ink);text-decoration:none;display:inline-block;margin-bottom:5px}
+  .km-c-nm:hover{color:var(--coral)}
+  .km-c-tools{display:flex;flex-wrap:wrap;gap:6px 12px}
+  .km-c-tools a{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);text-decoration:none;border-bottom:1.5px solid var(--coral)}
+  .km-c-tools a:hover{color:var(--coral)}
+  .km-none{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);opacity:.6}
+  .km-paths{display:flex;flex-wrap:wrap;gap:10px}
+  .km-path{font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);text-decoration:none;border:1.5px solid var(--line);border-radius:999px;padding:9px 16px}
+  .km-path:hover{border-color:var(--ink);color:var(--coral)}
+  @media(max-width:600px){.km-cols{grid-template-columns:1fr}.km-hint{display:none}}
+</style>
+
+<script is:inline define:vars={{ nodes, edges }}>
+  const svg = document.getElementById('graph');
+  const W = 1000, H = 600;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  // deterministic seed positions on a circle (no Math.random for stable layout)
+  const N = nodes.length;
+  nodes.forEach((n, i) => {
+    const a = (i / N) * Math.PI * 2;
+    n.x = W / 2 + Math.cos(a) * 230; n.y = H / 2 + Math.sin(a) * 190; n.vx = 0; n.vy = 0;
+  });
+  const idx = Object.fromEntries(nodes.map((n, i) => [n.id, i]));
+  const E = edges.map(e => ({ s: idx[e.s], t: idx[e.t], kind: e.kind })).filter(e => e.s != null && e.t != null);
+  const deg = nodes.map(() => 0); E.forEach(e => { deg[e.s]++; deg[e.t]++; });
+
+  // force simulation
+  const REP = 5200, SPRING = 0.012, LEN = 120, GRAV = 0.015, DAMP = 0.85;
+  for (let it = 0; it < 320; it++) {
+    for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+      let dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+      let d2 = dx * dx + dy * dy || 0.01; const d = Math.sqrt(d2);
+      const f = REP / d2; const fx = (dx / d) * f, fy = (dy / d) * f;
+      nodes[i].vx += fx; nodes[i].vy += fy; nodes[j].vx -= fx; nodes[j].vy -= fy;
+    }
+    E.forEach(e => {
+      const a = nodes[e.s], b = nodes[e.t];
+      let dx = b.x - a.x, dy = b.y - a.y; const d = Math.sqrt(dx * dx + dy * dy) || 0.01;
+      const f = (d - LEN) * SPRING; const fx = (dx / d) * f, fy = (dy / d) * f;
+      a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
+    });
+    nodes.forEach(n => {
+      n.vx += (W / 2 - n.x) * GRAV; n.vy += (H / 2 - n.y) * GRAV;
+      n.vx *= DAMP; n.vy *= DAMP; n.x += n.vx; n.y += n.vy;
+    });
+  }
+  // fit to viewbox
+  const pad = 70;
+  const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const sx = (W - pad * 2) / (maxX - minX || 1), sy = (H - pad * 2) / (maxY - minY || 1); const s = Math.min(sx, sy);
+  nodes.forEach(n => { n.x = pad + (n.x - minX) * s; n.y = pad + (n.y - minY) * s; });
+
+  // render
+  const gZoom = document.createElementNS(SVGNS, 'g');
+  const gEdges = document.createElementNS(SVGNS, 'g');
+  const gNodes = document.createElementNS(SVGNS, 'g');
+  gZoom.appendChild(gEdges); gZoom.appendChild(gNodes); svg.appendChild(gZoom);
+  const adj = nodes.map(() => new Set());
+  E.forEach((e, k) => {
+    const line = document.createElementNS(SVGNS, 'line');
+    line.setAttribute('x1', nodes[e.s].x); line.setAttribute('y1', nodes[e.s].y);
+    line.setAttribute('x2', nodes[e.t].x); line.setAttribute('y2', nodes[e.t].y);
+    line.setAttribute('class', 'edge ' + e.kind); line.dataset.s = e.s; line.dataset.t = e.t;
+    gEdges.appendChild(line); adj[e.s].add(e.t); adj[e.t].add(e.s);
+  });
+  nodes.forEach((n, i) => {
+    const g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'node ' + n.type); g.dataset.i = i;
+    const a = document.createElementNS(SVGNS, 'a'); a.setAttribute('href', n.id);
+    const c = document.createElementNS(SVGNS, 'circle');
+    c.setAttribute('cx', n.x); c.setAttribute('cy', n.y);
+    c.setAttribute('r', n.type === 'concept' ? 11 + Math.min(deg[i], 5) : 7);
+    const t = document.createElementNS(SVGNS, 'text');
+    t.setAttribute('x', n.x); t.setAttribute('y', n.y - (n.type === 'concept' ? 18 : 13));
+    t.setAttribute('text-anchor', 'middle'); t.textContent = n.label;
+    a.appendChild(c); g.appendChild(a); g.appendChild(t); gNodes.appendChild(g);
+    g.addEventListener('mouseenter', () => highlight(i));
+    g.addEventListener('mouseleave', clearHi);
+  });
+
+  function highlight(i) {
+    svg.classList.add('dim');
+    gNodes.querySelectorAll('.node').forEach(el => { const j = +el.dataset.i; el.classList.toggle('hi', j === i || adj[i].has(j)); });
+    gEdges.querySelectorAll('.edge').forEach(el => { el.classList.toggle('hi', +el.dataset.s === i || +el.dataset.t === i); });
+  }
+  function clearHi() { svg.classList.remove('dim'); gNodes.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); gEdges.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); }
+
+  // pan + zoom
+  let tx = 0, ty = 0, scale = 1, dragging = false, sx0 = 0, sy0 = 0, moved = false;
+  const apply = () => gZoom.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
+  svg.addEventListener('wheel', (e) => { e.preventDefault(); const f = e.deltaY < 0 ? 1.1 : 0.9; scale = Math.max(0.5, Math.min(3, scale * f)); apply(); }, { passive: false });
+  svg.addEventListener('pointerdown', (e) => { dragging = true; moved = false; sx0 = e.clientX; sy0 = e.clientY; svg.classList.add('grabbing'); });
+  svg.addEventListener('pointermove', (e) => { if (!dragging) return; const dx = e.clientX - sx0, dy = e.clientY - sy0; if (Math.abs(dx) + Math.abs(dy) > 3) moved = true; tx += dx; ty += dy; sx0 = e.clientX; sy0 = e.clientY; apply(); });
+  const end = () => { dragging = false; svg.classList.remove('grabbing'); };
+  svg.addEventListener('pointerup', end); svg.addEventListener('pointerleave', end);
+  // prevent click-navigation after a drag
+  gNodes.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
+</script>
