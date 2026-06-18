@@ -19,9 +19,10 @@ import ToolPage from '../layouts/ToolPage.astro';
     <div id="servers"></div>
     <div class="row" style="margin:14px 0 6px"><button class="btn ghost" id="add">+ Add server</button></div>
     <div class="pane">
-      <div class="pane-label"><span>claude_desktop_config.json</span><button class="link-btn" id="copy">copy</button></div>
+      <div class="pane-label"><span>claude_desktop_config.json</span></div>
       <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
     </div>
+    <button class="btn-copy" id="copy" type="button" style="margin-top:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="lbl">Copy config</span></button>
   </div>
 
   <!-- VALIDATE -->
@@ -215,7 +216,12 @@ import ToolPage from '../layouts/ToolPage.astro';
     $('validate-view').style.display = build ? 'none' : '';
   });
   $('add').addEventListener('click', () => addServer());
-  $('copy').addEventListener('click', async () => { if (!$('out').value) return; try { await navigator.clipboard.writeText($('out').value); const st = $('status'); st.className = 'status ok'; st.textContent = 'Copied.'; } catch { $('out').select(); document.execCommand('copy'); } });
+  $('copy').addEventListener('click', async () => {
+    if (!$('out').value) return;
+    try { await navigator.clipboard.writeText($('out').value); } catch { $('out').select(); document.execCommand('copy'); }
+    const b = $('copy'); b.classList.add('done'); b.querySelector('.lbl').textContent = 'Copied!';
+    setTimeout(() => { b.classList.remove('done'); b.querySelector('.lbl').textContent = 'Copy config'; }, 1600);
+  });
   $('vin').addEventListener('input', validate);
   $('vsample').addEventListener('click', () => { $('vin').value = SAMPLE_CFG; validate(); });
 

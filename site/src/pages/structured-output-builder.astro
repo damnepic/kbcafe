@@ -27,9 +27,10 @@ import ToolPage from '../layouts/ToolPage.astro';
     <button class="chip" data-t="gemini">Gemini</button>
   </div>
   <div class="pane">
-    <div class="pane-label"><span id="out-label">JSON Schema</span><button class="link-btn" id="copy">copy</button></div>
+    <div class="pane-label"><span id="out-label">JSON Schema</span></div>
     <textarea id="out" class="ta" readonly spellcheck="false" style="min-height:300px"></textarea>
   </div>
+  <button class="btn-copy" id="copy" type="button" style="margin-top:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="lbl">Copy schema</span></button>
   <p class="status" id="status"></p>
 
   <Fragment slot="explainer">
@@ -182,6 +183,11 @@ import ToolPage from '../layouts/ToolPage.astro';
   $('add').addEventListener('click', () => { fields.push({ name:'', type:'string', description:'', required:false, enumv:'' }); render(); });
   ['root','desc'].forEach(id => $(id).addEventListener('input', regen));
   $('tabs').addEventListener('click', e => { const b = e.target.closest('.chip'); if(!b) return; document.querySelectorAll('#tabs .chip').forEach(c=>c.classList.remove('active')); b.classList.add('active'); tab = b.dataset.t; $('out-label').textContent = b.textContent; regen(); });
-  $('copy').addEventListener('click', async () => { if(!$('out').value) return; try{ await navigator.clipboard.writeText($('out').value); $('status').className='status ok'; $('status').textContent='Copied.'; }catch{ $('out').select(); document.execCommand('copy'); } });
+  $('copy').addEventListener('click', async () => {
+    if(!$('out').value) return;
+    try{ await navigator.clipboard.writeText($('out').value); }catch{ $('out').select(); document.execCommand('copy'); }
+    const b=$('copy'); b.classList.add('done'); b.querySelector('.lbl').textContent='Copied!';
+    setTimeout(()=>{ b.classList.remove('done'); b.querySelector('.lbl').textContent='Copy schema'; },1600);
+  });
   render();
 </script>

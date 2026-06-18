@@ -30,9 +30,10 @@ import ToolPage from '../layouts/ToolPage.astro';
   </div>
 
   <div class="pane" style="margin-top:8px">
-    <div class="pane-label"><span>Your prompt</span><button class="link-btn" id="copy">copy</button></div>
+    <div class="pane-label"><span>Your prompt</span></div>
     <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
   </div>
+  <button class="btn-copy" id="copy" type="button" style="margin-top:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="lbl">Copy prompt</span></button>
   <p class="pb-note">Assembled from your answers, nothing invented. Tweak any field and the prompt updates live. Paste it into any AI chat.</p>
 
   <Fragment slot="explainer">
@@ -115,6 +116,11 @@ import ToolPage from '../layouts/ToolPage.astro';
     $('out').value = p;
   }
   ['task', 'subject', 'audience', 'goal', 'tone', 'length', 'format', 'extra'].forEach(id => $(id).addEventListener('input', build));
-  $('copy').addEventListener('click', async () => { if (!$('out').value) return; try { await navigator.clipboard.writeText($('out').value); } catch {} });
+  $('copy').addEventListener('click', async () => {
+    if (!$('out').value) return;
+    try { await navigator.clipboard.writeText($('out').value); } catch { return; }
+    const b = $('copy'); b.classList.add('done'); b.querySelector('.lbl').textContent = 'Copied!';
+    setTimeout(() => { b.classList.remove('done'); b.querySelector('.lbl').textContent = 'Copy prompt'; }, 1600);
+  });
   build();
 </script>

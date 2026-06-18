@@ -1,5 +1,6 @@
 ---
 import Layout from './Layout.astro';
+import Share from '../components/Share.astro';
 import { REFERENCE } from '../data/reference.js';
 
 const { title, description, path, eyebrow, h1, tagline, updated = '2026' } = Astro.props;
@@ -19,6 +20,8 @@ const others = REFERENCE.filter(r => r.href !== path).slice(0, 3);
       <slot />
     </div>
   </article>
+
+  <Share path={path} title={h1} variant="subtle" />
 
   <aside class="siblings">
     <h2>More references</h2>

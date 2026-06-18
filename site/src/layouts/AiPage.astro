@@ -1,5 +1,6 @@
 ---
 import Layout from './Layout.astro';
+import Share from '../components/Share.astro';
 import { AI, titleFor } from '../data/ai.js';
 import { TOOLS } from '../data/tools.js';
 import { TOOL_GRAPH } from '../data/toolGraph.js';
@@ -33,6 +34,8 @@ const appearsIn = pathsWith(path);
       <slot />
     </div>
   </article>
+
+  <Share path={path} title={h1} variant="subtle" />
 
   {graphRows.length > 0 && (
     <nav class="kgraph" aria-label="Related concepts">

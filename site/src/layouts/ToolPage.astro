@@ -1,5 +1,6 @@
 ---
 import Layout from './Layout.astro';
+import Share from '../components/Share.astro';
 import { TOOLS } from '../data/tools.js';
 import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
@@ -32,6 +33,8 @@ const siblings = !g ? TOOLS.filter(t => t.href && t.href !== path).slice(0, 4) :
   <section class="tool-stage">
     <slot />
   </section>
+
+  <Share path={path} title={h1} variant="prominent" />
 
   <section class="prose">
     <slot name="explainer" />
@@ -110,6 +113,15 @@ const siblings = !g ? TOOLS.filter(t => t.href && t.href !== path).slice(0, 4) :
   .btn:hover{background:var(--coral-deep)} .btn:active{transform:scale(.97)}
   .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
   .btn.ghost:hover{border-color:var(--ink);background:transparent}
+  /* big copy button for a tool's final output */
+  .btn-copy{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;
+    font-family:var(--font-display);font-weight:800;font-size:16px;color:#fff;
+    background:linear-gradient(135deg,#ff5839,#e23a1d);border:0;border-radius:14px;padding:15px 22px;cursor:pointer;
+    box-shadow:0 10px 24px rgba(226,58,29,.26);transition:transform .14s,box-shadow .14s}
+  .btn-copy:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(226,58,29,.32)}
+  .btn-copy:active{transform:scale(.99)}
+  .btn-copy.done{background:linear-gradient(135deg,#16a37e,#0f8a69);box-shadow:0 10px 24px rgba(15,159,130,.26)}
+  .btn-copy svg{width:19px;height:19px}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
   .chip{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--ink-soft);background:transparent;
