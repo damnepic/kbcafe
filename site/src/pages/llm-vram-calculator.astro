@@ -1,0 +1,171 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="LLM VRAM Calculator — can my GPU run this model? | KB Cafe"
+  description="Estimate the VRAM needed to run a local LLM from its parameter count, quantization, and context length, with weights computed exactly and KV cache estimated. Client-side."
+  path="/llm-vram-calculator"
+  eyebrow="AI Explained · Tool"
+  h1="LLM VRAM Calculator"
+  tagline="Estimate the GPU memory needed to run a model locally from its size, quantization, and context length, and see which cards fit. Weights are exact; KV cache and overhead are labelled estimates."
+>
+  <div class="vr-grid">
+    <div class="vr-card">
+      <h3>Model</h3>
+      <label class="vr-f">Parameters (billions) <input id="params" type="number" min="0.1" step="0.1" value="7" /></label>
+      <div class="vr-quant"><span class="vr-plabel">Quantization</span><div class="row" id="quant"></div></div>
+    </div>
+    <div class="vr-card">
+      <h3>Runtime</h3>
+      <label class="vr-f">Context length (tokens) <input id="ctx" type="number" min="0" step="512" value="4096" /></label>
+      <div class="vr-adv">
+        <span class="vr-plabel">Architecture <button class="link-btn" id="reset-arch">auto</button></span>
+        <label class="vr-f sm">Layers <input id="layers" type="number" min="1" value="32" /></label>
+        <label class="vr-f sm">Hidden size <input id="hidden" type="number" min="1" value="4096" /></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="vr-out">
+    <div class="vr-stat hero"><span class="s-lbl">Recommended VRAM</span><span class="s-num" id="o-total">0 GB</span></div>
+    <div class="vr-stat"><span class="s-lbl">Model weights (exact)</span><span class="s-num" id="o-w">0 GB</span></div>
+    <div class="vr-stat"><span class="s-lbl">KV cache (est.)</span><span class="s-num" id="o-kv">0 GB</span></div>
+    <div class="vr-stat"><span class="s-lbl">Overhead (est.)</span><span class="s-num" id="o-oh">0 GB</span></div>
+  </div>
+  <div class="vr-gpus" id="gpus"></div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>What eats GPU memory</h2>
+    <p>
+      Running a model locally needs room for three things. The <strong>weights</strong> dominate, and that part
+      is exact arithmetic: parameters × bits-per-weight ÷ 8. Quantization is the big lever, dropping from 16-bit
+      to a 4-bit quant roughly quarters the weight memory, which is how a 7B model fits in 8 GB. The
+      <strong>KV cache</strong> grows with <a href="/what-is-a-context-window">context length</a>, every token you
+      keep in the window stores keys and values for every layer. Finally there&rsquo;s <strong>overhead</strong>:
+      activations, CUDA context, and fragmentation.
+    </p>
+    <h3>Reading the numbers</h3>
+    <ul>
+      <li><strong>Weights</strong> are computed exactly from your inputs.</li>
+      <li><strong>KV cache</strong> is an <em>estimate</em>: it depends on the exact architecture, so the layer and
+        hidden-size defaults are inferred from the parameter count and are editable, put in your model&rsquo;s real
+        values for a tighter number.</li>
+      <li><strong>Overhead</strong> is a rough allowance; real usage varies by runtime (llama.cpp, vLLM, Transformers).</li>
+    </ul>
+    <p class="note">
+      Treat the total as a planning figure with headroom, not a guarantee. Batch size, longer context, LoRA
+      adapters, and the runtime all move it. Everything is computed in your browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why is the weight number the reliable one?</summary>
+      <p>Because it&rsquo;s pure arithmetic: a parameter stored at N bits takes N/8 bytes, full stop. The KV cache and overhead depend on architecture and runtime, so those are honest estimates, not exact.</p>
+    </details>
+    <details class="faq"><summary>What quantization should I pick?</summary>
+      <p>4-bit (Q4_K_M) is the popular quality/size sweet spot for local use; 5–6 bit trades a little memory for a little more fidelity; 8-bit and FP16 are closer to full precision. Lower than 4-bit saves memory but degrades quality faster.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No. It&rsquo;s arithmetic in your browser, nothing is sent anywhere and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>See how <a href="/what-is-a-context-window">context length</a> drives the KV cache, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer;margin-left:8px}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .vr-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  .vr-card{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:18px}
+  .vr-card h3{font-family:var(--font-display);font-weight:800;font-size:16px;margin:0 0 14px}
+  .vr-f{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);margin-bottom:11px}
+  .vr-f input{width:130px;font-family:var(--font-mono);font-size:14px;border:1.5px solid var(--ink);border-radius:10px;padding:9px 11px;background:var(--paper);color:var(--ink);outline:0;text-align:right}
+  .vr-f.sm input{width:100px}
+  .vr-f input:focus{box-shadow:4px 4px 0 var(--coral)}
+  .vr-plabel{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:8px}
+  .vr-quant .chip{margin:0 6px 6px 0}
+  .vr-adv{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+  .vr-out{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+  .vr-stat{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:16px 18px;display:flex;flex-direction:column;gap:5px}
+  .vr-stat.hero{border-color:var(--ink);box-shadow:6px 6px 0 rgba(238,75,43,.16)}
+  .vr-stat .s-lbl{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .vr-stat .s-num{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;font-size:26px;line-height:1;color:var(--ink)}
+  .vr-stat.hero .s-num{font-size:36px;color:var(--coral-deep)}
+  .vr-gpus{display:flex;flex-wrap:wrap;gap:10px}
+  .gpu{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);border-radius:12px;padding:10px 13px;font-family:var(--font-mono);font-size:12.5px;background:var(--cream)}
+  .gpu .dot{width:9px;height:9px;border-radius:50%}
+  .gpu.fit .dot{background:#2f7d32} .gpu.tight .dot{background:var(--gold)} .gpu.no .dot{background:var(--coral-deep)}
+  .gpu b{color:var(--ink)} .gpu.no{opacity:.6}
+  @media(max-width:620px){.vr-grid,.vr-out{grid-template-columns:1fr 1fr}.vr-out{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const num = (id) => Math.max(0, parseFloat($(id).value) || 0);
+  const gb = (n) => (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' GB';
+
+  const QUANTS = [
+    { id: 'fp16', label: 'FP16 / BF16', bits: 16 },
+    { id: 'int8', label: 'FP8 / INT8', bits: 8 },
+    { id: 'q6', label: 'Q6_K', bits: 6.6 },
+    { id: 'q5', label: 'Q5_K_M', bits: 5.6 },
+    { id: 'q4', label: 'Q4_K_M', bits: 4.8 },
+    { id: 'q3', label: 'Q3_K_M', bits: 3.9 },
+  ];
+  let bits = 4.8;
+  const quantBox = $('quant');
+  QUANTS.forEach(q => {
+    const b = document.createElement('button'); b.className = 'chip' + (q.bits === bits ? ' active' : ''); b.textContent = q.label;
+    b.addEventListener('click', () => { bits = q.bits; quantBox.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); calc(); });
+    quantBox.appendChild(b);
+  });
+
+  // illustrative GPU memory sizes (round, label kept generic to avoid going stale)
+  const GPUS = [
+    { gbv: 8, label: '8 GB' }, { gbv: 12, label: '12 GB' }, { gbv: 16, label: '16 GB' },
+    { gbv: 24, label: '24 GB' }, { gbv: 48, label: '48 GB' }, { gbv: 80, label: '80 GB' },
+  ];
+
+  function archFor(p) {
+    if (p <= 1.5) return { L: 24, H: 2048 };
+    if (p <= 4) return { L: 32, H: 3072 };
+    if (p <= 9) return { L: 32, H: 4096 };
+    if (p <= 16) return { L: 40, H: 5120 };
+    if (p <= 40) return { L: 48, H: 6144 };
+    if (p <= 80) return { L: 80, H: 8192 };
+    return { L: 96, H: 12288 };
+  }
+  let archDirty = false;
+
+  function calc() {
+    const p = num('params'), ctx = num('ctx');
+    if (!archDirty) { const a = archFor(p); $('layers').value = a.L; $('hidden').value = a.H; }
+    const L = num('layers'), H = num('hidden');
+
+    const weights = p * bits / 8;                       // GB, exact
+    const kv = 2 * L * ctx * H * 2 / 1e9;               // GB, fp16 K+V cache (estimate)
+    const overhead = weights * 0.08 + 0.5;             // GB, rough
+    const total = weights + kv + overhead;
+
+    $('o-w').textContent = gb(weights);
+    $('o-kv').textContent = gb(kv);
+    $('o-oh').textContent = gb(overhead);
+    $('o-total').textContent = gb(total);
+
+    $('gpus').innerHTML = GPUS.map(g => {
+      const cls = total <= g.gbv * 0.92 ? 'fit' : total <= g.gbv ? 'tight' : 'no';
+      const word = cls === 'fit' ? 'fits' : cls === 'tight' ? 'tight' : 'no';
+      return `<span class="gpu ${cls}"><span class="dot"></span><b>${g.label}</b> ${word}</span>`;
+    }).join('');
+
+    const st = $('status'); st.className = 'status';
+    st.textContent = `Weights exact; KV cache assumes ${L} layers, ${H} hidden dim, fp16 cache (estimate). Total includes ~8% overhead.`;
+  }
+
+  ['params', 'ctx'].forEach(id => $(id).addEventListener('input', calc));
+  ['layers', 'hidden'].forEach(id => $(id).addEventListener('input', () => { archDirty = true; calc(); }));
+  $('reset-arch').addEventListener('click', () => { archDirty = false; calc(); });
+  calc();
+</script>

@@ -1,0 +1,122 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+import { PRICE_TIERS, AS_OF } from '../data/aiModels.js';
+---
+<ToolPage
+  title="LLM API Cost Calculator — estimate token cost | KB Cafe"
+  description="Estimate the cost of an LLM API call from input and output tokens and per-million pricing. Editable prices, monthly projections, fully client-side. Nothing is uploaded."
+  path="/llm-cost-calculator"
+  eyebrow="AI Explained · Tool"
+  h1="LLM Cost Calculator"
+  tagline="Estimate what an API call costs from input and output tokens and the per-million price. Set your own prices or start from a tier, then project it to a month. Runs in your browser."
+>
+  <div class="cc-grid">
+    <div class="cc-card">
+      <h3>Per request</h3>
+      <label class="cc-f">Input tokens <input id="tin" type="number" min="0" value="2000" /></label>
+      <label class="cc-f">Output tokens <input id="tout" type="number" min="0" value="500" /></label>
+      <label class="cc-f">Requests / month <input id="reqs" type="number" min="0" value="10000" /></label>
+    </div>
+    <div class="cc-card">
+      <h3>Price <small>USD per 1M tokens</small></h3>
+      <label class="cc-f">Input price <input id="pin" type="number" min="0" step="0.01" value="3" /></label>
+      <label class="cc-f">Output price <input id="pout" type="number" min="0" step="0.01" value="15" /></label>
+      <div class="cc-presets"><span class="cc-plabel">Start from a tier:</span><div class="row" id="presets"></div></div>
+    </div>
+  </div>
+
+  <div class="cc-out">
+    <div class="cc-stat hero"><span class="s-lbl">Per request</span><span class="s-num" id="o-req">$0</span></div>
+    <div class="cc-stat"><span class="s-lbl">Per 1,000 requests</span><span class="s-num" id="o-1k">$0</span></div>
+    <div class="cc-stat"><span class="s-lbl">Per month</span><span class="s-num" id="o-mo">$0</span></div>
+  </div>
+  <div class="cc-break" id="break"></div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>How API pricing works</h2>
+    <p>
+      Almost every LLM API bills per <a href="/token-counter">token</a>, with <strong>input</strong> (your prompt,
+      history, and retrieved docs) and <strong>output</strong> (the reply) priced separately, output is usually
+      several times more expensive. Cost is simply
+      <code>(input ÷ 1,000,000 × input price) + (output ÷ 1,000,000 × output price)</code>. The surprise on most
+      bills is volume: a fraction of a cent per call becomes real money across thousands of requests a day, which
+      is what the monthly projection here is for.
+    </p>
+    <h3>Using it honestly</h3>
+    <ul>
+      <li>Get an accurate token count first with the <a href="/token-counter">Token Counter</a>, then drop the numbers in.</li>
+      <li>Remember the <strong>input</strong> includes everything you re-send each turn, system prompt, history, RAG context. The <a href="/context-window-visualizer">Context Window Visualizer</a> shows what that adds up to.</li>
+      <li>Cached input, batch discounts, and image/audio tokens aren&rsquo;t modelled here, check your provider&rsquo;s pricing page for those.</li>
+    </ul>
+    <p class="note">
+      The tier presets are <strong>round-number bands</strong> reflecting common pricing as of <strong>{AS_OF}</strong>,
+      not a live price sheet for any specific model. The price fields are editable, always confirm the real number
+      with your provider. Nothing you enter leaves your browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why is output more expensive than input?</summary>
+      <p>Generating tokens is more compute-intensive than reading them, so providers price output higher, often 3–5×. That&rsquo;s why trimming verbose responses saves more than trimming the prompt.</p>
+    </details>
+    <details class="faq"><summary>Are the tier prices real model prices?</summary>
+      <p>No. They&rsquo;re illustrative bands to start from, dated and rounded. Specific model prices change often, so the fields are editable and you should verify against your provider.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No. It&rsquo;s pure arithmetic in your browser, nothing is sent anywhere and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Count tokens with the <a href="/token-counter">Token Counter</a>, plan the prompt with the <a href="/context-window-visualizer">Context Window Visualizer</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .cc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  .cc-card{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:18px}
+  .cc-card h3{font-family:var(--font-display);font-weight:800;font-size:16px;margin:0 0 14px;display:flex;align-items:baseline;gap:8px}
+  .cc-card h3 small{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink-soft);text-transform:none;letter-spacing:0}
+  .cc-f{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);margin-bottom:11px}
+  .cc-f input{width:130px;font-family:var(--font-mono);font-size:14px;border:1.5px solid var(--ink);border-radius:10px;padding:9px 11px;background:var(--paper);color:var(--ink);outline:0;text-align:right}
+  .cc-f input:focus{box-shadow:4px 4px 0 var(--coral)}
+  .cc-presets{margin-top:6px}
+  .cc-plabel{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:8px}
+  .cc-out{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px;margin-bottom:16px}
+  .cc-stat{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:16px 18px;display:flex;flex-direction:column;gap:5px}
+  .cc-stat.hero{border-color:var(--ink);box-shadow:6px 6px 0 rgba(238,75,43,.16)}
+  .cc-stat .s-lbl{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft)}
+  .cc-stat .s-num{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;font-size:28px;line-height:1;color:var(--ink)}
+  .cc-stat.hero .s-num{font-size:38px;color:var(--coral-deep)}
+  .cc-break{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;flex-wrap:wrap;gap:16px}
+  .cc-break b{color:var(--ink);font-weight:800}
+  @media(max-width:620px){.cc-grid,.cc-out{grid-template-columns:1fr}}
+</style>
+
+<script is:inline define:vars={{ PRICE_TIERS }}>
+  const $ = (id) => document.getElementById(id);
+  const num = (id) => Math.max(0, parseFloat($(id).value) || 0);
+  const money = (n) => n >= 1000 ? '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 })
+    : n >= 1 ? '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : '$' + n.toFixed(n >= 0.01 ? 4 : 6);
+
+  const presets = $('presets');
+  PRICE_TIERS.forEach(t => {
+    const b = document.createElement('button'); b.className = 'chip'; b.textContent = t.label;
+    b.addEventListener('click', () => { $('pin').value = t.in; $('pout').value = t.out; calc(); });
+    presets.appendChild(b);
+  });
+
+  function calc() {
+    const tin = num('tin'), tout = num('tout'), pin = num('pin'), pout = num('pout'), reqs = num('reqs');
+    const inCost = tin / 1e6 * pin, outCost = tout / 1e6 * pout, per = inCost + outCost;
+    $('o-req').textContent = money(per);
+    $('o-1k').textContent = money(per * 1000);
+    $('o-mo').textContent = money(per * reqs);
+    const pct = per ? Math.round(outCost / per * 100) : 0;
+    $('break').innerHTML = per
+      ? `<span>input <b>${money(inCost)}</b></span><span>output <b>${money(outCost)}</b></span><span>output is <b>${pct}%</b> of cost</span><span>${(tin + tout).toLocaleString('en-US')} tokens / request</span>`
+      : '';
+  }
+  ['tin', 'tout', 'pin', 'pout', 'reqs'].forEach(id => $(id).addEventListener('input', calc));
+  calc();
+</script>

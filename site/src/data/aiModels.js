@@ -22,3 +22,15 @@ export const CONTEXT_TIERS = [
 // the result an ESTIMATE.
 export const CHARS_PER_TOKEN = 4;
 export const estimateTokens = (text) => (text ? Math.ceil([...text].length / CHARS_PER_TOKEN) : 0);
+
+// ILLUSTRATIVE price BANDS for the cost calculator — USD per 1,000,000 tokens.
+// House rule: these are round-number TIERS reflecting common pricing as of AS_OF, NOT a
+// live price sheet for any specific model. Providers change prices often; the calculator's
+// fields are always editable. Always confirm the real price with your provider before relying
+// on a number. Update AS_OF when revised.
+export const PRICE_TIERS = [
+  { id: 'nano',     label: 'Nano / cheapest tier',        in: 0.10, out: 0.40 },
+  { id: 'mini',     label: 'Small / mini tier',           in: 0.50, out: 1.50 },
+  { id: 'mid',      label: 'Mid / workhorse tier',        in: 3.00, out: 15.00 },
+  { id: 'frontier', label: 'Frontier / large tier',       in: 15.00, out: 75.00 },
+];

@@ -24,4 +24,4 @@ export const CAT_META = {
 export const CAT_ORDER = ['ai', 'json', 'encoding', 'convert', 'text', 'time', 'feeds'];
 
 // tools that get a "New" badge
-export const NEW_TOOLS = ['/context-window-visualizer', '/structured-output-builder', '/ai-pattern-explorer', '/base64'];
+export const NEW_TOOLS = ['/token-counter', '/rag-chunking-visualizer', '/mcp-config-generator', '/prompt-linter', '/llm-vram-calculator', '/llm-cost-calculator'];

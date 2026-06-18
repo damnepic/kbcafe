@@ -1,0 +1,194 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const SAMPLE = `Retrieval-Augmented Generation grounds a model in your own documents. Instead of fine-tuning, you store the documents as embeddings and retrieve the most relevant pieces at query time.
+
+The catch is chunking. A model can only attend to what you put in its context window, and an embedding represents one chunk of text. Chunk too large and retrieval gets noisy; chunk too small and you lose the surrounding meaning. Overlap helps: repeating a little text between neighbours keeps sentences from being cut in half.
+
+Most pipelines split on a fixed size with some overlap, or split on natural boundaries like sentences and paragraphs first, then pack those up to the size limit.`;
+---
+<ToolPage
+  title="RAG Chunking Visualizer — see how text splits into chunks | KB Cafe"
+  description="Paste a document, set chunk size and overlap, and watch how a RAG pipeline would split it, by characters or real tokens. Free, fully client-side, nothing is uploaded."
+  path="/rag-chunking-visualizer"
+  eyebrow="AI Explained · Tool"
+  h1="RAG Chunking Visualizer"
+  tagline="Paste a document, set the chunk size and overlap, and see exactly how it splits for retrieval, with the overlap between neighbours highlighted. Runs in your browser."
+>
+  <div class="cz-controls">
+    <div class="cz-grp"><span class="cz-lbl">Measure in</span>
+      <div class="row" id="unit"><button class="chip active" data-u="char">Characters</button><button class="chip" data-u="token">Tokens</button></div>
+    </div>
+    <div class="cz-grp"><span class="cz-lbl">Strategy</span>
+      <div class="row" id="strat"><button class="chip active" data-s="fixed">Fixed window</button><button class="chip" data-s="sentence">Sentence-aware</button></div>
+    </div>
+    <label class="cz-num">Chunk size <input id="size" type="number" min="20" value="600" /></label>
+    <label class="cz-num">Overlap <input id="ovl" type="number" min="0" value="80" /></label>
+  </div>
+
+  <div class="pane">
+    <div class="pane-label"><span>Document</span><span class="cz-actions"><button class="link-btn" id="sample">sample</button><button class="link-btn" id="clear">clear</button></span></div>
+    <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="Paste a document to see how it chunks…"></textarea>
+  </div>
+
+  <div class="cz-summary" id="summary"></div>
+  <div class="cz-chunks" id="chunks"></div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>Why chunking decides whether RAG works</h2>
+    <p>
+      In <a href="/what-is-rag">retrieval-augmented generation</a>, each piece of a document becomes one
+      <a href="/what-are-embeddings">embedding</a> in a <a href="/what-is-a-vector-database">vector database</a>.
+      Retrieval returns whole chunks, so the chunk <em>is</em> the unit of meaning. Too large and a single
+      embedding has to represent several ideas, so matches get fuzzy. Too small and a chunk loses the context
+      around it. <strong>Overlap</strong> repeats a little text between neighbours so a sentence split across a
+      boundary still shows up intact in at least one chunk.
+    </p>
+    <h3>The two common strategies</h3>
+    <ul>
+      <li><strong>Fixed window</strong> slides a window of N characters (or tokens) across the text, stepping
+        forward by <em>size minus overlap</em>. Simple and predictable, but it can cut mid-sentence.</li>
+      <li><strong>Sentence-aware</strong> splits on sentence boundaries first, then packs whole sentences up to
+        the size limit. Cleaner chunks, with overlap carried as trailing sentences.</li>
+    </ul>
+    <p class="note">
+      Token mode uses the real <code>o200k_base</code> tokenizer (the GPT-4o family), so the counts match what
+      an embedding model on that encoding would see. Character mode is tokenizer-agnostic. Everything runs
+      locally, your document never leaves the browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Should I chunk by characters or tokens?</summary>
+      <p>Embedding models have a token limit, so tokens are the honest unit. Characters are a convenient proxy (very roughly four characters per token for English). Use token mode when you need to respect a model&rsquo;s real limit.</p>
+    </details>
+    <details class="faq"><summary>How much overlap should I use?</summary>
+      <p>A common starting point is 10–20% of the chunk size. Enough to keep boundary sentences intact, not so much that you bloat the index with duplicated text.</p>
+    </details>
+    <details class="faq"><summary>Is my document uploaded?</summary>
+      <p>No. Chunking runs entirely in your browser, so the text stays on your device and the tool works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Learn <a href="/what-is-rag">what RAG is</a>, how <a href="/what-are-embeddings">embeddings</a> and a <a href="/what-is-a-vector-database">vector database</a> fit in, or count tokens with the <a href="/token-counter">Token Counter</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .cz-actions{display:flex;gap:14px}
+  .cz-controls{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:flex-end;margin-bottom:18px}
+  .cz-grp{display:flex;flex-direction:column;gap:7px}
+  .cz-lbl{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .cz-num{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:7px}
+  .cz-num input{font-family:var(--font-mono);font-size:14px;text-transform:none;letter-spacing:0;border:1.5px solid var(--ink);border-radius:11px;padding:10px 12px;background:var(--cream);color:var(--ink);outline:0;width:120px}
+  .cz-num input:focus{box-shadow:5px 5px 0 var(--coral)}
+  .pane{display:flex;flex-direction:column;gap:9px}
+  .pane-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .ta{min-height:160px}
+
+  .cz-summary{margin:20px 0 14px;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);display:flex;flex-wrap:wrap;gap:18px}
+  .cz-summary b{color:var(--ink);font-weight:800}
+  .cz-chunks{display:flex;flex-direction:column;gap:12px}
+  .ck{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);overflow:hidden}
+  .ck-head{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;background:var(--paper-2);font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-soft)}
+  .ck-head b{color:var(--ink)}
+  .ck-body{padding:12px 14px;font-family:var(--font-mono);font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:var(--ink)}
+  .ck-ovl{background:rgba(244,180,35,.32);border-radius:3px}
+  @media(max-width:620px){.cz-num input{width:100%}}
+</style>
+
+<script>
+  import { encode as encO, decode as decO } from 'gpt-tokenizer/encoding/o200k_base';
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n.toLocaleString('en-US');
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const inEl = $('in');
+  const SAMPLE = inEl.getAttribute('data-sample') || '';
+  let unit = 'char', strat = 'fixed';
+
+  // each chunk = { text, ovl } where ovl = number of leading characters that overlap the previous chunk
+  function chunkFixedChars(text, size, overlap) {
+    const step = Math.max(1, size - overlap), out = [];
+    for (let i = 0; i < text.length; i += step) {
+      const slice = text.slice(i, i + size);
+      out.push({ text: slice, ovl: i > 0 ? Math.min(overlap, slice.length) : 0 });
+      if (i + size >= text.length) break;
+    }
+    return out;
+  }
+  function chunkFixedTokens(text, size, overlap) {
+    const ids = encO(text), step = Math.max(1, size - overlap), out = [];
+    for (let i = 0; i < ids.length; i += step) {
+      const win = ids.slice(i, i + size);
+      const slice = decO(win);
+      const ovlChars = i > 0 ? decO(win.slice(0, Math.min(overlap, win.length))).length : 0;
+      out.push({ text: slice, ovl: ovlChars });
+      if (i + size >= ids.length) break;
+    }
+    return out;
+  }
+  function tail(s, n) { if (n <= 0) return ''; let t = s.slice(-n); const sp = t.indexOf(' '); return sp > 0 ? t.slice(sp + 1) : t; }
+  function chunkSentences(text, size, overlap) {
+    const sents = text.match(/[^.!?\n]+[.!?]*[\s\n]*/g) || [text];
+    const out = []; let cur = '', ovl = 0;
+    for (const s of sents) {
+      if (cur && (cur.length + s.length) > size) {
+        out.push({ text: cur, ovl });
+        const carried = tail(cur, overlap);
+        cur = carried; ovl = carried.length;
+      }
+      cur += s;
+    }
+    if (cur.trim()) out.push({ text: cur, ovl });
+    return out;
+  }
+
+  function render() {
+    const text = inEl.value;
+    const size = Math.max(20, parseInt($('size').value) || 0);
+    let overlap = Math.max(0, parseInt($('ovl').value) || 0);
+    if (overlap >= size) overlap = size - 1;
+
+    let chunks = [];
+    if (!text.trim()) chunks = [];
+    else if (strat === 'sentence') chunks = chunkSentences(text, size, overlap);
+    else chunks = unit === 'token' ? chunkFixedTokens(text, size, overlap) : chunkFixedChars(text, size, overlap);
+
+    const box = $('chunks'); box.innerHTML = '';
+    const sizeOf = (t) => unit === 'token' ? encO(t).length : [...t].length;
+    let totalUnits = 0;
+    chunks.forEach((c, i) => {
+      const n = sizeOf(c.text); totalUnits += n;
+      const ovl = Math.min(c.ovl, c.text.length);
+      const head = esc(c.text.slice(0, ovl)), rest = esc(c.text.slice(ovl));
+      const el = document.createElement('div'); el.className = 'ck';
+      el.innerHTML = `<div class="ck-head"><span>Chunk <b>${i + 1}</b></span><span><b>${fmt(n)}</b> ${unit === 'token' ? 'tokens' : 'chars'}${ovl ? ` · ${fmt(unit === 'token' ? encO(c.text.slice(0, ovl)).length : ovl)} overlap` : ''}</span></div>`
+        + `<div class="ck-body">${ovl ? `<span class="ck-ovl">${head}</span>` : ''}${rest}</div>`;
+      box.appendChild(el);
+    });
+
+    const avg = chunks.length ? Math.round(totalUnits / chunks.length) : 0;
+    $('summary').innerHTML = chunks.length
+      ? `<span><b>${fmt(chunks.length)}</b> chunks</span><span>avg <b>${fmt(avg)}</b> ${unit === 'token' ? 'tokens' : 'chars'}</span><span>size <b>${fmt(size)}</b> · overlap <b>${fmt(overlap)}</b></span>`
+      : '';
+    const st = $('status');
+    st.className = 'status'; st.textContent = chunks.length ? '' : 'Paste a document above to see it chunk.';
+  }
+
+  function syncStrat() {
+    // sentence-aware is character-based; token mode forces fixed window
+    const sBtns = document.querySelectorAll('#strat .chip');
+    if (unit === 'token' && strat === 'sentence') { strat = 'fixed'; sBtns.forEach(b => b.classList.toggle('active', b.dataset.s === 'fixed')); }
+    sBtns.forEach(b => { b.disabled = unit === 'token' && b.dataset.s === 'sentence'; b.style.opacity = b.disabled ? '.4' : ''; b.style.cursor = b.disabled ? 'not-allowed' : ''; });
+  }
+
+  $('unit').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#unit .chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); unit = b.dataset.u; syncStrat(); render(); });
+  $('strat').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b || b.disabled) return; document.querySelectorAll('#strat .chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); strat = b.dataset.s; render(); });
+  ['size', 'ovl'].forEach(id => $(id).addEventListener('input', render));
+  $('in').addEventListener('input', render);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; render(); });
+  $('clear').addEventListener('click', () => { inEl.value = ''; render(); inEl.focus(); });
+
+  inEl.value = SAMPLE; syncStrat(); render();
+</script>

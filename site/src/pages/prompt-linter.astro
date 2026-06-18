@@ -1,0 +1,147 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const SAMPLE = `Please write a good, comprehensive but concise summary of the article below. Make it nice and return it as JSON. Don't be boring or use jargon. etc.`;
+---
+<ToolPage
+  title="Prompt Linter — catch vague & conflicting prompts | KB Cafe"
+  description="Paste a prompt and get rule-based feedback: vague wording, conflicting instructions, missing output format, and more. Free, fully client-side, nothing is uploaded."
+  path="/prompt-linter"
+  eyebrow="AI Explained · Tool"
+  h1="Prompt Linter"
+  tagline="Paste a prompt and get instant, rule-based feedback on the things that quietly make prompts unreliable, vague wording, conflicting instructions, and missing structure. Runs in your browser."
+>
+  <div class="pl-wrap">
+    <div class="pane">
+      <div class="pane-label"><span>Your prompt</span><span class="pl-actions"><button class="link-btn" id="sample">sample</button><button class="link-btn" id="clear">clear</button></span></div>
+      <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="Paste a prompt to lint…"></textarea>
+    </div>
+    <div class="pl-score">
+      <div class="ring" id="ring"><span id="score">–</span><small>/ 100</small></div>
+      <div class="pl-grade" id="grade"></div>
+    </div>
+  </div>
+  <div class="pl-findings" id="findings"></div>
+
+  <Fragment slot="explainer">
+    <h2>What it checks (and what it can&rsquo;t)</h2>
+    <p>
+      This is a <strong>rule-based linter</strong>, not a model. It looks for the patterns that reliably make
+      prompts weaker: vague quality words the model can&rsquo;t optimize (&ldquo;good&rdquo;,
+      &ldquo;appropriate&rdquo;), conflicting instructions (&ldquo;detailed&rdquo; and &ldquo;concise&rdquo;),
+      asking for <a href="/what-are-structured-outputs">JSON</a> without specifying the shape, prohibitions
+      instead of positive instructions, and missing role, format, or audience. It runs entirely in your browser
+      and stays out of your way, treat it as a checklist, not a grade from an oracle.
+    </p>
+    <h3>Why these matter</h3>
+    <ul>
+      <li><strong>Vague words</strong> push the decision onto the model, so you get inconsistent output. Define the target.</li>
+      <li><strong>Conflicts</strong> make the model pick one and ignore the other, unpredictably.</li>
+      <li><strong>Unspecified format</strong> is the top cause of &ldquo;it almost worked.&rdquo; Say exactly what you want back.</li>
+      <li><strong>&ldquo;Don&rsquo;t&rdquo; instructions</strong> are followed less reliably than &ldquo;do&rdquo; instructions.</li>
+    </ul>
+    <p class="note">
+      A high score is not a guarantee and a low score is not a failure, some great prompts break these rules on
+      purpose. Use it to catch the unintentional ones. Nothing you paste leaves your browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it call a model to grade my prompt?</summary>
+      <p>No. Every check is a local rule (pattern matching and simple heuristics), so it is instant, free, and private. The deeper, model-based version is a separate idea for later.</p>
+    </details>
+    <details class="faq"><summary>How is the score calculated?</summary>
+      <p>It starts at 100 and subtracts points per finding, more for issues than for tips. It is a rough signal to draw your eye, not a precise measurement.</p>
+    </details>
+    <details class="faq"><summary>Is my prompt uploaded?</summary>
+      <p>No. Linting runs entirely in your browser, so the prompt stays on your device and it works offline.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Pin down output with <a href="/what-are-structured-outputs">structured outputs</a> and the <a href="/structured-output-builder">Structured Output Builder</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .pl-actions{display:flex;gap:14px}
+  .pl-wrap{display:grid;grid-template-columns:1fr 200px;gap:20px;align-items:start}
+  .pane{display:flex;flex-direction:column;gap:9px}
+  .pane-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .ta{min-height:190px}
+  .pl-score{display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:18px}
+  .ring{width:140px;height:140px;border-radius:50%;display:grid;place-items:center;border:6px solid var(--line);position:relative;transition:border-color .25s}
+  .ring #score{font-family:var(--font-display);font-weight:800;font-size:48px;line-height:1;color:var(--ink)}
+  .ring small{position:absolute;bottom:30px;font-family:var(--font-mono);font-size:11px;color:var(--ink-soft)}
+  .pl-grade{font-family:var(--font-mono);font-size:13px;font-weight:700;text-align:center}
+  .pl-findings{margin-top:24px;display:flex;flex-direction:column;gap:9px}
+  .find{display:flex;gap:11px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--cream);font-size:14px;line-height:1.5}
+  .find .ic{font-family:var(--font-mono);font-weight:800;font-size:13px;flex-shrink:0;margin-top:1px}
+  .find.issue{border-color:rgba(214,62,31,.45)} .find.issue .ic{color:var(--coral-deep)}
+  .find.tip .ic{color:var(--orange)} .find.ok{border-color:#2f7d32} .find.ok .ic{color:#2f7d32}
+  .find b{color:var(--ink)} .find .q{font-family:var(--font-mono);font-size:12.5px;background:var(--paper-2);padding:1px 6px;border-radius:5px;color:var(--ink)}
+  @media(max-width:620px){.pl-wrap{grid-template-columns:1fr}.pl-score{flex-direction:row;justify-content:center}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const inEl = $('in');
+  const SAMPLE = inEl.getAttribute('data-sample') || '';
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // each rule returns a finding {sev:'issue'|'tip', msg} or null
+  const RULES = [
+    (t, l) => /\b(good|nice|better|high[- ]?quality|appropriate|reasonable|relevant|properly|correctly|engaging|compelling)\b/i.test(t)
+      && { sev: 'issue', msg: `<b>Vague quality words.</b> Terms like <span class="q">${esc((t.match(/\b(good|nice|better|high[- ]?quality|appropriate|reasonable|relevant|properly|correctly|engaging|compelling)\b/i) || [])[0] || '')}</span> give the model nothing concrete to aim at. Say what &ldquo;good&rdquo; means here.` },
+    (t) => /\b(etc\.?|and so on|and more|among others)\b/i.test(t)
+      && { sev: 'issue', msg: `<b>Open-ended &ldquo;etc.&rdquo;</b> leaves the rest to the model&rsquo;s guess. Enumerate the cases you actually mean.` },
+    (t, l) => /\bjson\b/i.test(l) && !/(schema|fields?|keys?|properties|format|shape|structure|example|like this|response_format)/i.test(l)
+      && { sev: 'issue', msg: `<b>JSON requested without a shape.</b> Specify the exact keys or a schema, otherwise the structure will drift. See <a href="/what-are-structured-outputs">structured outputs</a>.` },
+    (t) => /\b(detailed|comprehensive|thorough|in[- ]depth|exhaustive|long)\b/i.test(t) && /\b(concise|brief|short|succinct|terse|quick|one[- ]line)\b/i.test(t)
+      && { sev: 'issue', msg: `<b>Conflicting length.</b> You ask for both more and less (e.g. &ldquo;comprehensive&rdquo; and &ldquo;concise&rdquo;). Pick one and give a target (word or bullet count).` },
+    (t) => { const neg = (t.match(/\b(don'?t|do not|never|avoid|no |without)\b/gi) || []).length; return neg >= 3 && { sev: 'tip', msg: `<b>Heavy on prohibitions.</b> ${neg} &ldquo;don&rsquo;t / never / avoid&rdquo; instructions. Models follow positive instructions (&ldquo;do X&rdquo;) more reliably than bans.` }; },
+    (t, l) => !/(^|\n)\s*(you are|act as|you'?re a|as an? |role:)/i.test(l) && t.trim().length > 40
+      && { sev: 'tip', msg: `<b>No role set.</b> Opening with &ldquo;You are a&hellip;&rdquo; anchors tone and expertise.` },
+    (t, l) => !/(format|as (a )?(list|bullet|table|json|markdown|csv)|bullet|numbered|steps|markdown|table|one per line|schema)/i.test(l) && t.trim().length > 60
+      && { sev: 'tip', msg: `<b>No output format.</b> Specify what you want back (a bulleted list, a table, JSON&hellip;). Unspecified format is the top cause of &ldquo;almost right.&rdquo;` },
+    (t) => /\b(please|thank you|thanks|kindly|appreciate it)\b/i.test(t)
+      && { sev: 'tip', msg: `<b>Politeness filler.</b> &ldquo;Please/thanks&rdquo; is harmless but adds tokens without improving output.` },
+    (t) => { const caps = (t.match(/\b[A-Z]{4,}\b/g) || []).filter(w => w !== 'JSON' && w !== 'HTML' && w !== 'CSV' && w !== 'YAML' && w !== 'HTTP' && w !== 'API'); return caps.length >= 3 && { sev: 'tip', msg: `<b>ALL-CAPS emphasis.</b> Long capitalised runs read as shouting and rarely help. Use labels or bold instead.` }; },
+    (t) => /(\bTODO\b|\bFIXME\b|\[(insert|your|name|topic|x)[^\]]*\]|\{\{?\s*[a-z_]+\s*\}?\})/i.test(t)
+      && { sev: 'issue', msg: `<b>Unfilled placeholder.</b> Looks like a template token (<span class="q">${esc((t.match(/(\bTODO\b|\bFIXME\b|\[(insert|your|name|topic|x)[^\]]*\]|\{\{?\s*[a-z_]+\s*\}?\})/i) || [])[0] || '')}</span>) was left in.` },
+    (t, l) => /\b(write|draft|compose|create|generate)\b/i.test(l) && !/(audience|reader|tone|voice|for (a|an|my|the)|persona|style)/i.test(l) && t.trim().length > 50
+      && { sev: 'tip', msg: `<b>No audience or tone.</b> For a writing task, name who it&rsquo;s for and the tone you want.` },
+    (t, l) => /\b(classify|categorize|categorise|label|extract|convert|reformat|rewrite|translate)\b/i.test(l) && !/(example|e\.g\.|for instance|sample|like this)/i.test(l)
+      && { sev: 'tip', msg: `<b>No examples for a transformation task.</b> One or two worked examples (few-shot) sharply improve consistency.` },
+    (t) => t.trim().length > 1200 && (t.match(/\n/g) || []).length < 3
+      && { sev: 'tip', msg: `<b>Long, unbroken prompt.</b> Break it into labelled sections (Role, Task, Format, Constraints) so the model can follow it.` },
+  ];
+
+  function lint() {
+    const t = inEl.value, l = t.toLowerCase();
+    const box = $('findings');
+    if (!t.trim()) { box.innerHTML = ''; setScore(null); return; }
+    const found = [];
+    for (const r of RULES) { const f = r(t, l); if (f) found.push(f); }
+    let score = 100;
+    found.forEach(f => score -= f.sev === 'issue' ? 14 : 5);
+    score = Math.max(0, score);
+    setScore(score);
+    if (!found.length) { box.innerHTML = `<div class="find ok"><span class="ic">✓</span><span><b>Clean.</b> No common prompt smells found. Remember: rules aren&rsquo;t a substitute for testing on real inputs.</span></div>`; return; }
+    found.sort((a, b) => (a.sev === 'issue' ? 0 : 1) - (b.sev === 'issue' ? 0 : 1));
+    box.innerHTML = found.map(f => `<div class="find ${f.sev}"><span class="ic">${f.sev === 'issue' ? '✕' : '!'}</span><span>${f.msg}</span></div>`).join('');
+  }
+  function setScore(s) {
+    const el = $('score'), ring = $('ring'), grade = $('grade');
+    if (s === null) { el.textContent = '–'; ring.style.borderColor = 'var(--line)'; grade.textContent = ''; return; }
+    el.textContent = s;
+    const color = s >= 85 ? '#2f7d32' : s >= 65 ? 'var(--gold)' : s >= 45 ? 'var(--orange)' : 'var(--coral-deep)';
+    ring.style.borderColor = color; el.style.color = color;
+    grade.textContent = s >= 85 ? 'Looks solid' : s >= 65 ? 'A few tweaks' : s >= 45 ? 'Worth tightening' : 'Needs work';
+    grade.style.color = color;
+  }
+
+  inEl.addEventListener('input', lint);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; lint(); });
+  $('clear').addEventListener('click', () => { inEl.value = ''; lint(); inEl.focus(); });
+  inEl.value = SAMPLE; lint();
+</script>

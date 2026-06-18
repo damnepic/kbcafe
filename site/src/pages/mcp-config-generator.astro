@@ -1,0 +1,225 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="MCP Config Generator & Validator — build claude_desktop_config.json | KB Cafe"
+  description="Build a valid Model Context Protocol (MCP) server config for Claude Desktop, or paste an existing one to validate it. Free, fully client-side, nothing is uploaded."
+  path="/mcp-config-generator"
+  eyebrow="AI Explained · Tool"
+  h1="MCP Config Generator"
+  tagline="Build a valid MCP server block for claude_desktop_config.json from a simple form, or paste an existing config to validate it. Runs entirely in your browser."
+>
+  <div class="row mc-mode" id="mode">
+    <button class="chip active" data-m="build">Build</button>
+    <button class="chip" data-m="validate">Validate</button>
+  </div>
+
+  <!-- BUILD -->
+  <div id="build-view">
+    <div id="servers"></div>
+    <div class="row" style="margin:14px 0 6px"><button class="btn ghost" id="add">+ Add server</button></div>
+    <div class="pane">
+      <div class="pane-label"><span>claude_desktop_config.json</span><button class="link-btn" id="copy">copy</button></div>
+      <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <!-- VALIDATE -->
+  <div id="validate-view" style="display:none">
+    <div class="pane">
+      <div class="pane-label"><span>Paste a config to validate</span><button class="link-btn" id="vsample">sample</button></div>
+      <textarea id="vin" class="ta" spellcheck="false" placeholder="Paste your claude_desktop_config.json…"></textarea>
+    </div>
+    <div class="mc-findings" id="findings"></div>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>What this builds</h2>
+    <p>
+      The <a href="/what-is-mcp">Model Context Protocol</a> lets an AI app connect to external tools through a
+      standard config. For Claude Desktop that config lives in <code>claude_desktop_config.json</code>, and every
+      server goes under an <code>mcpServers</code> object with a <strong>command</strong> to launch it, its
+      <strong>args</strong>, and any <strong>env</strong> variables (like API keys). A single misplaced comma or a
+      string where an array belongs stops every server from loading, so this tool builds the shape for you and
+      validates one you already have.
+    </p>
+    <h3>The shape of a server</h3>
+    <ul>
+      <li><strong>command</strong>, the executable, often <code>npx</code>, <code>node</code>, <code>uvx</code>, or <code>python</code>.</li>
+      <li><strong>args</strong>, an <em>array</em> of strings passed to the command (one per line in the form).</li>
+      <li><strong>env</strong>, optional key/value pairs, the usual home for secrets like <code>API_KEY</code>.</li>
+    </ul>
+    <p class="note">
+      This generates and checks the JSON locally, nothing is uploaded, so it is safe to paste a config that
+      contains keys. That said, treat real secrets carefully and prefer environment references where you can.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Where does this file go?</summary>
+      <p>On macOS, <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>; on Windows, <code>%APPDATA%\Claude\claude_desktop_config.json</code>. Restart Claude Desktop after editing.</p>
+    </details>
+    <details class="faq"><summary>Does the validator run my servers?</summary>
+      <p>No. It only checks the JSON structure (valid syntax, an <code>mcpServers</code> object, a string <code>command</code>, an array <code>args</code>, and object <code>env</code>). It never executes anything.</p>
+    </details>
+    <details class="faq"><summary>Is my config uploaded?</summary>
+      <p>No. Generation and validation are entirely client-side, so the config and any keys in it stay on your device.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Read <a href="/what-is-mcp">what MCP is</a> and how it relates to <a href="/what-is-tool-calling">tool calling</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .mc-mode{margin-bottom:18px}
+  .srv{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:16px;margin-bottom:14px}
+  .srv-top{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+  .srv-top input{flex:1;min-width:0}
+  .mc-in{font-family:var(--font-mono);font-size:13.5px;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--paper);color:var(--ink);outline:0}
+  .mc-in:focus{border-color:var(--ink)}
+  .mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .mc-field{display:flex;flex-direction:column;gap:6px}
+  .mc-field label{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .mc-field textarea{min-height:84px;resize:vertical;font-family:var(--font-mono);font-size:13px;line-height:1.5;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--paper);color:var(--ink);outline:0}
+  .mc-field textarea:focus{border-color:var(--ink)}
+  .srv-rm{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--coral-deep);background:none;border:0;cursor:pointer;white-space:nowrap}
+  .srv-rm:hover{text-decoration:underline}
+  .ta{min-height:180px}
+  .pane{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+  .pane-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+
+  .mc-findings{margin-top:18px;display:flex;flex-direction:column;gap:9px}
+  .find{display:flex;gap:11px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--cream);font-size:14px;line-height:1.45}
+  .find .ic{font-family:var(--font-mono);font-weight:800;font-size:13px;flex-shrink:0}
+  .find.err{border-color:var(--coral-deep)} .find.err .ic{color:var(--coral-deep)}
+  .find.warn .ic{color:var(--orange)} .find.ok{border-color:#2f7d32} .find.ok .ic{color:#2f7d32}
+  .find code{font-family:var(--font-mono);font-size:12.5px;background:var(--paper-2);padding:1px 5px;border-radius:5px}
+  @media(max-width:620px){.mc-grid{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const KNOWN = ['command', 'args', 'env', 'cwd', 'type', 'url', 'headers'];
+
+  // ---------- BUILD ----------
+  let servers = [];
+  let seed = 0;
+  function addServer(s) {
+    servers.push(Object.assign({ id: ++seed, name: '', command: 'npx', args: '', env: '' }, s || {}));
+    renderServers();
+  }
+  function renderServers() {
+    const box = $('servers'); box.innerHTML = '';
+    servers.forEach((s) => {
+      const el = document.createElement('div'); el.className = 'srv';
+      el.innerHTML = `
+        <div class="srv-top">
+          <input class="mc-in f-name" placeholder="server name (e.g. filesystem)" value="${escAttr(s.name)}" />
+          <input class="mc-in f-cmd" placeholder="command" value="${escAttr(s.command)}" style="max-width:160px" />
+          <button class="srv-rm">remove</button>
+        </div>
+        <div class="mc-grid">
+          <div class="mc-field"><label>args (one per line)</label><textarea class="f-args" spellcheck="false" placeholder="-y&#10;@modelcontextprotocol/server-filesystem&#10;/path/to/dir">${escHtml(s.args)}</textarea></div>
+          <div class="mc-field"><label>env (KEY=value per line)</label><textarea class="f-env" spellcheck="false" placeholder="API_KEY=sk-...">${escHtml(s.env)}</textarea></div>
+        </div>`;
+      el.querySelector('.f-name').addEventListener('input', (e) => { s.name = e.target.value; build(); });
+      el.querySelector('.f-cmd').addEventListener('input', (e) => { s.command = e.target.value; build(); });
+      el.querySelector('.f-args').addEventListener('input', (e) => { s.args = e.target.value; build(); });
+      el.querySelector('.f-env').addEventListener('input', (e) => { s.env = e.target.value; build(); });
+      el.querySelector('.srv-rm').addEventListener('click', () => { servers = servers.filter(x => x.id !== s.id); renderServers(); build(); });
+      box.appendChild(el);
+    });
+  }
+  function build() {
+    const obj = { mcpServers: {} };
+    servers.forEach((s) => {
+      const name = s.name.trim() || 'unnamed';
+      const entry = { command: s.command.trim() };
+      const args = s.args.split('\n').map(a => a.trim()).filter(Boolean);
+      entry.args = args;
+      const env = {};
+      s.env.split('\n').map(l => l.trim()).filter(Boolean).forEach(l => {
+        const i = l.indexOf('='); if (i > 0) env[l.slice(0, i).trim()] = l.slice(i + 1).trim();
+      });
+      if (Object.keys(env).length) entry.env = env;
+      obj.mcpServers[name] = entry;
+    });
+    $('out').value = JSON.stringify(obj, null, 2);
+  }
+  function escAttr(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+  function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  // ---------- VALIDATE ----------
+  const SAMPLE_CFG = `{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/me/docs"],
+      "env": { "LOG_LEVEL": "info" }
+    }
+  }
+}`;
+  function finding(kind, msg) { return `<div class="find ${kind}"><span class="ic">${kind === 'err' ? '✕' : kind === 'warn' ? '!' : '✓'}</span><span>${msg}</span></div>`; }
+  function validate() {
+    const raw = $('vin').value.trim(); const box = $('findings');
+    if (!raw) { box.innerHTML = ''; return; }
+    let data;
+    try { data = JSON.parse(raw); }
+    catch (e) { box.innerHTML = finding('err', 'Invalid JSON: ' + escHtml((e.message || '').split('\n')[0])); return; }
+    const out = [];
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) { box.innerHTML = finding('err', 'Top level must be a JSON object.'); return; }
+    let root = data;
+    if (!('mcpServers' in data)) {
+      // maybe they pasted just the servers map
+      const looksLikeServers = Object.values(data).every(v => v && typeof v === 'object' && ('command' in v || 'url' in v));
+      if (looksLikeServers && Object.keys(data).length) { out.push(finding('warn', 'No <code>mcpServers</code> wrapper found, validating the object as the servers map. Wrap it in <code>{ "mcpServers": { … } }</code>.')); root = { mcpServers: data }; }
+      else { box.innerHTML = finding('err', 'Missing <code>mcpServers</code> object.'); return; }
+    }
+    const servers = root.mcpServers;
+    if (typeof servers !== 'object' || servers === null || Array.isArray(servers)) { box.innerHTML = finding('err', '<code>mcpServers</code> must be an object keyed by server name.'); return; }
+    const names = Object.keys(servers);
+    if (!names.length) out.push(finding('warn', '<code>mcpServers</code> is empty, no servers will load.'));
+    names.forEach((name) => {
+      const s = servers[name];
+      if (typeof s !== 'object' || s === null || Array.isArray(s)) { out.push(finding('err', `Server <code>${escHtml(name)}</code> must be an object.`)); return; }
+      const remote = 'url' in s && !('command' in s);
+      if (remote) {
+        if (typeof s.url !== 'string' || !s.url) out.push(finding('err', `<code>${escHtml(name)}</code>: remote server needs a string <code>url</code>.`));
+      } else {
+        if (!('command' in s)) out.push(finding('err', `<code>${escHtml(name)}</code>: missing <code>command</code>.`));
+        else if (typeof s.command !== 'string' || !s.command.trim()) out.push(finding('err', `<code>${escHtml(name)}</code>: <code>command</code> must be a non-empty string.`));
+        if (!('args' in s)) out.push(finding('warn', `<code>${escHtml(name)}</code>: no <code>args</code> (defaults to none) — usually you want an array.`));
+        else if (!Array.isArray(s.args)) out.push(finding('err', `<code>${escHtml(name)}</code>: <code>args</code> must be an array of strings.`));
+        else if (!s.args.every(a => typeof a === 'string')) out.push(finding('err', `<code>${escHtml(name)}</code>: every item in <code>args</code> must be a string.`));
+      }
+      if ('env' in s) {
+        if (typeof s.env !== 'object' || s.env === null || Array.isArray(s.env)) out.push(finding('err', `<code>${escHtml(name)}</code>: <code>env</code> must be an object.`));
+        else if (!Object.values(s.env).every(v => typeof v === 'string')) out.push(finding('warn', `<code>${escHtml(name)}</code>: <code>env</code> values should be strings.`));
+      }
+      Object.keys(s).filter(k => !KNOWN.includes(k)).forEach(k => out.push(finding('warn', `<code>${escHtml(name)}</code>: unknown key <code>${escHtml(k)}</code>.`)));
+    });
+    const hasErr = out.some(f => f.includes('find err'));
+    if (!hasErr) out.unshift(finding('ok', `Valid. ${names.length} server${names.length === 1 ? '' : 's'} configured.`));
+    box.innerHTML = out.join('');
+  }
+
+  // ---------- mode switch ----------
+  $('mode').addEventListener('click', (e) => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    document.querySelectorAll('#mode .chip').forEach(c => c.classList.remove('active')); b.classList.add('active');
+    const build = b.dataset.m === 'build';
+    $('build-view').style.display = build ? '' : 'none';
+    $('validate-view').style.display = build ? 'none' : '';
+  });
+  $('add').addEventListener('click', () => addServer());
+  $('copy').addEventListener('click', async () => { if (!$('out').value) return; try { await navigator.clipboard.writeText($('out').value); const st = $('status'); st.className = 'status ok'; st.textContent = 'Copied.'; } catch { $('out').select(); document.execCommand('copy'); } });
+  $('vin').addEventListener('input', validate);
+  $('vsample').addEventListener('click', () => { $('vin').value = SAMPLE_CFG; validate(); });
+
+  // seed one example server
+  addServer({ name: 'filesystem', command: 'npx', args: '-y\n@modelcontextprotocol/server-filesystem\n/Users/me/docs', env: '' });
+  build();
+</script>

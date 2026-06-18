@@ -1,0 +1,183 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const SAMPLE = `You are a helpful assistant. Summarize the following article in three bullet points, then suggest a headline.\n\nTokenization is how a model turns text into the numbers it actually reads. "Hello" might be one token; "tokenization" is usually several.`;
+---
+<ToolPage
+  title="Token Counter & Tokenizer — count GPT tokens online | KB Cafe"
+  description="Count tokens in any text with the real OpenAI tokenizers (o200k_base and cl100k_base) and see the exact token-by-token split. Free, fully client-side, nothing is uploaded."
+  path="/token-counter"
+  eyebrow="AI Explained · Tool"
+  h1="Token Counter"
+  tagline="Count the tokens in any text with the real OpenAI tokenizers and see exactly how it splits, token by token. Runs entirely in your browser; nothing you paste is uploaded."
+>
+  <div class="row tc-models" id="models">
+    <button class="chip active" data-m="o200k">GPT-4o · GPT-4.1 · o-series</button>
+    <button class="chip" data-m="cl100k">GPT-4 · GPT-3.5</button>
+    <button class="chip" data-m="estimate">Claude · Gemini · other</button>
+  </div>
+
+  <div class="tc-stats">
+    <div class="stat hero"><span class="s-num" id="n-tokens">0</span><span class="s-lbl">tokens</span></div>
+    <div class="stat"><span class="s-num" id="n-chars">0</span><span class="s-lbl">characters</span></div>
+    <div class="stat"><span class="s-num" id="n-words">0</span><span class="s-lbl">words</span></div>
+    <div class="stat"><span class="s-num" id="n-ratio">0</span><span class="s-lbl">chars / token</span></div>
+  </div>
+
+  <div class="pane">
+    <div class="pane-label"><span>Your text</span><span class="tc-actions"><button class="link-btn" id="sample">sample</button><button class="link-btn" id="clear">clear</button></span></div>
+    <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="Paste or type text to count its tokens…"></textarea>
+  </div>
+
+  <div class="tv-head">
+    <label class="tv-toggle"><input type="checkbox" id="showtok" checked /> Show token split</label>
+    <span class="tv-cap" id="tv-cap"></span>
+  </div>
+  <div class="tokview" id="tokview"></div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>What a token actually is</h2>
+    <p>
+      Models don&rsquo;t read characters or words, they read <strong>tokens</strong>: chunks of text a
+      <a href="/what-are-embeddings">tokenizer</a> learned to split on. A common word is often one token; a
+      rarer or longer word splits into several (&ldquo;tokenization&rdquo; &rarr; <code>token</code> +
+      <code>ization</code>). Punctuation, leading spaces, and casing all matter. Token count is what
+      providers bill on and what fills a model&rsquo;s <a href="/what-is-a-context-window">context window</a>,
+      so counting them is the difference between a request that fits and one that gets truncated.
+    </p>
+    <h3>Which tokenizer should I pick?</h3>
+    <ul>
+      <li><strong>GPT-4o · GPT-4.1 · o-series</strong> use <code>o200k_base</code>, the newest OpenAI encoding.</li>
+      <li><strong>GPT-4 · GPT-3.5</strong> (and the <code>text-embedding-3</code> models) use <code>cl100k_base</code>.</li>
+      <li><strong>Claude, Gemini &amp; others</strong> use their own tokenizers, which are <em>not</em> published.
+        For those, this tool shows a <strong>character-based estimate</strong> (about four characters per token),
+        clearly labelled, never a fake exact count.</li>
+    </ul>
+    <p class="note">
+      The two OpenAI counts are <strong>exact</strong>, they run the same byte-pair encodings OpenAI uses, right
+      here in your browser. The &ldquo;other&rdquo; estimate is a planning ballpark only; verify against your
+      provider for billing.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Are the OpenAI token counts exact?</summary>
+      <p>Yes. This loads the actual <code>o200k_base</code> and <code>cl100k_base</code> tokenizers and encodes your text locally, so the count matches what OpenAI&rsquo;s API would charge for that text.</p>
+    </details>
+    <details class="faq"><summary>Why no exact Claude or Gemini count?</summary>
+      <p>Anthropic and Google don&rsquo;t publish their tokenizers, so an exact in-browser count isn&rsquo;t possible without calling their APIs. Rather than invent a number, we show an honest character-based estimate and label it as one.</p>
+    </details>
+    <details class="faq"><summary>Is my text uploaded?</summary>
+      <p>No. The tokenizer runs entirely in your browser, so whatever you paste stays on your device and the tool works offline.</p>
+    </details>
+    <details class="faq"><summary>Why does whitespace change the count?</summary>
+      <p>Most tokens include their leading space, so <code> token</code> and <code>token</code> can be different tokens. Casing and punctuation shift the split too, which is why two similar strings can have different counts.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>See <a href="/what-is-a-context-window">what a context window is</a>, plan a prompt with the <a href="/context-window-visualizer">Context Window Visualizer</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .tc-models{margin-bottom:18px}
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .tc-actions{display:flex;gap:14px}
+
+  .tc-stats{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:14px;margin-bottom:20px}
+  .stat{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:16px 18px;display:flex;flex-direction:column;gap:3px}
+  .stat.hero{border-color:var(--ink);box-shadow:6px 6px 0 rgba(238,75,43,.16)}
+  .s-num{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;font-size:30px;line-height:1;color:var(--ink)}
+  .stat.hero .s-num{font-size:40px;color:var(--coral-deep)}
+  .s-lbl{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+
+  .pane{display:flex;flex-direction:column;gap:9px}
+  .pane-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .ta{min-height:180px}
+
+  .tv-head{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;gap:12px}
+  .tv-toggle{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;cursor:pointer}
+  .tv-cap{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);opacity:.8}
+  .tokview{border:1.5px solid var(--line);border-radius:14px;background:var(--paper-2);padding:14px 15px;min-height:60px;
+    font-family:var(--font-mono);font-size:13.5px;line-height:2.1;white-space:pre-wrap;word-break:break-word}
+  .tok{border-radius:4px;padding:2px 0;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .tok.t0{background:rgba(238,75,43,.16)} .tok.t1{background:rgba(244,180,35,.22)} .tok.t2{background:rgba(52,120,246,.16)}
+  .tok.t3{background:rgba(15,159,130,.18)} .tok.t4{background:rgba(118,87,255,.16)}
+  .tv-nl{opacity:.4}
+  .tv-more{display:inline-block;margin-left:6px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);opacity:.75}
+  .tv-note{margin:0;font-family:var(--font-body);font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+  .tokview.hide{display:none}
+  @media(max-width:620px){.tc-stats{grid-template-columns:1fr 1fr}}
+</style>
+
+<script>
+  import { encode as encCl, decode as decCl } from 'gpt-tokenizer/encoding/cl100k_base';
+  import { encode as encO, decode as decO } from 'gpt-tokenizer/encoding/o200k_base';
+
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n.toLocaleString('en-US');
+  const ENC = { o200k: { encode: encO, decode: decO }, cl100k: { encode: encCl, decode: decCl } };
+  const SAMPLE = $('in').getAttribute('data-sample') || '';
+  let mode = 'o200k';
+
+  const inEl = $('in'), tokview = $('tokview'), showtok = $('showtok');
+  const wordCount = (t) => { const m = t.trim().match(/\S+/g); return m ? m.length : 0; };
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const CAP = 4000; // cap the visual split for very large inputs
+
+  function renderTokens(ids, m) {
+    if (!showtok.checked) { tokview.classList.add('hide'); return; }
+    tokview.classList.remove('hide');
+    if (!ids) {
+      tokview.innerHTML = '<p class="tv-note">Switch to an OpenAI encoding to see the exact token-by-token split. Claude and Gemini tokenizers aren’t published, so their counts here are honest character-based estimates.</p>';
+      $('tv-cap').textContent = '';
+      return;
+    }
+    const dec = ENC[m].decode;
+    const shown = ids.slice(0, CAP);
+    let html = '';
+    shown.forEach((id, i) => {
+      let s;
+      try { s = dec([id]); } catch { s = '�'; }
+      s = esc(s).replace(/\n/g, '<span class="tv-nl">↵</span>\n');
+      html += `<span class="tok t${i % 5}">${s || '·'}</span>`;
+    });
+    if (ids.length > CAP) html += `<span class="tv-more">+${fmt(ids.length - CAP)} more tokens</span>`;
+    tokview.innerHTML = html;
+    $('tv-cap').textContent = ids.length > CAP ? `showing first ${fmt(CAP)} of ${fmt(ids.length)} tokens` : `${fmt(ids.length)} tokens`;
+  }
+
+  function run() {
+    const text = inEl.value;
+    const chars = [...text].length;
+    const wc = wordCount(text);
+    let tokens, ids = null, approx = false;
+    if (mode === 'estimate') { tokens = Math.ceil(chars / 4); approx = true; }
+    else { ids = ENC[mode].encode(text); tokens = ids.length; }
+
+    $('n-tokens').textContent = (approx ? '≈ ' : '') + fmt(tokens);
+    $('n-chars').textContent = fmt(chars);
+    $('n-words').textContent = fmt(wc);
+    $('n-ratio').textContent = tokens ? (chars / tokens).toFixed(2) : '0';
+
+    renderTokens(ids, mode);
+
+    const st = $('status');
+    if (approx) { st.className = 'status'; st.textContent = 'Estimate only — Claude/Gemini tokenizers are not public. The OpenAI counts above are exact.'; }
+    else { st.className = 'status ok'; st.textContent = `Exact count using the ${mode === 'o200k' ? 'o200k_base' : 'cl100k_base'} tokenizer.`; }
+  }
+
+  $('models').addEventListener('click', (e) => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    document.querySelectorAll('#models .chip').forEach((c) => c.classList.remove('active'));
+    b.classList.add('active'); mode = b.dataset.m; run();
+  });
+  inEl.addEventListener('input', run);
+  showtok.addEventListener('change', run);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; run(); });
+  $('clear').addEventListener('click', () => { inEl.value = ''; run(); inEl.focus(); });
+
+  inEl.value = SAMPLE;
+  run();
+</script>
