@@ -90,9 +90,12 @@ const canonical = new URL(path, Astro.site).href;
   /* nav */
   nav{display:flex;align-items:center;justify-content:space-between;padding:24px 0 8px}
   .brand{display:flex;align-items:center;gap:11px;font-family:var(--font-display);
-    font-weight:800;font-size:25px;letter-spacing:-.02em;text-decoration:none}
-  .brand .mark{height:44px;width:auto;display:block;filter:drop-shadow(0 2px 3px rgba(30,24,19,.18))}
-  .brand .kb{color:var(--coral)} .brand .cf{color:var(--ink)}
+    font-weight:800;font-size:25px;letter-spacing:-.02em;text-decoration:none;transition:transform .15s}
+  .brand:hover{transform:translateY(-1px)}
+  .brand .mark{height:44px;width:auto;display:block;filter:drop-shadow(0 2px 3px rgba(30,24,19,.18));transition:transform .15s}
+  .brand:hover .mark{transform:rotate(-3deg)}
+  .brand .kb{color:var(--coral)} .brand .cf{color:var(--ink);transition:color .15s}
+  .brand:hover .cf{color:var(--coral)}
   .nav-links{display:flex;align-items:center;gap:26px;font-weight:600;font-size:15px}
   .nav-links a{color:var(--ink-soft);text-decoration:none;transition:color .15s}
   .nav-links a:hover{color:var(--coral)}
