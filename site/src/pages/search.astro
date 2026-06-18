@@ -1,0 +1,144 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { TOOLS } from '../data/tools.js';
+import { REFERENCE } from '../data/reference.js';
+import { AI } from '../data/ai.js';
+import { PATTERNS } from '../data/patterns.js';
+import { POSTS } from '../data/blog.js';
+
+// Unified, client-searchable index across every content destination.
+// kind drives the colored badge + the filter chips.
+const KIND_META = {
+  tool:      { label: 'Tool',      bg: '#ee4b2b' },
+  reference: { label: 'Reference', bg: '#3478f6' },
+  ai:        { label: 'AI',        bg: '#7657ff' },
+  pattern:   { label: 'Pattern',   bg: '#0f9f82' },
+  blog:      { label: 'Blog',      bg: '#e0911a' },
+};
+const KIND_ORDER = ['tool', 'reference', 'ai', 'pattern', 'blog'];
+
+const INDEX = [
+  ...TOOLS.filter(t => t.href).map(t => ({ kind: 'tool', title: t.nm, ds: t.ds, href: t.href, tag: t.ctl })),
+  ...REFERENCE.map(r => ({ kind: 'reference', title: r.nm, ds: r.ds, href: r.href, tag: r.tag })),
+  ...AI.map(a => ({ kind: 'ai', title: a.nm, ds: a.ds, href: a.href, tag: a.tag })),
+  ...PATTERNS.map(p => ({ kind: 'pattern', title: `${p.name} pattern`, ds: p.tagline, href: `/ai-patterns/${p.slug}`, tag: p.tag })),
+  ...POSTS.map(p => ({ kind: 'blog', title: p.title, ds: p.excerpt, href: `/blog/${p.slug}`, tag: p.tag })),
+];
+const total = INDEX.length;
+const counts = Object.fromEntries(KIND_ORDER.map(k => [k, INDEX.filter(i => i.kind === k).length]));
+---
+<Layout
+  title="Search — every tool, reference & AI topic | KB Cafe"
+  description="Search all of KB Cafe in one place: developer tools, evergreen references, and AI explainers. Fast, fully client-side, nothing is uploaded."
+  path="/search"
+>
+  <section class="search-page">
+    <header class="sp-head">
+      <div class="eyebrow">☕ Search the cafe</div>
+      <h1>Find <span class="mk">anything.</span></h1>
+      <p class="lede">{total} tools, references, and AI explainers in one box. Filtering happens entirely in your browser, so it is instant and nothing you type is sent anywhere.</p>
+
+      <div class="sp-search">
+        <span class="s-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+        <input id="q" type="text" autocomplete="off" placeholder="Try “mcp”, “rag”, “embeddings”, “json”, “cron”…" />
+        <button class="s-clear" id="clear" hidden>✕</button>
+      </div>
+      <div class="sp-chips" id="chips">
+        <button class="chip active" data-k="all">All <span class="chip-n">{total}</span></button>
+        {KIND_ORDER.filter(k => counts[k]).map(k => (
+          <button class="chip" data-k={k}><span class="chip-dot" style={`background:${KIND_META[k].bg}`}></span>{KIND_META[k].label} <span class="chip-n">{counts[k]}</span></button>
+        ))}
+      </div>
+    </header>
+
+    <p class="sp-count" id="count" aria-live="polite"></p>
+    <div class="sp-grid" id="grid">
+      {INDEX.map(i => (
+        <a class="r-card" href={i.href} data-kind={i.kind} data-q={`${i.title} ${i.ds} ${i.tag || ''} ${KIND_META[i.kind].label}`.toLowerCase()}>
+          <div class="r-top"><span class="r-badge" style={`background:${KIND_META[i.kind].bg}`}>{KIND_META[i.kind].label}</span>{i.tag && <span class="r-tag">{i.tag}</span>}</div>
+          <h3>{i.title}</h3>
+          <p>{i.ds}</p>
+          <span class="r-go">Open <span aria-hidden="true">→</span></span>
+        </a>
+      ))}
+    </div>
+    <p class="sp-none" id="none" hidden>No resource matches that. Try a different term. ☕</p>
+  </section>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const q = $('#q'), chips = $('#chips'), none = $('#none'), countEl = $('#count'), clearBtn = $('#clear');
+    const cards = [...document.querySelectorAll('.r-card')];
+    let kind = 'all', term = '';
+
+    function apply() {
+      term = q.value.trim().toLowerCase();
+      clearBtn.hidden = !term;
+      let shown = 0;
+      cards.forEach(c => {
+        const kindOk = kind === 'all' || c.dataset.kind === kind;
+        const qOk = !term || c.dataset.q.includes(term);
+        const vis = kindOk && qOk;
+        c.hidden = !vis; if (vis) shown++;
+      });
+      none.hidden = shown > 0;
+      countEl.textContent = (term || kind !== 'all')
+        ? `${shown} result${shown === 1 ? '' : 's'}${term ? ` for “${q.value.trim()}”` : ''}`
+        : '';
+    }
+    q.addEventListener('input', apply);
+    clearBtn.addEventListener('click', () => { q.value = ''; apply(); q.focus(); });
+    chips.addEventListener('click', (e) => {
+      const b = e.target.closest('.chip'); if (!b) return;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      b.classList.add('active'); kind = b.dataset.k; apply();
+    });
+    // read ?q= / ?kind= from the URL (homepage search submits here)
+    const p = new URLSearchParams(location.search);
+    if (p.get('q')) q.value = p.get('q');
+    const k0 = p.get('kind');
+    if (k0) { const b = chips.querySelector(`.chip[data-k="${k0}"]`); if (b) { document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); kind = k0; } }
+    apply();
+    q.focus();
+  </script>
+</Layout>
+
+<style>
+  .search-page{padding:40px 0 30px;max-width:1120px;margin:0 auto}
+  .sp-head{max-width:760px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  h1{font-family:var(--font-display);font-weight:700;letter-spacing:-.03em;line-height:1.02;font-size:clamp(38px,5vw,60px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.12em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:98% .42em}
+  .lede{margin-top:20px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:600px}
+
+  .sp-search{margin-top:26px;max-width:560px;height:62px;border-radius:18px;background:var(--cream);border:1.2px solid var(--line);box-shadow:0 12px 36px rgba(45,30,16,.07);display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:12px;padding:0 18px}
+  .sp-search .s-ic{color:var(--coral);display:grid;place-items:center}
+  .sp-search input{border:0;outline:0;background:transparent;font-family:var(--font-body);font-size:16.5px;color:var(--ink);min-width:0}
+  .sp-search input::placeholder{color:#a99e90}
+  .s-clear{border:0;background:none;color:var(--ink-soft);font-size:16px;cursor:pointer;padding:0 4px}
+
+  .sp-chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+  .chip{height:36px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.55);color:var(--ink-soft);padding:0 14px;display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .14s}
+  .chip:hover{border-color:var(--ink);color:var(--ink)}
+  .chip.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .chip-dot{width:8px;height:8px;border-radius:50%}
+  .chip-n{font-size:11px;opacity:.7}
+
+  .sp-count{margin:26px 0 0;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+  .sp-grid{margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .r-card{display:flex;flex-direction:column;min-height:172px;background:rgba(255,255,255,.62);border:1.2px solid var(--line);border-radius:18px;padding:20px;text-decoration:none;color:var(--ink);transition:transform .16s,box-shadow .16s,border-color .16s}
+  .r-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(40,24,12,.08);border-color:rgba(17,17,17,.2)}
+  .r-card[hidden]{display:none}
+  .r-top{display:flex;align-items:center;gap:8px;margin-bottom:13px}
+  .r-badge{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;padding:3px 9px;border-radius:999px}
+  .r-tag{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);opacity:.7}
+  .r-card h3{font-family:var(--font-display);font-weight:800;font-size:16.5px;line-height:1.22;letter-spacing:-.02em;margin:0 0 8px}
+  .r-card p{margin:0 0 14px;color:var(--ink-soft);font-size:13px;line-height:1.5}
+  .r-go{margin-top:auto;color:var(--coral);font-family:var(--font-display);font-weight:800;font-size:13.5px}
+  .sp-none{text-align:center;font-family:var(--font-mono);color:var(--ink-soft);font-size:15px;padding:36px 0}
+
+  @media(max-width:900px){.sp-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.sp-grid{grid-template-columns:1fr}.sp-search{max-width:none}}
+</style>

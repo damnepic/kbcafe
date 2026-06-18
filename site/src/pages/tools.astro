@@ -121,6 +121,7 @@ const total = live.length;
   .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   .t-card{display:grid;grid-template-columns:48px 1fr;gap:15px;align-items:center;background:rgba(255,255,255,.62);border:1.2px solid var(--line);border-radius:18px;padding:18px;text-decoration:none;color:var(--ink);transition:transform .16s,box-shadow .16s,border-color .16s}
   .t-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(40,24,12,.08);border-color:rgba(17,17,17,.2)}
+  .t-card[hidden]{display:none}
   .t-ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;color:#fff;flex-shrink:0}
   .t-ic svg{width:22px;height:22px}
   .t-body{min-width:0}

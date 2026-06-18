@@ -94,9 +94,9 @@ const refCount = REFERENCE.length + AI.length; // evergreen references + AI expl
 
   <!-- SEARCH -->
   <div class="search-wrap">
-    <form class="search" action="/tools" method="get">
+    <form class="search" action="/search" method="get">
       <span class="s-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
-      <input id="q" name="q" type="text" autocomplete="off" placeholder={`Search ${toolCount} tools: JSON, JWT, cron, base64, YAML…`} />
+      <input id="q" name="q" type="text" autocomplete="off" placeholder="Search tools, references &amp; AI topics: MCP, RAG, JSON, cron…" />
       <kbd class="s-key">/</kbd>
       <button type="submit">Search</button>
     </form>
