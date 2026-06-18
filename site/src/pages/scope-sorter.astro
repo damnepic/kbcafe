@@ -1,0 +1,111 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const SAMPLE = `User login and signup\nPassword reset\nDark mode\nPublic API\nTeam workspaces\nCSV export\nMobile app\nEmail notifications\nAdmin dashboard\nTwo-factor auth`;
+---
+<ToolPage
+  title="Scope Sorter, MoSCoW your roadmap, find the real MVP | KB Cafe"
+  description="Paste your feature list and sort it into Must / Should / Could / Won't. You decide the priorities, no invented timelines or AI guesses, just a clear MVP you control. Client-side."
+  path="/scope-sorter"
+  eyebrow="AI Explained · Tool"
+  h1="Scope Sorter"
+  tagline="Paste every feature you're considering and sort it into Must, Should, Could, and Won't. You make the calls; the tool just makes the MVP obvious. No fake timelines."
+>
+  <div class="pane">
+    <div class="pane-label"><span>Features, one per line</span><span class="ss-actions"><button class="link-btn" id="load">load</button><button class="link-btn" id="sample">sample</button></span></div>
+    <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="Paste your feature ideas, one per line, then click load…"></textarea>
+  </div>
+
+  <div class="ss-board" id="board"></div>
+  <p class="ss-mvp" id="mvp"></p>
+
+  <Fragment slot="explainer">
+    <h2>Scope is a decision, not a guess</h2>
+    <p>
+      Feature creep happens when everything feels essential. The MoSCoW method forces the call: every feature is a
+      <strong>Must</strong> (no launch without it), a <strong>Should</strong> (important, not vital), a
+      <strong>Could</strong> (nice if it&rsquo;s cheap), or a <strong>Won&rsquo;t</strong> (not this time). Your
+      MVP is simply the Must column. This tool deliberately won&rsquo;t estimate timelines or auto-grade your
+      ideas, those numbers would be made up. <em>You</em> own the priorities; it just lays them out.
+    </p>
+    <h3>How to use it</h3>
+    <ul>
+      <li>Paste your features and click <strong>load</strong>.</li>
+      <li>Tag each one. Be honest, if everything is a Must, nothing is.</li>
+      <li>The <strong>Must</strong> column is your MVP. The <strong>Won&rsquo;t</strong> column is the discipline.</li>
+    </ul>
+    <p class="note">
+      Your sort is saved in your browser (local only). Nothing is uploaded, and there&rsquo;s no AI judging your
+      roadmap, just a structure to think in.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why no time estimate?</summary>
+      <p>Because an honest estimate needs your team, stack, and unknowns, none of which a web tool has. A &ldquo;3 weeks&rdquo; label here would be fiction. The value is the prioritisation, which only you can do.</p>
+    </details>
+    <details class="faq"><summary>Is my roadmap uploaded?</summary>
+      <p>No. It&rsquo;s stored only in your browser&rsquo;s local storage and never sent anywhere.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Sanity-check an idea with the <a href="/launch-rubric">Launch Readiness Rubric</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .ss-actions{display:flex;gap:14px}.ta{min-height:120px}
+  .ss-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+  .col{border:1.5px solid var(--line);border-radius:14px;background:var(--paper-2);padding:12px;min-height:120px}
+  .col-h{font-family:var(--font-display);font-weight:800;font-size:14px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center}
+  .col-h .cnt{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  .col.must{border-color:rgba(238,75,43,.5)} .col.must .col-h{color:var(--coral-deep)}
+  .col.should .col-h{color:#9a7400} .col.could .col-h{color:#2b5cc4} .col.wont{opacity:.75}
+  .item{background:var(--cream);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:7px;font-size:13px}
+  .item-t{margin-bottom:6px;line-height:1.3}
+  .item-btns{display:flex;gap:4px}
+  .item-btns button{flex:1;font-family:var(--font-mono);font-size:10px;font-weight:700;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink-soft);padding:3px 0;cursor:pointer}
+  .item-btns button.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .ss-mvp{margin-top:18px;font-family:var(--font-mono);font-size:13.5px;padding:13px 15px;border-radius:11px;background:rgba(238,75,43,.08);color:var(--ink);line-height:1.5}
+  .ss-mvp b{color:var(--coral-deep)}
+  @media(max-width:760px){.ss-board{grid-template-columns:1fr 1fr}}
+  @media(max-width:460px){.ss-board{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const inEl = $('in');
+  const SAMPLE = inEl.getAttribute('data-sample') || '';
+  const KEY = 'kbcafe-scope';
+  const BUCKETS = [['must', 'Must'], ['should', 'Should'], ['could', 'Could'], ['wont', "Won't"]];
+  let items = []; // {t, b}
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(items)); } catch {} }
+  function load() {
+    const lines = inEl.value.split('\n').map(s => s.trim()).filter(Boolean);
+    items = lines.map(t => { const ex = items.find(i => i.t === t); return { t, b: ex ? ex.b : 'must' }; });
+    save(); render();
+  }
+  function render() {
+    const board = $('board'); board.innerHTML = '';
+    BUCKETS.forEach(([id, name]) => {
+      const inB = items.filter(i => i.b === id);
+      const col = document.createElement('div'); col.className = 'col ' + id;
+      col.innerHTML = `<div class="col-h">${name}<span class="cnt">${inB.length}</span></div>` + inB.map((it) => {
+        const gi = items.indexOf(it);
+        return `<div class="item"><div class="item-t">${esc(it.t)}</div><div class="item-btns">${BUCKETS.map(([bid, bn]) => `<button data-i="${gi}" data-b="${bid}" class="${it.b === bid ? 'on' : ''}">${bn[0]}</button>`).join('')}</div></div>`;
+      }).join('');
+      board.appendChild(col);
+    });
+    const musts = items.filter(i => i.b === 'must');
+    $('mvp').innerHTML = items.length
+      ? `Your MVP is the <b>${musts.length} Must</b> feature(s)${musts.length ? ': ' + musts.map(m => esc(m.t)).join(', ') : ''}. ${items.filter(i => i.b === 'wont').length} parked as Won't.`
+      : '';
+  }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  $('board').addEventListener('click', (e) => { const b = e.target.closest('button[data-b]'); if (!b) return; items[+b.dataset.i].b = b.dataset.b; save(); render(); });
+  $('load').addEventListener('click', load);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; load(); });
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.length) { items = s; inEl.value = s.map(i => i.t).join('\n'); render(); } else { inEl.value = SAMPLE; load(); } } catch { inEl.value = SAMPLE; load(); }
+</script>

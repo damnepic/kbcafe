@@ -1,0 +1,157 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="AI Architecture Generator (BYO key), describe an app, get an architecture | KB Cafe"
+  description="Describe what you want to build and get a clear architecture (components, data flow, risks, MVP), not code. Brings your own OpenAI or Anthropic key, stored only in your browser."
+  path="/ai-architecture-generator"
+  eyebrow="AI Explained · Tool · BYO key"
+  h1="AI Architecture Generator"
+  tagline="Describe what you want to build and get a clear architecture back, components, data flow, risks, and an MVP cut, not code. Uses your own API key, kept in your browser and sent only to your provider."
+>
+  <div class="ag-key">
+    <div class="row ag-prov" id="prov">
+      <button class="chip active" data-p="openai">OpenAI</button>
+      <button class="chip" data-p="anthropic">Anthropic</button>
+    </div>
+    <div class="ag-keyrow">
+      <input id="key" type="password" placeholder="sk-… (your API key)" autocomplete="off" />
+      <input id="model" type="text" class="ag-model" />
+      <button class="link-btn" id="forget">forget</button>
+    </div>
+    <p class="ag-keynote">🔒 Your key is stored only in <strong>this browser</strong> (localStorage) and sent <strong>directly to your provider</strong>, never to KB Cafe. You pay your provider for the call.</p>
+  </div>
+
+  <div class="pane">
+    <div class="pane-label"><span>What do you want to build?</span><button class="link-btn" id="sample">sample</button></div>
+    <textarea id="desc" class="ta" spellcheck="false" placeholder="e.g. A site where users upload PDFs and ask questions about them, with accounts and a free tier…"></textarea>
+  </div>
+  <div class="row" style="margin:14px 0"><button class="btn" id="gen">Generate architecture</button><span class="ag-status" id="status"></span></div>
+
+  <div class="ag-out" id="out" hidden></div>
+
+  <Fragment slot="explainer">
+    <h2>Architecture, not code</h2>
+    <p>
+      Before you write a line, the useful question is <em>what are the pieces and how do they connect?</em> This
+      tool takes a plain description and returns an <strong>architecture</strong>, the frontend, backend, storage,
+      any <a href="/what-is-rag">retrieval</a> layer, auth, the data flow, the risks, and a minimal first version,
+      so you can see the shape of the system. It deliberately doesn&rsquo;t write code; the value is the map, not
+      the bricks.
+    </p>
+    <h3>Why bring your own key</h3>
+    <p>
+      This is the one tool here that calls a real model, so it needs a key. KB Cafe stays true to its rule by
+      keeping it <strong>yours</strong>: the key lives in your browser and the request goes straight to OpenAI or
+      Anthropic, never through our servers. We never see your key, your prompt, or the output, and you only pay
+      your provider&rsquo;s normal rate.
+    </p>
+    <p class="note">
+      Because the call is browser-to-provider, the prompt that powers this is visible in the page, that&rsquo;s the
+      honest trade for a no-backend, no-cost-to-you design. Get a key from your provider&rsquo;s dashboard; a small,
+      cheap model is plenty for an architecture sketch.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does KB Cafe see my key or data?</summary>
+      <p>No. The key is in your browser&rsquo;s localStorage and the request goes directly to your provider&rsquo;s API. Nothing routes through KB Cafe, there&rsquo;s no backend here at all.</p>
+    </details>
+    <details class="faq"><summary>Why architecture instead of code?</summary>
+      <p>The hard part of building isn&rsquo;t typing, it&rsquo;s deciding the components and how data flows. A good architecture sketch makes the code obvious and catches problems early.</p>
+    </details>
+    <details class="faq"><summary>What does it cost?</summary>
+      <p>Whatever your provider charges for the tokens, usually a fraction of a cent on a small model. Estimate it with the <a href="/llm-cost-calculator">Cost Calculator</a>.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Design the agent flow in the <a href="/ai-pattern-builder">Pattern Builder</a>, map the concepts with the <a href="/ai-stack-explainer">Stack Explainer</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .ag-key{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:15px 16px;margin-bottom:18px}
+  .ag-prov{margin-bottom:11px}
+  .ag-keyrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .ag-keyrow input{font-family:var(--font-mono);font-size:13.5px;border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--paper);color:var(--ink);outline:0}
+  #key{flex:1;min-width:200px} .ag-model{width:200px}
+  .ag-keyrow input:focus{border-color:var(--ink)}
+  .ag-keynote{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);line-height:1.5;margin:10px 0 0}
+  .ta{min-height:120px}
+  .ag-status{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+  .ag-out{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:20px 22px;line-height:1.6}
+  .ag-out h3{font-family:var(--font-display);font-weight:800;font-size:19px;margin:18px 0 8px;letter-spacing:-.02em}
+  .ag-out h3:first-child{margin-top:0}
+  .ag-out h4{font-family:var(--font-display);font-weight:800;font-size:15px;margin:14px 0 5px}
+  .ag-out p{margin:0 0 10px;color:var(--ink)}
+  .ag-out ul,.ag-out ol{margin:0 0 12px;padding-left:22px}
+  .ag-out li{margin-bottom:4px;color:var(--ink-soft);line-height:1.5}
+  .ag-out strong{color:var(--ink)}
+  .ag-out code{font-family:var(--font-mono);font-size:12.5px;background:var(--paper-2);padding:1px 5px;border-radius:5px}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const DEFAULTS = { openai: 'gpt-4o-mini', anthropic: 'claude-3-5-sonnet-latest' };
+  let prov = 'openai';
+  const SYS = "You are a senior software architect. Given a product description, output a clear ARCHITECTURE, not code. Use markdown with these sections: ## Overview, ## Components (cover Frontend, Backend, Storage/DB, AI / Retrieval if relevant, Auth, Integrations), ## Data flow (a numbered list), ## Key risks, ## MVP scope (the smallest first version). Be concrete and concise. Do NOT write code or commands.";
+  const SAMPLE = "A web app where users upload PDFs and ask questions about them in a chat. Accounts with a free tier (3 PDFs) and a paid tier. Answers should cite the source page.";
+
+  function keyId() { return 'kbcafe-key-' + prov; }
+  function loadKey() { try { $('key').value = localStorage.getItem(keyId()) || ''; } catch {} $('model').value = DEFAULTS[prov]; }
+  function saveKey() { try { localStorage.setItem(keyId(), $('key').value.trim()); } catch {} }
+
+  // tiny markdown renderer (headings, bold, lists, paragraphs)
+  function md(src) {
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const lines = esc(src).split('\n'); let html = '', list = '';
+    const closeList = () => { if (list) { html += `<${list.tag}>${list.items}</${list.tag}>`; list = ''; } };
+    lines.forEach(raw => {
+      let l = raw.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>');
+      if (/^###?\s+/.test(raw)) { closeList(); const lvl = raw.startsWith('### ') ? 'h4' : 'h3'; html += `<${lvl}>${l.replace(/^#+\s+/, '')}</${lvl}>`; }
+      else if (/^\s*[-*]\s+/.test(raw)) { if (!list || list.tag !== 'ul') { closeList(); list = { tag: 'ul', items: '' }; } list.items += `<li>${l.replace(/^\s*[-*]\s+/, '')}</li>`; }
+      else if (/^\s*\d+\.\s+/.test(raw)) { if (!list || list.tag !== 'ol') { closeList(); list = { tag: 'ol', items: '' }; } list.items += `<li>${l.replace(/^\s*\d+\.\s+/, '')}</li>`; }
+      else if (raw.trim() === '') { closeList(); }
+      else { closeList(); html += `<p>${l}</p>`; }
+    });
+    closeList(); return html;
+  }
+
+  async function generate() {
+    const key = $('key').value.trim(), model = $('model').value.trim() || DEFAULTS[prov], desc = $('desc').value.trim();
+    if (!key) { $('status').textContent = 'Enter your API key first.'; return; }
+    if (!desc) { $('status').textContent = 'Describe what you want to build.'; return; }
+    saveKey(); $('gen').disabled = true; $('status').textContent = 'Generating…'; $('out').hidden = true;
+    try {
+      let text;
+      if (prov === 'openai') {
+        const r = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+          body: JSON.stringify({ model, temperature: 0.4, messages: [{ role: 'system', content: SYS }, { role: 'user', content: desc }] }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error ? d.error.message : ('HTTP ' + r.status));
+        text = d.choices[0].message.content;
+      } else {
+        const r = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model, max_tokens: 1800, system: SYS, messages: [{ role: 'user', content: desc }] }),
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error ? d.error.message : ('HTTP ' + r.status));
+        text = d.content[0].text;
+      }
+      $('out').innerHTML = md(text); $('out').hidden = false; $('status').textContent = 'Done. (You paid your provider for this call.)';
+    } catch (e) {
+      $('status').textContent = 'Error: ' + ((e && e.message) || 'request failed') + '. Check the key, model name, and your provider account.';
+    } finally { $('gen').disabled = false; }
+  }
+
+  $('prov').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#prov .chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); prov = b.dataset.p; loadKey(); });
+  $('key').addEventListener('change', saveKey);
+  $('forget').addEventListener('click', () => { try { localStorage.removeItem(keyId()); } catch {} $('key').value = ''; $('status').textContent = 'Key forgotten.'; });
+  $('sample').addEventListener('click', () => { $('desc').value = SAMPLE; });
+  $('gen').addEventListener('click', generate);
+  loadKey();
+</script>

@@ -2,7 +2,7 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="Context Budget Analyzer — what's eating your context window | KB Cafe"
+  title="Context Budget Analyzer, what's eating your context window | KB Cafe"
   description="Paste your prompt and the files or docs you send to an LLM and see exactly what fills the context window, the biggest offenders, and what to drop first. Real tokenizer, client-side."
   path="/context-budget-analyzer"
   eyebrow="AI Explained · Tool"
@@ -190,7 +190,7 @@ import ToolPage from '../layouts/ToolPage.astro';
   files = [
     { id: ++seed, name: 'system prompt', body: 'You are a senior engineer. Answer with code, cite file paths, never invent APIs.' },
     { id: ++seed, name: 'auth.ts', body: `export async function authenticate(req) {\n  const token = req.headers.authorization?.split(' ')[1];\n  if (!token) throw new Error('missing token');\n  return verifyJwt(token);\n}` },
-    { id: ++seed, name: 'api-reference.md', body: `# API Reference\nGET /users — list users\nPOST /users — create a user\nGET /users/:id — fetch one user\nPATCH /users/:id — update fields\nDELETE /users/:id — remove a user` },
+    { id: ++seed, name: 'api-reference.md', body: `# API Reference\nGET /users, list users\nPOST /users, create a user\nGET /users/:id, fetch one user\nPATCH /users/:id, update fields\nDELETE /users/:id, remove a user` },
   ];
   renderFiles(); calc();
 </script>

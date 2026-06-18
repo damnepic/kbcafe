@@ -1,0 +1,99 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const SAMPLE = `You are a senior copy editor. Summarize the article below in exactly 3 bullet points, then suggest one headline. Keep it neutral and under 60 words. Return JSON: { "bullets": string[], "headline": string }.\n\nArticle: ...`;
+---
+<ToolPage
+  title="Prompt X-Ray, see the structure of your prompt | KB Cafe"
+  description="Break a prompt into its parts, role, task, context, constraints, output format, and examples, and see what's present and what's missing. Rule-based, client-side, nothing uploaded."
+  path="/prompt-x-ray"
+  eyebrow="AI Explained · Tool"
+  h1="Prompt X-Ray"
+  tagline="See the anatomy of your prompt: which of the six building blocks (role, task, context, constraints, format, examples) it contains, and which are missing. A structural read, not a grade."
+>
+  <div class="pane">
+    <div class="pane-label"><span>Your prompt</span><span class="xr-actions"><button class="link-btn" id="sample">sample</button><button class="link-btn" id="clear">clear</button></span></div>
+    <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="Paste a prompt to x-ray…"></textarea>
+  </div>
+
+  <div class="xr-summary" id="summary"></div>
+  <div class="xr-parts" id="parts"></div>
+
+  <Fragment slot="explainer">
+    <h2>The anatomy of a good prompt</h2>
+    <p>
+      Strong prompts tend to contain the same building blocks: a <strong>role</strong> to set tone and expertise, a
+      clear <strong>task</strong>, the <strong>context</strong> to work from, <strong>constraints</strong> (length,
+      style, rules), an explicit <strong>output format</strong>, and sometimes <strong>examples</strong>. This x-ray
+      detects which blocks are present so you can see your prompt&rsquo;s shape at a glance and spot what&rsquo;s
+      missing, the format and constraints are the ones people forget most.
+    </p>
+    <p class="note">
+      This is a <strong>structural read, not a verdict.</strong> A missing block isn&rsquo;t automatically wrong,
+      some great prompts are deliberately minimal. It uses pattern matching, not a model, so it&rsquo;s instant and
+      private. Pair it with the <a href="/prompt-linter">Prompt Linter</a> for quality checks.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>What&rsquo;s the difference from the Prompt Linter?</summary>
+      <p>The x-ray shows <em>structure</em> (which parts exist). The <a href="/prompt-linter">linter</a> flags <em>problems</em> (vague words, conflicts, missing format). Use them together.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No. Detection runs entirely in your browser, so the prompt stays on your device.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Lint quality with the <a href="/prompt-linter">Prompt Linter</a>, compare versions with <a href="/prompt-diff">Prompt Diff</a>, or pin output shape with <a href="/what-are-structured-outputs">structured outputs</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .xr-actions{display:flex;gap:14px}
+  .ta{min-height:150px}
+  .xr-summary{margin:20px 0 14px;font-family:var(--font-mono);font-size:14px;color:var(--ink)}
+  .xr-summary b{color:var(--ink);font-weight:800}
+  .xr-parts{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .part{border:1.5px solid var(--line);border-radius:13px;padding:13px 15px;background:var(--cream)}
+  .part.on{border-color:rgba(15,159,130,.45)} .part.off{opacity:.85;border-style:dashed}
+  .part-h{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .part-ic{font-family:var(--font-mono);font-weight:800;font-size:13px}
+  .part.on .part-ic{color:#2f7d32} .part.off .part-ic{color:var(--ink-soft)}
+  .part-nm{font-family:var(--font-display);font-weight:800;font-size:15px}
+  .part-snip{font-family:var(--font-mono);font-size:12px;color:var(--ink);background:var(--paper-2);border-radius:6px;padding:4px 8px;margin-top:4px;display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .part-miss{font-size:12.5px;color:var(--ink-soft);line-height:1.4}
+  @media(max-width:560px){.xr-parts{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const inEl = $('in');
+  const SAMPLE = inEl.getAttribute('data-sample') || '';
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const PARTS = [
+    { key: 'role', name: 'Role', re: /((?:^|\n)\s*(?:you are|act as|you'?re a|as an? )[^.!?\n]*)/i, miss: 'No persona. “You are a…” anchors tone and expertise.' },
+    { key: 'task', name: 'Task', re: /\b((?:write|summari[sz]e|classif|extract|translate|generate|explain|create|list|analy[sz]e|review|fix|convert|draft|compose|rewrite)[a-z]*\b[^.!?\n]*)/i, miss: 'No clear instruction verb. State the action to perform.' },
+    { key: 'context', name: 'Context', re: /\b(below|following|here is|here'?s|context:|article:|text:|given the|based on the)\b[^\n]*/i, miss: 'No material to work from. Provide or reference the input.' },
+    { key: 'constraints', name: 'Constraints', re: /\b(must|only|never|always|exactly|at most|no more than|under \d+|in \d+|limit|keep it|don'?t|do not|neutral|formal|concise)\b[^.!?\n]*/i, miss: 'No limits on length, style, or rules.' },
+    { key: 'format', name: 'Output format', re: /\b(json|markdown|bullet|numbered|table|csv|schema|format:|return (?:a|the)|as (?:a )?(?:list|table))\b[^.!?\n]*/i, miss: 'No output shape. Say exactly what to return (list, JSON…).' },
+    { key: 'examples', name: 'Examples', re: /\b(example|e\.g\.|for instance|sample|like this)\b[^.!?\n]*/i, miss: 'No examples. Few-shot examples improve consistency.' },
+  ];
+
+  function run() {
+    const t = inEl.value;
+    let present = 0;
+    $('parts').innerHTML = PARTS.map(p => {
+      const m = t.match(p.re);
+      const on = !!(m && m[0].trim());
+      if (on) present++;
+      const snip = on ? `<span class="part-snip" title="${esc(m[0].trim())}">${esc(m[0].trim().slice(0, 70))}</span>` : `<span class="part-miss">${p.miss}</span>`;
+      return `<div class="part ${on ? 'on' : 'off'}"><div class="part-h"><span class="part-ic">${on ? '✓' : '○'}</span><span class="part-nm">${p.name}</span></div>${snip}</div>`;
+    }).join('');
+    $('summary').innerHTML = t.trim() ? `<b>${present}</b> of <b>6</b> building blocks present.` + (present < 6 ? ' The dashed ones are worth considering.' : ' Well-structured.') : 'Paste a prompt to see its anatomy.';
+  }
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; run(); });
+  $('clear').addEventListener('click', () => { inEl.value = ''; run(); inEl.focus(); });
+  inEl.value = SAMPLE; run();
+</script>

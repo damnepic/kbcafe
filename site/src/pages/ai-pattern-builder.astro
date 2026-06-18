@@ -1,0 +1,200 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="AI Pattern Builder, design an agent flow, export scaffolding | KB Cafe"
+  description="Compose AI agent patterns (router, reflection, judge, verification, human-in-the-loop) into a flow, see the diagram, and export starter scaffolding for OpenAI, LangGraph, and CrewAI. Client-side."
+  path="/ai-pattern-builder"
+  eyebrow="AI Explained · Tool"
+  h1="AI Pattern Builder"
+  tagline="Compose the building blocks of an AI agent into a flow, see the diagram, and export starter scaffolding for OpenAI, LangGraph, or CrewAI. Learn how agents are architected by building one."
+>
+  <div class="pb-cols">
+    <div class="pb-palette">
+      <div class="pb-h">Building blocks</div>
+      <div id="palette"></div>
+    </div>
+    <div class="pb-pipe">
+      <div class="pb-h">Your flow <button class="link-btn" id="reset">reset</button></div>
+      <div class="pb-flow" id="flow"></div>
+    </div>
+  </div>
+
+  <div class="pb-export">
+    <div class="row pb-tabs" id="tabs">
+      <button class="chip active" data-t="pseudo">Pseudocode</button>
+      <button class="chip" data-t="openai">OpenAI</button>
+      <button class="chip" data-t="langgraph">LangGraph</button>
+      <button class="chip" data-t="crewai">CrewAI</button>
+    </div>
+    <div class="pane">
+      <div class="pane-label"><span id="exp-label">Pseudocode</span><button class="link-btn" id="copy">copy</button></div>
+      <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+    </div>
+    <p class="pb-note">Starter scaffolding to adapt, not runnable production code. It mirrors the flow above so you can see how the pattern maps to each framework.</p>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>Agents are patterns, not magic</h2>
+    <p>
+      Almost every &ldquo;AI agent&rdquo; is a small number of <a href="/ai-patterns">patterns</a> wired together:
+      a <strong>router</strong> picks a path, a <strong>planner</strong> breaks down the task, a
+      <strong>generator</strong> drafts, <strong>reflection</strong> critiques and revises, a
+      <strong>judge</strong> scores options, <strong>verification</strong> checks the result, and a human
+      approves the risky steps. Build a flow here and watch how the same shape expresses itself as an OpenAI loop,
+      a LangGraph graph, or a CrewAI crew.
+    </p>
+    <h3>How to use it</h3>
+    <ul>
+      <li>Add blocks from the palette; reorder or remove them to shape the flow.</li>
+      <li>The diagram updates live, and each block links to the concept it implements.</li>
+      <li>Switch export tabs to see the same flow as scaffolding in three popular frameworks.</li>
+    </ul>
+    <p class="note">
+      The export is <strong>deterministic scaffolding</strong>, the same flow always produces the same code, with
+      no model involved. It&rsquo;s a starting point you fill in, not a finished agent. Everything runs in your browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Is the exported code runnable?</summary>
+      <p>It&rsquo;s a scaffold: the structure, the steps, and the wiring, with TODOs where your prompts and tools go. Think of it as a labelled skeleton that saves you the boilerplate, not a working agent.</p>
+    </details>
+    <details class="faq"><summary>Does it call a model?</summary>
+      <p>No. The builder and the code generation are pure and deterministic, so it&rsquo;s instant, free, and private.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Read the <a href="/ai-patterns">AI Patterns Library</a>, compare them in the <a href="/ai-pattern-explorer">Pattern Explorer</a>, or see <a href="/what-is-tool-calling">tool calling</a> and <a href="/what-is-agent-memory">agent memory</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .pb-cols{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
+  .pb-h{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
+  #palette{display:flex;flex-direction:column;gap:7px}
+  .pal{display:flex;flex-direction:column;gap:2px;text-align:left;border:1.5px solid var(--line);border-radius:11px;background:var(--cream);padding:9px 11px;cursor:pointer;transition:border-color .14s,transform .12s}
+  .pal:hover{border-color:var(--ink);transform:translateX(2px)}
+  .pal .pn{font-family:var(--font-display);font-weight:800;font-size:13.5px;display:flex;align-items:center;gap:7px}
+  .pal .pd{font-size:11.5px;color:var(--ink-soft);line-height:1.35}
+  .pal .pdot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+
+  .pb-flow{display:flex;flex-direction:column;align-items:center;gap:0;border:1.5px dashed var(--line);border-radius:16px;padding:18px;min-height:200px;background:var(--paper-2)}
+  .node{width:100%;max-width:340px;border:1.5px solid var(--ink);border-radius:12px;background:var(--cream);padding:11px 14px;display:flex;align-items:center;gap:10px;box-shadow:4px 4px 0 rgba(30,24,19,.07)}
+  .node .ndot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+  .node .nn{font-family:var(--font-display);font-weight:800;font-size:14px}
+  .node .nlink{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--coral);text-decoration:none}
+  .node .nlink:hover{text-decoration:underline}
+  .node.fixed{border-style:solid;background:var(--ink);color:var(--cream)}
+  .node .nctl{display:flex;gap:6px;margin-left:auto}
+  .node .nb{font-family:var(--font-mono);font-size:12px;background:none;border:0;cursor:pointer;color:var(--ink-soft);line-height:1}
+  .node .nb:hover{color:var(--coral-deep)}
+  .arrow{width:2px;height:20px;background:var(--ink-soft);position:relative;opacity:.5}
+  .arrow::after{content:"";position:absolute;bottom:0;left:-3px;border:4px solid transparent;border-top-color:var(--ink-soft)}
+  .pb-empty{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);text-align:center;padding:30px 0}
+
+  .pb-export{margin-top:24px}
+  .pb-tabs{margin-bottom:12px}
+  .pane{display:flex;flex-direction:column;gap:9px}
+  .pane-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .ta{min-height:300px}
+  .pb-note{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);margin-top:8px;opacity:.85}
+  @media(max-width:720px){.pb-cols{grid-template-columns:1fr}}
+</style>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const C = { plan: '#7657ff', route: '#3478f6', gen: '#ee4b2b', quality: '#0f9f82', mem: '#e0911a', tool: '#f4842a', human: '#6F4E37' };
+  const BLOCKS = {
+    planner:   { name: 'Planner',           color: C.plan,    desc: 'Break the task into steps', link: '/ai-patterns' },
+    router:    { name: 'Router',            color: C.route,   desc: 'Pick a path or tool',       link: '/ai-patterns/router' },
+    retrieval: { name: 'Retrieval (RAG)',   color: C.route,   desc: 'Fetch relevant context',    link: '/what-is-rag' },
+    tool:      { name: 'Tool call',         color: C.tool,    desc: 'Call a function or API',     link: '/what-is-tool-calling' },
+    generate:  { name: 'Generator',         color: C.gen,     desc: 'Draft an answer',           link: '/what-are-structured-outputs' },
+    reflect:   { name: 'Reflection',        color: C.quality, desc: 'Self-critique and revise',  link: '/ai-patterns/reflection' },
+    judge:     { name: 'Judge',             color: C.quality, desc: 'Score candidate answers',   link: '/ai-patterns/judge' },
+    verify:    { name: 'Verification',      color: C.quality, desc: 'Check against criteria',    link: '/ai-patterns/verification' },
+    memory:    { name: 'Memory',            color: C.mem,     desc: 'Store and recall facts',    link: '/what-is-agent-memory' },
+    human:     { name: 'Human-in-the-loop', color: C.human,  desc: 'A human approves',          link: '/ai-patterns/human-in-the-loop' },
+  };
+  const DEFAULT = ['planner', 'retrieval', 'generate', 'reflect'];
+  let pipe = [...DEFAULT];
+
+  function renderPalette() {
+    $('palette').innerHTML = Object.entries(BLOCKS).map(([id, b]) =>
+      `<button class="pal" data-add="${id}"><span class="pn"><span class="pdot" style="background:${b.color}"></span>${b.name}</span><span class="pd">${b.desc}</span></button>`).join('');
+  }
+  function renderFlow() {
+    const flow = $('flow');
+    const seq = ['__input', ...pipe, '__answer'];
+    flow.innerHTML = seq.map((id, i) => {
+      let node;
+      if (id === '__input') node = `<div class="node fixed"><span class="nn">User input</span></div>`;
+      else if (id === '__answer') node = `<div class="node fixed"><span class="nn">Answer</span></div>`;
+      else { const b = BLOCKS[id], pos = i - 1;
+        node = `<div class="node"><span class="ndot" style="background:${b.color}"></span><span class="nn">${b.name}</span>
+          <span class="nctl"><a class="nlink" href="${b.link}">learn</a><button class="nb" data-up="${pos}" title="up">▲</button><button class="nb" data-down="${pos}" title="down">▼</button><button class="nb" data-rm="${pos}" title="remove">✕</button></span></div>`; }
+      return node + (i < seq.length - 1 ? '<div class="arrow"></div>' : '');
+    }).join('');
+    if (!pipe.length) flow.insertAdjacentHTML('afterbegin', '');
+    genCode();
+  }
+
+  // ---- code export ----
+  const label = { pseudo: 'Pseudocode', openai: 'OpenAI', langgraph: 'LangGraph', crewai: 'CrewAI' };
+  let tab = 'pseudo';
+  const stepNote = { planner: 'plan = decompose(task)', router: 'route = choose_path(task)', retrieval: 'ctx = retrieve(task)  # vector search', tool: 'result = call_tool(args)', generate: 'draft = llm(prompt + context)', reflect: 'draft = reflect_and_revise(draft)', judge: 'best = judge(candidates)', verify: 'assert verify(draft, criteria)', memory: 'memory.save(facts); ctx += memory.recall(task)', human: 'draft = await human_review(draft)' };
+
+  function genCode() {
+    const steps = pipe;
+    let code = '';
+    if (tab === 'pseudo') {
+      code = 'function agent(task):\n  input = task\n';
+      steps.forEach(s => { code += `  ${stepNote[s] || s}\n`; });
+      code += '  return answer';
+    } else if (tab === 'openai') {
+      code = `from openai import OpenAI\nclient = OpenAI()\n\ndef agent(task: str) -> str:\n    ctx = ""\n`;
+      steps.forEach(s => {
+        if (s === 'retrieval') code += `    ctx += retrieve(task)  # TODO: vector search\n`;
+        else if (s === 'tool') code += `    # TODO: define tools=[...] and handle tool_calls in the loop\n`;
+        else if (s === 'memory') code += `    ctx += memory_recall(task)  # TODO\n`;
+        else if (s === 'human') code += `    draft = human_review(draft)  # TODO: pause for approval\n`;
+        else if (s === 'reflect') code += `    draft = reflect(client, draft)  # critique + revise\n`;
+        else if (s === 'judge') code += `    draft = judge(client, candidates)  # score + pick\n`;
+        else if (s === 'verify') code += `    assert verify(draft)  # check criteria, else retry\n`;
+        else if (s === 'planner') code += `    plan = client.chat.completions.create(model="gpt-4o", messages=[{"role":"user","content":f"Plan: {task}"}])\n`;
+        else if (s === 'generate') code += `    draft = client.chat.completions.create(model="gpt-4o", messages=[{"role":"user","content":f"{ctx}\\n{task}"}]).choices[0].message.content\n`;
+      });
+      code += `    return draft`;
+    } else if (tab === 'langgraph') {
+      code = `from langgraph.graph import StateGraph, START, END\n\ng = StateGraph(dict)\n`;
+      steps.forEach(s => { code += `g.add_node("${s}", ${s}_node)  # ${BLOCKS[s].desc}\n`; });
+      const order = ['START', ...steps.map(s => `"${s}"`), 'END'];
+      for (let i = 0; i < order.length - 1; i++) {
+        const a = order[i] === 'START' ? 'START' : order[i], b = order[i + 1] === 'END' ? 'END' : order[i + 1];
+        code += `g.add_edge(${a}, ${b})\n`;
+      }
+      code += `app = g.compile()`;
+    } else if (tab === 'crewai') {
+      code = `from crewai import Agent, Task, Crew, Process\n\n`;
+      steps.forEach(s => { code += `${s} = Agent(role="${BLOCKS[s].name}", goal="${BLOCKS[s].desc}", backstory="TODO")\n`; });
+      code += `\ncrew = Crew(\n  agents=[${steps.join(', ')}],\n  tasks=[Task(description=task, agent=${steps[0] || 'generate'})],\n  process=Process.sequential,\n)\nresult = crew.kickoff()`;
+    }
+    $('out').value = code;
+    $('exp-label').textContent = label[tab];
+  }
+
+  $('palette').addEventListener('click', (e) => { const b = e.target.closest('[data-add]'); if (!b) return; pipe.push(b.dataset.add); renderFlow(); });
+  $('flow').addEventListener('click', (e) => {
+    const up = e.target.closest('[data-up]'), dn = e.target.closest('[data-down]'), rm = e.target.closest('[data-rm]');
+    if (up) { const i = +up.dataset.up; if (i > 0) { [pipe[i - 1], pipe[i]] = [pipe[i], pipe[i - 1]]; renderFlow(); } }
+    else if (dn) { const i = +dn.dataset.down; if (i < pipe.length - 1) { [pipe[i + 1], pipe[i]] = [pipe[i], pipe[i + 1]]; renderFlow(); } }
+    else if (rm) { pipe.splice(+rm.dataset.rm, 1); renderFlow(); }
+  });
+  $('tabs').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#tabs .chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); tab = b.dataset.t; genCode(); });
+  $('reset').addEventListener('click', () => { pipe = [...DEFAULT]; renderFlow(); });
+  $('copy').addEventListener('click', async () => { if (!$('out').value) return; try { await navigator.clipboard.writeText($('out').value); } catch {} });
+
+  renderPalette(); renderFlow();
+</script>

@@ -1,0 +1,138 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+
+// concept → its explainer page
+const CONCEPTS = {
+  context: { name: 'Context window', href: '/what-is-a-context-window', blurb: 'Holds the prompt, history, and retrieved text the model reads each turn.' },
+  rag: { name: 'RAG / retrieval', href: '/what-is-rag', blurb: 'Pulls relevant documents in at query time so answers are grounded in real sources.' },
+  embeddings: { name: 'Embeddings', href: '/what-are-embeddings', blurb: 'Turns text into vectors that capture meaning, the engine behind semantic search.' },
+  vectordb: { name: 'Vector database', href: '/what-is-a-vector-database', blurb: 'Stores embeddings and finds the nearest ones fast, the backbone of retrieval.' },
+  tools: { name: 'Tool calling', href: '/what-is-tool-calling', blurb: 'Lets the model call functions and APIs, browse, run code, take actions.' },
+  structured: { name: 'Structured outputs', href: '/what-are-structured-outputs', blurb: 'Forces the model to return valid JSON to a schema, citations, fields, arguments.' },
+  mcp: { name: 'MCP', href: '/what-is-mcp', blurb: 'A standard for connecting tools and data sources to an AI app.' },
+  memory: { name: 'Agent memory', href: '/what-is-agent-memory', blurb: 'Persists facts across turns, since the model itself is stateless.' },
+};
+
+const PRODUCTS = [
+  { id: 'chatgpt', label: 'ChatGPT', uses: [['context', 'Keeps your conversation in the window each turn.'], ['tools', 'Browsing, code, and custom GPT actions are tool calls.'], ['structured', 'Function/tool arguments come back as structured JSON.'], ['memory', 'The "memory" feature persists facts between chats.'], ['rag', 'File search and browsing retrieve outside content.']] },
+  { id: 'claude', label: 'Claude', uses: [['context', 'A large window holds long documents and history.'], ['tools', 'Tool use lets it call your functions.'], ['mcp', 'Anthropic created MCP to connect tools and data.'], ['structured', 'Tool inputs are schema-constrained JSON.']] },
+  { id: 'cursor', label: 'Cursor', uses: [['rag', 'Indexes your repo and retrieves relevant files.'], ['embeddings', 'Code is embedded so it can be searched by meaning.'], ['vectordb', 'Those embeddings live in a vector index.'], ['tools', 'It edits files and runs commands via tools.'], ['context', 'Surrounding code fills the window.']] },
+  { id: 'perplexity', label: 'Perplexity', uses: [['rag', 'Every answer retrieves live web sources.'], ['embeddings', 'Search ranks results by semantic relevance.'], ['structured', 'Citations are returned as structured references.'], ['context', 'Retrieved snippets fill the window.']] },
+  { id: 'copilot', label: 'GitHub Copilot', uses: [['context', 'Your surrounding code is the context.'], ['rag', 'Agent mode retrieves across the repo.'], ['tools', 'It runs tools to edit and execute code.']] },
+  { id: 'support', label: 'A support bot', uses: [['rag', 'Answers from your help-center / knowledge base.'], ['embeddings', 'Articles are embedded for semantic lookup.'], ['vectordb', 'Embeddings are stored and queried in a vector DB.'], ['structured', 'Extracts ticket fields as structured JSON.'], ['memory', 'Remembers the customer across the conversation.']] },
+  { id: 'coding-agent', label: 'A coding agent', uses: [['tools', 'Reads, edits, and runs code through tools.'], ['mcp', 'Connects to editors and services via MCP.'], ['memory', 'Tracks the task and prior steps.'], ['context', 'Files and history fill the window.']] },
+];
+
+const KW = [
+  [/search|web|answer|cite|source|research/i, ['rag', 'embeddings', 'vectordb']],
+  [/code|repo|ide|editor|refactor|program/i, ['tools', 'rag', 'context']],
+  [/chat|assistant|conversation|companion/i, ['context', 'memory']],
+  [/pdf|doc|knowledge|upload|file|manual|wiki/i, ['rag', 'embeddings', 'vectordb']],
+  [/json|api|structured|extract|field|schema/i, ['structured']],
+  [/tool|action|function|agent|automat|workflow/i, ['tools', 'mcp']],
+  [/remember|personal|memory|history|profile/i, ['memory']],
+];
+---
+<ToolPage
+  title="AI Stack Explainer, what's under the hood of an AI product | KB Cafe"
+  description="Pick an AI product (or describe one) and see the building blocks it likely uses, context windows, RAG, embeddings, tool calling, MCP, and more, each explained and linked. Client-side."
+  path="/ai-stack-explainer"
+  eyebrow="AI Explained · Tool"
+  h1="AI Stack Explainer"
+  tagline="Pick an AI product, or describe your own, and see the building blocks it likely runs on, each one explained and linked. A map from the products you use to the concepts behind them."
+>
+  <div class="se-pick" id="pick">
+    {PRODUCTS.map(p => <button class="chip" data-p={p.id}>{p.label}</button>)}
+  </div>
+  <div class="se-custom">
+    <input id="desc" type="text" placeholder="…or describe any AI product (e.g. “an app that answers questions about my PDFs”)" />
+  </div>
+
+  <div class="se-stack" id="stack"></div>
+  <p class="se-note">An educational illustration of the building blocks a product like this <em>typically</em> uses, inferred from how it behaves, not confidential architecture.</p>
+
+  <Fragment slot="explainer">
+    <h2>From the products you use to the concepts behind them</h2>
+    <p>
+      Every AI product is a stack of a few recurring building blocks. The same handful, a
+      <a href="/what-is-a-context-window">context window</a>, <a href="/what-is-rag">retrieval</a> over
+      <a href="/what-are-embeddings">embeddings</a> in a <a href="/what-is-a-vector-database">vector database</a>,
+      <a href="/what-is-tool-calling">tool calling</a>, <a href="/what-are-structured-outputs">structured
+      outputs</a>, <a href="/what-is-mcp">MCP</a>, and <a href="/what-is-agent-memory">memory</a>, show up again
+      and again. Recognise them in the tools you already use and the whole field gets less mysterious.
+    </p>
+    <p class="note">
+      For the preset products, the mapping is a reasonable read of public behaviour, not inside knowledge. For your
+      own description, it&rsquo;s a keyword match meant to point you at the right concepts to learn, not a precise
+      spec. Everything runs in your browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Is this the real architecture of these products?</summary>
+      <p>It&rsquo;s an educated, public-behaviour read of the building blocks they almost certainly use, not leaked internals. The point is to connect familiar products to the concepts that power them.</p>
+    </details>
+    <details class="faq"><summary>How does the custom box work?</summary>
+      <p>It matches keywords in your description to the relevant concepts, an honest heuristic to point you at what to learn, not an AI analysis.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Start with <a href="/ai">AI Explained</a>, or jump to <a href="/what-is-rag">RAG</a>, <a href="/what-are-embeddings">embeddings</a>, and <a href="/what-is-tool-calling">tool calling</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .se-pick{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}
+  .se-custom{margin-bottom:22px}
+  .se-custom input{width:100%;font-family:var(--font-body);font-size:15px;border:1.5px solid var(--line);border-radius:13px;padding:13px 16px;background:var(--cream);color:var(--ink);outline:0}
+  .se-custom input:focus{border-color:var(--ink);box-shadow:5px 5px 0 rgba(238,75,43,.14)}
+  .se-stack{display:flex;flex-direction:column;gap:11px;min-height:80px}
+  .layer{display:grid;grid-template-columns:46px 1fr auto;gap:14px;align-items:center;border:1.5px solid var(--line);border-radius:15px;background:var(--cream);padding:15px 16px;transition:transform .14s,border-color .14s}
+  .layer:hover{transform:translateX(3px);border-color:var(--ink)}
+  .layer .num{font-family:var(--font-display);font-weight:800;font-size:20px;color:var(--ink-soft);text-align:center}
+  .layer .lname{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.02em;margin-bottom:3px}
+  .layer .lwhy{font-size:13px;color:var(--ink-soft);line-height:1.4}
+  .layer .lwhy .blurb{display:block;opacity:.8;margin-top:2px}
+  .layer .llink{font-family:var(--font-display);font-weight:800;font-size:13px;color:var(--coral);text-decoration:none;white-space:nowrap}
+  .layer .llink:hover{text-decoration:underline}
+  .se-empty{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);text-align:center;padding:28px 0}
+  .se-note{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);margin-top:14px;opacity:.85}
+  @media(max-width:560px){.layer{grid-template-columns:1fr;gap:6px}.layer .num{display:none}.layer .llink{margin-top:4px}}
+</style>
+
+<script is:inline define:vars={{ CONCEPTS, PRODUCTS, KW }}>
+  const $ = (id) => document.getElementById(id);
+  const byId = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
+
+  function renderConcepts(items) {
+    // items: array of [conceptId, whyText]
+    const stack = $('stack');
+    if (!items.length) { stack.innerHTML = '<p class="se-empty">Pick a product above, or describe one, to see its building blocks.</p>'; return; }
+    stack.innerHTML = items.map(([id, why], i) => {
+      const c = CONCEPTS[id]; if (!c) return '';
+      return `<div class="layer"><span class="num">${i + 1}</span>
+        <div><div class="lname">${c.name}</div><div class="lwhy">${why || ''}<span class="blurb">${c.blurb}</span></div></div>
+        <a class="llink" href="${c.href}">Learn →</a></div>`;
+    }).join('');
+  }
+
+  function fromProduct(id) { const p = byId[id]; if (p) renderConcepts(p.uses); }
+  function fromText(t) {
+    const order = ['context', 'rag', 'embeddings', 'vectordb', 'tools', 'structured', 'mcp', 'memory'];
+    const hit = new Set();
+    KW.forEach(([re, ids]) => { if (re.test(t)) ids.forEach(x => hit.add(x)); });
+    const items = order.filter(id => hit.has(id)).map(id => [id, 'Matched from your description.']);
+    if (!items.length && t.trim()) { renderConcepts([['context', 'Almost every AI product needs this.']]); return; }
+    renderConcepts(items);
+  }
+
+  $('pick').addEventListener('click', (e) => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    document.querySelectorAll('#pick .chip').forEach(c => c.classList.remove('active')); b.classList.add('active');
+    $('desc').value = ''; fromProduct(b.dataset.p);
+  });
+  $('desc').addEventListener('input', (e) => { document.querySelectorAll('#pick .chip').forEach(c => c.classList.remove('active')); if (e.target.value.trim()) fromText(e.target.value); else renderConcepts([]); });
+
+  // default
+  document.querySelector('#pick .chip[data-p="chatgpt"]').classList.add('active');
+  fromProduct('chatgpt');
+</script>

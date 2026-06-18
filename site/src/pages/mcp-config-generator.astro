@@ -2,7 +2,7 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="MCP Config Generator & Validator — build claude_desktop_config.json | KB Cafe"
+  title="MCP Config Generator & Validator, build claude_desktop_config.json | KB Cafe"
   description="Build a valid Model Context Protocol (MCP) server config for Claude Desktop, or paste an existing one to validate it. Free, fully client-side, nothing is uploaded."
   path="/mcp-config-generator"
   eyebrow="AI Explained · Tool"
@@ -191,7 +191,7 @@ import ToolPage from '../layouts/ToolPage.astro';
       } else {
         if (!('command' in s)) out.push(finding('err', `<code>${escHtml(name)}</code>: missing <code>command</code>.`));
         else if (typeof s.command !== 'string' || !s.command.trim()) out.push(finding('err', `<code>${escHtml(name)}</code>: <code>command</code> must be a non-empty string.`));
-        if (!('args' in s)) out.push(finding('warn', `<code>${escHtml(name)}</code>: no <code>args</code> (defaults to none) — usually you want an array.`));
+        if (!('args' in s)) out.push(finding('warn', `<code>${escHtml(name)}</code>: no <code>args</code> (defaults to none), usually you want an array.`));
         else if (!Array.isArray(s.args)) out.push(finding('err', `<code>${escHtml(name)}</code>: <code>args</code> must be an array of strings.`));
         else if (!s.args.every(a => typeof a === 'string')) out.push(finding('err', `<code>${escHtml(name)}</code>: every item in <code>args</code> must be a string.`));
       }

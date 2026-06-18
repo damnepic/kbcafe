@@ -1,0 +1,207 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Agent Memory Simulator, how AI memory actually works | KB Cafe"
+  description="Models are stateless. See how a sliding context window, summary buffer, and retrieval keep (or lose) facts across a conversation, and what the model actually sees each turn. Client-side."
+  path="/agent-memory-simulator"
+  eyebrow="AI Explained · Tool"
+  h1="Agent Memory Simulator"
+  tagline="Models don't remember anything, memory is engineered around them. Step through a conversation and watch a sliding window, a summary buffer, and retrieval keep or drop facts, and see exactly what the model sees each turn."
+>
+  <div class="am-controls">
+    <div class="am-grp"><span class="am-lbl">Memory strategy</span>
+      <div class="row" id="strat">
+        <button class="chip active" data-s="window">Sliding window</button>
+        <button class="chip" data-s="summary">+ Summary</button>
+        <button class="chip" data-s="retrieval">+ Retrieval</button>
+      </div>
+    </div>
+    <label class="am-num">Window (last N messages) <input id="win" type="number" min="1" value="4" /></label>
+  </div>
+
+  <div class="am-cols">
+    <div class="am-conv">
+      <div class="am-h">Conversation <button class="link-btn" id="add">+ message</button></div>
+      <div id="messages"></div>
+    </div>
+    <div class="am-sees">
+      <div class="am-h">What the model sees on the latest turn <span class="am-tok" id="ctx-tok"></span></div>
+      <div id="seen"></div>
+      <p class="am-verdict" id="verdict"></p>
+    </div>
+  </div>
+  <p class="status" id="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>The thing everyone gets wrong about AI memory</h2>
+    <p>
+      A model is <strong>stateless</strong>. It doesn&rsquo;t remember your last message, or the last thousand,
+      every turn, your app re-sends whatever history fits and the model reads it fresh. So &ldquo;memory&rdquo; isn&rsquo;t
+      something the model <em>has</em>; it&rsquo;s something you <em>engineer</em> by deciding what to put back into
+      the <a href="/what-is-a-context-window">context window</a> each time. This simulator shows three common
+      strategies and, crucially, what each one <em>forgets</em>.
+    </p>
+    <h3>The three strategies here</h3>
+    <ul>
+      <li><strong>Sliding window</strong> keeps the last N messages verbatim. Simple, but anything older just
+        falls off, including important facts.</li>
+      <li><strong>+ Summary</strong> compresses the dropped messages into a running summary. Cheaper than keeping
+        everything, but a summary can blur or lose a specific detail.</li>
+      <li><strong>+ Retrieval</strong> stores facts and pulls the relevant ones back into context when they matter,
+        the same idea as <a href="/what-is-rag">RAG</a>, applied to memory. The most reliable way to keep a
+        specific fact alive across a long chat.</li>
+    </ul>
+    <p class="note">
+      Pin a message as a <strong>fact</strong> (the ☆) to make it eligible for retrieval. Real systems match facts
+      by <em>meaning</em> using <a href="/what-are-embeddings">embeddings</a>; here we approximate with keyword
+      overlap to keep it transparent. The summary block stands for &ldquo;these turns were compressed&rdquo;, in
+      production an LLM writes it. Everything runs in your browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does the model really not remember?</summary>
+      <p>Correct. Each API call is independent. Any continuity you see is your application re-sending history (or a summary, or retrieved facts) every single turn. Take that away and the model is a blank slate.</p>
+    </details>
+    <details class="faq"><summary>Why did the window strategy &ldquo;forget&rdquo; my allergy?</summary>
+      <p>Because that message scrolled out of the last N. A pure sliding window has no idea a dropped message mattered. Retrieval fixes exactly this by storing facts and pulling them back when relevant.</p>
+    </details>
+    <details class="faq"><summary>Is anything uploaded?</summary>
+      <p>No. The simulation is entirely client-side, so your conversation stays on your device.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Read <a href="/what-is-agent-memory">what agent memory is</a>, how <a href="/what-is-rag">RAG</a> and <a href="/what-are-embeddings">embeddings</a> power retrieval, or size a window with the <a href="/context-window-visualizer">Context Window Visualizer</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .am-controls{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end;margin-bottom:20px}
+  .am-grp{display:flex;flex-direction:column;gap:8px}
+  .am-lbl,.am-num{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .am-num{display:flex;flex-direction:column;gap:8px}
+  .am-num input{width:110px;font-family:var(--font-mono);font-size:14px;text-transform:none;letter-spacing:0;border:1.5px solid var(--ink);border-radius:10px;padding:9px 11px;background:var(--cream);color:var(--ink);outline:0}
+  .am-num input:focus{box-shadow:4px 4px 0 var(--coral)}
+  .am-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .am-h{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+  .am-tok{text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-soft)}
+  .am-tok b{color:var(--ink)}
+
+  .msg{border:1.5px solid var(--line);border-radius:12px;background:var(--cream);padding:10px 12px;margin-bottom:9px;transition:opacity .15s}
+  .msg.evicted{opacity:.42}
+  .msg-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .msg-role{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:5px}
+  .msg-role.user{background:rgba(238,75,43,.14);color:var(--coral-deep)} .msg-role.assistant{background:rgba(52,120,246,.14);color:#2b5cc4}
+  .msg-pin{margin-left:auto;font-size:15px;background:none;border:0;cursor:pointer;color:var(--ink-soft);line-height:1}
+  .msg-pin.on{color:var(--gold)}
+  .msg-rm{font-size:11px;font-family:var(--font-mono);color:var(--coral-deep);background:none;border:0;cursor:pointer}
+  .msg textarea{width:100%;border:0;outline:0;background:transparent;resize:vertical;min-height:20px;font-family:var(--font-body);font-size:14px;line-height:1.4;color:var(--ink)}
+  .msg-tag{font-family:var(--font-mono);font-size:10px;color:var(--ink-soft)}
+
+  #seen{display:flex;flex-direction:column;gap:9px}
+  .blk{border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--cream)}
+  .blk-h{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:7px}
+  .blk.retrieved{border-color:rgba(15,159,130,.45);background:rgba(15,159,130,.06)} .blk.retrieved .blk-h{color:#0f7d68}
+  .blk.summary{border-color:rgba(244,180,35,.5);background:rgba(244,180,35,.08)} .blk.summary .blk-h{color:#9a7400}
+  .blk.window .blk-h{color:var(--ink-soft)}
+  .blk .line{font-size:13px;line-height:1.45;color:var(--ink);margin-bottom:3px}
+  .blk .line .r{font-family:var(--font-mono);font-size:10px;color:var(--ink-soft);margin-right:6px}
+  .blk em{color:var(--ink-soft);font-style:italic}
+  .am-verdict{font-family:var(--font-mono);font-size:12.5px;line-height:1.55;margin:14px 0 0;padding:12px 14px;border-radius:11px;background:var(--paper-2);color:var(--ink)}
+  .am-verdict.warn{background:rgba(214,62,31,.1);color:var(--coral-deep)} .am-verdict.good{background:rgba(15,159,130,.1);color:#0f7d68}
+  @media(max-width:760px){.am-cols{grid-template-columns:1fr}}
+</style>
+
+<script>
+  import { encode } from 'gpt-tokenizer/encoding/o200k_base';
+  const $ = (id) => document.getElementById(id);
+  const STOP = new Set(['this', 'that', 'with', 'have', 'your', 'from', 'about', 'what', 'some', 'will', 'just', 'they', 'them', 'then', 'than', 'also', 'when', 'into', 'over', 'more', 'like', 'want', 'need', 'give', 'make']);
+  const keywords = (t) => [...new Set((t.toLowerCase().match(/[a-z][a-z'-]{3,}/g) || []).filter(w => !STOP.has(w)))];
+  const overlap = (a, b) => a.some(x => b.some(y => x === y || (x.length >= 4 && y.length >= 4 && (x.startsWith(y.slice(0, 4)) || y.startsWith(x.slice(0, 4))))));
+
+  let seed = 0;
+  let msgs = [
+    { id: ++seed, role: 'user', text: 'Hey, quick note: I am allergic to peanuts.', fact: true },
+    { id: ++seed, role: 'assistant', text: 'Got it. I will avoid peanuts in anything I suggest.', fact: false },
+    { id: ++seed, role: 'user', text: 'What is a good workout split for beginners?', fact: false },
+    { id: ++seed, role: 'assistant', text: 'A 3-day full-body split is a solid start.', fact: false },
+    { id: ++seed, role: 'user', text: 'And a simple high-protein breakfast idea?', fact: false },
+    { id: ++seed, role: 'assistant', text: 'Greek yogurt with berries works well.', fact: false },
+    { id: ++seed, role: 'user', text: 'Now suggest a peanut-free protein snack.', fact: false },
+  ];
+  let strat = 'window';
+
+  function renderMessages(evictedIds) {
+    const box = $('messages'); box.innerHTML = '';
+    msgs.forEach((m) => {
+      const el = document.createElement('div'); el.className = 'msg' + (evictedIds.has(m.id) ? ' evicted' : '');
+      el.innerHTML = `<div class="msg-top"><span class="msg-role ${m.role}">${m.role}</span>
+        ${evictedIds.has(m.id) ? '<span class="msg-tag">out of window</span>' : ''}
+        <button class="msg-pin ${m.fact ? 'on' : ''}" title="Pin as a fact (eligible for retrieval)">${m.fact ? '★' : '☆'}</button>
+        <button class="msg-rm" title="remove">✕</button></div>
+        <textarea rows="1"></textarea>`;
+      const ta = el.querySelector('textarea'); ta.value = m.text;
+      ta.addEventListener('input', (e) => { m.text = e.target.value; calc(); });
+      el.querySelector('.msg-pin').addEventListener('click', () => { m.fact = !m.fact; calc(); });
+      el.querySelector('.msg-rm').addEventListener('click', () => { msgs = msgs.filter(x => x.id !== m.id); calc(); });
+      box.appendChild(el);
+    });
+  }
+
+  function calc() {
+    const win = Math.max(1, parseInt($('win').value) || 1);
+    const n = msgs.length;
+    const windowMsgs = msgs.slice(Math.max(0, n - win));
+    const windowIds = new Set(windowMsgs.map(m => m.id));
+    const evicted = msgs.filter(m => !windowIds.has(m.id));
+    const evictedIds = new Set(evicted.map(m => m.id));
+    renderMessages(evictedIds);
+
+    const latestUser = [...msgs].reverse().find(m => m.role === 'user');
+    const latestKw = latestUser ? keywords(latestUser.text) : [];
+
+    // facts that are pinned, outside the window
+    const evictedFacts = evicted.filter(m => m.fact);
+    const retrieved = (strat === 'retrieval') ? evictedFacts.filter(m => overlap(keywords(m.text), latestKw)) : [];
+    const retrievedIds = new Set(retrieved.map(m => m.id));
+
+    // assemble what the model sees
+    const seen = $('seen'); seen.innerHTML = '';
+    let ctxText = '';
+    if (retrieved.length) {
+      seen.insertAdjacentHTML('beforeend', `<div class="blk retrieved"><div class="blk-h">⟳ Retrieved memory</div>${retrieved.map(m => `<div class="line"><span class="r">fact</span>${esc(m.text)}</div>`).join('')}</div>`);
+      ctxText += retrieved.map(m => m.text).join('\n') + '\n';
+    }
+    if (strat !== 'window' && evicted.length) {
+      const kept = evicted.filter(m => !retrievedIds.has(m.id));
+      if (kept.length) {
+        seen.insertAdjacentHTML('beforeend', `<div class="blk summary"><div class="blk-h">▤ Summary buffer</div><div class="line"><em>[Summary of ${kept.length} earlier message${kept.length === 1 ? '' : 's'}, an LLM writes this in production]</em></div></div>`);
+        ctxText += `[summary of ${kept.length} earlier messages]\n`;
+      }
+    }
+    seen.insertAdjacentHTML('beforeend', `<div class="blk window"><div class="blk-h">▣ Context window (last ${windowMsgs.length})</div>${windowMsgs.map(m => `<div class="line"><span class="r">${m.role}</span>${esc(m.text)}</div>`).join('')}</div>`);
+    ctxText += windowMsgs.map(m => `${m.role}: ${m.text}`).join('\n');
+
+    $('ctx-tok').innerHTML = `<b>${encode(ctxText).length}</b> tokens`;
+
+    // verdict, what's lost vs kept
+    const v = $('verdict');
+    const lostFacts = evictedFacts.filter(m => !retrievedIds.has(m.id));
+    const summarized = strat !== 'window' && lostFacts.length > 0;
+    if (!evictedFacts.length) { v.className = 'am-verdict'; v.textContent = evicted.length ? `${evicted.length} message(s) scrolled out of the window. Pin one as a fact (☆) to see retrieval in action.` : 'All messages fit in the window. Shrink it, or add more turns, to see memory pressure.'; }
+    else if (retrieved.length) { v.className = 'am-verdict good'; v.textContent = `Retrieval pulled ${retrieved.length} pinned fact(s) back into context, the model knows: “${retrieved[0].text}”. Switch to “Sliding window” to watch it disappear.`; }
+    else if (summarized) { v.className = 'am-verdict warn'; v.textContent = `${lostFacts.length} pinned fact(s) are only in the summary now (e.g. “${lostFacts[0].text}”). A summary may blur a specific detail, retrieval keeps it exact.`; }
+    else { v.className = 'am-verdict warn'; v.textContent = `The model no longer sees: “${lostFacts[0].text}”. With a pure sliding window it has fallen out of context entirely. Turn on + Retrieval to bring it back.`; }
+
+    $('status').className = 'status';
+    $('status').textContent = `${n} messages · ${windowMsgs.length} in window · ${evicted.length} evicted · ${msgs.filter(m => m.fact).length} pinned fact(s).`;
+  }
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  $('strat').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#strat .chip').forEach(c => c.classList.remove('active')); b.classList.add('active'); strat = b.dataset.s; calc(); });
+  $('win').addEventListener('input', calc);
+  $('add').addEventListener('click', () => { const last = msgs[msgs.length - 1]; msgs.push({ id: ++seed, role: last && last.role === 'user' ? 'assistant' : 'user', text: '', fact: false }); calc(); });
+  calc();
+</script>

@@ -1,0 +1,162 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const SAMPLE = `dog\ncat\nkitten\npuppy\npizza\nhamburger\ncar\ntruck\nbicycle\nhappy\njoyful\nangry`;
+---
+<ToolPage
+  title="Embedding Explorer, see semantic similarity for real | KB Cafe"
+  description="Type words or phrases and compute real embeddings in your browser to see what's semantically close. Powered by a genuine model (MiniLM), loaded locally, your text is never uploaded."
+  path="/embedding-explorer"
+  eyebrow="AI Explained · Tool"
+  h1="Embedding Explorer"
+  tagline="Type words or phrases and compute real embeddings, right in your browser, to see which ones mean similar things. A genuine model, not a fake distance. Then search them by meaning."
+>
+  <div class="pane">
+    <div class="pane-label"><span>Items, one per line</span><span class="ee-actions"><button class="link-btn" id="sample">sample</button></span></div>
+    <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="dog&#10;cat&#10;pizza&#10;car…"></textarea>
+  </div>
+  <div class="row" style="margin:14px 0"><button class="btn" id="run">Compute embeddings</button><span class="ee-status" id="estat"></span></div>
+
+  <div id="results" hidden>
+    <h3 class="ee-h">Semantic search</h3>
+    <div class="ee-search"><input id="q" type="text" placeholder="Type a query to rank items by meaning (e.g. “pet”)…" /></div>
+    <div class="ee-rank" id="rank"></div>
+
+    <h3 class="ee-h">Nearest neighbours</h3>
+    <div class="ee-nn" id="nn"></div>
+
+    <h3 class="ee-h">Similarity matrix</h3>
+    <div class="ee-matrix" id="matrix"></div>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>Meaning, as numbers</h2>
+    <p>
+      An <a href="/what-are-embeddings">embedding</a> turns a piece of text into a vector, a long list of numbers,
+      positioned so that things with similar <em>meaning</em> land near each other. &ldquo;dog&rdquo; and
+      &ldquo;puppy&rdquo; end up close; &ldquo;dog&rdquo; and &ldquo;car&rdquo; far apart, even though they share no
+      letters. That single idea powers semantic search, <a href="/what-is-rag">RAG</a>, recommendations, and
+      clustering. This tool computes <strong>real embeddings</strong> with a genuine model so the similarities you
+      see are the real thing, not a string-matching trick.
+    </p>
+    <h3>What you&rsquo;re seeing</h3>
+    <ul>
+      <li><strong>Semantic search</strong>, your query is embedded and the items are ranked by cosine similarity, exactly how a <a href="/what-is-a-vector-database">vector database</a> retrieves.</li>
+      <li><strong>Nearest neighbours</strong>, each item&rsquo;s closest sibling by meaning.</li>
+      <li><strong>Similarity matrix</strong>, every pair scored 0 to 1; warmer means closer.</li>
+    </ul>
+    <p class="note">
+      The first run downloads a real embedding model (~25&nbsp;MB, all-MiniLM-L6-v2) from a public CDN into your
+      browser. After that it&rsquo;s instant and offline. Your text is embedded <strong>locally and never
+      uploaded</strong>, only the model files are fetched, like any web asset.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Are these real embeddings?</summary>
+      <p>Yes. It runs all-MiniLM-L6-v2 (a real sentence-embedding model) in your browser via WebAssembly, the same family used in production semantic search. The cosine similarities are genuine.</p>
+    </details>
+    <details class="faq"><summary>Why the one-time download?</summary>
+      <p>The model weights (~25&nbsp;MB) load on first use. They&rsquo;re cached afterwards. Your words never leave the page, only the model is fetched.</p>
+    </details>
+    <details class="faq"><summary>Is my text uploaded?</summary>
+      <p>No. Embedding happens locally in your browser. Nothing you type is sent to a server.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Read <a href="/what-are-embeddings">what embeddings are</a>, where they live in a <a href="/what-is-a-vector-database">vector database</a>, and how <a href="/what-is-rag">RAG</a> uses them.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .ta{min-height:150px}
+  .ee-status{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+  .ee-h{font-family:var(--font-display);font-weight:800;font-size:18px;margin:24px 0 12px}
+  .ee-search input{width:100%;font-family:var(--font-body);font-size:15px;border:1.5px solid var(--ink);border-radius:12px;padding:12px 15px;background:var(--cream);color:var(--ink);outline:0}
+  .ee-search input:focus{box-shadow:5px 5px 0 var(--coral)}
+  .ee-rank{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+  .rk{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1.5px solid var(--line);border-radius:10px;padding:9px 13px;background:var(--cream);font-family:var(--font-mono);font-size:13px}
+  .rk .rbar{height:8px;border-radius:4px;background:var(--paper-2);overflow:hidden;margin-top:5px}
+  .rk .rbar i{display:block;height:100%;background:var(--coral)}
+  .rk .sc{color:var(--ink-soft)}
+  .ee-nn{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+  .nn{border:1.5px solid var(--line);border-radius:10px;padding:10px 13px;background:var(--cream);font-family:var(--font-mono);font-size:13px}
+  .nn b{color:var(--ink)} .nn .arrow{color:var(--coral)}
+  .ee-matrix{overflow-x:auto}
+  table.mx{border-collapse:collapse;font-family:var(--font-mono);font-size:11px}
+  table.mx td,table.mx th{padding:5px 7px;text-align:center;border:1px solid var(--line)}
+  table.mx th{color:var(--ink-soft);font-weight:700;white-space:nowrap}
+  table.mx td.diag{opacity:.35}
+  @media(max-width:560px){.ee-nn{grid-template-columns:1fr}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const inEl = $('in');
+  const SAMPLE = inEl.getAttribute('data-sample') || '';
+  inEl.value = SAMPLE;
+  let extractor = null, vecs = [], labels = [];
+  const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
+  const heat = (s) => { const x = Math.max(0, Math.min(1, s)); return `background:rgba(238,75,43,${(x * x * 0.75).toFixed(3)})`; };
+
+  async function embed(text) {
+    const out = await extractor(text, { pooling: 'mean', normalize: true });
+    return Array.from(out.data);
+  }
+  async function ensureModel() {
+    if (extractor) return;
+    $('estat').textContent = 'Loading model (~25MB, first time only)…';
+    const { pipeline, env } = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+    env.allowLocalModels = false;
+    extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+  }
+
+  async function run() {
+    labels = inEl.value.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 14);
+    if (labels.length < 2) { $('estat').textContent = 'Add at least two items.'; return; }
+    $('run').disabled = true;
+    try {
+      await ensureModel();
+      $('estat').textContent = 'Embedding…';
+      vecs = [];
+      for (const t of labels) vecs.push(await embed(t));
+      $('estat').textContent = `Done, ${labels.length} items embedded locally (${vecs[0].length}-dim).`;
+      $('results').hidden = false;
+      renderNN(); renderMatrix(); $('q').value = ''; $('rank').innerHTML = '';
+    } catch (e) {
+      $('estat').textContent = 'Could not load the model (offline or CDN blocked). ' + ((e && e.message) || '');
+    } finally { $('run').disabled = false; }
+  }
+
+  function renderNN() {
+    $('nn').innerHTML = labels.map((lab, i) => {
+      let best = -1, bj = -1;
+      labels.forEach((_, j) => { if (j !== i) { const s = dot(vecs[i], vecs[j]); if (s > best) { best = s; bj = j; } } });
+      return `<div class="nn"><b>${esc(lab)}</b> <span class="arrow">→</span> ${esc(labels[bj])} <span style="opacity:.6">(${best.toFixed(2)})</span></div>`;
+    }).join('');
+  }
+  function renderMatrix() {
+    let h = '<table class="mx"><tr><th></th>' + labels.map(l => `<th>${esc(l.slice(0, 8))}</th>`).join('') + '</tr>';
+    labels.forEach((l, i) => {
+      h += `<tr><th>${esc(l.slice(0, 10))}</th>` + labels.map((_, j) => {
+        const s = i === j ? 1 : dot(vecs[i], vecs[j]);
+        return `<td class="${i === j ? 'diag' : ''}" style="${heat(s)}">${s.toFixed(2)}</td>`;
+      }).join('') + '</tr>';
+    });
+    $('matrix').innerHTML = h + '</table>';
+  }
+  async function search() {
+    const q = $('q').value.trim();
+    if (!q || !vecs.length) { $('rank').innerHTML = ''; return; }
+    try {
+      const qv = await embed(q);
+      const ranked = labels.map((l, i) => ({ l, s: dot(qv, vecs[i]) })).sort((a, b) => b.s - a.s);
+      $('rank').innerHTML = ranked.map(r => `<div class="rk"><div>${esc(r.l)}<div class="rbar"><i style="width:${Math.max(0, r.s * 100).toFixed(0)}%"></i></div></div><span class="sc">${r.s.toFixed(3)}</span></div>`).join('');
+    } catch {}
+  }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  let qt; $('q').addEventListener('input', () => { clearTimeout(qt); qt = setTimeout(search, 250); });
+  $('run').addEventListener('click', run);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; });
+</script>

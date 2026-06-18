@@ -3,7 +3,7 @@ import ToolPage from '../layouts/ToolPage.astro';
 const SAMPLE = `You are a helpful assistant. Summarize the following article in three bullet points, then suggest a headline.\n\nTokenization is how a model turns text into the numbers it actually reads. "Hello" might be one token; "tokenization" is usually several.`;
 ---
 <ToolPage
-  title="Token Counter & Tokenizer — count GPT tokens online | KB Cafe"
+  title="Token Counter & Tokenizer, count GPT tokens online | KB Cafe"
   description="Count tokens in any text with the real OpenAI tokenizers (o200k_base and cl100k_base) and see the exact token-by-token split. Free, fully client-side, nothing is uploaded."
   path="/token-counter"
   eyebrow="AI Explained · Tool"
@@ -164,7 +164,7 @@ const SAMPLE = `You are a helpful assistant. Summarize the following article in 
     renderTokens(ids, mode);
 
     const st = $('status');
-    if (approx) { st.className = 'status'; st.textContent = 'Estimate only — Claude/Gemini tokenizers are not public. The OpenAI counts above are exact.'; }
+    if (approx) { st.className = 'status'; st.textContent = 'Estimate only, Claude/Gemini tokenizers are not public. The OpenAI counts above are exact.'; }
     else { st.className = 'status ok'; st.textContent = `Exact count using the ${mode === 'o200k' ? 'o200k_base' : 'cl100k_base'} tokenizer.`; }
   }
 

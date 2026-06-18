@@ -1,0 +1,115 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+const SAMPLE = `Our platform is the best in the industry, with 99.9% uptime since 2019. Studies show that 80% of users prefer it. According to Gartner, it leads the market. The API is fast and reliable, and everyone agrees it's the future of work.`;
+---
+<ToolPage
+  title="Claim & Citation Checker, flag claims to verify | KB Cafe"
+  description="Paste text and highlight the factual, statistical, and absolute claims that have no citation, so you know what to verify before publishing. A writing aid, not a fact or hallucination checker."
+  path="/claim-checker"
+  eyebrow="AI Explained · Tool"
+  h1="Claim & Citation Checker"
+  tagline="Paste any text, AI-written or not, and see the factual, numeric, and absolute claims that lack a source. A prompt to go verify them yourself. It can't tell you what's true; it tells you what to check."
+>
+  <div class="pane">
+    <div class="pane-label"><span>Text to check</span><span class="cl-actions"><button class="link-btn" id="sample">sample</button><button class="link-btn" id="clear">clear</button></span></div>
+    <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="Paste an article, marketing copy, or an AI answer…"></textarea>
+  </div>
+
+  <div class="cl-summary" id="summary"></div>
+  <div class="pane" style="margin-top:6px"><div class="pane-label"><span>Highlighted</span><span class="cl-key"><span class="k claim">claim to verify</span><span class="k cited">has a source</span></span></div>
+    <div class="cl-text" id="hl"></div></div>
+  <div class="cl-list" id="list"></div>
+
+  <Fragment slot="explainer">
+    <h2>What this does, and what it deliberately doesn&rsquo;t</h2>
+    <p>
+      This tool does <strong>not</strong> detect hallucinations or judge whether anything is true, no client-side
+      tool honestly can. What it does is surface the sentences that <em>assert something checkable</em>, statistics,
+      superlatives, dates, named authorities, and flags the ones with <strong>no citation</strong>. Those are exactly
+      the lines worth verifying before you publish, whether a human or an AI wrote them. Think of it as a highlighter
+      for &ldquo;go check this,&rdquo; not a truth machine.
+    </p>
+    <h3>What gets flagged</h3>
+    <ul>
+      <li><strong>Numbers and stats</strong>, percentages, counts, dates, &ldquo;millions&rdquo;.</li>
+      <li><strong>Absolutes and superlatives</strong>, &ldquo;the best&rdquo;, &ldquo;always&rdquo;, &ldquo;everyone&rdquo;, &ldquo;proven&rdquo;.</li>
+      <li><strong>Vague attributions</strong>, &ldquo;studies show&rdquo;, &ldquo;experts say&rdquo;, with no named, linkable source.</li>
+    </ul>
+    <p class="note">
+      A sentence with a real citation (a link, &ldquo;according to [named source]&rdquo;, a footnote) is marked as
+      sourced, not because it&rsquo;s correct, but because there&rsquo;s something to check. The judgment is still
+      yours. Nothing is uploaded.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it tell me if a claim is false?</summary>
+      <p>No, and it never claims to. It can&rsquo;t know truth. It points at the statements that make a checkable assertion without backing them up, so you know where to look.</p>
+    </details>
+    <details class="faq"><summary>Why not call it a hallucination detector?</summary>
+      <p>Because a heuristic can&rsquo;t detect hallucinations, and a tool that pretended to would mislead exactly the people who&rsquo;d trust it. Honest scope: flag unsupported claims, leave the verifying to you.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Tighten AI output with <a href="/what-are-structured-outputs">structured outputs</a>, or understand why models assert confidently in <a href="/what-is-a-context-window">how context works</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .cl-actions{display:flex;gap:14px}.ta{min-height:140px}
+  .cl-summary{margin:20px 0 14px;font-family:var(--font-mono);font-size:14px}
+  .cl-summary b{font-weight:800;color:var(--ink)}
+  .cl-key{display:flex;gap:10px}.k{font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
+  .k.claim{background:rgba(244,180,35,.3);color:#9a7400}.k.cited{background:rgba(15,159,130,.18);color:#0f7d68}
+  .cl-text{border:1.5px solid var(--line);border-radius:14px;background:var(--paper-2);padding:15px 16px;line-height:1.85;font-size:15px;color:var(--ink)}
+  .cl-text .claim{background:rgba(244,180,35,.32);border-radius:4px;padding:1px 3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .cl-text .cited{background:rgba(15,159,130,.18);border-radius:4px;padding:1px 3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .cl-list{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+  .cl-row{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;background:var(--cream);font-size:14px;line-height:1.45}
+  .cl-row .ic{font-family:var(--font-mono);font-weight:800;color:#9a7400;flex-shrink:0}
+  .cl-row .why{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);margin-left:6px}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const inEl = $('in');
+  const SAMPLE = inEl.getAttribute('data-sample') || '';
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const NUM = /\b(\d{1,3}(?: \d{3})*(?:\.\d+)?\s*(?:%|percent|million|billion|thousand|x)?|\b(?:19|20)\d{2}\b)/i;
+  const ABS = /\b(the best|the most|the leading|number one|#1|world'?s|always|never|every(?:one|body)?|all (?:users|customers|people)|guaranteed|proven|undeniabl|the future of|revolutionary|unmatched|fastest|cheapest)\b/i;
+  const VAGUE = /\b(studies show|research shows|experts say|it'?s well known|scientists say|data shows|everyone agrees|many believe|reports suggest)\b/i;
+  const CITE = /(https?:\/\/|\[\d+\]|\(source|according to [A-Z]|\bper [A-Z]|\bcited|\bsource:)/i;
+
+  function run() {
+    const t = inEl.value;
+    // split into sentences keeping them
+    const sentences = t.match(/[^.!?\n]+[.!?]*\s*/g) || (t.trim() ? [t] : []);
+    let claims = 0, cited = 0; const rows = [];
+    const html = sentences.map(s => {
+      const trimmed = s.trim(); if (!trimmed) return esc(s);
+      const hasCite = CITE.test(s);
+      const why = [];
+      if (NUM.test(s)) why.push('stat/number');
+      if (ABS.test(s)) why.push('absolute/superlative');
+      if (VAGUE.test(s)) why.push('vague attribution');
+      const isClaim = why.length > 0;
+      if (!isClaim) return esc(s);
+      if (hasCite) { cited++; return `<span class="cited">${esc(s)}</span>`; }
+      claims++;
+      rows.push(`<div class="cl-row"><span class="ic">!</span><span>${esc(trimmed)}<span class="why">, ${why.join(', ')}, no source</span></span></div>`);
+      return `<span class="claim">${esc(s)}</span>`;
+    }).join('');
+
+    $('hl').innerHTML = t.trim() ? html : '<span style="opacity:.5">Paste text to highlight its claims.</span>';
+    $('list').innerHTML = rows.join('');
+    $('summary').innerHTML = t.trim()
+      ? `<b>${claims}</b> claim(s) to verify · <b>${cited}</b> with a source. <span style="color:var(--ink-soft)">This flags what to check, not what's true.</span>`
+      : '';
+  }
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; run(); });
+  $('clear').addEventListener('click', () => { inEl.value = ''; run(); inEl.focus(); });
+  inEl.value = SAMPLE; run();
+</script>

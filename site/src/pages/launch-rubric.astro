@@ -1,0 +1,107 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Launch Readiness Rubric, score your own idea honestly | KB Cafe"
+  description="Rate your project across the dimensions that actually predict traction, problem, differentiation, distribution, monetization, feasibility. You score it; the rubric adds it up. No AI guessing."
+  path="/launch-rubric"
+  eyebrow="AI Explained · Tool"
+  h1="Launch Readiness Rubric"
+  tagline="Score your own project across the six things that actually predict traction. You make the honest calls; the rubric just totals them and shows your weakest link. No invented grades."
+>
+  <div class="rb-dims" id="dims"></div>
+  <div class="rb-result">
+    <div class="rb-score"><span id="total">0</span><small>/ 30</small></div>
+    <div class="rb-band" id="band"></div>
+  </div>
+  <p class="rb-weak" id="weak"></p>
+
+  <Fragment slot="explainer">
+    <h2>An honest mirror, not an oracle</h2>
+    <p>
+      It&rsquo;s tempting to want a tool that grades your startup idea &ldquo;Market: B+&rdquo;. But a web page
+      can&rsquo;t know your market, and a confident letter grade would be pure fiction. So this does the honest
+      version: it gives you the <strong>six dimensions that actually predict traction</strong> and asks <em>you</em>
+      to rate each one. The total is just your own scores added up, the value is the structure and the brutal
+      question each row forces you to answer.
+    </p>
+    <h3>Why these six</h3>
+    <ul>
+      <li><strong>Problem</strong>, is it real, frequent, and painful?</li>
+      <li><strong>Differentiation</strong>, why you, and not the obvious alternative?</li>
+      <li><strong>Distribution</strong>, do you have a concrete way to reach users?</li>
+      <li><strong>Monetization</strong>, is there a believable path to money?</li>
+      <li><strong>Feasibility</strong>, can you actually build and run it?</li>
+      <li><strong>Motivation</strong>, will you still care in a year?</li>
+    </ul>
+    <p class="note">
+      Distribution and motivation are the ones founders overrate least and need most. The rubric won&rsquo;t tell
+      you to build or not, it shows you your weakest link so you know what to fix or validate next. Nothing is uploaded.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it judge whether my idea is good?</summary>
+      <p>No. It reflects <em>your</em> ratings back, totalled, with your lowest dimension flagged. The honesty is yours to supply; the structure is the tool&rsquo;s job.</p>
+    </details>
+    <details class="faq"><summary>What&rsquo;s a &ldquo;good&rdquo; score?</summary>
+      <p>There&rsquo;s no magic number, a high score from dishonest self-rating means nothing. Use it to compare ideas and to spot the one dimension dragging the rest down.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Cut scope with the <a href="/scope-sorter">Scope Sorter</a>, then design the build in the <a href="/ai-pattern-builder">Pattern Builder</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .rb-dims{display:flex;flex-direction:column;gap:14px}
+  .dim{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:15px 17px}
+  .dim-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+  .dim-nm{font-family:var(--font-display);font-weight:800;font-size:16px}
+  .dim-val{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--coral-deep)}
+  .dim-q{font-size:13px;color:var(--ink-soft);line-height:1.4;margin-bottom:11px}
+  .dim input[type=range]{width:100%;accent-color:var(--coral);cursor:pointer}
+  .dim-scale{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--ink-soft);margin-top:2px}
+  .rb-result{display:flex;align-items:center;gap:20px;margin-top:24px;padding:20px;border:1.5px solid var(--ink);border-radius:16px;background:var(--cream);box-shadow:6px 6px 0 rgba(238,75,43,.14)}
+  .rb-score{font-family:var(--font-display);font-weight:800;display:flex;align-items:baseline;gap:6px}
+  .rb-score #total{font-size:54px;line-height:1;color:var(--coral-deep)}
+  .rb-score small{font-family:var(--font-mono);font-size:14px;color:var(--ink-soft)}
+  .rb-band{font-family:var(--font-display);font-weight:800;font-size:18px;line-height:1.3}
+  .rb-weak{margin-top:14px;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);line-height:1.5}
+  .rb-weak b{color:var(--ink)}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const DIMS = [
+    { key: 'problem', name: 'Problem', q: 'Is the problem real, frequent, and painful enough that people seek a fix?' },
+    { key: 'diff', name: 'Differentiation', q: 'Is there a clear reason to choose you over the obvious alternative (including "do nothing")?' },
+    { key: 'dist', name: 'Distribution', q: 'Do you have a concrete, repeatable way to reach the people who have this problem?' },
+    { key: 'money', name: 'Monetization', q: 'Is there a believable path to revenue, and will someone actually pay?' },
+    { key: 'feas', name: 'Feasibility', q: 'Can you realistically build, ship, and operate this with what you have?' },
+    { key: 'motiv', name: 'Motivation', q: 'Will you still care about this in twelve months of unglamorous work?' },
+  ];
+  const vals = {};
+  DIMS.forEach(d => vals[d.key] = 3);
+
+  function render() {
+    $('dims').innerHTML = DIMS.map(d => `<div class="dim">
+      <div class="dim-h"><span class="dim-nm">${d.name}</span><span class="dim-val" id="v-${d.key}">${vals[d.key]}</span></div>
+      <div class="dim-q">${d.q}</div>
+      <input type="range" min="0" max="5" step="1" value="${vals[d.key]}" data-k="${d.key}" />
+      <div class="dim-scale"><span>0 · weak</span><span>5 · strong</span></div>
+    </div>`).join('');
+  }
+  function calc() {
+    const total = DIMS.reduce((a, d) => a + vals[d.key], 0);
+    $('total').textContent = total;
+    const band = $('band');
+    if (total <= 14) { band.textContent = 'Early, sharpen the weak spots'; band.style.color = 'var(--coral-deep)'; }
+    else if (total <= 22) { band.textContent = 'Promising, shore up the lowest dimension'; band.style.color = 'var(--gold)'; }
+    else { band.textContent = 'Strong on paper, now validate with real users'; band.style.color = '#0f7d68'; }
+    const min = Math.min(...DIMS.map(d => vals[d.key]));
+    const weakest = DIMS.filter(d => vals[d.key] === min);
+    $('weak').innerHTML = `Your weakest link: <b>${weakest.map(d => d.name).join(', ')}</b> (${min}/5). That&rsquo;s where this idea is most likely to fail, fix or validate it before building more. <span style="opacity:.8">This reflects your own honest ratings, not a judgment of the idea.</span>`;
+  }
+  $('dims').addEventListener('input', (e) => { const r = e.target.closest('input[data-k]'); if (!r) return; vals[r.dataset.k] = +r.value; $('v-' + r.dataset.k).textContent = r.value; calc(); });
+  render(); calc();
+</script>

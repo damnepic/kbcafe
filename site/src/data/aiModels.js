@@ -23,7 +23,7 @@ export const CONTEXT_TIERS = [
 export const CHARS_PER_TOKEN = 4;
 export const estimateTokens = (text) => (text ? Math.ceil([...text].length / CHARS_PER_TOKEN) : 0);
 
-// ILLUSTRATIVE price BANDS for the cost calculator — USD per 1,000,000 tokens.
+// ILLUSTRATIVE price BANDS for the cost calculator, USD per 1,000,000 tokens.
 // House rule: these are round-number TIERS reflecting common pricing as of AS_OF, NOT a
 // live price sheet for any specific model. Providers change prices often; the calculator's
 // fields are always editable. Always confirm the real price with your provider before relying

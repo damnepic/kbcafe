@@ -1,0 +1,138 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Tool Call Visualizer, how function calling works, step by step | KB Cafe"
+  description="Step through the tool-calling loop: the model emits a structured call, your code runs it, the result goes back, and the model answers. See the payload at every stage. Client-side."
+  path="/tool-call-visualizer"
+  eyebrow="AI Explained · Tool"
+  h1="Tool Call Visualizer"
+  tagline="Watch the tool-calling loop one step at a time: the model decides to call a function, your code runs it, the result returns, and the model answers, with the exact payload at every stage."
+>
+  <div class="row tc-scen" id="scen"></div>
+
+  <div class="tc-diagram">
+    <div class="tc-node" data-node="user"><span class="tc-ic">🧑</span><span class="tc-nm">User</span></div>
+    <div class="tc-flow"></div>
+    <div class="tc-node" data-node="model"><span class="tc-ic">🧠</span><span class="tc-nm">Model</span></div>
+    <div class="tc-flow"></div>
+    <div class="tc-node" data-node="code"><span class="tc-ic">⚙️</span><span class="tc-nm">Your code</span></div>
+  </div>
+
+  <div class="tc-stage">
+    <div class="tc-stage-h"><span id="stage-label">Step</span><span class="tc-count" id="stage-count"></span></div>
+    <p class="tc-desc" id="stage-desc"></p>
+    <pre class="tc-payload" id="stage-payload"></pre>
+  </div>
+  <div class="row tc-controls">
+    <button class="btn ghost" id="prev">‹ Back</button>
+    <button class="btn" id="next">Next ›</button>
+    <button class="btn ghost" id="replay">↺ Replay</button>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>The loop behind every &ldquo;agent&rdquo;</h2>
+    <p>
+      A model can only produce text, so <a href="/what-is-tool-calling">tool calling</a> is how it reaches the real
+      world. It never runs anything itself: it emits a <strong>structured request</strong> naming a function and its
+      arguments, <em>your</em> code runs the real function, and you hand the result back for the model to use. Repeat
+      that, call a tool, read the result, decide what&rsquo;s next, and you have an agent. This walks through one full
+      turn so the hand-off is concrete.
+    </p>
+    <h3>The four moments</h3>
+    <ul>
+      <li><strong>Ask</strong>, the user&rsquo;s request enters the model.</li>
+      <li><strong>Call</strong>, the model returns a tool call (a function name + JSON arguments), not prose.</li>
+      <li><strong>Run</strong>, your code executes the real function and produces a result.</li>
+      <li><strong>Answer</strong>, the result goes back and the model writes the final reply.</li>
+    </ul>
+    <p class="note">
+      The model <em>proposes</em>; your code <em>disposes</em>. Treat tool arguments as untrusted input, validate
+      them against your <a href="/what-are-structured-outputs">schema</a> before acting. Everything here is a static
+      illustration running in your browser.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does the model run the function?</summary>
+      <p>No. It only emits the name and arguments. Your application runs it, which is exactly why you stay in control of what&rsquo;s allowed.</p>
+    </details>
+    <details class="faq"><summary>How does this relate to MCP?</summary>
+      <p>Tool calling is the model deciding to invoke a tool; <a href="/what-is-mcp">MCP</a> is the standard for describing and connecting those tools so they&rsquo;re reusable across apps.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Read <a href="/what-is-tool-calling">what tool calling is</a>, build a schema with the <a href="/structured-output-builder">Structured Output Builder</a>, or design a flow in the <a href="/ai-pattern-builder">Pattern Builder</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .tc-scen{margin-bottom:20px}
+  .tc-diagram{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:22px}
+  .tc-node{display:flex;flex-direction:column;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:14px 20px;transition:all .2s;min-width:96px}
+  .tc-node.active{border-color:var(--ink);background:var(--ink);color:var(--cream);box-shadow:5px 5px 0 rgba(238,75,43,.2);transform:translateY(-2px)}
+  .tc-ic{font-size:24px;line-height:1}
+  .tc-nm{font-family:var(--font-display);font-weight:800;font-size:13.5px}
+  .tc-flow{flex:1;max-width:90px;height:2px;background:var(--line);position:relative}
+  .tc-flow.fwd{background:var(--coral)} .tc-flow.fwd::after{content:"▶";position:absolute;right:-2px;top:-9px;color:var(--coral);font-size:12px}
+  .tc-flow.back{background:var(--gold)} .tc-flow.back::before{content:"◀";position:absolute;left:-2px;top:-9px;color:#9a7400;font-size:12px}
+
+  .tc-stage{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:18px;min-height:150px}
+  .tc-stage-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+  #stage-label{font-family:var(--font-display);font-weight:800;font-size:18px}
+  .tc-count{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  .tc-desc{font-size:14.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 12px}
+  .tc-payload{margin:0;font-family:var(--font-mono);font-size:13px;line-height:1.55;background:var(--paper-2);border-radius:10px;padding:13px 15px;white-space:pre-wrap;word-break:break-word;color:var(--ink)}
+  .tc-payload:empty{display:none}
+  .tc-controls{margin-top:16px;justify-content:center}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const SCEN = {
+    weather: { label: 'Weather', steps: [
+      { node: 'user', flow: '', label: '1 · Ask', desc: 'The user sends a request. The app passes it to the model along with the tools it may use.', payload: 'User: "What\'s the weather in Miami right now?"\n\ntools: [ get_weather(city: string) ]' },
+      { node: 'model', flow: 'fwd', label: '2 · Call', desc: 'The model decides a tool would help and returns a structured tool call instead of prose, a name and JSON arguments.', payload: '{\n  "tool_call": {\n    "name": "get_weather",\n    "arguments": { "city": "Miami" }\n  }\n}' },
+      { node: 'code', flow: 'fwd', label: '3 · Run', desc: 'Your code runs the real get_weather function (calls a weather API). The model never executes anything itself.', payload: '// your server\nconst r = await getWeather("Miami");\n// → { tempF: 88, condition: "sunny" }' },
+      { node: 'model', flow: 'back', label: '4 · Answer', desc: 'You hand the result back to the model, which uses it to write the final reply.', payload: 'tool_result: { "tempF": 88, "condition": "sunny" }\n\nModel: "It\'s 88°F and sunny in Miami right now."' },
+    ] },
+    db: { label: 'Database', steps: [
+      { node: 'user', flow: '', label: '1 · Ask', desc: 'The user asks a question that needs live data.', payload: 'User: "How many orders did we get yesterday?"\n\ntools: [ run_query(sql: string) ]' },
+      { node: 'model', flow: 'fwd', label: '2 · Call', desc: 'The model emits a tool call with the query as a structured argument.', payload: '{\n  "tool_call": {\n    "name": "run_query",\n    "arguments": {\n      "sql": "SELECT count(*) FROM orders WHERE day = \'yesterday\'"\n    }\n  }\n}' },
+      { node: 'code', flow: 'fwd', label: '3 · Run', desc: 'Your code validates and runs the query. Validate first, the model can propose a wrong or unsafe call.', payload: '// validate, then execute (read-only role!)\nconst rows = await db.query(args.sql);\n// → [{ count: 142 }]' },
+      { node: 'model', flow: 'back', label: '4 · Answer', desc: 'The result returns and the model phrases the answer.', payload: 'tool_result: [{ "count": 142 }]\n\nModel: "You received 142 orders yesterday."' },
+    ] },
+    calc: { label: 'Calculator', steps: [
+      { node: 'user', flow: '', label: '1 · Ask', desc: 'Models are unreliable at exact math, so a calculator tool is offered.', payload: 'User: "What\'s 18% tip on $264.50?"\n\ntools: [ calculate(expression: string) ]' },
+      { node: 'model', flow: 'fwd', label: '2 · Call', desc: 'Rather than guess, the model calls the calculator.', payload: '{\n  "tool_call": {\n    "name": "calculate",\n    "arguments": { "expression": "264.50 * 0.18" }\n  }\n}' },
+      { node: 'code', flow: 'fwd', label: '3 · Run', desc: 'Your code evaluates it exactly.', payload: 'const r = evaluate("264.50 * 0.18");\n// → 47.61' },
+      { node: 'model', flow: 'back', label: '4 · Answer', desc: 'The exact result comes back for the model to present.', payload: 'tool_result: 47.61\n\nModel: "An 18% tip on $264.50 is $47.61."' },
+    ] },
+  };
+  let key = 'weather', i = 0;
+
+  function renderScen() {
+    $('scen').innerHTML = Object.entries(SCEN).map(([k, s]) => `<button class="chip ${k === key ? 'active' : ''}" data-k="${k}">${s.label}</button>`).join('');
+  }
+  function render() {
+    const steps = SCEN[key].steps, s = steps[i];
+    document.querySelectorAll('.tc-node').forEach(n => n.classList.toggle('active', n.dataset.node === s.node));
+    const flows = document.querySelectorAll('.tc-flow');
+    flows.forEach(f => { f.className = 'tc-flow'; });
+    if (s.flow) { // light the flow segments toward the active node
+      if (s.node === 'model' && s.flow === 'fwd') flows[0].classList.add('fwd');
+      if (s.node === 'code') flows[1].classList.add('fwd');
+      if (s.node === 'model' && s.flow === 'back') flows[1].classList.add('back');
+    }
+    $('stage-label').textContent = s.label;
+    $('stage-count').textContent = `${i + 1} / ${steps.length}`;
+    $('stage-desc').textContent = s.desc;
+    $('stage-payload').textContent = s.payload;
+    $('prev').disabled = i === 0; $('next').disabled = i === steps.length - 1;
+    $('prev').style.opacity = i === 0 ? '.4' : ''; $('next').style.opacity = i === steps.length - 1 ? '.4' : '';
+  }
+  $('scen').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; key = b.dataset.k; i = 0; renderScen(); render(); });
+  $('next').addEventListener('click', () => { if (i < SCEN[key].steps.length - 1) { i++; render(); } });
+  $('prev').addEventListener('click', () => { if (i > 0) { i--; render(); } });
+  $('replay').addEventListener('click', () => { i = 0; render(); });
+  renderScen(); render();
+</script>
