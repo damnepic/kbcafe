@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KB Cafe — "freshly brewed" underline concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#FBF4E9; --paper-2:#F4E9D6; --ink:#1E1813; --ink-soft:#574b3f;
+    --coral:#EE4B2B; --coral-deep:#D63E1F; --orange:#F4842A; --gold:#F4B423;
+    --cream:#FFFCF5; --line:rgba(30,24,19,.12);
+    --hl:#F4B423;        /* the live highlight colour — driven by the swatches */
+    --font-display:"Bricolage Grotesque",system-ui,sans-serif;
+    --font-body:"Hanken Grotesk",system-ui,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-body);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;padding:36px 20px 80px}
+  .page{max-width:880px;margin:0 auto}
+  .top{text-align:center;margin-bottom:8px}
+  .top .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:12px}
+  .top h1{font-family:var(--font-display);font-weight:800;font-size:32px;letter-spacing:-.02em}
+  .top p{color:var(--ink-soft);font-size:15px;margin-top:10px;max-width:580px;margin-left:auto;margin-right:auto;line-height:1.5}
+
+  /* colour switcher */
+  .swatches{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin:22px auto 30px;padding:14px;border:1.5px dashed var(--line);border-radius:16px;background:var(--cream);max-width:640px}
+  .swatches .lbl{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);width:100%;text-align:center;margin-bottom:2px}
+  .sw{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;padding:4px}
+  .sw .dot{width:34px;height:34px;border-radius:50%;border:2.5px solid transparent;box-shadow:0 0 0 1px var(--line) inset;transition:transform .12s,border-color .12s}
+  .sw:hover .dot{transform:scale(1.1)}
+  .sw.active .dot{border-color:var(--ink);transform:scale(1.12)}
+  .sw .nm{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft)}
+  .sw.active .nm{color:var(--ink);font-weight:700}
+
+  .hero{font-family:var(--font-display);font-weight:800;letter-spacing:-.035em;line-height:.98;font-size:clamp(36px,6vw,60px);color:var(--ink)}
+  .mk{position:relative;white-space:nowrap;display:inline-block}
+
+  /* accordion */
+  details{background:var(--cream);border:1.5px solid var(--ink);border-radius:18px;margin-bottom:16px;overflow:hidden}
+  details[open]{box-shadow:10px 10px 0 rgba(30,24,19,.06)}
+  summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:18px 22px;font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.01em}
+  summary::-webkit-details-marker{display:none}
+  summary .num{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--cream);background:var(--ink);width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex-shrink:0}
+  summary .tag{margin-left:auto;font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em}
+  details[open] summary{border-bottom:1.5px solid var(--line)}
+  .body{padding:30px 22px 26px}
+  .stage{text-align:center;padding:34px 10px 44px}
+  .desc{font-size:14.5px;line-height:1.6;color:var(--ink-soft);max-width:600px;margin:0 auto 18px;text-align:center}
+  .code{font-family:var(--font-mono);font-size:12px;line-height:1.6;background:var(--ink);color:#f4e9d6;border-radius:12px;padding:16px 18px;overflow:auto;white-space:pre;margin-top:10px}
+  .code .c-sel{color:#F4B423}.code .c-prop{color:#7fd1c4}.code .c-val{color:#fff}
+  .note{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:14px}
+
+  /* ============ A — Flat Bar (straight, under) ============ */
+  .demo-a .mk::after{content:"";position:absolute;left:0;right:0;bottom:-.16em;height:.13em;background:var(--hl)}
+
+  /* ============ B — Rounded Marker (pill ends) ============ */
+  .demo-b .mk::after{content:"";position:absolute;left:-.04em;right:-.04em;bottom:-.18em;height:.17em;background:var(--hl);border-radius:99px}
+
+  /* ============ C — Hand-drawn Swash (organic) ============ */
+  .demo-c .mk::after{content:"";position:absolute;left:-1%;right:-1%;bottom:-.14em;height:.16em;
+    background:var(--hl);border-radius:46% 54% 58% 42%/100%;transform:skewX(-10deg)}
+
+  /* ============ D — Double Rule (editorial) ============ */
+  .demo-d .mk::after{content:"";position:absolute;left:0;right:0;bottom:-.14em;height:.085em;background:var(--hl)}
+  .demo-d .mk::before{content:"";position:absolute;left:0;right:0;bottom:-.235em;height:.028em;background:var(--ink)}
+
+  /* ============ E — Wavy Squiggle (SVG, recoloured by JS) ============ */
+  .demo-e .mk{padding-bottom:.22em;background-repeat:repeat-x;background-position:left bottom;background-size:1.1em .45em}
+
+  /* ============ F — Brush Stroke (SVG, recoloured by JS) ============ */
+  .demo-f .mk{padding-bottom:.18em;background-repeat:no-repeat;background-position:center bottom;background-size:100% .4em}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <div class="eyebrow">☕ KB Cafe · underline studio</div>
+    <h1>&ldquo;freshly brewed&rdquo; — 6 underlines, <em>under</em> the word</h1>
+    <p>Six underline styles, each sitting cleanly <strong>below</strong> the text. Pick a colour below — every concept recolours live so you can compare gold vs. coffee tones. One concept opens at a time.</p>
+  </div>
+
+  <div class="swatches" id="swatches">
+    <span class="lbl">highlight colour — try the coffee tones</span>
+    <button class="sw active" data-c="#F4B423"><span class="dot" style="background:#F4B423"></span><span class="nm">Gold</span></button>
+    <button class="sw" data-c="#F4842A"><span class="dot" style="background:#F4842A"></span><span class="nm">Orange</span></button>
+    <button class="sw" data-c="#EE4B2B"><span class="dot" style="background:#EE4B2B"></span><span class="nm">Coral</span></button>
+    <button class="sw" data-c="#C97B30"><span class="dot" style="background:#C97B30"></span><span class="nm">Caramel</span></button>
+    <button class="sw" data-c="#6F4E37"><span class="dot" style="background:#6F4E37"></span><span class="nm">Coffee</span></button>
+    <button class="sw" data-c="#3B2F2F"><span class="dot" style="background:#3B2F2F"></span><span class="nm">Espresso</span></button>
+  </div>
+
+  <details name="concept" open>
+    <summary><span class="num">A</span> Flat Bar <span class="tag">straight · clean</span></summary>
+    <div class="body">
+      <p class="desc">A simple, <strong>straight</strong> thick rule directly beneath the word — the underline cousin of your screenshot bar. Graphic and confident.</p>
+      <div class="stage demo-a"><div class="hero"><span class="mk">freshly brewed.</span></div></div>
+      <div class="code"><span class="c-sel">.mk::after</span>{
+  content:""; position:absolute;
+  left:0; right:0; <span class="c-prop">bottom</span>:<span class="c-val">-.16em</span>;
+  <span class="c-prop">height</span>:<span class="c-val">.13em</span>;
+  <span class="c-prop">background</span>:<span class="c-val">var(--hl)</span>;
+}</div>
+    </div>
+  </details>
+
+  <details name="concept">
+    <summary><span class="num">B</span> Rounded Marker <span class="tag">pill ends · friendly</span></summary>
+    <div class="body">
+      <p class="desc">Same bar with <strong>fully rounded ends</strong>, slightly wider than the word — softer and more approachable, like one marker stroke.</p>
+      <div class="stage demo-b"><div class="hero"><span class="mk">freshly brewed.</span></div></div>
+      <div class="code"><span class="c-sel">.mk::after</span>{
+  content:""; position:absolute;
+  left:-.04em; right:-.04em; bottom:-.18em;
+  <span class="c-prop">height</span>:<span class="c-val">.17em</span>;
+  background:var(--hl);
+  <span class="c-prop">border-radius</span>:<span class="c-val">99px</span>;
+}</div>
+    </div>
+  </details>
+
+  <details name="concept">
+    <summary><span class="num">C</span> Hand-drawn Swash <span class="tag">organic</span></summary>
+    <div class="body">
+      <p class="desc">A slightly <strong>irregular, skewed</strong> stroke — looks drawn by hand, not ruled. The most personality; especially nice in coffee or coral.</p>
+      <div class="stage demo-c"><div class="hero"><span class="mk">freshly brewed.</span></div></div>
+      <div class="code"><span class="c-sel">.mk::after</span>{
+  content:""; position:absolute;
+  left:-1%; right:-1%; bottom:-.14em; height:.16em;
+  background:var(--hl);
+  <span class="c-prop">border-radius</span>:<span class="c-val">46% 54% 58% 42% / 100%</span>;
+  <span class="c-prop">transform</span>:<span class="c-val">skewX(-10deg)</span>;
+}</div>
+    </div>
+  </details>
+
+  <details name="concept">
+    <summary><span class="num">D</span> Double Rule <span class="tag">editorial · refined</span></summary>
+    <div class="body">
+      <p class="desc">A bold rule with a <strong>fine ink hairline</strong> beneath — classic masthead feel, quieter and more &ldquo;premium reference.&rdquo; Coffee here reads very editorial.</p>
+      <div class="stage demo-d"><div class="hero"><span class="mk">freshly brewed.</span></div></div>
+      <div class="code"><span class="c-sel">.mk::after</span>{  /* thick */
+  content:""; position:absolute; left:0; right:0;
+  bottom:-.14em; <span class="c-prop">height</span>:<span class="c-val">.085em</span>; background:var(--hl);
+}
+<span class="c-sel">.mk::before</span>{ /* hairline ink */
+  content:""; position:absolute; left:0; right:0;
+  bottom:-.235em; height:.028em; background:var(--ink);
+}</div>
+    </div>
+  </details>
+
+  <details name="concept">
+    <summary><span class="num">E</span> Wavy Squiggle <span class="tag">playful</span></summary>
+    <div class="body">
+      <p class="desc">A repeating <strong>wavy underline</strong> — friendly and energetic. Lightest, most informal; signals &ldquo;approachable dev tools.&rdquo;</p>
+      <div class="stage demo-e"><div class="hero"><span class="mk">freshly brewed.</span></div></div>
+      <div class="code"><span class="c-sel">.mk</span>{
+  padding-bottom:.22em;
+  <span class="c-prop">background-image</span>:<span class="c-val">url("…wave.svg")</span>; /* stroke = --hl */
+  background-repeat:repeat-x; background-position:left bottom;
+  <span class="c-prop">background-size</span>:<span class="c-val">1.1em .45em</span>;
+}</div>
+    </div>
+  </details>
+
+  <details name="concept">
+    <summary><span class="num">F</span> Brush Stroke <span class="tag">artisanal</span></summary>
+    <div class="body">
+      <p class="desc">A single <strong>tapered brush stroke</strong> — fat in the middle, thinning at the ends, like one confident pass of a paint pen. Most crafted look; gorgeous in coffee/espresso.</p>
+      <div class="stage demo-f"><div class="hero"><span class="mk">freshly brewed.</span></div></div>
+      <div class="code"><span class="c-sel">.mk</span>{
+  padding-bottom:.18em;
+  <span class="c-prop">background-image</span>:<span class="c-val">url("…brush.svg")</span>; /* fill = --hl */
+  background-repeat:no-repeat; background-position:center bottom;
+  <span class="c-prop">background-size</span>:<span class="c-val">100% .4em</span>;
+}</div>
+    </div>
+  </details>
+
+  <p class="note">tip: the SVG wavy + brush underlines recolour too — they're drawn with the chosen colour, not a fixed one.</p>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const eMk = document.querySelector('.demo-e .mk');
+  const fMk = document.querySelector('.demo-f .mk');
+
+  // SVG templates — %COL% is swapped for the chosen colour (URL-encoded #)
+  const wave = c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 10'%3E%3Cpath d='M0 5 Q 6 0 12 5 T 24 5' fill='none' stroke='${c}' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E")`;
+  const brush = c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='${c}'/%3E%3C/svg%3E")`;
+
+  function setColor(hex){
+    root.style.setProperty('--hl', hex);
+    const enc = hex.replace('#', '%23');
+    eMk.style.backgroundImage = wave(enc);
+    fMk.style.backgroundImage = brush(enc);
+  }
+
+  document.getElementById('swatches').addEventListener('click', e => {
+    const btn = e.target.closest('.sw'); if(!btn) return;
+    document.querySelectorAll('.sw').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    setColor(btn.dataset.c);
+  });
+
+  setColor('#F4B423'); // gold default
+</script>
+</body>
+</html>
