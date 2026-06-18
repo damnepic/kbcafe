@@ -1,7 +1,7 @@
 // Context-window reference for the Context Window Visualizer + the explainers.
 //
 // IMPORTANT (house rule: no fabricated/undated facts): these are ORDER-OF-MAGNITUDE
-// size TIERS, not a live model spec sheet. Providers change real limits often — the
+// size TIERS, not a live model spec sheet. Providers change real limits often, the
 // example model names are illustrative only. Always verify a specific model's context
 // limit against its provider's current docs. Update AS_OF when you revise this file.
 export const AS_OF = 'June 2026';

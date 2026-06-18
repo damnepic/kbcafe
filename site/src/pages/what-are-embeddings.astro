@@ -2,16 +2,16 @@
 import AiPage from '../layouts/AiPage.astro';
 ---
 <AiPage
-  title="What are embeddings? — vectors, similarity &amp; semantic search | KB Cafe"
+  title="What are embeddings?, vectors, similarity &amp; semantic search | KB Cafe"
   description="A clear explainer of embeddings: how text becomes a vector that captures meaning, how similarity is measured, and why embeddings power semantic search, RAG, and recommendations."
   path="/what-are-embeddings"
   eyebrow="AI Explained · Concept"
   h1="What are embeddings?"
-  tagline="An embedding turns a piece of content into a list of numbers that captures its meaning — so that things which mean similar things sit close together. That one idea powers search, RAG, and recommendations."
+  tagline="An embedding turns a piece of content into a list of numbers that captures its meaning, so that things which mean similar things sit close together. That one idea powers search, RAG, and recommendations."
 >
   <h2>The core idea</h2>
   <p>
-    An <strong>embedding</strong> is a <strong>vector</strong> — a fixed-length list of numbers — that
+    An <strong>embedding</strong> is a <strong>vector</strong>: a fixed-length list of numbers, that
     represents the <em>meaning</em> of a piece of content. An embedding model reads your text (or image, or
     audio) and outputs something like 768 or 1,536 numbers. The numbers themselves aren&rsquo;t meant to be
     read; what matters is <strong>position</strong>: content with similar meaning produces vectors that land
@@ -24,22 +24,22 @@ import AiPage from '../layouts/AiPage.astro';
   <p>
     Keyword search matches <em>characters</em>: search &ldquo;car&rdquo; and you miss &ldquo;automobile,&rdquo;
     &ldquo;vehicle,&rdquo; and &ldquo;sedan.&rdquo; Embeddings match <em>meaning</em>, so a search for
-    &ldquo;car&rdquo; finds all of them — that&rsquo;s <strong>semantic search</strong>. The same trick
+    &ldquo;car&rdquo; finds all of them, that&rsquo;s <strong>semantic search</strong>. The same trick
     underlies a lot of modern AI plumbing:
   </p>
   <ul>
-    <li><strong>Semantic search</strong> — find by what you meant, not the exact words.</li>
-    <li><strong><a href="/what-is-rag">RAG</a></strong> — retrieve the document chunks most relevant to a
+    <li><strong>Semantic search</strong>: find by what you meant, not the exact words.</li>
+    <li><strong><a href="/what-is-rag">RAG</a></strong>: retrieve the document chunks most relevant to a
       question and feed them to the model.</li>
-    <li><strong>Recommendations</strong> — surface items similar to what someone liked.</li>
-    <li><strong>Clustering &amp; classification</strong> — group similar content, or label it.</li>
-    <li><strong>Deduplication</strong> — spot near-identical text even when the wording differs.</li>
+    <li><strong>Recommendations</strong>: surface items similar to what someone liked.</li>
+    <li><strong>Clustering &amp; classification</strong>: group similar content, or label it.</li>
+    <li><strong>Deduplication</strong>: spot near-identical text even when the wording differs.</li>
   </ul>
 
   <h2>How similarity is measured</h2>
   <p>
     Once content is vectors, &ldquo;similar&rdquo; becomes a distance you can compute. The most common
-    measure is <strong>cosine similarity</strong> — the angle between two vectors (1.0 means identical
+    measure is <strong>cosine similarity</strong>: the angle between two vectors (1.0 means identical
     direction, 0 means unrelated). <strong>Dot product</strong> and <strong>Euclidean distance</strong> are
     also used. To find the best matches for a query, you embed the query the same way and look for its
     <strong>nearest neighbors</strong> in the vector space.
@@ -47,32 +47,31 @@ import AiPage from '../layouts/AiPage.astro';
 
   <h2>Where the vectors live</h2>
   <p>
-    For a handful of items you can compare vectors in memory. At scale — thousands or millions of chunks —
-    you store them in a <strong>vector database</strong> built for fast approximate nearest-neighbor search.
+    For a handful of items you can compare vectors in memory. At scale, thousands or millions of chunks, you store them in a <strong>vector database</strong> built for fast approximate nearest-neighbor search.
     Indexing once and querying many times is exactly the pattern <a href="/what-is-rag">RAG</a> uses.
   </p>
 
   <h2>Practical things that trip people up</h2>
   <ul>
     <li><strong>Use the same model for indexing and querying.</strong> Vectors from different embedding
-      models aren&rsquo;t comparable — they live in different spaces.</li>
+      models aren&rsquo;t comparable, they live in different spaces.</li>
     <li><strong>Dimensions are a tradeoff.</strong> More dimensions can capture more nuance but cost more to
       store and search; pick what your use case needs.</li>
     <li><strong>Chunking matters.</strong> Embedding a whole document blurs its meaning into one vector;
       embedding well-sized passages keeps retrieval sharp.</li>
     <li><strong>Embeddings aren&rsquo;t the model&rsquo;s &ldquo;knowledge.&rdquo;</strong> They&rsquo;re a
-      representation of <em>this</em> content for comparison — not a store of facts the model reasons over.</li>
+      representation of <em>this</em> content for comparison, not a store of facts the model reasons over.</li>
   </ul>
 
   <h2>FAQ</h2>
   <details class="faq"><summary>What is a &ldquo;dimension&rdquo; in an embedding?</summary>
-    <p>Each number in the vector is one dimension. A 1,536-dimensional embedding is a point in 1,536-dimensional space — impossible to picture, but the math of &ldquo;how close are these two points&rdquo; works exactly like it does in 2D or 3D.</p>
+    <p>Each number in the vector is one dimension. A 1,536-dimensional embedding is a point in 1,536-dimensional space, impossible to picture, but the math of &ldquo;how close are these two points&rdquo; works exactly like it does in 2D or 3D.</p>
   </details>
   <details class="faq"><summary>Can I compare embeddings from two different models?</summary>
     <p>No. Each model defines its own space, so a vector from model A is meaningless next to one from model B. Always embed everything you&rsquo;ll compare with the same model.</p>
   </details>
   <details class="faq"><summary>Are embeddings only for text?</summary>
-    <p>No — images, audio, and code can all be embedded, and multimodal models can put text and images in the same space, so you can search images with a text query.</p>
+    <p>No, images, audio, and code can all be embedded, and multimodal models can put text and images in the same space, so you can search images with a text query.</p>
   </details>
 
   <h3>Related</h3>

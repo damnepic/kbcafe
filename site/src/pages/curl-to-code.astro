@@ -2,12 +2,12 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="cURL to Code — convert curl to fetch, axios, Python, Go | KB Cafe"
-  description="Paste a cURL command and get equivalent code for JavaScript fetch, axios, Python requests, or Go. Free, fast, fully client-side — nothing is uploaded."
+  title="cURL to Code, convert curl to fetch, axios, Python, Go | KB Cafe"
+  description="Paste a cURL command and get equivalent code for JavaScript fetch, axios, Python requests, or Go. Free, fast, fully client-side, nothing is uploaded."
   path="/curl-to-code"
   eyebrow="Converters"
   h1="cURL → Code"
-  tagline="Paste a cURL command and get the equivalent in fetch, axios, Python requests, or Go — method, headers, body, and auth carried over. Runs in your browser."
+  tagline="Paste a cURL command and get the equivalent in fetch, axios, Python requests, or Go, method, headers, body, and auth carried over. Runs in your browser."
 >
   <div class="pane" style="margin-bottom:14px">
     <div class="pane-label"><span>cURL command</span><button class="link-btn" id="sample">load sample</button></div>
@@ -28,29 +28,29 @@ import ToolPage from '../layouts/ToolPage.astro';
   <Fragment slot="explainer">
     <h2>From a copied cURL to working code</h2>
     <p>
-      Browser dev tools and API docs hand you requests as <code>curl</code> commands. This tool parses one — URL,
+      Browser dev tools and API docs hand you requests as <code>curl</code> commands. This tool parses one, URL,
       method, every <code>-H</code> header, the request body (<code>-d</code>/<code>--data</code>/<code>--data-raw</code>),
-      and basic auth (<code>-u</code>) — and rewrites it as idiomatic code in the language you actually use. It handles
+      and basic auth (<code>-u</code>), and rewrites it as idiomatic code in the language you actually use. It handles
       quoted arguments and backslash line-continuations, so pasting a multi-line curl works as-is.
     </p>
 
     <h3>Targets</h3>
     <ul>
-      <li><strong>fetch</strong> — the browser/Node standard, no dependencies.</li>
-      <li><strong>axios</strong> — the popular JS HTTP client.</li>
-      <li><strong>Python</strong> — the <code>requests</code> library, with <code>json=</code> used automatically when the body is JSON.</li>
-      <li><strong>Go</strong> — <code>net/http</code> with the body and headers set up for you.</li>
+      <li><strong>fetch</strong>: the browser/Node standard, no dependencies.</li>
+      <li><strong>axios</strong>: the popular JS HTTP client.</li>
+      <li><strong>Python</strong>: the <code>requests</code> library, with <code>json=</code> used automatically when the body is JSON.</li>
+      <li><strong>Go</strong>: <code>net/http</code> with the body and headers set up for you.</li>
     </ul>
 
     <h2>FAQ</h2>
     <details class="faq"><summary>Does it handle headers and JSON bodies?</summary>
-      <p>Yes — every <code>-H</code> becomes a header, and a JSON body with a JSON content-type is emitted in the idiomatic way for each language (e.g. Python&rsquo;s <code>json=</code>).</p>
+      <p>Yes, every <code>-H</code> becomes a header, and a JSON body with a JSON content-type is emitted in the idiomatic way for each language (e.g. Python&rsquo;s <code>json=</code>).</p>
     </details>
     <details class="faq"><summary>What about <code>-u</code> basic auth?</summary>
-      <p>It&rsquo;s converted to the right mechanism per language — an <code>Authorization</code> header or the client&rsquo;s auth option.</p>
+      <p>It&rsquo;s converted to the right mechanism per language, an <code>Authorization</code> header or the client&rsquo;s auth option.</p>
     </details>
     <details class="faq"><summary>Is my command uploaded?</summary>
-      <p>No — parsing runs in your browser, so tokens and secrets in the command stay local and it works offline.</p>
+      <p>No, parsing runs in your browser, so tokens and secrets in the command stay local and it works offline.</p>
     </details>
 
     <h3>Related</h3>

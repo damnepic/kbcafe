@@ -46,8 +46,8 @@ const popular = popularDefs.map(d => ({ ...d, ...toolBy[d.href] }));
 const toolCount = TOOLS.filter(t => t.href).length;
 ---
 <Layout
-  title="KB Cafe — a developer’s knowledge base"
-  description="Fast, clean developer tools, deep references, and clear AI explainers — freshly brewed. Everything runs in your browser: nothing uploaded, nothing tracked."
+  title="KB Cafe, a developer’s knowledge base"
+  description="Fast, clean developer tools, deep references, and clear AI explainers, freshly brewed. Everything runs in your browser: nothing uploaded, nothing tracked."
   path="/"
   bodyClass="home"
 >
@@ -56,9 +56,9 @@ const toolCount = TOOLS.filter(t => t.href).length;
     <div class="hero-left">
       <div class="eyebrow">✦ The developer&rsquo;s knowledge base</div>
       <h1 class="hero-title">Tools &amp; references,<br /><span class="ul">freshly brewed.</span></h1>
-      <p class="hero-copy">Fast, clean developer tools and deep references — all in one place. Everything runs in your browser: nothing uploaded, nothing tracked.</p>
+      <p class="hero-copy">Fast, clean developer tools and deep references, all in one place. Everything runs in your browser: nothing uploaded, nothing tracked.</p>
       <div class="hero-actions">
-        <a class="btn-primary" href="#menu">Explore tools <span aria-hidden="true">→</span></a>
+        <a class="btn-primary" href="/tools">Explore tools <span aria-hidden="true">→</span></a>
         <a class="btn-secondary" href="/reference">Browse references</a>
       </div>
     </div>
@@ -73,7 +73,7 @@ const toolCount = TOOLS.filter(t => t.href).length;
       <div class="hai-body">
         <div class="hai-kicker">AI Explained <span class="badge-new">New</span></div>
         <div class="hai-title">How modern AI<br />actually works.</div>
-        <p class="hai-copy">Context windows, MCP, RAG, embeddings &amp; more — explained clearly, with tools.</p>
+        <p class="hai-copy">Context windows, MCP, RAG, embeddings &amp; more, explained clearly, with tools.</p>
         <div class="hai-links">
           <span class="hai-link"><span>{aiCards[0] && '☕'} Context Window Visualizer</span> <span aria-hidden="true">→</span></span>
           <span class="hai-link"><span>⚙ Structured Output Builder</span> <span aria-hidden="true">→</span></span>
@@ -85,21 +85,21 @@ const toolCount = TOOLS.filter(t => t.href).length;
 
   <!-- SEARCH -->
   <div class="search-wrap">
-    <form class="search" onsubmit="return false">
+    <form class="search" action="/tools" method="get">
       <span class="s-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
-      <input id="q" type="text" autocomplete="off" placeholder="What do you need? Try “json to typescript”, “cron”, “jwt”…" />
+      <input id="q" name="q" type="text" autocomplete="off" placeholder="What do you need? Try “json to typescript”, “cron”, “jwt”…" />
       <kbd class="s-key">/</kbd>
       <button type="submit">Search</button>
     </form>
-    <div class="cats" id="cats">
-      <button class="cat active" data-c="all">All</button>
-      <button class="cat" data-c="ai">AI Explained <span class="cat-new">New</span></button>
-      <button class="cat" data-c="json">JSON</button>
-      <button class="cat" data-c="encoding">Encoding</button>
-      <button class="cat" data-c="text">Text</button>
-      <button class="cat" data-c="convert">Converters</button>
-      <button class="cat" data-c="time">Time &amp; Cron</button>
-      <button class="cat" data-c="feeds">Feeds</button>
+    <div class="cats">
+      <a class="cat" href="/tools">All</a>
+      <a class="cat" href="/tools?cat=ai">AI Explained <span class="cat-new">New</span></a>
+      <a class="cat" href="/tools?cat=json">JSON</a>
+      <a class="cat" href="/tools?cat=encoding">Encoding</a>
+      <a class="cat" href="/tools?cat=text">Text</a>
+      <a class="cat" href="/tools?cat=convert">Converters</a>
+      <a class="cat" href="/tools?cat=time">Time &amp; Cron</a>
+      <a class="cat" href="/tools?cat=feeds">Feeds</a>
     </div>
   </div>
 
@@ -111,13 +111,7 @@ const toolCount = TOOLS.filter(t => t.href).length;
     <div class="benefit"><span class="b-ic b-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg></span><div><h3>Developer Friendly</h3><p>Clean UI, keyboard-friendly, and zero fluff.</p></div></div>
   </div>
 
-  <!-- SEARCH RESULTS (hidden until filtering) -->
-  <section class="results" id="results" hidden>
-    <div class="sec-head"><span class="kicker" id="results-kicker">Results</span><button class="sec-link" id="clear">Clear ✕</button></div>
-    <div class="tool-grid" id="grid"></div>
-  </section>
-
-  <div id="curated">
+  <div>
     <!-- AI EXPLAINED -->
     <section class="home-sec">
       <div class="sec-head"><span class="kicker">AI Explained <span class="cat-new">New</span></span><a class="sec-link" href="/ai">View all AI topics →</a></div>
@@ -135,7 +129,7 @@ const toolCount = TOOLS.filter(t => t.href).length;
 
     <!-- POPULAR TOOLS -->
     <section class="home-sec" id="menu">
-      <div class="sec-head"><span class="kicker">Popular Tools</span><button class="sec-link" id="showall">View all {toolCount} tools →</button></div>
+      <div class="sec-head"><span class="kicker">Popular Tools</span><a class="sec-link" href="/tools">View all {toolCount} tools →</a></div>
       <div class="tool-grid">
         {popular.map(t => (
           <a class="tool-card" href={t.href}>
@@ -147,7 +141,7 @@ const toolCount = TOOLS.filter(t => t.href).length;
           </a>
         ))}
       </div>
-      <div class="viewall"><button class="btn-outline" id="showall2">View all {toolCount} tools →</button></div>
+      <div class="viewall"><a class="btn-outline" href="/tools">View all {toolCount} tools →</a></div>
     </section>
   </div>
 
@@ -167,55 +161,16 @@ const toolCount = TOOLS.filter(t => t.href).length;
     </a>
   </div>
 
-  <script define:vars={{ TOOLS }}>
-    const $ = id => document.getElementById(id);
-    const grid = $('grid'), results = $('results'), curated = $('curated'), qEl = $('q');
-    let activeCat = 'all', query = '', forceAll = false;
-
-    function active(){ return forceAll || query.trim() !== '' || activeCat !== 'all'; }
-
-    function render(){
-      if(!active()){ results.hidden = true; curated.style.display = ''; return; }
-      curated.style.display = 'none'; results.hidden = false;
-      const q = query.trim().toLowerCase();
-      const list = TOOLS.filter(t => {
-        const catOk = forceAll || activeCat === 'all' || t.cat === activeCat;
-        const qOk = !q || (t.nm + ' ' + t.ds + ' ' + t.ctl).toLowerCase().includes(q);
-        return catOk && qOk;
-      });
-      $('results-kicker').textContent = forceAll ? `All tools · ${list.length}` : `Results · ${list.length}`;
-      grid.innerHTML = '';
-      if(!list.length){ grid.innerHTML = '<p class="none">No tool for that yet — but it could be next on the menu. ☕</p>'; return; }
-      list.forEach(t => {
-        const live = !!t.href;
-        const el = document.createElement(live ? 'a' : 'div');
-        if(live) el.href = t.href;
-        el.className = 'tool-card' + (live ? '' : ' soon');
-        el.innerHTML = `<span class="tool-ic" style="background:var(--ink)">${(t.ctl||'').slice(0,2)}</span>`
-          + `<div class="tc-body"><h3>${t.nm}</h3><p>${t.ds}</p>`
-          + `<span class="tc-dm">${live ? t.ctl : 'soon on the menu'}</span></div>`;
-        grid.appendChild(el);
-      });
-    }
-
-    qEl.addEventListener('input', e => { query = e.target.value; forceAll = false; render(); });
-    $('cats').addEventListener('click', e => {
-      const b = e.target.closest('.cat'); if(!b) return;
-      document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
-      b.classList.add('active'); activeCat = b.dataset.c; forceAll = false; render();
-    });
-    $('clear').addEventListener('click', () => { query = ''; qEl.value = ''; activeCat = 'all'; forceAll = false;
-      document.querySelectorAll('.cat').forEach(c => c.classList.toggle('active', c.dataset.c === 'all')); render(); });
-    function showAll(){ forceAll = true; render(); results.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    $('showall').addEventListener('click', showAll); $('showall2').addEventListener('click', showAll);
-
-    // "/" focuses search
+  <script is:inline>
+    // "/" focuses the search box
+    const qEl = document.getElementById('q');
     document.addEventListener('keydown', e => {
       if(e.key === '/' && document.activeElement !== qEl && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); qEl.focus(); }
     });
     // newsletter: honest no-backend acknowledgement
-    $('nlform').addEventListener('submit', () => {
-      const f = $('nlform'); f.innerHTML = '<p class="nl-done">Thanks — the newsletter is launching soon. ☕</p>';
+    const nlform = document.getElementById('nlform');
+    nlform.addEventListener('submit', () => {
+      nlform.innerHTML = '<p class="nl-done">Thanks. The newsletter is launching soon. ☕</p>';
     });
   </script>
 </Layout>
@@ -273,7 +228,7 @@ const toolCount = TOOLS.filter(t => t.href).length;
   .s-key{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:7px;padding:3px 8px;background:var(--paper-2)}
   .search button{height:50px;border:0;border-radius:15px;padding:0 24px;background:linear-gradient(135deg,#ff5839,#e23a1d);color:#fff;font-family:var(--font-display);font-weight:800;font-size:15px;cursor:pointer}
   .cats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px auto 0;max-width:820px}
-  .cat{height:38px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.55);color:var(--ink-soft);padding:0 16px;display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .14s}
+  .cat{height:38px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.55);color:var(--ink-soft);padding:0 16px;display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .14s}
   .cat:hover{border-color:var(--ink);color:var(--ink)}
   .cat.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
   .cat-new{margin-left:6px;padding:2px 7px;background:#ffe5dd;color:var(--coral-deep);font-size:9.5px}

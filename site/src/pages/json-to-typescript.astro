@@ -14,12 +14,12 @@ const sample = `{
 }`;
 ---
 <ToolPage
-  title="JSON to TypeScript — generate typed interfaces | KB Cafe"
-  description="Paste JSON and instantly get clean, typed TypeScript interfaces. Free, fast, and fully client-side — your data never leaves the browser."
+  title="JSON to TypeScript, generate typed interfaces | KB Cafe"
+  description="Paste JSON and instantly get clean, typed TypeScript interfaces. Free, fast, and fully client-side, your data never leaves the browser."
   path="/json-to-typescript"
   eyebrow="JSON · Converters"
   h1="JSON → TypeScript"
-  tagline="Paste any JSON payload and get clean, ready-to-use TypeScript interfaces. Runs entirely in your browser — nothing is uploaded."
+  tagline="Paste any JSON payload and get clean, ready-to-use TypeScript interfaces. Runs entirely in your browser, nothing is uploaded."
 >
   <div class="panes">
     <div class="pane">
@@ -48,14 +48,14 @@ const sample = `{
       Paste a JSON object or array on the left and KB Cafe walks the structure to produce
       matching <code>interface</code> declarations on the right. Nested objects become their own
       named interfaces, arrays are typed by their elements, and mixed primitives collapse into
-      union types like <code>string | number</code>. It all happens in your browser — no request
+      union types like <code>string | number</code>. It all happens in your browser, no request
       is ever sent, so it is safe to paste API responses or config you would rather not upload.
     </p>
 
     <h3>How type inference works here</h3>
     <ul>
       <li><strong>Objects</strong> become an <code>interface</code>; nested objects get a named child interface based on the key.</li>
-      <li><strong>Arrays</strong> are typed by merging every element — <code>[1, 2]</code> is <code>number[]</code>, and an array of objects merges their keys (missing keys become optional).</li>
+      <li><strong>Arrays</strong> are typed by merging every element, <code>[1, 2]</code> is <code>number[]</code>, and an array of objects merges their keys (missing keys become optional).</li>
       <li><strong>null</strong> values widen a field to <code>… | null</code> rather than guessing.</li>
       <li><strong>Empty arrays / objects</strong> fall back to <code>unknown[]</code> and <code>Record&lt;string, unknown&gt;</code> so nothing is silently wrong.</li>
     </ul>
@@ -64,7 +64,7 @@ const sample = `{
     <p>
       Given a coffee record with an <code>origin</code> object and a list of <code>reviews</code>,
       you get a root <code>interface</code> plus an <code>Origin</code> and <code>Review</code>
-      interface — drop them straight into your <code>.ts</code> file. Click <em>load sample</em>
+      interface, drop them straight into your <code>.ts</code> file. Click <em>load sample</em>
       above to try it.
     </p>
 
@@ -76,7 +76,7 @@ const sample = `{
       <p>When an array contains objects that don&rsquo;t all share the same keys, the keys that are missing from some elements are marked optional. You can also force every field optional with the toggle above.</p>
     </details>
     <details class="faq"><summary>Does it handle deeply nested JSON?</summary>
-      <p>Yes — nesting is unlimited. Each distinct object shape becomes its own interface, named after the key that holds it.</p>
+      <p>Yes, nesting is unlimited. Each distinct object shape becomes its own interface, named after the key that holds it.</p>
     </details>
 
     <h3>Related references</h3>

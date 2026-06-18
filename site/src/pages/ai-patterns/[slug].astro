@@ -11,7 +11,7 @@ const related = (p.related || []).map(patternBySlug).filter(Boolean);
 const more = PATTERNS.filter(x => x.slug !== p.slug).slice(0, 4);
 ---
 <Layout
-  title={`${p.name} Pattern — ${p.tagline} | KB Cafe`}
+  title={`${p.name} Pattern, ${p.tagline} | KB Cafe`}
   description={`The ${p.name} pattern for AI systems: ${p.tagline} How it works, its strengths and weaknesses, when to use it, and an example prompt.`}
   path={path}
 >

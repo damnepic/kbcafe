@@ -4,12 +4,12 @@ import { CONTEXT_TIERS, CHARS_PER_TOKEN, AS_OF } from '../data/aiModels.js';
 const SAMPLE = `You are a helpful coding assistant for the ACME app. Always answer concisely, cite file paths, and never invent APIs.`;
 ---
 <ToolPage
-  title="Context Window Visualizer — see how your prompt fills the budget | KB Cafe"
-  description="Paste your system prompt, conversation, and retrieved docs and see how they fill an AI model's context window — with token estimates and a visual budget bar. Free, client-side."
+  title="Context Window Visualizer, see how your prompt fills the budget | KB Cafe"
+  description="Paste your system prompt, conversation, and retrieved docs and see how they fill an AI model's context window, with token estimates and a visual budget bar. Free, client-side."
   path="/context-window-visualizer"
   eyebrow="AI Explained · Tool"
   h1="Context Window Visualizer"
-  tagline="See how your system prompt, conversation history, retrieved docs, and reserved output fill a model's context window — and how much room is actually left. Runs in your browser."
+  tagline="See how your system prompt, conversation history, retrieved docs, and reserved output fill a model's context window, and how much room is actually left. Runs in your browser."
 >
   <div class="row" style="margin-bottom:14px">
     <label class="opt">Model context budget
@@ -50,7 +50,7 @@ const SAMPLE = `You are a helpful coding assistant for the ACME app. Always answ
     <h2>Where did all my context go?</h2>
     <p>
       A model&rsquo;s <a href="/what-is-a-context-window">context window</a> is shared by everything in a
-      request — your system prompt, the conversation history the app keeps re-sending, any retrieved
+      request, your system prompt, the conversation history the app keeps re-sending, any retrieved
       documents, and the reply itself. This tool estimates the tokens in each part and shows them stacked
       against a model&rsquo;s budget, so you can see what&rsquo;s actually eating the space and how much is
       left to answer.
@@ -59,12 +59,12 @@ const SAMPLE = `You are a helpful coding assistant for the ACME app. Always answ
     <ul>
       <li>Pick a <strong>context budget</strong> (a size tier, or enter a custom number for your exact model).</li>
       <li>Paste each part of your prompt; the bar fills proportionally and the percentage updates live.</li>
-      <li>If the total turns <strong>red</strong>, you&rsquo;re over budget — the app would truncate or reject
+      <li>If the total turns <strong>red</strong>, you&rsquo;re over budget, the app would truncate or reject
         the request. Trim history, retrieve fewer chunks, or reserve less output.</li>
     </ul>
     <p class="note">
       Token counts are <strong>estimates</strong> (~{CHARS_PER_TOKEN} characters per token). Real
-      tokenization varies by model and content — code and non-English text tokenize differently. Size tiers
+      tokenization varies by model and content, code and non-English text tokenize differently. Size tiers
       are dated <strong>{AS_OF}</strong>; verify your model&rsquo;s exact limit with its provider.
     </p>
 
@@ -73,10 +73,10 @@ const SAMPLE = `You are a helpful coding assistant for the ACME app. Always answ
       <p>Every model family tokenizes differently, and the exact split depends on the text. The ~4-chars-per-token rule is a solid ballpark for English prose; treat it as a planning estimate, not an exact bill.</p>
     </details>
     <details class="faq"><summary>Why reserve space for output?</summary>
-      <p>The reply is generated <em>into</em> the same window as the input. If you fill the budget with input, there&rsquo;s no room left to answer — so apps reserve a slice for the response.</p>
+      <p>The reply is generated <em>into</em> the same window as the input. If you fill the budget with input, there&rsquo;s no room left to answer, so apps reserve a slice for the response.</p>
     </details>
     <details class="faq"><summary>Is anything uploaded?</summary>
-      <p>No — estimation runs entirely in your browser, so prompts and documents stay local and it works offline.</p>
+      <p>No, estimation runs entirely in your browser, so prompts and documents stay local and it works offline.</p>
     </details>
 
     <h3>Related</h3>
@@ -164,7 +164,7 @@ const SAMPLE = `You are a helpful coding assistant for the ACME app. Always answ
     ).join('');
 
     const st = $('status');
-    if(over){ st.className = 'status bad'; st.textContent = `Over budget by ${fmt(used - bud)} tokens — the request would be truncated or rejected. Trim history or retrieve fewer chunks.`; }
+    if(over){ st.className = 'status bad'; st.textContent = `Over budget by ${fmt(used - bud)} tokens, the request would be truncated or rejected. Trim history or retrieve fewer chunks.`; }
     else { st.className = 'status ok'; st.textContent = `Estimated ${fmt(used)} tokens used (${Math.round(pct)}% of budget).`; }
   }
 

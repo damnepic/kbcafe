@@ -131,3 +131,23 @@ for (const [f, k] of targets) {
   r.hits.forEach(h => console.log("        - " + h));
 }
 console.log(`\n${bad === 0 ? "ALL CLEAN ✓" : bad + " file(s) with hits"}`);
+
+// ── Em-dash ban: em dashes read as AI-written. Scan the whole src tree. ──
+// En dashes (–) are allowed for ranges; only — / &mdash; are flagged.
+const emFiles = [];
+(function walk(d) {
+  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+    const p = path.join(d, e.name);
+    if (e.isDirectory()) walk(p);
+    else if (/\.(astro|js)$/.test(e.name)) {
+      const n = (fs.readFileSync(p, "utf8").match(/—|&mdash;/g) || []).length;
+      if (n) emFiles.push([path.relative("C:/KBCafe/site", p), n]);
+    }
+  }
+})("C:/KBCafe/site/src");
+if (emFiles.length) {
+  console.log(`\n✗ EM DASHES FOUND in ${emFiles.length} file(s) — run: node scripts/dedash.cjs`);
+  emFiles.forEach(([f, n]) => console.log(`        - ${f} (${n})`));
+} else {
+  console.log("Em-dash ban ✓  (0 found)");
+}

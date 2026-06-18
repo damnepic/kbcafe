@@ -2,7 +2,7 @@
 import ReferencePage from '../layouts/ReferencePage.astro';
 ---
 <ReferencePage
-  title="Multithreading &amp; concurrency explained — threads, races, locks, deadlocks | KB Cafe"
+  title="Multithreading &amp; concurrency explained, threads, races, locks, deadlocks | KB Cafe"
   description="A practical reference on multithreading: threads vs processes, race conditions, locks and mutexes, deadlocks, thread safety, and when to use async instead of threads."
   path="/multithreading-explained"
   eyebrow="Reference · Concurrency"
@@ -13,7 +13,7 @@ import ReferencePage from '../layouts/ReferencePage.astro';
   <p>
     A <strong>process</strong> is a running program with its own isolated memory. A <strong>thread</strong>
     is a unit of execution <em>inside</em> a process; threads in the same process <strong>share memory</strong>.
-    That shared memory is what makes threads cheap to communicate — and also what makes concurrency hard.
+    That shared memory is what makes threads cheap to communicate, and also what makes concurrency hard.
     Multiple threads reading and writing the same data at the same time is the root of most concurrency bugs.
   </p>
 
@@ -35,7 +35,7 @@ import ReferencePage from '../layouts/ReferencePage.astro';
 
   <h2>Locks, mutexes, and critical sections</h2>
   <p>
-    The fix is to make the dangerous sequence <strong>atomic</strong> — indivisible. A <strong>lock</strong> (or
+    The fix is to make the dangerous sequence <strong>atomic</strong>: indivisible. A <strong>lock</strong> (or
     <strong>mutex</strong>, &ldquo;mutual exclusion&rdquo;) ensures only one thread enters a <strong>critical
     section</strong> at a time; others wait. Hold locks for as <em>short</em> a time as possible: locking too much
     serializes your program and kills the benefit of threads, while locking too little leaves races open.
@@ -51,17 +51,17 @@ import ReferencePage from '../layouts/ReferencePage.astro';
 
   <h2>Writing thread-safe code</h2>
   <ul>
-    <li><strong>Don&rsquo;t share mutable state</strong> if you can avoid it — the safest shared data is no shared data.</li>
+    <li><strong>Don&rsquo;t share mutable state</strong> if you can avoid it, the safest shared data is no shared data.</li>
     <li><strong>Prefer immutability:</strong> data that never changes after creation is automatically thread-safe.</li>
     <li><strong>Use higher-level tools:</strong> thread-safe collections, atomic types, and message-passing
       (queues / channels) are easier to get right than hand-rolled locks.</li>
-    <li><strong>Protect every access</strong> to shared mutable data with the same lock — guarding only some accesses still races.</li>
+    <li><strong>Protect every access</strong> to shared mutable data with the same lock, guarding only some accesses still races.</li>
   </ul>
 
   <h2>Async vs threads</h2>
   <p>
-    Not all concurrency needs threads. For <strong>I/O-bound</strong> work — waiting on the network, disk, or a
-    database — <strong>async / non-blocking</strong> models (event loops, <code>async/await</code>) let a single
+    Not all concurrency needs threads. For <strong>I/O-bound</strong> work, waiting on the network, disk, or a
+    database, <strong>async / non-blocking</strong> models (event loops, <code>async/await</code>) let a single
     thread juggle thousands of in-flight operations without the overhead and locking of real threads. Reach for
     <strong>threads (or multiple processes) for CPU-bound</strong> work that needs real parallelism across cores;
     reach for <strong>async for I/O-bound</strong> work that&rsquo;s mostly waiting.

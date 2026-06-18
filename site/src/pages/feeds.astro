@@ -1,19 +1,19 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-// The Feeds pillar — honors kbcafe.com's RSS-era heritage and is the canonical
+// The Feeds pillar, honors kbcafe.com's RSS-era heritage and is the canonical
 // landing for the aged /rss/, /Rmail, and /juice backlink equity. Tools ship over time;
 // the page is a real, content-bearing 200 from day one so the link equity lands well.
 const tools = [
-  { nm: 'RSS / Atom validator', ds: 'Check any feed against the RSS 2.0 and Atom specs — see exactly what is malformed and where.', soon: true },
+  { nm: 'RSS / Atom validator', ds: 'Check any feed against the RSS 2.0 and Atom specs, see exactly what is malformed and where.', soon: true },
   { nm: 'OPML converter', ds: 'Import, view, and convert OPML subscription lists to and from JSON.', soon: true },
-  { nm: 'RSS → JSON', ds: 'Turn any feed into clean JSON for your app — no server round-trip.', soon: true },
+  { nm: 'RSS → JSON', ds: 'Turn any feed into clean JSON for your app, no server round-trip.', soon: true },
   { nm: 'Feed preview', ds: 'Paste a feed URL or XML and read it as a clean, human-friendly list.', soon: true },
 ];
 ---
 <Layout
-  title="Feeds — RSS, Atom & OPML tools | KB Cafe"
-  description="Modern, client-side RSS, Atom, and OPML tools — validate feeds, convert OPML, turn feeds into JSON. Honoring kbcafe.com's long heritage as an RSS-era developer resource."
+  title="Feeds, RSS, Atom & OPML tools | KB Cafe"
+  description="Modern, client-side RSS, Atom, and OPML tools, validate feeds, convert OPML, turn feeds into JSON. Honoring kbcafe.com's long heritage as an RSS-era developer resource."
   path="/feeds"
 >
   <section class="feeds">
@@ -21,7 +21,7 @@ const tools = [
     <h1>Feed tools, <span class="mk">freshly brewed.</span></h1>
     <p class="lede">
       Fast, private, client-side tools for <strong>RSS</strong>, <strong>Atom</strong>, and
-      <strong>OPML</strong> — validate a feed, convert a subscription list, or turn a feed into
+      <strong>OPML</strong>: validate a feed, convert a subscription list, or turn a feed into
       JSON. Everything runs in your browser: paste a feed and nothing is uploaded.
     </p>
 
@@ -39,7 +39,7 @@ const tools = [
     <div class="prose">
       <h2>A feed-native corner of the web</h2>
       <p>
-        <code>kbcafe.com</code> has been a developer resource since the early RSS era — when
+        <code>kbcafe.com</code> has been a developer resource since the early RSS era, when
         feeds were how the web's writing actually moved around. That heritage is why the Feeds
         section exists: it is the most on-topic part of the site's history, and it is being
         rebuilt with modern, no-tracking tooling rather than left to rot.
@@ -47,23 +47,23 @@ const tools = [
 
       <h3>The pieces of a feed</h3>
       <ul>
-        <li><strong>RSS 2.0</strong> — the classic <code>&lt;channel&gt;</code> / <code>&lt;item&gt;</code> format most blogs still publish.</li>
-        <li><strong>Atom</strong> — the IETF-standard alternative (<code>&lt;feed&gt;</code> / <code>&lt;entry&gt;</code>), stricter and namespaced.</li>
-        <li><strong>OPML</strong> — the outline format used to import and export whole lists of feed subscriptions between readers.</li>
+        <li><strong>RSS 2.0</strong>: the classic <code>&lt;channel&gt;</code> / <code>&lt;item&gt;</code> format most blogs still publish.</li>
+        <li><strong>Atom</strong>: the IETF-standard alternative (<code>&lt;feed&gt;</code> / <code>&lt;entry&gt;</code>), stricter and namespaced.</li>
+        <li><strong>OPML</strong>: the outline format used to import and export whole lists of feed subscriptions between readers.</li>
       </ul>
 
       <h3>Why client-side</h3>
       <p>
         A feed often contains URLs, tokens in query strings, or content you would rather not hand
         to a third-party service. KB Cafe's feed tools parse everything locally in your browser,
-        so a feed you paste here never leaves your machine — and the tools keep working offline
+        so a feed you paste here never leaves your machine, and the tools keep working offline
         once the page has loaded.
       </p>
 
       <h3>On the way</h3>
       <p>
         The validator, OPML converter, RSS-to-JSON, and feed preview tools are being built in the
-        order above. In the meantime, browse the <a href="/#menu">full menu of tools</a> — including
+        order above. In the meantime, browse the <a href="/#menu">full menu of tools</a>, including
         the <a href="/json-to-typescript">JSON → TypeScript</a> converter, which pairs well with the
         coming RSS-to-JSON output.
       </p>

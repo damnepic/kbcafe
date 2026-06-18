@@ -3,12 +3,12 @@ import ToolPage from '../layouts/ToolPage.astro';
 import { PATTERNS } from '../data/patterns.js';
 ---
 <ToolPage
-  title="AI Pattern Explorer — compare agent design patterns | KB Cafe"
-  description="An interactive explorer for AI design patterns — Reflection, Router, Judge, Verification, Human-in-the-Loop. See each pattern's flow, strengths, watch-outs, and an example prompt."
+  title="AI Pattern Explorer, compare agent design patterns | KB Cafe"
+  description="An interactive explorer for AI design patterns, Reflection, Router, Judge, Verification, Human-in-the-Loop. See each pattern's flow, strengths, watch-outs, and an example prompt."
   path="/ai-pattern-explorer"
   eyebrow="AI Explained · Tool"
   h1="AI Pattern Explorer"
-  tagline="Pick an AI design pattern and see how it works at a glance — its flow, strengths, watch-outs, and an example prompt. The patterns behind modern agents, side by side."
+  tagline="Pick an AI design pattern and see how it works at a glance, its flow, strengths, watch-outs, and an example prompt. The patterns behind modern agents, side by side."
 >
   <div class="px">
     <nav class="px-list" id="list"></nav>
@@ -18,7 +18,7 @@ import { PATTERNS } from '../data/patterns.js';
   <Fragment slot="explainer">
     <h2>The patterns behind modern agents</h2>
     <p>
-      Building with AI is settling into a small set of recurring shapes — the same way classic software did with
+      Building with AI is settling into a small set of recurring shapes, the same way classic software did with
       <a href="/software-design-patterns">design patterns</a>. This explorer puts them side by side: select a
       pattern to see its <strong>flow</strong>, what it&rsquo;s <strong>good and bad at</strong>, when to reach
       for it, and a <strong>prompt</strong> you can adapt. Each links to a full write-up in the
@@ -26,11 +26,11 @@ import { PATTERNS } from '../data/patterns.js';
     </p>
     <h3>The starter set</h3>
     <ul>
-      <li><strong>Reflection</strong> — the model critiques and improves its own output.</li>
-      <li><strong>Router</strong> — classify the request and route it to the right path.</li>
-      <li><strong>Judge</strong> — one model evaluates another&rsquo;s output against a rubric.</li>
-      <li><strong>Verification</strong> — check the claims before responding.</li>
-      <li><strong>Human-in-the-Loop</strong> — request approval before acting.</li>
+      <li><strong>Reflection</strong>: the model critiques and improves its own output.</li>
+      <li><strong>Router</strong>: classify the request and route it to the right path.</li>
+      <li><strong>Judge</strong>: one model evaluates another&rsquo;s output against a rubric.</li>
+      <li><strong>Verification</strong>: check the claims before responding.</li>
+      <li><strong>Human-in-the-Loop</strong>: request approval before acting.</li>
     </ul>
 
     <h2>FAQ</h2>
@@ -38,10 +38,10 @@ import { PATTERNS } from '../data/patterns.js';
       <p>They&rsquo;re the names the community has converged on across agent frameworks and provider docs. The value is collecting them in one place with honest trade-offs, not coining a standard.</p>
     </details>
     <details class="faq"><summary>Can I combine patterns?</summary>
-      <p>Almost always — real systems chain them. A Router picks a path, that path uses Reflection, and a Judge gates the result. The patterns are building blocks, not either/or choices.</p>
+      <p>Almost always, real systems chain them. A Router picks a path, that path uses Reflection, and a Judge gates the result. The patterns are building blocks, not either/or choices.</p>
     </details>
     <details class="faq"><summary>Is anything uploaded?</summary>
-      <p>No — the explorer is static content rendered in your browser. Nothing is sent anywhere.</p>
+      <p>No, the explorer is static content rendered in your browser. Nothing is sent anywhere.</p>
     </details>
 
     <h3>Related</h3>

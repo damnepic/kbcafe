@@ -2,12 +2,12 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="Cron Generator &amp; Explainer — build and read crontab expressions | KB Cafe"
+  title="Cron Generator &amp; Explainer, build and read crontab expressions | KB Cafe"
   description="Build a crontab schedule with simple controls and read any cron expression in plain English. Free, fast, client-side. See the next run times instantly."
   path="/cron-generator"
   eyebrow="Time &amp; Cron · Scheduling"
   h1="Cron Generator"
-  tagline="Build a schedule with simple controls, or paste a cron expression to read it in plain English — with the next run times. Runs entirely in your browser."
+  tagline="Build a schedule with simple controls, or paste a cron expression to read it in plain English, with the next run times. Runs entirely in your browser."
 >
   <div class="pane" style="margin-bottom:14px">
     <div class="pane-label"><span>Cron expression</span><span id="valid-flag" class="vflag"></span></div>
@@ -51,16 +51,16 @@ import ToolPage from '../layouts/ToolPage.astro';
 
     <h3>The operators</h3>
     <ul>
-      <li><code>*</code> — every value (&ldquo;every minute&rdquo;, &ldquo;every day&rdquo;).</li>
-      <li><code>,</code> — a list, e.g. <code>1,15,30</code>.</li>
-      <li><code>-</code> — a range, e.g. <code>1-5</code> (Mon–Fri).</li>
-      <li><code>/</code> — a step, e.g. <code>*/15</code> (every 15 units) or <code>0-30/10</code>.</li>
+      <li><code>*</code>: every value (&ldquo;every minute&rdquo;, &ldquo;every day&rdquo;).</li>
+      <li><code>,</code>: a list, e.g. <code>1,15,30</code>.</li>
+      <li><code>-</code>: a range, e.g. <code>1-5</code> (Mon–Fri).</li>
+      <li><code>/</code>: a step, e.g. <code>*/15</code> (every 15 units) or <code>0-30/10</code>.</li>
     </ul>
 
     <h3>A subtle gotcha: day-of-month vs day-of-week</h3>
     <p>
       When <em>both</em> day-of-month and day-of-week are restricted (neither is <code>*</code>),
-      classic cron runs the job when <strong>either</strong> matches — an OR, not an AND. So
+      classic cron runs the job when <strong>either</strong> matches, an OR, not an AND. So
       <code>0 0 13 * 5</code> fires on the 13th <em>and</em> every Friday, not just Friday the 13th.
       Keep one field as <code>*</code> to avoid surprises.
     </p>
@@ -70,7 +70,7 @@ import ToolPage from '../layouts/ToolPage.astro';
       <p>This tool uses the classic 5-field crontab format used by Linux cron, most CI schedulers, and Vercel Cron. Some systems (Quartz, some Kubernetes setups) add a seconds field for 6 fields.</p>
     </details>
     <details class="faq"><summary>What timezone do the next run times use?</summary>
-      <p>The preview next-run times are computed in <em>your</em> local timezone for readability. Real cron runs in the server&rsquo;s timezone — check your platform&rsquo;s docs (many CI systems default to UTC).</p>
+      <p>The preview next-run times are computed in <em>your</em> local timezone for readability. Real cron runs in the server&rsquo;s timezone, check your platform&rsquo;s docs (many CI systems default to UTC).</p>
     </details>
     <details class="faq"><summary>Does anything get uploaded?</summary>
       <p>No. Parsing and the next-run preview are computed in your browser, so it works offline.</p>

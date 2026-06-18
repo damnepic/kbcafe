@@ -2,12 +2,12 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="YAML to JSON Converter (and back) — online &amp; client-side | KB Cafe"
-  description="Convert YAML to JSON or JSON to YAML instantly, with full multi-document and type support. Free, fast, fully client-side — your config never leaves the browser."
+  title="YAML to JSON Converter (and back), online &amp; client-side | KB Cafe"
+  description="Convert YAML to JSON or JSON to YAML instantly, with full multi-document and type support. Free, fast, fully client-side, your config never leaves the browser."
   path="/yaml-to-json"
   eyebrow="Converters"
   h1="YAML ⇄ JSON"
-  tagline="Convert YAML to JSON or JSON back to YAML — full spec support via a real parser. Paste a config; it&rsquo;s converted in your browser and never uploaded."
+  tagline="Convert YAML to JSON or JSON back to YAML, full spec support via a real parser. Paste a config; it&rsquo;s converted in your browser and never uploaded."
 >
   <div class="row" style="margin-bottom:12px">
     <button class="chip active" id="m-y2j">YAML → JSON</button>
@@ -31,9 +31,9 @@ import ToolPage from '../layouts/ToolPage.astro';
   <Fragment slot="explainer">
     <h2>YAML and JSON, both ways</h2>
     <p>
-      YAML is what humans write — config files, CI pipelines, Kubernetes manifests; JSON is what machines and APIs
+      YAML is what humans write, config files, CI pipelines, Kubernetes manifests; JSON is what machines and APIs
       prefer. This converter goes both directions using a full YAML parser, so anchors, multi-line strings, typed
-      scalars (numbers, booleans, null, dates), and nested structures all convert correctly — not just the simple
+      scalars (numbers, booleans, null, dates), and nested structures all convert correctly, not just the simple
       key/value cases.
     </p>
 
@@ -41,7 +41,7 @@ import ToolPage from '../layouts/ToolPage.astro';
     <ul>
       <li><strong>JSON is valid YAML.</strong> YAML is a superset, which is why a <code>.json</code> file usually parses as YAML too.</li>
       <li><strong>Types matter.</strong> Unquoted <code>yes</code>, <code>no</code>, <code>on</code>, <code>off</code>, and bare numbers become booleans/numbers. Quote them if you meant strings.</li>
-      <li><strong>Indentation is structure</strong> in YAML — tabs are not allowed for indentation; use spaces.</li>
+      <li><strong>Indentation is structure</strong> in YAML, tabs are not allowed for indentation; use spaces.</li>
     </ul>
 
     <h2>FAQ</h2>
@@ -49,10 +49,10 @@ import ToolPage from '../layouts/ToolPage.astro';
       <p>It uses a complete YAML 1.1 parser, so anchors/aliases, block and flow styles, multi-line scalars, and typed values are all handled.</p>
     </details>
     <details class="faq"><summary>Is my config uploaded?</summary>
-      <p>No — conversion runs entirely in your browser, so secrets in a config stay local and the tool works offline.</p>
+      <p>No, conversion runs entirely in your browser, so secrets in a config stay local and the tool works offline.</p>
     </details>
     <details class="faq"><summary>Why did my <code>on:</code> key become <code>true</code>?</summary>
-      <p>YAML reads bare <code>on</code>/<code>off</code>/<code>yes</code>/<code>no</code> as booleans. Wrap them in quotes (<code>"on"</code>) to keep them as strings — a classic gotcha in GitHub Actions files.</p>
+      <p>YAML reads bare <code>on</code>/<code>off</code>/<code>yes</code>/<code>no</code> as booleans. Wrap them in quotes (<code>"on"</code>) to keep them as strings, a classic gotcha in GitHub Actions files.</p>
     </details>
 
     <h3>Related</h3>

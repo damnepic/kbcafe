@@ -1,15 +1,15 @@
 ---
 import ToolPage from '../layouts/ToolPage.astro';
-// A harmless sample token (HS256, signature is not valid — for demo only).
+// A harmless sample token (HS256, signature is not valid, for demo only).
 const sample = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFkYSBMb3ZlbGFjZSIsImFkbWluIjp0cnVlLCJpYXQiOjE3MTYyMzkwMjIsImV4cCI6MTcxNjI0MjYyMn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 ---
 <ToolPage
-  title="JWT Decoder — decode &amp; inspect JSON Web Tokens | KB Cafe"
-  description="Paste a JWT to decode its header and payload, read the claims, and see when it expires. Free, fast, fully client-side — your token never leaves your browser."
+  title="JWT Decoder, decode &amp; inspect JSON Web Tokens | KB Cafe"
+  description="Paste a JWT to decode its header and payload, read the claims, and see when it expires. Free, fast, fully client-side, your token never leaves your browser."
   path="/jwt-decoder"
   eyebrow="Encoding · Auth"
   h1="JWT Decoder"
-  tagline="Decode a JSON Web Token to read its header, payload, and claims. Everything is decoded locally in your browser — your token is never sent anywhere."
+  tagline="Decode a JSON Web Token to read its header, payload, and claims. Everything is decoded locally in your browser, your token is never sent anywhere."
 >
   <div class="pane" style="margin-bottom:18px">
     <div class="pane-label"><span>Token</span><button class="link-btn" id="sample">load sample</button></div>
@@ -37,30 +37,30 @@ const sample = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiw
       <code>header.payload.signature</code>. The header says which algorithm signed it, the
       payload carries the claims (who the token is for, when it expires), and the signature lets
       a server verify the first two parts weren&rsquo;t tampered with. This tool decodes the
-      header and payload so you can read them — decoding is <em>not</em> the same as verifying.
+      header and payload so you can read them, decoding is <em>not</em> the same as verifying.
     </p>
 
     <h3>Common claims you&rsquo;ll see</h3>
     <ul>
-      <li><code>iss</code> — issuer, who created the token.</li>
-      <li><code>sub</code> — subject, usually the user ID.</li>
-      <li><code>aud</code> — audience, who the token is meant for.</li>
-      <li><code>exp</code> — expiry (Unix seconds); after this the token is invalid.</li>
-      <li><code>iat</code> — issued-at; <code>nbf</code> — not-valid-before.</li>
+      <li><code>iss</code>: issuer, who created the token.</li>
+      <li><code>sub</code>: subject, usually the user ID.</li>
+      <li><code>aud</code>: audience, who the token is meant for.</li>
+      <li><code>exp</code>: expiry (Unix seconds); after this the token is invalid.</li>
+      <li><code>iat</code>: issued-at; <code>nbf</code>: not-valid-before.</li>
     </ul>
     <p>This decoder humanizes <code>exp</code>, <code>iat</code>, and <code>nbf</code> into readable dates and flags an expired token.</p>
 
-    <h2 style="color:var(--coral-deep)">Security note — read this</h2>
+    <h2 style="color:var(--coral-deep)">Security note, read this</h2>
     <p>
       <strong>The payload is only encoded, not encrypted.</strong> Anyone holding the token can
-      read every claim — exactly like this page does. Never put secrets in a JWT payload, and never
+      read every claim, exactly like this page does. Never put secrets in a JWT payload, and never
       trust a token without verifying its signature on the server. This tool deliberately does
       <em>not</em> ask for your signing secret: it decodes locally and never transmits your token.
     </p>
 
     <h2>FAQ</h2>
     <details class="faq"><summary>Does this verify the signature?</summary>
-      <p>No. Verifying requires your secret or public key, which should stay on your server. This tool only decodes the readable header and payload — the safe, common need when debugging.</p>
+      <p>No. Verifying requires your secret or public key, which should stay on your server. This tool only decodes the readable header and payload, the safe, common need when debugging.</p>
     </details>
     <details class="faq"><summary>Is my token sent to a server?</summary>
       <p>Never. All decoding is JavaScript running on this page, so your token stays in your browser and the tool works offline.</p>
@@ -122,7 +122,7 @@ const sample = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiw
     const parts = raw.split('.');
     if(parts.length < 2 || parts.length > 3){
       tok.classList.add('err'); statusEl.className = 'status bad';
-      statusEl.textContent = 'Not a JWT — expected 2 or 3 dot-separated parts.';
+      statusEl.textContent = 'Not a JWT, expected 2 or 3 dot-separated parts.';
       return;
     }
     let header, payload;

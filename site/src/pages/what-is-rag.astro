@@ -2,12 +2,12 @@
 import AiPage from '../layouts/AiPage.astro';
 ---
 <AiPage
-  title="What is RAG (Retrieval-Augmented Generation)? — explained | KB Cafe"
+  title="What is RAG (Retrieval-Augmented Generation)?, explained | KB Cafe"
   description="A clear explainer of RAG: how retrieval-augmented generation grounds a model in your own documents using embeddings and a vector search, why it beats fine-tuning for facts, and its pitfalls."
   path="/what-is-rag"
   eyebrow="AI Explained · Pattern"
   h1="What is RAG (Retrieval-Augmented Generation)?"
-  tagline="RAG lets a model answer from your documents instead of only its training data — by retrieving the relevant pieces at query time and putting them in the context."
+  tagline="RAG lets a model answer from your documents instead of only its training data, by retrieving the relevant pieces at query time and putting them in the context."
 >
   <h2>Why RAG exists</h2>
   <p>
@@ -25,7 +25,7 @@ import AiPage from '../layouts/AiPage.astro';
   <ul>
     <li><strong>Chunk</strong> your documents into passages small enough to be specific but large enough to
       be meaningful.</li>
-    <li><strong>Embed</strong> each chunk — turn it into a vector (a list of numbers) that captures its
+    <li><strong>Embed</strong> each chunk, turn it into a vector (a list of numbers) that captures its
       meaning, using an embedding model.</li>
     <li><strong>Store</strong> the vectors in a <strong>vector database</strong> that can search by
       similarity.</li>
@@ -37,15 +37,14 @@ import AiPage from '../layouts/AiPage.astro';
       (semantic search), optionally <strong>rerank</strong> them for relevance.</li>
     <li><strong>Augment</strong> the prompt: drop the top chunks into the model&rsquo;s
       <a href="/what-is-a-context-window">context window</a> alongside the question.</li>
-    <li><strong>Generate</strong> — the model answers using those chunks, and can <strong>cite</strong> them.</li>
+    <li><strong>Generate</strong>: the model answers using those chunks, and can <strong>cite</strong> them.</li>
   </ul>
 
   <h2>RAG vs fine-tuning</h2>
   <p>
     A common question is whether to RAG or fine-tune. They solve different problems.
-    <strong>Fine-tuning</strong> changes how a model <em>behaves</em> — its tone, format, or skill at a task —
-    and bakes knowledge in at training time (slow and static). <strong>RAG</strong> gives a model
-    <em>facts</em> at query time — current, private, and easy to update by just changing the documents. For
+    <strong>Fine-tuning</strong> changes how a model <em>behaves</em>, its tone, format, or skill at a task, and bakes knowledge in at training time (slow and static). <strong>RAG</strong> gives a model
+    <em>facts</em> at query time, current, private, and easy to update by just changing the documents. For
     &ldquo;answer from our knowledge base / latest docs,&rdquo; RAG is usually the right tool; for &ldquo;always
     respond in this exact style,&rdquo; fine-tuning is. Many systems use both.
   </p>
@@ -55,22 +54,22 @@ import AiPage from '../layouts/AiPage.astro';
     <li><strong>Bad chunking.</strong> Chunks that are too big bury the answer; too small lose the context
       around it. This is the most common failure.</li>
     <li><strong>Retrieval misses.</strong> If the right chunk isn&rsquo;t retrieved, the model answers
-      without it — confidently. Good retrieval and reranking matter more than the model.</li>
+      without it, confidently. Good retrieval and reranking matter more than the model.</li>
     <li><strong>Context limits.</strong> You can only fit so many chunks; relevance ranking is what keeps
       the budget honest.</li>
-    <li><strong>Garbage in.</strong> RAG grounds the model in your sources — if those are wrong or stale, so
+    <li><strong>Garbage in.</strong> RAG grounds the model in your sources, if those are wrong or stale, so
       is the answer.</li>
   </ul>
 
   <h2>FAQ</h2>
   <details class="faq"><summary>Does RAG stop hallucinations?</summary>
-    <p>It reduces them by grounding answers in retrieved facts and enabling citations, but it doesn&rsquo;t eliminate them — the model can still misread a chunk or fill a retrieval gap. Treat RAG as strong grounding, not a guarantee.</p>
+    <p>It reduces them by grounding answers in retrieved facts and enabling citations, but it doesn&rsquo;t eliminate them, the model can still misread a chunk or fill a retrieval gap. Treat RAG as strong grounding, not a guarantee.</p>
   </details>
   <details class="faq"><summary>RAG or a bigger context window?</summary>
     <p>Long context lets you paste more, but it&rsquo;s costly, slower, and prone to &ldquo;lost in the middle.&rdquo; RAG sends only the relevant pieces, which is cheaper and often more accurate. They combine well: retrieve the best chunks, then use the context you have wisely.</p>
   </details>
   <details class="faq"><summary>Do I need a vector database?</summary>
-    <p>For anything beyond a handful of documents, yes — it&rsquo;s what makes similarity search fast at scale. For a tiny set you can get away with searching in memory.</p>
+    <p>For anything beyond a handful of documents, yes, it&rsquo;s what makes similarity search fast at scale. For a tiny set you can get away with searching in memory.</p>
   </details>
 
   <h3>Related</h3>

@@ -2,12 +2,12 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="CSV to JSON Converter (and back) — online &amp; client-side | KB Cafe"
-  description="Convert CSV to JSON or JSON to CSV instantly. Handles quoted fields, custom delimiters, and headers. Free, fast, fully client-side — your data never leaves the browser."
+  title="CSV to JSON Converter (and back), online &amp; client-side | KB Cafe"
+  description="Convert CSV to JSON or JSON to CSV instantly. Handles quoted fields, custom delimiters, and headers. Free, fast, fully client-side, your data never leaves the browser."
   path="/csv-to-json"
   eyebrow="Converters"
   h1="CSV ⇄ JSON"
-  tagline="Convert CSV to a JSON array of objects, or JSON back to CSV — with proper handling of quotes, commas-in-fields, and custom delimiters. All in your browser."
+  tagline="Convert CSV to a JSON array of objects, or JSON back to CSV, with proper handling of quotes, commas-in-fields, and custom delimiters. All in your browser."
 >
   <div class="row" style="margin-bottom:12px">
     <button class="chip active" id="m-c2j">CSV → JSON</button>
@@ -41,20 +41,20 @@ import ToolPage from '../layouts/ToolPage.astro';
 
     <h3>Options</h3>
     <ul>
-      <li><strong>Delimiter</strong> — comma, semicolon, tab, or pipe, for European exports and TSV files.</li>
-      <li><strong>First row is header</strong> — on, each row becomes an object keyed by the header; off, rows become arrays.</li>
+      <li><strong>Delimiter</strong>: comma, semicolon, tab, or pipe, for European exports and TSV files.</li>
+      <li><strong>First row is header</strong>: on, each row becomes an object keyed by the header; off, rows become arrays.</li>
     </ul>
     <p>Going JSON → CSV, an array of objects is flattened to columns (the union of all keys), and any value containing the delimiter, a quote, or a newline is safely quoted.</p>
 
     <h2>FAQ</h2>
     <details class="faq"><summary>Does it handle commas inside a field?</summary>
-      <p>Yes — fields wrapped in double quotes can contain commas, newlines, and escaped quotes. That&rsquo;s the part naive split-on-comma converters get wrong.</p>
+      <p>Yes, fields wrapped in double quotes can contain commas, newlines, and escaped quotes. That&rsquo;s the part naive split-on-comma converters get wrong.</p>
     </details>
     <details class="faq"><summary>Are numbers kept as numbers?</summary>
       <p>Yes. Values that look like numbers, booleans, or null become real JSON types. Anything ambiguous stays a string.</p>
     </details>
     <details class="faq"><summary>Is my data uploaded?</summary>
-      <p>No — parsing runs in your browser, so it&rsquo;s safe for private exports and works offline.</p>
+      <p>No, parsing runs in your browser, so it&rsquo;s safe for private exports and works offline.</p>
     </details>
 
     <h3>Related</h3>

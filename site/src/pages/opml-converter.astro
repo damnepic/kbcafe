@@ -2,7 +2,7 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="OPML Converter — OPML to JSON &amp; feed-URL list | KB Cafe"
+  title="OPML Converter, OPML to JSON &amp; feed-URL list | KB Cafe"
   description="Paste an OPML subscription export and convert it to clean JSON, a flat list of feed URLs, or a readable outline. Free, fast, fully client-side."
   path="/opml-converter"
   eyebrow="Feeds"
@@ -28,8 +28,7 @@ import ToolPage from '../layouts/ToolPage.astro';
     <h2>Get your subscriptions out of OPML</h2>
     <p>
       <strong>OPML</strong> is the outline format every feed reader uses to export and import subscription lists.
-      It&rsquo;s XML, which is awkward to work with directly. This converter parses it — preserving nested folders —
-      and gives you three views: structured <strong>JSON</strong> for code, a flat <strong>list of feed URLs</strong>
+      It&rsquo;s XML, which is awkward to work with directly. This converter parses it, preserving nested folders, and gives you three views: structured <strong>JSON</strong> for code, a flat <strong>list of feed URLs</strong>
       (the <code>xmlUrl</code> of every subscription) for importing elsewhere, and a readable indented
       <strong>outline</strong>.
     </p>
@@ -37,20 +36,20 @@ import ToolPage from '../layouts/ToolPage.astro';
     <h3>What it pulls out</h3>
     <ul>
       <li><strong>Title / text</strong> of each outline node and folder.</li>
-      <li><strong><code>xmlUrl</code></strong> — the actual feed URL (what you usually want).</li>
-      <li><strong><code>htmlUrl</code></strong> — the site&rsquo;s homepage, when present.</li>
-      <li><strong>Folder nesting</strong> — categories are kept as nested structure in JSON and outline views.</li>
+      <li><strong><code>xmlUrl</code></strong>: the actual feed URL (what you usually want).</li>
+      <li><strong><code>htmlUrl</code></strong>: the site&rsquo;s homepage, when present.</li>
+      <li><strong>Folder nesting</strong>: categories are kept as nested structure in JSON and outline views.</li>
     </ul>
 
     <h2>FAQ</h2>
     <details class="faq"><summary>What&rsquo;s the &ldquo;Feed URLs&rdquo; mode for?</summary>
-      <p>It flattens the whole tree to just the list of feed URLs — handy for bulk-importing into another reader, a script, or an RSS-to-JSON pipeline.</p>
+      <p>It flattens the whole tree to just the list of feed URLs, handy for bulk-importing into another reader, a script, or an RSS-to-JSON pipeline.</p>
     </details>
     <details class="faq"><summary>Does it keep my folders?</summary>
-      <p>Yes — the JSON and outline views preserve the nested folder structure. The feed-URL view flattens it intentionally.</p>
+      <p>Yes, the JSON and outline views preserve the nested folder structure. The feed-URL view flattens it intentionally.</p>
     </details>
     <details class="faq"><summary>Is my list uploaded?</summary>
-      <p>No — parsing runs in your browser, so your subscription list stays private and it works offline.</p>
+      <p>No, parsing runs in your browser, so your subscription list stays private and it works offline.</p>
     </details>
 
     <h3>Related</h3>
@@ -94,7 +93,7 @@ import ToolPage from '../layouts/ToolPage.astro';
     return out;
   }
   function flatten(tree, acc){ tree.forEach(n => { if(n.xmlUrl) acc.push(n.xmlUrl); if(n.children) flatten(n.children, acc); }); return acc; }
-  function outline(tree, depth){ let s = ''; tree.forEach(n => { s += '  '.repeat(depth) + (n.children ? '▸ ' : '• ') + (n.title || '(untitled)') + (n.xmlUrl ? '  —  ' + n.xmlUrl : '') + '\n'; if(n.children) s += outline(n.children, depth + 1); }); return s; }
+  function outline(tree, depth){ let s = ''; tree.forEach(n => { s += '  '.repeat(depth) + (n.children ? '▸ ' : '• ') + (n.title || '(untitled)') + (n.xmlUrl ? ', ' + n.xmlUrl : '') + '\n'; if(n.children) s += outline(n.children, depth + 1); }); return s; }
 
   function run(){
     const raw = inEl.value.trim();
@@ -103,7 +102,7 @@ import ToolPage from '../layouts/ToolPage.astro';
     const doc = new DOMParser().parseFromString(raw, 'application/xml');
     if(doc.querySelector('parsererror')){ inEl.classList.add('err'); outEl.value = ''; statusEl.className = 'status bad'; statusEl.textContent = 'XML is not well-formed.'; return; }
     const body = doc.getElementsByTagName('body')[0];
-    if(!body){ inEl.classList.add('err'); outEl.value = ''; statusEl.className = 'status bad'; statusEl.textContent = 'No <body> found — is this OPML?'; return; }
+    if(!body){ inEl.classList.add('err'); outEl.value = ''; statusEl.className = 'status bad'; statusEl.textContent = 'No <body> found, is this OPML?'; return; }
     const tree = walk(body);
     const all = flatten(tree, []);
     if(mode === 'json') outEl.value = JSON.stringify(tree, null, 2);

@@ -2,12 +2,12 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="Case Converter — camelCase, snake_case, kebab-case &amp; more | KB Cafe"
-  description="Convert text between camelCase, PascalCase, snake_case, CONSTANT_CASE, kebab-case, Title Case and more — all at once, copy any. Free, fast, client-side."
+  title="Case Converter, camelCase, snake_case, kebab-case &amp; more | KB Cafe"
+  description="Convert text between camelCase, PascalCase, snake_case, CONSTANT_CASE, kebab-case, Title Case and more, all at once, copy any. Free, fast, client-side."
   path="/case-converter"
   eyebrow="Text"
   h1="Case Converter"
-  tagline="Type anything and get it in every case at once — camelCase, snake_case, kebab-case, CONSTANT_CASE and more. Copy any line. Runs entirely in your browser."
+  tagline="Type anything and get it in every case at once, camelCase, snake_case, kebab-case, CONSTANT_CASE and more. Copy any line. Runs entirely in your browser."
 >
   <div class="pane" style="margin-bottom:18px">
     <div class="pane-label"><span>Your text</span><button class="link-btn" id="sample">load sample</button></div>
@@ -19,20 +19,20 @@ import ToolPage from '../layouts/ToolPage.astro';
   <Fragment slot="explainer">
     <h2>Every naming convention, one paste</h2>
     <p>
-      Paste a phrase or an identifier and this tool re-tokenizes it — splitting on spaces, hyphens, underscores,
-      and the boundaries inside <code>camelCase</code> and <code>PascalCase</code> — then re-joins it in each common
+      Paste a phrase or an identifier and this tool re-tokenizes it, splitting on spaces, hyphens, underscores,
+      and the boundaries inside <code>camelCase</code> and <code>PascalCase</code>: then re-joins it in each common
       convention. It detects word boundaries intelligently, so <code>getUserID</code>, <code>get_user_id</code>, and
       <code>get user id</code> all produce the same set of outputs.
     </p>
 
     <h3>The conventions</h3>
     <ul>
-      <li><code>camelCase</code> — first word lower, the rest capitalized. Common for JS/Java variables.</li>
-      <li><code>PascalCase</code> — every word capitalized. Types, classes, React components.</li>
-      <li><code>snake_case</code> — lowercase, underscores. Python, Ruby, SQL columns.</li>
-      <li><code>CONSTANT_CASE</code> — uppercase snake. Constants and env vars.</li>
-      <li><code>kebab-case</code> — lowercase, hyphens. URLs, CSS classes, file names.</li>
-      <li><code>Title Case</code> / <code>Sentence case</code> — for headings and prose.</li>
+      <li><code>camelCase</code>: first word lower, the rest capitalized. Common for JS/Java variables.</li>
+      <li><code>PascalCase</code>: every word capitalized. Types, classes, React components.</li>
+      <li><code>snake_case</code>: lowercase, underscores. Python, Ruby, SQL columns.</li>
+      <li><code>CONSTANT_CASE</code>: uppercase snake. Constants and env vars.</li>
+      <li><code>kebab-case</code>: lowercase, hyphens. URLs, CSS classes, file names.</li>
+      <li><code>Title Case</code> / <code>Sentence case</code>: for headings and prose.</li>
     </ul>
 
     <h2>FAQ</h2>
@@ -40,7 +40,7 @@ import ToolPage from '../layouts/ToolPage.astro';
       <p>It splits on spaces, <code>-</code>, <code>_</code>, <code>.</code>, and <code>/</code>, and also on lower-to-upper transitions (<code>userName</code> → <code>user</code> + <code>name</code>) and acronym edges (<code>parseJSONData</code> → <code>parse</code> + <code>JSON</code> + <code>data</code>).</p>
     </details>
     <details class="faq"><summary>Is my text uploaded?</summary>
-      <p>No — conversion runs in your browser, so it works offline and nothing is sent anywhere.</p>
+      <p>No, conversion runs in your browser, so it works offline and nothing is sent anywhere.</p>
     </details>
 
     <h3>Related</h3>
@@ -64,7 +64,7 @@ import ToolPage from '../layouts/ToolPage.astro';
 <script is:inline>
   const $ = id => document.getElementById(id);
   const inEl = $('in'), out = $('out'), statusEl = $('status');
-  const SAMPLE = 'KB Cafe — freshly brewed dev tools';
+  const SAMPLE = 'KB Cafe, freshly brewed dev tools';
 
   function words(s){
     return String(s)

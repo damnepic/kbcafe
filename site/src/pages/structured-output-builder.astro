@@ -2,7 +2,7 @@
 import ToolPage from '../layouts/ToolPage.astro';
 ---
 <ToolPage
-  title="Structured Output Builder — JSON schemas for OpenAI, Anthropic &amp; Gemini | KB Cafe"
+  title="Structured Output Builder, JSON schemas for OpenAI, Anthropic &amp; Gemini | KB Cafe"
   description="Visually build a schema and generate structured-output / function-calling schemas for OpenAI, Anthropic, Gemini, and plain JSON Schema. Free, fast, fully client-side."
   path="/structured-output-builder"
   eyebrow="AI Explained · Tool"
@@ -41,28 +41,28 @@ import ToolPage from '../layouts/ToolPage.astro';
       the right shape for each:
     </p>
     <ul>
-      <li><strong>JSON Schema</strong> — the portable base (draft 2020-12), <code>additionalProperties: false</code>.</li>
-      <li><strong>OpenAI</strong> — a <code>response_format</code> of type <code>json_schema</code> with <code>strict: true</code>.</li>
-      <li><strong>Anthropic</strong> — a tool whose <code>input_schema</code> is your schema (the model &ldquo;calls&rdquo; it with the data).</li>
-      <li><strong>Gemini</strong> — a <code>responseSchema</code> (uppercase OpenAPI types) plus <code>responseMimeType</code>.</li>
+      <li><strong>JSON Schema</strong>: the portable base (draft 2020-12), <code>additionalProperties: false</code>.</li>
+      <li><strong>OpenAI</strong>: a <code>response_format</code> of type <code>json_schema</code> with <code>strict: true</code>.</li>
+      <li><strong>Anthropic</strong>: a tool whose <code>input_schema</code> is your schema (the model &ldquo;calls&rdquo; it with the data).</li>
+      <li><strong>Gemini</strong>: a <code>responseSchema</code> (uppercase OpenAPI types) plus <code>responseMimeType</code>.</li>
     </ul>
     <p class="note">Tip for OpenAI strict mode: it expects <em>every</em> property to be listed as required. For a
       genuinely optional field, make its type nullable rather than dropping it from <code>required</code>.</p>
 
     <h3>Field types</h3>
     <p>string, number, integer, boolean, an <strong>enum</strong> (comma-separated values → a closed set),
-      and typed <strong>arrays</strong>. Add a <code>description</code> to each field — it steers the model far
+      and typed <strong>arrays</strong>. Add a <code>description</code> to each field, it steers the model far
       more than the field name alone.</p>
 
     <h2>FAQ</h2>
     <details class="faq"><summary>Does a schema guarantee correct data?</summary>
-      <p>It guarantees the <em>shape</em> — right fields and types. It can&rsquo;t guarantee the model put the <em>right value</em> in a field; validate business rules yourself.</p>
+      <p>It guarantees the <em>shape</em>, right fields and types. It can&rsquo;t guarantee the model put the <em>right value</em> in a field; validate business rules yourself.</p>
     </details>
     <details class="faq"><summary>Is this the same as function calling?</summary>
-      <p>A tool/function call&rsquo;s arguments are a structured output — the same JSON Schema, wrapped as a tool. The Anthropic tab shows exactly that form.</p>
+      <p>A tool/function call&rsquo;s arguments are a structured output, the same JSON Schema, wrapped as a tool. The Anthropic tab shows exactly that form.</p>
     </details>
     <details class="faq"><summary>Is anything uploaded?</summary>
-      <p>No — schema generation runs in your browser, so your field names and structure stay local and it works offline.</p>
+      <p>No, schema generation runs in your browser, so your field names and structure stay local and it works offline.</p>
     </details>
 
     <h3>Related</h3>
