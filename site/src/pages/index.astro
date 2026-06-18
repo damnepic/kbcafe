@@ -47,6 +47,19 @@ const popular = popularDefs.map(d => ({ ...d, ...toolBy[d.href] }));
 const toolCount = TOOLS.filter(t => t.href).length;
 // honest, data-derived counts for the social-proof strip
 const refCount = REFERENCE.length + AI.length; // evergreen references + AI explainers
+
+// goal-first workflows: bundle tools by what you're trying to do (vs browsing 34 tools)
+const WORKFLOWS = [
+  { title: 'Building an AI app', path: '/learn#agents', accent: '#7657ff',
+    blurb: 'Go from idea to architecture: design the system, wire the tools, compose the agent.',
+    tools: [['AI Architecture Generator', '/ai-architecture-generator'], ['AI Stack Explainer', '/ai-stack-explainer'], ['Pattern Builder', '/ai-pattern-builder'], ['MCP Config Generator', '/mcp-config-generator']] },
+  { title: 'Optimizing prompts', path: '/learn#prompting', accent: '#ee4b2b',
+    blurb: 'Make prompts behave: see their structure, catch the smells, compare versions.',
+    tools: [['Prompt X-Ray', '/prompt-x-ray'], ['Prompt Linter', '/prompt-linter'], ['Prompt Diff', '/prompt-diff'], ['Structured Output Builder', '/structured-output-builder']] },
+  { title: 'Understanding context & memory', path: '/learn#infra', accent: '#0f9f82',
+    blurb: 'Why models run out of room and forget things, and how to manage both.',
+    tools: [['Token Counter', '/token-counter'], ['Context Budget Analyzer', '/context-budget-analyzer'], ['Agent Memory Simulator', '/agent-memory-simulator'], ['Context Window Visualizer', '/context-window-visualizer']] },
+];
 ---
 <Layout
   title="KB Cafe, a developer’s knowledge base"
@@ -138,6 +151,29 @@ const refCount = REFERENCE.length + AI.length; // evergreen references + AI expl
             <p>{c.ds}</p>
             <span class="read">Read more →</span>
           </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- WORKFLOWS -->
+    <section class="home-sec">
+      <div class="sec-head">
+        <div class="sec-title">
+          <span class="kicker">Start with a workflow</span>
+          <p class="sec-sub">Tell us what you&rsquo;re doing, not which of {toolCount} tools to open.</p>
+        </div>
+        <a class="sec-link" href="/learn">See learning paths →</a>
+      </div>
+      <div class="wf-grid">
+        {WORKFLOWS.map(w => (
+          <div class="wf-card">
+            <h3 style={`--wf:${w.accent}`}>{w.title}</h3>
+            <p>{w.blurb}</p>
+            <div class="wf-tools">
+              {w.tools.map(([nm, href]) => <a class="wf-tool" href={href}><span class="wf-dot" style={`background:${w.accent}`}></span>{nm}</a>)}
+            </div>
+            <a class="wf-path" href={w.path}>Follow the path <span aria-hidden="true">→</span></a>
+          </div>
         ))}
       </div>
     </section>
@@ -292,6 +328,20 @@ const refCount = REFERENCE.length + AI.length; // evergreen references + AI expl
   .ai-card p{color:var(--ink-soft);line-height:1.55;font-size:13px;margin:0 0 18px}
   .read{margin-top:auto;color:var(--coral);font-family:var(--font-display);font-weight:800;font-size:13.5px}
 
+  /* workflow cards */
+  .wf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .wf-card{display:flex;flex-direction:column;border-radius:20px;background:rgba(255,255,255,.6);border:1.2px solid var(--line);box-shadow:0 8px 24px rgba(40,24,12,.045);padding:24px 22px}
+  .wf-card h3{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:-.02em;margin:0 0 8px;padding-left:13px;position:relative}
+  .wf-card h3::before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:4px;border-radius:3px;background:var(--wf)}
+  .wf-card>p{color:var(--ink-soft);font-size:13.5px;line-height:1.5;margin:0 0 16px}
+  .wf-tools{display:flex;flex-direction:column;gap:2px;margin-bottom:16px}
+  .wf-tool{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);font-family:var(--font-mono);font-size:13px;font-weight:600;padding:7px 0;border-bottom:1px solid var(--line)}
+  .wf-tool:last-child{border-bottom:0}
+  .wf-tool:hover{color:var(--coral)}
+  .wf-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .wf-path{margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);text-decoration:none}
+  .wf-path:hover{color:var(--coral)}
+
   .tool-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
   .tool-card{min-height:118px;border-radius:20px;padding:20px;background:rgba(255,255,255,.62);border:1.2px solid var(--line);text-decoration:none;color:var(--ink);display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:center;transition:transform .18s,box-shadow .18s,border-color .18s}
   .tool-card:hover{transform:translateY(-4px);box-shadow:0 18px 42px rgba(40,24,12,.085);border-color:rgba(17,17,17,.2)}
@@ -335,6 +385,7 @@ const refCount = REFERENCE.length + AI.length; // evergreen references + AI expl
   @media(max-width:1020px){
     .hero{grid-template-columns:1fr;gap:34px}
     .benefits{grid-template-columns:repeat(2,1fr)}
+    .wf-grid{grid-template-columns:1fr}
     .ai-grid{grid-template-columns:repeat(3,1fr)}
     .tool-grid{grid-template-columns:repeat(2,1fr)}
     .cta{grid-template-columns:1fr}

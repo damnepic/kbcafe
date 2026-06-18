@@ -1,13 +1,27 @@
 ---
 import Layout from './Layout.astro';
 import { TOOLS } from '../data/tools.js';
+import { AI } from '../data/ai.js';
+import { REFERENCE } from '../data/reference.js';
+import { TOOL_GRAPH } from '../data/toolGraph.js';
 
 const { title, description, path, eyebrow, h1, tagline } = Astro.props;
-// sibling tools that are live, excluding the current page
-const siblings = TOOLS.filter(t => t.href && t.href !== path).slice(0, 4);
+
+// resolve any href to a label/description so the graph block can render real names
+const resolve = {};
+TOOLS.forEach(t => { if (t.href) resolve[t.href] = { href: t.href, label: t.nm, ds: t.ds, kind: 'Tool' }; });
+AI.forEach(a => { resolve[a.href] = { href: a.href, label: a.nm, ds: a.ds, kind: 'Concept' }; });
+REFERENCE.forEach(r => { resolve[r.href] = { href: r.href, label: r.nm, ds: r.ds, kind: 'Reference' }; });
+
+const g = TOOL_GRAPH[path];
+const learn = g ? g.learn.map(h => resolve[h]).filter(Boolean) : [];
+const related = g ? g.related.map(h => resolve[h]).filter(Boolean) : [];
+const next = g && g.next ? resolve[g.next] : null;
+// tools with no graph entry fall back to category siblings
+const siblings = !g ? TOOLS.filter(t => t.href && t.href !== path).slice(0, 4) : [];
 ---
 <Layout title={title} description={description} path={path}>
-  <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/#menu">Tools</a> <span>/</span> <em>{h1}</em></nav>
+  <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/tools">Tools</a> <span>/</span> <em>{h1}</em></nav>
 
   <header class="tool-head">
     <div class="eyebrow">{eyebrow}</div>
@@ -23,18 +37,49 @@ const siblings = TOOLS.filter(t => t.href && t.href !== path).slice(0, 4);
     <slot name="explainer" />
   </section>
 
-  <aside class="siblings">
-    <h2>More on the menu</h2>
-    <div class="sib-grid">
-      {siblings.map(t => (
-        <a class="sib" href={t.href}>
-          <span class="sib-ct">{t.ctl}</span>
-          <span class="sib-nm">{t.nm}</span>
-          <span class="sib-ds">{t.ds}</span>
+  {g ? (
+    <aside class="tgraph">
+      {next && (
+        <a class="tg-next" href={next.href}>
+          <span class="tg-next-lbl">Next step</span>
+          <span class="tg-next-nm">{next.label} <span aria-hidden="true">→</span></span>
+          <span class="tg-next-ds">{next.ds}</span>
         </a>
-      ))}
-    </div>
-  </aside>
+      )}
+      <div class="tg-cols">
+        {learn.length > 0 && (
+          <div class="tg-col">
+            <h3>Learn the concept</h3>
+            {learn.map(x => (
+              <a class="tg-link" href={x.href}><span class="tg-k tg-concept">Concept</span><span class="tg-nm">{x.label}</span></a>
+            ))}
+          </div>
+        )}
+        {related.length > 0 && (
+          <div class="tg-col">
+            <h3>Related tools</h3>
+            {related.map(x => (
+              <a class="tg-link" href={x.href}><span class="tg-k tg-tool">Tool</span><span class="tg-nm">{x.label}</span></a>
+            ))}
+          </div>
+        )}
+      </div>
+      <a class="tg-all" href="/tools?cat=ai">Browse all AI tools →</a>
+    </aside>
+  ) : (
+    <aside class="siblings">
+      <h2>More on the menu</h2>
+      <div class="sib-grid">
+        {siblings.map(t => (
+          <a class="sib" href={t.href}>
+            <span class="sib-ct">{t.ctl}</span>
+            <span class="sib-nm">{t.nm}</span>
+            <span class="sib-ds">{t.ds}</span>
+          </a>
+        ))}
+      </div>
+    </aside>
+  )}
 </Layout>
 
 <style is:global>
@@ -102,6 +147,26 @@ const siblings = TOOLS.filter(t => t.href && t.href !== path).slice(0, 4);
   .sib-nm{font-family:var(--font-mono);font-weight:700;font-size:15px}
   .sib-ds{font-size:12.5px;color:var(--ink-soft);line-height:1.4}
 
-  @media(max-width:760px){.panes{grid-template-columns:1fr}.sib-grid{grid-template-columns:1fr 1fr}}
+  /* knowledge-graph cross-nav */
+  .tgraph{padding:32px 0 10px;border-top:1px solid var(--line);margin-top:26px}
+  .tg-next{display:flex;flex-direction:column;gap:3px;text-decoration:none;color:#fff;border-radius:18px;padding:18px 22px;margin-bottom:22px;
+    background:radial-gradient(circle at 90% 30%,rgba(238,75,43,.28),transparent 40%),linear-gradient(135deg,#1c1410,#241813);
+    box-shadow:0 16px 40px rgba(16,17,18,.18);transition:transform .16s,box-shadow .16s}
+  .tg-next:hover{transform:translateY(-2px);box-shadow:0 22px 50px rgba(16,17,18,.24)}
+  .tg-next-lbl{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+  .tg-next-nm{font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:-.02em}
+  .tg-next-ds{font-size:13.5px;color:rgba(255,255,255,.72)}
+  .tg-cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .tg-col h3{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px}
+  .tg-link{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);padding:9px 0;border-bottom:1px solid var(--line)}
+  .tg-link:last-child{border-bottom:0}
+  .tg-link:hover .tg-nm{color:var(--coral)}
+  .tg-k{font-family:var(--font-mono);font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:5px;flex-shrink:0}
+  .tg-concept{background:#efe8ff;color:#6a4dff} .tg-tool{background:#ffe5dd;color:var(--coral-deep)}
+  .tg-nm{font-family:var(--font-display);font-weight:700;font-size:14.5px;transition:color .14s}
+  .tg-all{display:inline-block;margin-top:22px;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);text-decoration:none}
+  .tg-all:hover{color:var(--coral)}
+
+  @media(max-width:760px){.panes{grid-template-columns:1fr}.sib-grid{grid-template-columns:1fr 1fr}.tg-cols{grid-template-columns:1fr;gap:20px}}
   @media(max-width:480px){.sib-grid{grid-template-columns:1fr}}
 </style>

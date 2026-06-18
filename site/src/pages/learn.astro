@@ -1,0 +1,107 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { TOOLS } from '../data/tools.js';
+import { AI } from '../data/ai.js';
+
+const resolve = {};
+TOOLS.forEach(t => { if (t.href) resolve[t.href] = { href: t.href, label: t.nm, ds: t.ds, kind: 'Tool' }; });
+AI.forEach(a => { resolve[a.href] = { href: a.href, label: a.nm, ds: a.ds, kind: 'Concept' }; });
+
+const PATHS = [
+  {
+    id: 'infra', title: 'AI Infrastructure', tag: 'Foundations',
+    blurb: 'The plumbing behind every AI feature: how text becomes tokens and vectors, and how models are grounded in real data.',
+    steps: ['/what-is-a-context-window', '/token-counter', '/what-are-embeddings', '/embedding-explorer', '/what-is-a-vector-database', '/what-is-rag', '/rag-chunking-visualizer'],
+  },
+  {
+    id: 'agents', title: 'Build AI Agents', tag: 'Applied',
+    blurb: 'From a model that can only talk to a system that can act: tools, structured calls, patterns, memory, and how to architect it.',
+    steps: ['/what-is-tool-calling', '/tool-call-visualizer', '/what-are-structured-outputs', '/structured-output-builder', '/ai-patterns', '/ai-pattern-builder', '/what-is-agent-memory', '/agent-memory-simulator', '/what-is-mcp', '/mcp-config-generator', '/ai-architecture-generator'],
+  },
+  {
+    id: 'prompting', title: 'Master Prompting', tag: 'Craft',
+    blurb: 'Write prompts that behave: understand their anatomy, catch the smells, compare versions, and respect the context budget.',
+    steps: ['/what-are-structured-outputs', '/prompt-x-ray', '/prompt-linter', '/prompt-diff', '/what-is-a-context-window', '/context-budget-analyzer'],
+  },
+];
+// label for the hubs that aren't tools or single explainers
+const EXTRA = { '/ai-patterns': { label: 'AI Patterns Library', ds: 'Reflection, Router, Judge, Verification, Human-in-the-loop.', kind: 'Concept' } };
+const get = (h) => resolve[h] || EXTRA[h] || { href: h, label: h, ds: '', kind: 'Concept' };
+---
+<Layout
+  title="AI Learning Paths, a curriculum, not a pile of pages | KB Cafe"
+  description="Three guided paths through KB Cafe: AI infrastructure, building agents, and mastering prompting. Each step pairs a concept explainer with a hands-on tool. Free and self-paced."
+  path="/learn"
+>
+  <section class="lp">
+    <header class="lp-head">
+      <div class="eyebrow">☕ Learn</div>
+      <h1>Learn AI, <span class="mk">end to end.</span></h1>
+      <p class="lede">Three guided paths through the cafe. Each step pairs a concept you can read with a tool you can play with, so the idea sticks. Self-paced, free, and entirely in your browser.</p>
+      <div class="lp-jump">{PATHS.map(p => <a href={`#${p.id}`}>{p.title}</a>)}</div>
+    </header>
+
+    {PATHS.map(p => (
+      <section class="path" id={p.id}>
+        <div class="path-head">
+          <span class="path-tag">{p.tag}</span>
+          <h2>{p.title}</h2>
+          <p>{p.blurb}</p>
+          <span class="path-count">{p.steps.length} steps</span>
+        </div>
+        <ol class="path-steps">
+          {p.steps.map((h, i) => { const x = get(h); return (
+            <li>
+              <a class="step" href={x.href}>
+                <span class="step-n">{i + 1}</span>
+                <span class="step-body">
+                  <span class="step-top"><span class={`step-k ${x.kind === 'Tool' ? 'k-tool' : 'k-concept'}`}>{x.kind}</span><span class="step-nm">{x.label}</span></span>
+                  <span class="step-ds">{x.ds}</span>
+                </span>
+                <span class="step-go" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ); })}
+        </ol>
+      </section>
+    ))}
+
+    <p class="lp-foot">Prefer to wander? Browse <a href="/tools?cat=ai">all AI tools</a> or the <a href="/ai">AI Explained</a> hub.</p>
+  </section>
+</Layout>
+
+<style>
+  .lp{max-width:920px;margin:0 auto;padding:40px 0 20px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .lp-head h1{font-family:var(--font-display);font-weight:700;letter-spacing:-.03em;line-height:1.02;font-size:clamp(38px,5vw,58px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.12em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:98% .42em}
+  .lede{margin-top:18px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:620px}
+  .lp-jump{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+  .lp-jump a{font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:7px 14px;text-decoration:none;transition:all .14s}
+  .lp-jump a:hover{border-color:var(--ink);color:var(--ink)}
+
+  .path{margin-top:46px;scroll-margin-top:20px}
+  .path-head{margin-bottom:18px}
+  .path-tag{font-family:var(--font-mono);font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+  .path-head h2{font-family:var(--font-display);font-weight:800;font-size:28px;letter-spacing:-.025em;margin:6px 0 6px}
+  .path-head p{font-size:15.5px;color:var(--ink-soft);line-height:1.55;max-width:620px;margin:0}
+  .path-count{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);opacity:.8}
+  .path-steps{list-style:none;margin:0;padding:0;position:relative}
+  .path-steps::before{content:"";position:absolute;left:21px;top:18px;bottom:18px;width:2px;background:var(--line)}
+  .path-steps li{position:relative;margin-bottom:10px}
+  .step{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;text-decoration:none;color:var(--ink);
+    background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:13px 16px;transition:transform .14s,box-shadow .14s,border-color .14s}
+  .step:hover{transform:translateX(3px);box-shadow:6px 7px 0 rgba(30,24,19,.07);border-color:var(--ink)}
+  .step-n{position:relative;z-index:1;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--cream);font-family:var(--font-display);font-weight:800;font-size:14px}
+  .step-top{display:flex;align-items:center;gap:9px;margin-bottom:3px;flex-wrap:wrap}
+  .step-k{font-family:var(--font-mono);font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:5px}
+  .k-concept{background:#efe8ff;color:#6a4dff} .k-tool{background:#ffe5dd;color:var(--coral-deep)}
+  .step-nm{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.02em}
+  .step-ds{font-size:13px;color:var(--ink-soft);line-height:1.4}
+  .step-go{font-family:var(--font-display);font-weight:800;color:var(--coral);font-size:18px}
+  .lp-foot{margin-top:44px;font-size:15px;color:var(--ink-soft)}
+  .lp-foot a{color:var(--coral);font-weight:600;text-decoration:none}.lp-foot a:hover{text-decoration:underline}
+  @media(max-width:560px){.step{grid-template-columns:36px 1fr;gap:11px}.step-go{display:none}}
+</style>
