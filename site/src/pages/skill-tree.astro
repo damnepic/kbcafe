@@ -1,0 +1,115 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Share from '../components/Share.astro';
+
+const SKILLS = [
+  { id: 'prompting', tier: 'Start here', title: 'Prompting', blurb: 'Get good answers out of any AI, on any topic.', concept: ['Learn Prompting', '/learn-prompting'], practice: ['Prompt Simulator', '/prompt-simulator'] },
+  { id: 'context', tier: 'Start here', title: 'Tokens & context', blurb: 'Why models run out of room, and how to manage it.', concept: ['Context window', '/what-is-a-context-window'], practice: ['Token Counter', '/token-counter'] },
+  { id: 'structured', tier: 'Build with it', title: 'Structured outputs', blurb: 'Make AI return clean, valid JSON every time.', concept: ['Structured outputs', '/what-are-structured-outputs'], practice: ['Structured Output Builder', '/structured-output-builder'] },
+  { id: 'tools', tier: 'Build with it', title: 'Tool calling', blurb: 'Let a model call functions and take actions.', concept: ['Tool calling', '/what-is-tool-calling'], practice: ['Tool Call Visualizer', '/tool-call-visualizer'] },
+  { id: 'embeddings', tier: 'Build with it', title: 'Embeddings', blurb: 'Turn meaning into vectors, the engine of search.', concept: ['Embeddings', '/what-are-embeddings'], practice: ['Embedding Explorer', '/embedding-explorer'] },
+  { id: 'rag', tier: 'Go advanced', title: 'RAG & retrieval', blurb: 'Ground a model in your own documents.', concept: ['RAG', '/what-is-rag'], practice: ['RAG Chunking Visualizer', '/rag-chunking-visualizer'] },
+  { id: 'memory', tier: 'Go advanced', title: 'Agents & memory', blurb: 'Build systems that act, and remember.', concept: ['Agent memory', '/what-is-agent-memory'], practice: ['Agent Memory Simulator', '/agent-memory-simulator'] },
+  { id: 'mcp', tier: 'Go advanced', title: 'MCP & architecture', blurb: 'Wire tools into a real system with MCP.', concept: ['MCP', '/what-is-mcp'], practice: ['Pattern Builder', '/ai-pattern-builder'] },
+];
+const tiers = [...new Set(SKILLS.map(s => s.tier))];
+---
+<Layout
+  title="AI Skill Tree, learn modern AI, level by level | KB Cafe"
+  description="An interactive skill tree for learning modern AI, from prompting to agents and MCP. Read the concept, try the tool, mark it done. Progress saved locally, no account, no tracking."
+  path="/skill-tree"
+>
+  <section class="st">
+    <header class="st-head">
+      <div class="eyebrow">☕ Skill tree</div>
+      <h1>Learn modern AI, <span class="mk">level by level.</span></h1>
+      <p class="lede">Eight skills take you from &ldquo;write me a prompt&rdquo; to building AI agents. Each one: read the concept, try the tool, mark it done. Your progress is saved <strong>in this browser only</strong>, no account, no tracking, ever.</p>
+      <div class="st-prog">
+        <div class="st-prog-h"><span><strong id="done">0</strong> of {SKILLS.length} skills</span><button class="st-reset" id="reset" hidden>reset</button></div>
+        <div class="st-bar"><i id="bar"></i></div>
+      </div>
+    </header>
+
+    <div class="st-tree">
+      {tiers.map(tier => (
+        <div class="st-tier">
+          <div class="st-tier-h">{tier}</div>
+          {SKILLS.filter(s => s.tier === tier).map(s => (
+            <div class="sk-node" data-id={s.id}>
+              <button class="sk-check" aria-label={`Mark ${s.title} complete`}><span class="sk-tick" aria-hidden="true">✓</span></button>
+              <div class="sk-body">
+                <div class="sk-title">{s.title}</div>
+                <div class="sk-blurb">{s.blurb}</div>
+                <div class="sk-links">
+                  <a class="sk-learn" href={s.concept[1]}>Learn: {s.concept[0]}</a>
+                  <a class="sk-try" href={s.practice[1]}>Try: {s.practice[0]} <span aria-hidden="true">→</span></a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+
+    <p class="st-foot" id="foot"></p>
+    <Share path="/skill-tree" title="AI Skill Tree" variant="prominent" />
+    <p class="st-links">Prefer a guided route? Take a <a href="/learn">learning path</a>, or explore the <a href="/map">knowledge map</a>.</p>
+  </section>
+</Layout>
+
+<style>
+  .st{max-width:860px;margin:0 auto;padding:40px 0 20px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .st-head h1{font-family:var(--font-display);font-weight:700;letter-spacing:-.03em;line-height:1.04;font-size:clamp(36px,5vw,56px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.12em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:98% .42em}
+  .lede{margin-top:18px;font-size:18px;line-height:1.6;color:var(--ink-soft)}
+  .st-prog{margin-top:24px;max-width:520px}
+  .st-prog-h{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);margin-bottom:8px}
+  .st-prog-h strong{color:var(--coral-deep);font-size:18px}
+  .st-reset{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);background:none;border:0;cursor:pointer;text-decoration:underline}
+  .st-bar{height:10px;border-radius:6px;background:var(--paper-2);overflow:hidden}
+  .st-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16a37e,#0f9f82);transition:width .35s}
+
+  .st-tree{margin-top:34px;position:relative}
+  .st-tier{margin-bottom:10px}
+  .st-tier-h{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--coral);margin:22px 0 12px}
+  .sk-node{display:grid;grid-template-columns:44px 1fr;gap:15px;align-items:start;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:10px;transition:border-color .15s,box-shadow .15s}
+  .sk-node.done{border-color:rgba(15,159,130,.5);box-shadow:0 0 0 1px rgba(15,159,130,.2)}
+  .sk-check{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--paper);cursor:pointer;display:grid;place-items:center;transition:all .15s;margin-top:2px}
+  .sk-check:hover{border-color:#0f9f82}
+  .sk-tick{color:#fff;font-weight:800;font-size:16px;opacity:0;transition:opacity .15s}
+  .sk-node.done .sk-check{background:#0f9f82;border-color:#0f9f82}.sk-node.done .sk-tick{opacity:1}
+  .sk-title{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:-.02em}
+  .sk-blurb{font-size:14px;color:var(--ink-soft);line-height:1.45;margin:3px 0 10px}
+  .sk-links{display:flex;flex-wrap:wrap;gap:8px 10px}
+  .sk-links a{font-family:var(--font-mono);font-size:12.5px;font-weight:700;text-decoration:none;border-radius:8px;padding:6px 11px}
+  .sk-learn{color:#6a4dff;background:#efe8ff}.sk-learn:hover{background:#6a4dff;color:#fff}
+  .sk-try{color:var(--coral-deep);background:#ffe5dd}.sk-try:hover{background:var(--coral);color:#fff}
+  .st-foot{margin-top:20px;font-family:var(--font-mono);font-size:13.5px;color:#0f7d68;min-height:20px;font-weight:700}
+  .st-links{margin-top:18px;font-size:15px;color:var(--ink-soft)}
+  .st-links a{color:var(--coral);font-weight:600;text-decoration:none}.st-links a:hover{text-decoration:underline}
+  @media(max-width:560px){.sk-node{grid-template-columns:34px 1fr;gap:11px}}
+</style>
+
+<script is:inline define:vars={{ total: SKILLS.length }}>
+  const KP = window.kbProgress;
+  const nodes = [...document.querySelectorAll('.sk-node')];
+  const bar = document.getElementById('bar'), doneEl = document.getElementById('done'), foot = document.getElementById('foot'), reset = document.getElementById('reset');
+  const key = (id) => 'skill:' + id;
+
+  function refresh() {
+    let n = 0;
+    nodes.forEach(node => { const on = KP.has(key(node.dataset.id)); node.classList.toggle('done', on); if (on) n++; });
+    bar.style.width = Math.round(n / total * 100) + '%';
+    doneEl.textContent = n;
+    reset.hidden = n === 0;
+    foot.textContent = n === 0 ? '' : n === total ? '🎉 All eight skills complete. You understand how modern AI systems actually work.' : `${n} down, ${total - n} to go. Progress saved locally on this device.`;
+  }
+  nodes.forEach(node => {
+    node.querySelector('.sk-check').addEventListener('click', () => { KP.toggle(key(node.dataset.id)); refresh(); });
+  });
+  reset.addEventListener('click', () => { nodes.forEach(node => KP.set(key(node.dataset.id), false)); refresh(); });
+  refresh();
+</script>

@@ -75,7 +75,7 @@ const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
       </div>
       <h2 style="margin-top:30px">Learning paths</h2>
       <div class="km-paths">
-        {LEARNING_PATHS.map(p => <a class="km-path" href={`/learn#${p.id}`}>{p.title} <span aria-hidden="true">→</span></a>)}
+        {LEARNING_PATHS.map(p => <a class="km-path" href={p.route}>{p.title} <span aria-hidden="true">→</span></a>)}
       </div>
     </div>
   </section>

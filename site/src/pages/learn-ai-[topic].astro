@@ -1,0 +1,120 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Share from '../components/Share.astro';
+import { TOOLS } from '../data/tools.js';
+import { AI } from '../data/ai.js';
+import { LEARNING_PATHS } from '../data/learningPaths.js';
+
+export function getStaticPaths() {
+  return LEARNING_PATHS
+    .filter(p => p.route && p.route.startsWith('/learn-ai-'))
+    .map(p => ({ params: { topic: p.route.slice('/learn-ai-'.length) }, props: { p } }));
+}
+const { p } = Astro.props;
+
+const resolve = {};
+TOOLS.forEach(t => { if (t.href) resolve[t.href] = { href: t.href, label: t.nm, ds: t.ds, kind: 'Tool' }; });
+AI.forEach(a => { resolve[a.href] = { href: a.href, label: a.nm, ds: a.ds, kind: 'Concept' }; });
+const EXTRA = { '/ai-patterns': { label: 'AI Patterns Library', ds: 'Reflection, Router, Judge, Verification, Human-in-the-loop.', kind: 'Concept' } };
+const get = (h) => resolve[h] || EXTRA[h] || { href: h, label: h, ds: '', kind: 'Concept' };
+const steps = p.steps.map(get);
+const tools = steps.filter(s => s.kind === 'Tool').length;
+const reads = steps.length - tools;
+---
+<Layout
+  title={`Learn ${p.shortTitle}, a free, hands-on AI course | KB Cafe`}
+  description={`${p.outcome.replace(/^I want to /, 'Learn to ')}. A free, self-paced path: ${reads} concepts and ${tools} hands-on tools, about ${p.minutes} minutes. No account, progress saved locally.`}
+  path={p.route}
+>
+  <section class="lpp">
+    <header class="lpp-head">
+      <div class="eyebrow">☕ Learning path</div>
+      <h1>Learn <span class="mk">{p.shortTitle}.</span></h1>
+      <p class="lede">{p.blurb}</p>
+      <div class="lpp-meta">
+        <span>⏱ ~{p.minutes} min</span><span class="dot">·</span>
+        <span>{reads} concepts</span><span class="dot">·</span>
+        <span>{tools} hands-on tools</span><span class="dot">·</span>
+        <span>free, no account</span>
+      </div>
+      <div class="lpp-prog">
+        <div class="lpp-prog-h"><span><strong id="done">0</strong> of {steps.length} steps</span><button class="lpp-reset" id="reset" hidden>reset</button></div>
+        <div class="lpp-bar"><i id="bar"></i></div>
+      </div>
+    </header>
+
+    <ol class="lpp-steps">
+      {steps.map((x, i) => (
+        <li class="lpp-step" data-href={x.href}>
+          <button class="lpp-check" aria-label={`Mark step ${i + 1} done`}><span class="lpp-n">{i + 1}</span><span class="lpp-tick" aria-hidden="true">✓</span></button>
+          <a class="lpp-card" href={x.href}>
+            <span class="lpp-top"><span class={`lpp-k ${x.kind === 'Tool' ? 'k-tool' : 'k-concept'}`}>{x.kind === 'Tool' ? 'Try' : 'Read'}</span><span class="lpp-nm">{x.label}</span></span>
+            <span class="lpp-ds">{x.ds}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+
+    <p class="lpp-foot" id="foot"></p>
+    <Share path={p.route} title={`Learn ${p.shortTitle}`} variant="prominent" />
+    <p class="lpp-links">More routes: <a href="/learn">all learning paths</a>, the <a href="/skill-tree">skill tree</a>, or the <a href="/map">knowledge map</a>.</p>
+  </section>
+</Layout>
+
+<style>
+  .lpp{max-width:840px;margin:0 auto;padding:40px 0 20px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .lpp-head h1{font-family:var(--font-display);font-weight:700;letter-spacing:-.03em;line-height:1.04;font-size:clamp(36px,5vw,54px)}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.12em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%236F4E37'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:98% .42em}
+  .lede{margin-top:18px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:620px}
+  .lpp-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+  .lpp-meta .dot{opacity:.45}
+  .lpp-prog{margin-top:20px;max-width:520px}
+  .lpp-prog-h{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);margin-bottom:8px}
+  .lpp-prog-h strong{color:var(--coral-deep);font-size:18px}
+  .lpp-reset{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);background:none;border:0;cursor:pointer;text-decoration:underline}
+  .lpp-bar{height:10px;border-radius:6px;background:var(--paper-2);overflow:hidden}
+  .lpp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16a37e,#0f9f82);transition:width .35s}
+
+  .lpp-steps{list-style:none;margin:34px 0 0;padding:0}
+  .lpp-step{display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:center;margin-bottom:10px}
+  .lpp-check{position:relative;width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:var(--paper);cursor:pointer;display:grid;place-items:center}
+  .lpp-check:hover{border-color:#0f9f82}
+  .lpp-n{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink-soft)}
+  .lpp-tick{position:absolute;color:#fff;font-weight:800;font-size:18px;opacity:0}
+  .lpp-step.done .lpp-check{background:#0f9f82;border-color:#0f9f82}
+  .lpp-step.done .lpp-n{opacity:0}.lpp-step.done .lpp-tick{opacity:1}
+  .lpp-card{display:flex;flex-direction:column;gap:3px;text-decoration:none;color:var(--ink);background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:13px 16px;transition:transform .14s,box-shadow .14s,border-color .14s}
+  .lpp-card:hover{transform:translateX(3px);box-shadow:6px 7px 0 rgba(30,24,19,.07);border-color:var(--ink)}
+  .lpp-step.done .lpp-card{opacity:.7}
+  .lpp-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .lpp-k{font-family:var(--font-mono);font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:5px}
+  .k-concept{background:#efe8ff;color:#6a4dff}.k-tool{background:#ffe5dd;color:var(--coral-deep)}
+  .lpp-nm{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.02em}
+  .lpp-ds{font-size:13px;color:var(--ink-soft);line-height:1.4}
+  .lpp-foot{margin-top:20px;font-family:var(--font-mono);font-size:13.5px;color:#0f7d68;font-weight:700;min-height:20px}
+  .lpp-links{margin-top:18px;font-size:15px;color:var(--ink-soft)}
+  .lpp-links a{color:var(--coral);font-weight:600;text-decoration:none}.lpp-links a:hover{text-decoration:underline}
+  @media(max-width:560px){.lpp-step{grid-template-columns:40px 1fr}}
+</style>
+
+<script is:inline>
+  const KP = window.kbProgress;
+  const steps = [...document.querySelectorAll('.lpp-step')];
+  const bar = document.getElementById('bar'), doneEl = document.getElementById('done'), foot = document.getElementById('foot'), reset = document.getElementById('reset');
+  const total = steps.length;
+  const key = (h) => 'path:' + location.pathname + ':' + h;
+
+  function refresh() {
+    let n = 0;
+    steps.forEach(s => { const on = KP.has(key(s.dataset.href)); s.classList.toggle('done', on); if (on) n++; });
+    bar.style.width = Math.round(n / total * 100) + '%';
+    doneEl.textContent = n; reset.hidden = n === 0;
+    foot.textContent = n === 0 ? '' : n === total ? '🎉 Path complete. Nicely done.' : `${n} of ${total} done, saved locally on this device.`;
+  }
+  steps.forEach(s => s.querySelector('.lpp-check').addEventListener('click', () => { KP.toggle(key(s.dataset.href)); refresh(); }));
+  reset.addEventListener('click', () => { steps.forEach(s => KP.set(key(s.dataset.href), false)); refresh(); });
+  refresh();
+</script>

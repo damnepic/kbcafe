@@ -35,6 +35,18 @@ const canonical = new URL(path, Astro.site).href;
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<!-- progress tracking: 100% local (localStorage), no accounts, no tracking, never leaves the device -->
+<script is:inline>
+  window.kbProgress = {
+    k: 'kbcafe-progress',
+    all() { try { return new Set(JSON.parse(localStorage.getItem(this.k) || '[]')); } catch { return new Set(); } },
+    has(h) { return this.all().has(h); },
+    save(s) { try { localStorage.setItem(this.k, JSON.stringify([...s])); } catch {} },
+    toggle(h) { const s = this.all(); s.has(h) ? s.delete(h) : s.add(h); this.save(s); return s.has(h); },
+    set(h, on) { const s = this.all(); on ? s.add(h) : s.delete(h); this.save(s); },
+    count() { return this.all().size },
+  };
+</script>
 </head>
 <body class={bodyClass}>
 <!-- reusable marks -->

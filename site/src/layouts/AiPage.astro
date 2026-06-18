@@ -63,7 +63,7 @@ const appearsIn = pathsWith(path);
       {appearsIn.length > 0 && (
         <div class="kg-row">
           <span class="kg-lbl">Appears in</span>
-          <span class="kg-links paths">{appearsIn.map(p => <a href={`/learn#${p.id}`}>{p.title} path</a>)}</span>
+          <span class="kg-links paths">{appearsIn.map(p => <a href={p.route}>{p.title} path</a>)}</span>
         </div>
       )}
       <a class="kg-map" href="/map">See the whole knowledge map →</a>

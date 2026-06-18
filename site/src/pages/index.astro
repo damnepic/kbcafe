@@ -50,14 +50,14 @@ const refCount = REFERENCE.length + AI.length; // evergreen references + AI expl
 
 // goal-first workflows: bundle tools by what you're trying to do (vs browsing 34 tools)
 const WORKFLOWS = [
-  { title: 'Building an AI app', path: '/learn#agents', accent: '#7657ff',
+  { title: 'Build an AI app or agent', path: '/learn-ai-agents', accent: '#7657ff',
     blurb: 'Go from idea to architecture: design the system, wire the tools, compose the agent.',
     tools: [['AI Architecture Generator', '/ai-architecture-generator'], ['AI Stack Explainer', '/ai-stack-explainer'], ['Pattern Builder', '/ai-pattern-builder'], ['MCP Config Generator', '/mcp-config-generator']] },
   { title: 'Writing prompts that work', path: '/learn-prompting', accent: '#ee4b2b',
     blurb: 'Why AI gives bad answers, and how to fix it. Start here if your prompts disappoint.',
     tools: [['Prompt Simulator', '/prompt-simulator'], ['Prompt Builder', '/prompt-builder'], ['Good vs Bad Prompts', '/good-vs-bad-prompts'], ['Prompt Linter', '/prompt-linter']] },
-  { title: 'Understanding context & memory', path: '/learn#infra', accent: '#0f9f82',
-    blurb: 'Why models run out of room and forget things, and how to manage both.',
+  { title: 'Understand how AI works', path: '/learn-ai-infrastructure', accent: '#0f9f82',
+    blurb: 'Context windows, tokens, embeddings, RAG. The infrastructure behind every AI feature.',
     tools: [['Token Counter', '/token-counter'], ['Context Budget Analyzer', '/context-budget-analyzer'], ['Agent Memory Simulator', '/agent-memory-simulator'], ['Context Window Visualizer', '/context-window-visualizer']] },
 ];
 ---
@@ -159,8 +159,8 @@ const WORKFLOWS = [
     <section class="home-sec">
       <div class="sec-head">
         <div class="sec-title">
-          <span class="kicker">Start with a workflow</span>
-          <p class="sec-sub">Tell us what you&rsquo;re doing, not which of {toolCount} tools to open.</p>
+          <span class="kicker">What are you trying to do?</span>
+          <p class="sec-sub">Pick a goal, not one of {toolCount} tools. We&rsquo;ll route you to the right path.</p>
         </div>
         <a class="sec-link" href="/learn">See learning paths →</a>
       </div>
