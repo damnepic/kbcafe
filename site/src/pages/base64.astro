@@ -1,5 +1,30 @@
 ---
 import ToolPage from '../layouts/ToolPage.astro';
+
+// The 64-character Base64 alphabet (RFC 4648), generated so the reference table is exact.
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split('');
+
+// FAQ drives both the visible <details> list and the FAQPage JSON-LD, so they never drift apart.
+const FAQ = [
+  { q: 'Is Base64 encryption?', a: 'No. Base64 is encoding, not encryption. Anyone can decode it instantly with no key, so it provides no confidentiality. Use it to move bytes safely through text channels, and use real encryption to protect secrets.' },
+  { q: 'Why is my Base64 longer than the input?', a: 'Every 3 bytes become 4 characters, so the encoded output is about 33% larger than the original. That overhead is the price of being safe to send through text-only systems.' },
+  { q: 'What are the = signs at the end?', a: 'They are padding. Base64 output length is always a multiple of 4, so when the input is not a multiple of 3 bytes, one or two = characters pad the final group. URL-safe Base64 often omits them.' },
+  { q: 'What is URL-safe Base64?', a: 'A variant from RFC 4648 that replaces + with - and / with _, and usually drops the = padding, so the string is safe inside URLs and filenames. JSON Web Tokens use it.' },
+  { q: 'Why does Base64 break on emojis or accented characters?', a: 'In browsers, btoa() only handles characters in the Latin1 range. For Unicode you must encode the text as UTF-8 bytes first (for example with TextEncoder), then Base64 those bytes. This tool does that for you.' },
+  { q: 'Is a JWT encrypted because it is Base64?', a: 'No. A standard JWT is three Base64URL parts, and the payload is readable by anyone who decodes it. The signature proves it was not tampered with, but it does not hide the contents.' },
+  { q: 'What is a data URI?', a: 'A way to embed a file inline as text, written data:[mediatype];base64,[data]. It lets you put a small image or font directly in HTML or CSS instead of making a separate request.' },
+  { q: 'Base64 vs hex, which should I use?', a: 'Base64 is more compact, about 33% overhead versus 100% for hex, so it is better for size. Hex is simpler to read by eye. Use Base64 for transport and storage, hex for debugging and hashes.' },
+  { q: 'Can I Base64 encode an image or file?', a: 'Yes. The bytes of any file can be Base64 encoded, which is how images get embedded as data URIs. The result is larger than the binary, so it suits small assets rather than big files.' },
+  { q: 'Why did my decoded text come out as gibberish?', a: 'Usually a character-set mismatch or missing padding. Make sure the input is complete Base64, that you picked the right variant (standard vs URL-safe), and that the original bytes were UTF-8 text, not raw binary.' },
+  { q: 'Does this tool upload my data?', a: 'No. Encoding and decoding happen entirely in your browser, so whatever you paste stays on your machine and the tool keeps working offline.' },
+  { q: 'Is Base64 a kind of compression?', a: 'No, the opposite. Base64 makes data about a third larger. It exists to make bytes text-safe, not to make them smaller.' },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 ---
 <ToolPage
   title="Base64 Encoder / Decoder, encode &amp; decode text online | KB Cafe"
@@ -27,50 +52,148 @@ import ToolPage from '../layouts/ToolPage.astro';
   <p class="status" id="status"></p>
 
   <Fragment slot="explainer">
-    <h2>What is Base64?</h2>
+    <nav class="toc" aria-label="On this page">
+      <span class="toc-h">On this page</span>
+      <a href="#what">What is Base64?</a>
+      <a href="#why">Why it exists</a>
+      <a href="#how">How it works</a>
+      <a href="#table">Character table</a>
+      <a href="#examples">Examples</a>
+      <a href="#code">In code</a>
+      <a href="#vs-hex">vs Hex</a>
+      <a href="#mistakes">Common mistakes</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <h2 id="what">What is Base64?</h2>
     <p>
       Base64 is a way to represent <strong>binary data using only 64 printable ASCII characters</strong>
-      (<code>A–Z</code>, <code>a–z</code>, <code>0–9</code>, <code>+</code>, <code>/</code>). It exists
-      because many systems, email headers, URLs, JSON, HTTP basic auth, were built for text and will
-      mangle raw bytes. Encoding to Base64 lets binary travel safely through a text-only channel.
+      (<code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>+</code>, <code>/</code>). It exists because
+      many systems, email headers, URLs, JSON, HTTP basic auth, were built for text and will mangle raw bytes.
+      Encoding to Base64 lets binary travel safely through a text-only channel, then decode back to the exact
+      original bytes on the other side.
     </p>
 
-    <h3>How it works</h3>
+    <h2 id="why">Why Base64 exists</h2>
+    <p>The same need shows up all over the stack, any time bytes have to ride through something built for text:</p>
+    <ul>
+      <li><strong>Email (MIME)</strong>: attachments are Base64 so 8-bit binary survives mail servers that expect text. See <a href="/how-smtp-works">how SMTP works</a>.</li>
+      <li><strong>Data URIs</strong>: a small image or font embedded straight into HTML or CSS as <code>data:image/png;base64,…</code>, no extra request.</li>
+      <li><strong>JSON &amp; APIs</strong>: JSON has no binary type, so bytes (a file, a hash, an image) travel as a Base64 string. Pair it with <a href="/json-to-typescript">JSON tools</a>.</li>
+      <li><strong>HTTP Basic auth</strong>: the <code>Authorization</code> header sends <code>Base64(user:pass)</code>. See <a href="/http-explained">HTTP explained</a>.</li>
+      <li><strong>Tokens</strong>: a <a href="/jwt-decoder">JWT</a> is three Base64URL parts; its payload is just Base64-encoded JSON.</li>
+    </ul>
+
+    <h2 id="how">How Base64 works</h2>
     <p>
-      Base64 takes <strong>3 bytes (24 bits) at a time and splits them into 4 groups of 6 bits</strong>.
-      Each 6-bit group (0–63) maps to one character in the Base64 alphabet. Because 3 input bytes become
-      4 output characters, Base64 is always about <strong>33% larger</strong> than the original. When the
-      input isn&rsquo;t a multiple of 3 bytes, the output is padded with <code>=</code> so its length stays
-      a multiple of 4.
+      Base64 takes <strong>3 bytes (24 bits) at a time and splits them into 4 groups of 6 bits</strong>. Each
+      6-bit group is a number from 0 to 63, which maps to one character in the alphabet below. Three input bytes
+      always become four output characters, which is why Base64 is about <strong>33% larger</strong> than the
+      original.
     </p>
-
+    <div class="b64-ex">
+      <div class="b64-ex-row"><span class="b64-ex-l">Text</span><code>Hel</code></div>
+      <div class="b64-ex-mid">3 bytes = 24 bits, regrouped into 4 &times; 6 bits</div>
+      <div class="b64-ex-row"><span class="b64-ex-l">Base64</span><code>SGVs</code></div>
+    </div>
+    <p>
+      Encode the whole word <code>Hello</code> (5 bytes) and you get <code>SGVsbG8=</code>. The trailing
+      <code>=</code> is <strong>padding</strong>: when the input is not a clean multiple of 3 bytes, one or two
+      <code>=</code> keep the output length a multiple of 4. Try it in the tool above.
+    </p>
     <h3>Standard vs URL-safe</h3>
     <ul>
       <li><strong>Standard</strong> uses <code>+</code> and <code>/</code> and pads with <code>=</code>.</li>
-      <li><strong>URL-safe</strong> (RFC 4648 §5) swaps <code>+→-</code> and <code>/→_</code> and usually drops the
-        <code>=</code> padding, so the string is safe inside a URL or filename. Toggle it above.</li>
+      <li><strong>URL-safe</strong> (RFC 4648 §5) swaps <code>+</code> to <code>-</code> and <code>/</code> to
+        <code>_</code>, and usually drops the <code>=</code>, so the string is safe inside a URL or filename.
+        Toggle it above.</li>
     </ul>
 
-    <h2 style="color:var(--coral-deep)">Base64 is encoding, not encryption</h2>
+    <h2 id="table">Base64 character table</h2>
+    <p>The 64 values and the character each one maps to (index <code>0</code> to <code>63</code>):</p>
+    <div class="b64-table">
+      {ALPHABET.map((c, i) => (<span class="b64-cell"><b>{i}</b>{c}</span>))}
+      <span class="b64-cell b64-pad"><b>pad</b>=</span>
+    </div>
+
+    <h2 id="examples">Common examples</h2>
+    <ul>
+      <li><strong>Encode text</strong>: <code>Hello</code> becomes <code>SGVsbG8=</code>.</li>
+      <li><strong>Decode</strong>: <code>S0IgQ2FmZQ==</code> becomes <code>KB Cafe</code> (load the sample above).</li>
+      <li><strong>Data URI</strong>: <code>data:text/plain;base64,SGVsbG8=</code> renders as <code>Hello</code>.</li>
+      <li><strong>JWT payload</strong>: the middle segment of a token is Base64URL JSON, decode it with the <a href="/jwt-decoder">JWT decoder</a>.</li>
+    </ul>
+
+    <h2 id="code">Base64 in code</h2>
+    <h3>JavaScript</h3>
+    <pre class="code"><code>// Browser, Unicode-safe (handles emoji and accents)
+const bytes = new TextEncoder().encode("Hello");
+const b64   = btoa(String.fromCharCode(...bytes));   // "SGVsbG8="
+
+const bin  = atob(b64);
+const text = new TextDecoder().decode(Uint8Array.from(bin, c =&gt; c.charCodeAt(0)));
+
+// Node.js
+Buffer.from("Hello", "utf8").toString("base64");      // "SGVsbG8="
+Buffer.from("SGVsbG8=", "base64").toString("utf8");   // "Hello"</code></pre>
+    <h3>Python</h3>
+    <pre class="code"><code>import base64
+
+base64.b64encode(b"Hello").decode()      # 'SGVsbG8='
+base64.b64decode("SGVsbG8=").decode()    # 'Hello'
+
+# URL-safe variant
+base64.urlsafe_b64encode(b"Hello").decode()
+base64.urlsafe_b64decode(data)</code></pre>
+
+    <h2 id="vs-hex">Base64 vs Hex</h2>
+    <p>Both turn bytes into text. They trade size against readability:</p>
+    <table class="cmp">
+      <thead><tr><th></th><th>Base64</th><th>Hex</th></tr></thead>
+      <tbody>
+        <tr><td>Alphabet</td><td>64 chars (A-Z a-z 0-9 + /)</td><td>16 chars (0-9 a-f)</td></tr>
+        <tr><td>Size</td><td>~33% larger than input</td><td>100% larger (2 chars per byte)</td></tr>
+        <tr><td>Readability</td><td>Dense, hard to read by eye</td><td>Each byte is plainly visible</td></tr>
+        <tr><td>Typical use</td><td>Transport, data URIs, JWT, email</td><td>Hashes, color codes, debugging</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="mistakes" style="color:var(--coral-deep)">Common mistakes</h2>
+    <ul>
+      <li><strong>Treating it as security.</strong> Base64 is trivially reversible, this page decodes it in one
+        click. It hides nothing; use real encryption for secrets.</li>
+      <li><strong>Unicode with <code>btoa()</code>.</strong> Raw <code>btoa("café")</code> throws. Encode to
+        UTF-8 bytes first (as the JavaScript example does).</li>
+      <li><strong>Dropped or wrong padding.</strong> Some decoders reject a string whose length is not a
+        multiple of 4. If you stripped <code>=</code>, add it back before decoding.</li>
+      <li><strong>Forgetting URL-safe.</strong> Standard Base64&rsquo;s <code>+</code> and <code>/</code> break
+        inside URLs and filenames. Use the URL-safe variant there.</li>
+      <li><strong>Double encoding.</strong> Encoding an already-Base64 string just makes it bigger and confusing.</li>
+    </ul>
+
+    <h2 id="faq">FAQ</h2>
+    {FAQ.map(f => (
+      <details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>
+    ))}
+
+    <h3>Related concepts</h3>
     <p>
-      Anyone can decode Base64, this page does it with one click. It provides <strong>no
-      confidentiality</strong>. Never use Base64 to &ldquo;hide&rdquo; secrets; use real encryption for that.
-      Its job is safe <em>transport</em> of bytes, not security.
+      <a href="/jwt-decoder">JWT decoder</a> &middot; <a href="/json-to-typescript">JSON to TypeScript</a> &middot;
+      <a href="/http-explained">HTTP explained</a> &middot; <a href="/how-smtp-works">How SMTP works</a> &middot;
+      <a href="/what-is-rss">What is RSS</a> &middot; <a href="/reference">all references</a>.
     </p>
 
-    <h2>FAQ</h2>
-    <details class="faq"><summary>Why is my Base64 longer than the input?</summary>
-      <p>Every 3 bytes become 4 characters, so the encoded form is ~33% larger. That overhead is the cost of being text-safe.</p>
-    </details>
-    <details class="faq"><summary>What are the <code>=</code> signs at the end?</summary>
-      <p>Padding. They keep the output length a multiple of 4 when the input length isn&rsquo;t a multiple of 3. URL-safe Base64 often omits them.</p>
-    </details>
-    <details class="faq"><summary>Is anything uploaded?</summary>
-      <p>No, encoding and decoding run in your browser, so your text stays local and the tool works offline.</p>
-    </details>
+    <div class="classic">
+      <span class="classic-tag">☕ KB Cafe Classic</span>
+      <p>
+        This guide is a modern restoration of one of <code>kbcafe.com</code>&rsquo;s most-referenced technical
+        resources from the early web era, rewritten for today&rsquo;s development practices and kept fully
+        client-side. The original Base64 how-to was linked across the developer web for years; this is its
+        current home.
+      </p>
+    </div>
 
-    <h3>Related</h3>
-    <p>Decoding a token? A JWT is three Base64URL parts, use the <a href="/jwt-decoder">JWT decoder</a>. Learn more in the <a href="/reference">Reference</a>, including <a href="/memory-leaks-explained">memory leaks</a> and <a href="/object-oriented-programming-concepts">OOP concepts</a>.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </Fragment>
 </ToolPage>
 
@@ -79,6 +202,36 @@ import ToolPage from '../layouts/ToolPage.astro';
   .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
   .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:7px;cursor:pointer;margin-left:auto}
   .opt code{font-size:12px}
+
+  /* ── flagship reference hub ── */
+  .toc{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:6px 0 30px;padding:14px 16px;border:1.2px solid var(--line);border-radius:13px;background:var(--paper-2)}
+  .toc-h{font-family:var(--font-mono);font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-right:4px}
+  .toc a{font-family:var(--font-mono);font-size:12.5px;color:var(--coral);text-decoration:none;font-weight:600}
+  .toc a:hover{text-decoration:underline}
+
+  .b64-ex{display:flex;flex-direction:column;align-items:center;gap:6px;margin:16px 0;padding:18px;border:1.5px solid var(--line);border-radius:14px;background:var(--cream)}
+  .b64-ex-row{display:flex;align-items:center;gap:12px}
+  .b64-ex-l{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);width:60px;text-align:right}
+  .b64-ex-row code{font-family:var(--font-mono);font-size:22px;font-weight:700;letter-spacing:.06em;color:var(--ink);background:var(--paper-2);padding:6px 14px;border-radius:9px}
+  .b64-ex-mid{font-family:var(--font-mono);font-size:12px;color:var(--coral-deep)}
+
+  .b64-table{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:14px 0 4px}
+  .b64-cell{display:flex;align-items:baseline;justify-content:center;gap:6px;font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--ink);background:var(--cream);border:1.2px solid var(--line);border-radius:8px;padding:7px 4px}
+  .b64-cell b{font-size:10px;font-weight:600;color:var(--ink-soft)}
+  .b64-cell.b64-pad{background:rgba(244,180,35,.14);border-color:rgba(244,132,42,.3)}
+  @media(max-width:560px){.b64-table{grid-template-columns:repeat(4,1fr)}}
+
+  .code{background:#1e1813;color:#f4e9d6;border-radius:12px;padding:15px 16px;overflow-x:auto;margin:10px 0 4px;border:1px solid rgba(255,255,255,.08)}
+  .code code{font-family:var(--font-mono);font-size:13px;line-height:1.65;white-space:pre;color:inherit;background:none;padding:0}
+
+  .cmp{width:100%;border-collapse:collapse;margin:12px 0 4px;font-size:14px}
+  .cmp th,.cmp td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  .cmp thead th{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper-2)}
+  .cmp td:first-child{font-weight:700;color:var(--ink);width:130px}
+
+  .classic{margin:30px 0 0;padding:16px 18px;border:1.5px solid rgba(244,132,42,.32);border-radius:14px;background:rgba(244,180,35,.1)}
+  .classic-tag{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a5b00}
+  .classic p{margin:9px 0 0;font-size:14px;line-height:1.6;color:var(--ink-soft)}
 </style>
 
 <script is:inline>
