@@ -47,7 +47,7 @@ const reads = steps.length - tools;
       {steps.map((x, i) => (
         <li class="lpp-step" data-href={x.href}>
           <button class="lpp-check" aria-label={`Mark step ${i + 1} done`}><span class="lpp-n">{i + 1}</span><span class="lpp-tick" aria-hidden="true">✓</span></button>
-          <a class="lpp-card" href={x.href}>
+          <a class="lpp-card" href={`${x.href}?p=${p.id}&s=${i}`}>
             <span class="lpp-top"><span class={`lpp-k ${x.kind === 'Tool' ? 'k-tool' : 'k-concept'}`}>{x.kind === 'Tool' ? 'Try' : 'Read'}</span><span class="lpp-nm">{x.label}</span></span>
             <span class="lpp-ds">{x.ds}</span>
           </a>

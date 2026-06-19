@@ -1,6 +1,7 @@
 ---
 import Layout from './Layout.astro';
 import Share from '../components/Share.astro';
+import PathNav from '../components/PathNav.astro';
 import { TOOLS } from '../data/tools.js';
 import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
@@ -28,6 +29,7 @@ const siblings = !g ? TOOLS.filter(t => t.href && t.href !== path).slice(0, 4) :
     <h1>{h1}</h1>
     <p class="tagline">{tagline}</p>
   </header>
+  <div id="pn-top"></div>
 
   <section class="tool-stage">
     <slot />
@@ -38,6 +40,9 @@ const siblings = !g ? TOOLS.filter(t => t.href && t.href !== path).slice(0, 4) :
   <section class="prose">
     <slot name="explainer" />
   </section>
+
+  <div id="pn-bottom"></div>
+  <PathNav />
 
   {g ? (
     <aside class="tgraph">

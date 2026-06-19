@@ -1,6 +1,7 @@
 ---
 import Layout from './Layout.astro';
 import Share from '../components/Share.astro';
+import PathNav from '../components/PathNav.astro';
 import { AI, titleFor } from '../data/ai.js';
 import { TOOLS } from '../data/tools.js';
 import { TOOL_GRAPH } from '../data/toolGraph.js';
@@ -29,12 +30,16 @@ const appearsIn = pathsWith(path);
       <h1 set:html={h1} />
       <p class="tagline">{tagline}</p>
     </header>
+    <div id="pn-top"></div>
     <div class="prose">
       <slot />
     </div>
   </article>
 
+  <div id="pn-bottom"></div>
+
   <Share path={path} title={h1} variant="subtle" />
+  <PathNav />
 
   {graphRows.length > 0 && (
     <nav class="kgraph" aria-label="Related concepts">

@@ -1,0 +1,130 @@
+---
+// Learning-path continuation: a compact progress bar near the top and a big
+// "STEP X OF Y → NEXT" component at the bottom of every step page. Reads path
+// context from ?p=<id>&s=<index>; falls back to inferring the path from the URL.
+// Fills the server-rendered #pn-top / #pn-bottom divs the layouts provide.
+import { LEARNING_PATHS } from '../data/learningPaths.js';
+import { TOOLS } from '../data/tools.js';
+import { AI } from '../data/ai.js';
+import { REFERENCE } from '../data/reference.js';
+
+const labelOf = {};
+TOOLS.forEach(t => { if (t.href) labelOf[t.href] = t.nm; });
+AI.forEach(a => { labelOf[a.href] = a.nm; });
+REFERENCE.forEach(r => { labelOf[r.href] = r.nm; });
+
+const PATHS = {};
+LEARNING_PATHS.forEach(p => {
+  PATHS[p.id] = { id: p.id, route: p.route, title: p.shortTitle || p.title, steps: p.steps.map(h => ({ href: h, label: labelOf[h] || h })) };
+});
+---
+<script is:inline define:vars={{ PATHS }}>
+  (function () {
+    const topEl = document.getElementById('pn-top');
+    const botEl = document.getElementById('pn-bottom');
+    if (!topEl && !botEl) return;
+    const here = location.pathname.replace(/\/+$/, '') || '/';
+    const qp = new URLSearchParams(location.search);
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const mark = (h) => { try { window.kbProgress && window.kbProgress.set(h, true); } catch (e) {} };
+    const stepUrl = (id, i) => PATHS[id].steps[i].href + '?p=' + id + '&s=' + i;
+
+    let path = null, idx = -1;
+    const pid = qp.get('p');
+    if (pid && PATHS[pid]) {
+      path = PATHS[pid];
+      const s = parseInt(qp.get('s'), 10);
+      idx = Number.isInteger(s) ? s : path.steps.findIndex((st) => st.href === here);
+    } else {
+      const inP = Object.keys(PATHS).map((k) => PATHS[k]).filter((p) => p.steps.some((st) => st.href === here));
+      if (inP.length === 1) { path = inP[0]; idx = path.steps.findIndex((st) => st.href === here); }
+      else if (inP.length > 1) { renderChooser(inP); return; }
+    }
+    if (!path || idx < 0 || idx >= path.steps.length) return;
+
+    const total = path.steps.length, n = idx + 1, pct = Math.round((n / total) * 100), last = idx === total - 1;
+
+    if (topEl) {
+      topEl.innerHTML =
+        '<a class="pn-top-path" href="' + path.route + '">' + esc(path.title) + ' path</a>' +
+        '<div class="pn-bar"><i style="width:' + pct + '%"></i></div>' +
+        '<span class="pn-top-step">Step ' + n + ' of ' + total + '</span>';
+      topEl.className = 'pn-top';
+    }
+
+    if (botEl) {
+      if (last) {
+        mark(here);
+        const others = Object.keys(PATHS).map((k) => PATHS[k]).filter((p) => p.id !== path.id);
+        botEl.innerHTML =
+          '<div class="pn-confetti">🎉</div>' +
+          '<div class="pn-done-h">Path complete</div>' +
+          '<p class="pn-done-sub">You finished <strong>' + esc(path.title) + '</strong>.</p>' +
+          '<div class="pn-bar pn-bar-lg"><i style="width:100%"></i></div>' +
+          '<div class="pn-continue-h">Continue learning</div>' +
+          '<div class="pn-continue">' + others.map((p) => '<a href="' + p.route + '">' + esc(p.title) + ' &rarr;</a>').join('') + '</div>';
+        botEl.className = 'pn-bottom pn-done';
+      } else {
+        const nextStep = path.steps[idx + 1];
+        const prev = idx > 0 ? '<a class="pn-prev" href="' + stepUrl(path.id, idx - 1) + '">&larr; Previous</a>' : '<span></span>';
+        botEl.innerHTML =
+          '<div class="pn-eyebrow">' + esc(path.title) + ' &middot; learning path</div>' +
+          '<div class="pn-big">STEP ' + n + ' OF ' + total + '</div>' +
+          '<div class="pn-bar pn-bar-lg"><i style="width:' + pct + '%"></i></div>' +
+          '<div class="pn-pct">' + pct + '% complete</div>' +
+          '<div class="pn-actions">' + prev +
+          '<a class="pn-next" href="' + stepUrl(path.id, idx + 1) + '">Next: ' + esc(nextStep.label) + ' &rarr;</a></div>';
+        botEl.className = 'pn-bottom';
+        const nx = botEl.querySelector('.pn-next');
+        if (nx) nx.addEventListener('click', () => mark(here));
+      }
+    }
+
+    function renderChooser(list) {
+      if (!botEl) return;
+      botEl.innerHTML =
+        '<div class="pn-eyebrow">This page is part of ' + list.length + ' learning paths</div>' +
+        '<div class="pn-continue">' + list.map((p) => {
+          const i = p.steps.findIndex((st) => st.href === here);
+          return '<a href="' + p.steps[i].href + '?p=' + p.id + '&s=' + i + '">Continue: ' + esc(p.title) + ' &rarr;</a>';
+        }).join('') + '</div>';
+      botEl.className = 'pn-bottom pn-choose';
+    }
+  })();
+</script>
+
+<style is:global>
+  /* path nav (JS-injected into #pn-top / #pn-bottom) */
+  #pn-top:empty, #pn-bottom:empty { display: none; }
+  .pn-bar{height:6px;background:var(--paper-2);border-radius:999px;overflow:hidden}
+  .pn-bar i{display:block;height:100%;background:var(--coral);border-radius:999px;transition:width .35s}
+  .pn-bar-lg{height:12px;margin:12px 0 8px}
+
+  .pn-top{display:flex;align-items:center;gap:13px;margin:0 0 4px}
+  .pn-top .pn-bar{flex:1}
+  .pn-top-path{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--coral);text-decoration:none;white-space:nowrap}
+  .pn-top-path:hover{text-decoration:underline}
+  .pn-top-step{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-soft);white-space:nowrap}
+
+  .pn-bottom{margin:34px 0 4px;padding:24px 24px 22px;border:1.5px solid var(--line);border-radius:18px;background:var(--cream);box-shadow:0 12px 30px rgba(40,24,12,.06)}
+  .pn-eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px}
+  .pn-big{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,5vw,42px);letter-spacing:-.02em;line-height:1;color:var(--ink)}
+  .pn-pct{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral-deep)}
+  .pn-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:18px}
+  .pn-prev{font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink-soft);text-decoration:none;white-space:nowrap}
+  .pn-prev:hover{color:var(--ink)}
+  .pn-next{font-family:var(--font-display);font-weight:800;font-size:15.5px;color:#fff;background:var(--coral);border-radius:12px;padding:13px 22px;text-decoration:none;box-shadow:0 8px 20px rgba(238,75,43,.28);transition:transform .14s,box-shadow .14s;text-align:center}
+  .pn-next:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(238,75,43,.36);background:var(--coral-deep)}
+
+  .pn-done{text-align:center}
+  .pn-confetti{font-size:38px;line-height:1}
+  .pn-done-h{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:-.02em;margin-top:4px}
+  .pn-done-sub{font-size:16px;color:var(--ink-soft);margin:6px 0 0}
+  .pn-done .pn-bar{max-width:340px;margin:14px auto 0}
+  .pn-continue-h{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 11px}
+  .pn-continue{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .pn-choose{text-align:left}.pn-choose .pn-continue{justify-content:flex-start}
+  .pn-continue a{font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);background:var(--paper-2);border:1.2px solid var(--line);border-radius:11px;padding:10px 16px;text-decoration:none;transition:border-color .14s,color .14s}
+  .pn-continue a:hover{border-color:var(--coral);color:var(--coral-deep)}
+  @media(max-width:560px){.pn-actions{flex-direction:column-reverse;align-items:stretch}.pn-next{padding:14px}.pn-prev{text-align:center}}
+</style>
