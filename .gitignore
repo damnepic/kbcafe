@@ -23,6 +23,8 @@ kbtrans.png
 /*.gif
 /*.bundle
 /*.pdf
+/*.txt
+/_*
 
 # ── build output & deps ────────────────────────────────────────────
 node_modules/
