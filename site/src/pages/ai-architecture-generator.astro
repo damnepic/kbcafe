@@ -93,7 +93,7 @@ import ToolPage from '../layouts/ToolPage.astro';
 
 <script is:inline>
   const $ = (id) => document.getElementById(id);
-  const DEFAULTS = { openai: 'gpt-4o-mini', anthropic: 'claude-3-5-sonnet-latest' };
+  const DEFAULTS = { openai: 'gpt-4o-mini', anthropic: 'claude-sonnet-4-6' };
   let prov = 'openai';
   const SYS = "You are a senior software architect. Given a product description, output a clear ARCHITECTURE, not code. Use markdown with these sections: ## Overview, ## Components (cover Frontend, Backend, Storage/DB, AI / Retrieval if relevant, Auth, Integrations), ## Data flow (a numbered list), ## Key risks, ## MVP scope (the smallest first version). Be concrete and concise. Do NOT write code or commands.";
   const SAMPLE = "A web app where users upload PDFs and ask questions about them in a chat. Accounts with a free tier (3 PDFs) and a paid tier. Answers should cite the source page.";
