@@ -1,0 +1,88 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What is AI Orchestration?, explained simply | KB Cafe"
+  description="A clear explainer of AI orchestration: the layer that coordinates multiple models, tools, and data steps into one reliable pipeline. How it differs from a single prompt, a workflow, and an agent, plus the frameworks involved."
+  path="/what-is-ai-orchestration"
+  eyebrow="Automation · AI"
+  h1="What is AI Orchestration?"
+  tagline="Real AI features are rarely a single prompt. Orchestration is the conductor layer that chains retrieval, models, tools, and logic into one pipeline that runs reliably, the difference between a demo and production."
+>
+  <h2>Why a single call isn&rsquo;t enough</h2>
+  <p>
+    A demo is one prompt in, one answer out. A real feature usually isn&rsquo;t. Answering a question over your
+    docs means: take the query, <a href="/what-is-rag">retrieve</a> relevant passages, build a prompt, call the
+    model, maybe call a <a href="/what-is-tool-calling">tool</a>, check the result, and format the output, with
+    branching and retries along the way. <strong>AI orchestration</strong> is the layer that coordinates those
+    steps into one dependable pipeline. It&rsquo;s the conductor that decides what runs, in what order, and what
+    happens when a step fails.
+  </p>
+
+  <h2>What orchestration actually handles</h2>
+  <ul>
+    <li><strong>Chaining</strong>: the output of one step feeds the next (retrieve, then read, then answer).</li>
+    <li><strong>Branching and tool loops</strong>: call a tool, look at the result, decide whether to call
+      another, possibly looping until done.</li>
+    <li><strong>State</strong>: remembering what&rsquo;s happened so far across a multi-step run or a
+      conversation.</li>
+    <li><strong>Reliability</strong>: retries on a failed or rate-limited call, timeouts, and fallbacks (a
+      cheaper model, a default answer).</li>
+    <li><strong>Observability and cost</strong>: tracing each step so you can see where a run went wrong and what
+      it cost in <a href="/llm-cost-calculator">tokens</a>.</li>
+    <li><strong>Human-in-the-loop</strong>: pausing for approval before a consequential action.</li>
+  </ul>
+
+  <h2>Orchestration vs workflow vs agent</h2>
+  <p>
+    These overlap, so it helps to place them. A <a href="/what-is-workflow-automation">workflow</a> runs a fixed
+    path <em>you</em> defined. An <a href="/ai-agents-vs-workflows-vs-rpa">agent</a> lets the <em>model</em>
+    choose the path at runtime. <strong>Orchestration is the umbrella</strong>: the machinery that runs either of
+    them reliably, plus everything in between (a mostly-fixed pipeline with one model-decided branch). An agent
+    framework is one <em>style</em> of orchestration, the one that hands the most control to the model.
+  </p>
+
+  <h2>The landscape</h2>
+  <p>
+    A few categories of tool do this, and they blur together:
+  </p>
+  <ul>
+    <li><strong>LLM frameworks</strong>: LangChain / LangGraph and LlamaIndex, for chaining model calls,
+      retrieval, and tools in code, with LangGraph leaning into explicit graphs of steps.</li>
+    <li><strong>Multi-agent frameworks</strong>: CrewAI, AutoGen, where several agents with roles coordinate.</li>
+    <li><strong>Durable workflow engines</strong>: Temporal and (for data pipelines) Apache Airflow, general
+      orchestrators increasingly used to run AI steps reliably at scale.</li>
+    <li><strong>No-code platforms with AI nodes</strong>: n8n, Make, and similar, which add &ldquo;call a
+      model&rdquo; as a step inside a visual workflow.</li>
+  </ul>
+  <p>
+    The right choice depends on how much the model should decide, how much reliability you need, and whether your
+    team prefers code or a visual canvas.
+  </p>
+
+  <h2>Do you even need it?</h2>
+  <p>
+    Not always, and that&rsquo;s worth saying plainly. For a single prompt, a direct API call is simpler and you
+    should resist adding a framework. You reach for orchestration when you&rsquo;re <strong>chaining multiple
+    steps</strong>, need <strong>retries and tracing</strong>, or are coordinating <strong>tools and
+    branching</strong>, the point where doing it by hand starts to get fragile.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Is orchestration the same as an agent framework?</summary>
+    <p>No, an agent framework is one kind of orchestration, the kind that lets the model drive. Orchestration
+      also covers fixed pipelines and hybrids where most steps are predetermined and only some are model-decided.</p>
+  </details>
+  <details class="faq"><summary>Do I need LangChain or a framework to build with AI?</summary>
+    <p>No. Plenty of production features are plain API calls and a little code. Frameworks earn their keep once
+      you&rsquo;re juggling retrieval, tools, state, retries, and tracing, the coordination they exist to manage.</p>
+  </details>
+  <details class="faq"><summary>How is this different from regular workflow automation?</summary>
+    <p>It&rsquo;s workflow automation tuned for AI&rsquo;s specific demands: non-deterministic model output, token
+      and context limits, tool-calling loops, streaming, and cost control, things a generic connector flow
+      wasn&rsquo;t built to handle.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>See <a href="/ai-agents-vs-workflows-vs-rpa">agents vs workflows vs RPA</a>, <a href="/what-is-tool-calling">tool calling</a>, and <a href="/what-is-agent-memory">agent memory</a>. Try the <a href="/ai-architecture-generator">AI architecture generator</a>, or browse <a href="/ai">AI Explained</a>.</p>
+</AiPage>

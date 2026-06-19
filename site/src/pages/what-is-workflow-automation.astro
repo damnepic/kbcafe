@@ -1,0 +1,88 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What is Workflow Automation?, explained simply | KB Cafe"
+  description="A clear explainer of workflow automation: the trigger-to-action model, how no-code tools like Zapier, Make, and n8n work, where AI fits in, and how it differs from a plain script or a cron job."
+  path="/what-is-workflow-automation"
+  eyebrow="Automation · Fundamentals"
+  h1="What is Workflow Automation?"
+  tagline="Workflow automation is software that runs a sequence of steps for you, kicked off by an event or a schedule, so a repetitive task happens reliably without anyone doing each step by hand."
+>
+  <h2>The core idea: trigger then action</h2>
+  <p>
+    Almost every automation, however fancy, is the same shape: a <strong>trigger</strong> starts it, and one
+    or more <strong>actions</strong> run in response. &ldquo;When <em>this</em> happens, do <em>that</em>.&rdquo;
+    When a form is submitted, add a row to a sheet and send a Slack message. When a file lands in a folder,
+    resize it and upload it. The job of an automation tool is to watch for the trigger and carry out the actions
+    in order, every time, without you in the loop.
+  </p>
+
+  <h2>Triggers: how an automation starts</h2>
+  <p>There are two broad kinds of trigger:</p>
+  <ul>
+    <li><strong>Event-based</strong>: something happens and the automation fires, a webhook arrives, a new row
+      appears, an email is received, a payment clears. See <a href="/webhooks-vs-polling">webhooks vs polling</a>
+      for how tools actually detect these.</li>
+    <li><strong>Scheduled</strong>: the automation runs on a clock, every hour, every weekday at 9am, the first
+      of the month. This is what a <a href="/cron-generator">cron expression</a> describes.</li>
+  </ul>
+
+  <h2>Actions, steps, and the data between them</h2>
+  <p>
+    After the trigger, a workflow runs its <strong>steps</strong>: call an API, transform some data, send a
+    notification, create a record. Two things make a workflow more than a straight line:
+  </p>
+  <ul>
+    <li><strong>Data mapping</strong>: each step can use output from earlier steps (the new contact&rsquo;s email,
+      the uploaded file&rsquo;s URL). Wiring those fields together is most of the work in practice.</li>
+    <li><strong>Logic</strong>: <em>branches</em> (if the order is over $100, route to a human), <em>filters</em>
+      (only continue for paying customers), and <em>loops</em> (do this for each item).</li>
+  </ul>
+
+  <h2>The tools</h2>
+  <p>
+    You can hand-write automations in code, but a category of platforms exists to make them visual and
+    connected. <strong>Zapier</strong> and <strong>Make</strong> are hosted, no-code, with large libraries of
+    pre-built app connectors. <strong>n8n</strong> is similar but open-source and self-hostable, popular when you
+    want to run it yourself or handle sensitive data. They all add the unglamorous-but-essential parts a raw
+    script lacks: connectors, retries, run history, and a UI to see what happened.
+  </p>
+
+  <h2>Where AI fits</h2>
+  <p>
+    AI doesn&rsquo;t replace this model, it becomes one of the most useful <em>actions</em> in it. A step can
+    now be &ldquo;have a model condense this ticket,&rdquo; &ldquo;classify this email,&rdquo; or
+    &ldquo;draft a reply.&rdquo; The workflow still owns the structure (the trigger, the order, the error
+    handling); the model handles the one fuzzy step in the middle that used to require a person. When the model
+    is allowed to decide the steps itself rather than follow a fixed path, you&rsquo;ve moved from a workflow
+    toward an <a href="/ai-agents-vs-workflows-vs-rpa">AI agent</a>.
+  </p>
+
+  <h2>Workflow vs a plain script</h2>
+  <p>
+    A script can do the same actions. The difference is everything around them: a workflow platform gives you
+    triggers you didn&rsquo;t have to build, hundreds of ready connectors, automatic retries when a step fails,
+    a log of every run, and a way for non-engineers to read and edit the flow. For a one-off you might just write
+    the script; for something that has to run unattended for months, the platform&rsquo;s plumbing is the point.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Do I need to know how to code?</summary>
+    <p>Not for no-code tools like Zapier or Make, you connect steps in a visual editor. Code helps when you need
+      custom logic, a connector that doesn&rsquo;t exist, or full control over hosting and cost.</p>
+  </details>
+  <details class="faq"><summary>How is this different from a cron job?</summary>
+    <p>A cron job is one kind of trigger, a schedule. Workflow automation is the whole picture: the trigger
+      (which may be a schedule <em>or</em> an event), the chain of actions, the data passed between them, and the
+      error handling. Cron answers &ldquo;when,&rdquo; a workflow answers &ldquo;when, then what.&rdquo;</p>
+  </details>
+  <details class="faq"><summary>Is workflow automation the same as RPA?</summary>
+    <p>No. Workflow automation connects systems through their APIs. <a href="/ai-agents-vs-workflows-vs-rpa">RPA</a>
+      drives the user interface, clicking and typing like a person, which is how you automate older systems that
+      have no API. They solve the same goal in very different ways.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Next: <a href="/ai-agents-vs-workflows-vs-rpa">agents vs workflows vs RPA</a> and <a href="/webhooks-vs-polling">webhooks vs polling</a>. Build a schedule with the <a href="/cron-generator">cron generator</a>, or browse <a href="/ai">AI Explained</a>.</p>
+</AiPage>

@@ -1,0 +1,88 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="AI Agents vs Workflows vs RPA, what's the difference? | KB Cafe"
+  description="Workflow automation, RPA, and AI agents all automate work, but in fundamentally different ways. A clear comparison of how each decides what to do, when to use which, and how they combine."
+  path="/ai-agents-vs-workflows-vs-rpa"
+  eyebrow="Automation · Concept"
+  h1="AI Agents vs Workflows vs RPA"
+  tagline="Three ways to automate work that people constantly mix up. The real difference comes down to one question: who decides the steps, you, a recorded UI script, or the model itself?"
+>
+  <h2>The one question that separates them</h2>
+  <p>
+    Workflow automation, RPA, and AI agents can all end at the same place, work that used to need a human now
+    runs by itself. They differ in <strong>who decides what happens next</strong>, and that single distinction
+    drives everything else: how predictable they are, how they break, and when each is the right tool.
+  </p>
+
+  <h2>Workflow automation: you decide the steps</h2>
+  <p>
+    In a <a href="/what-is-workflow-automation">workflow</a> (Zapier, Make, n8n), <strong>you</strong> lay out
+    the path in advance: trigger, then step, then step. The same input always takes the same route. That makes
+    workflows <strong>deterministic</strong>, easy to test, and easy to debug, you can point at the exact step
+    that failed. They connect systems through their <strong>APIs</strong>. The trade-off: they only handle the
+    cases you designed for. Hand a workflow something ambiguous and it has no judgment to fall back on.
+  </p>
+
+  <h2>RPA: a recorded script drives the screen</h2>
+  <p>
+    <strong>RPA (Robotic Process Automation)</strong>, from tools like UiPath or Automation Anywhere, automates
+    by <strong>mimicking a human at the keyboard</strong>: it clicks buttons, types into fields, and copies data
+    between applications through their <em>user interface</em> rather than an API. That&rsquo;s its whole reason
+    to exist, it can automate <strong>legacy systems that have no API</strong>, a mainframe screen, an old
+    desktop app, a vendor portal. The cost is fragility: when the UI changes, a moved button or renamed field,
+    the robot breaks, because it was following pixels and labels, not a stable contract.
+  </p>
+
+  <h2>AI agents: the model decides the steps</h2>
+  <p>
+    An <strong>AI agent</strong> flips the model from follower to driver. You give it a goal and a set of
+    <a href="/what-is-tool-calling">tools</a>, and the <em>model</em> decides which tool to call, reads the
+    result, and loops until the goal is met. That makes agents <strong>non-deterministic</strong> and flexible:
+    they can handle inputs nobody scripted for, reason about ambiguity, and adapt. The trade-off is the mirror
+    image of a workflow&rsquo;s: more capability, less predictability. The same input can take a different path
+    on different runs, which is powerful for open-ended tasks and risky for ones that demand the exact same
+    outcome every time. (See <a href="/what-is-agent-memory">agent memory</a> and the
+    <a href="/ai-patterns">agent patterns</a> that keep them on the rails.)
+  </p>
+
+  <h2>When to use which</h2>
+  <ul>
+    <li><strong>Workflow</strong> when the path is known and repeatable, and the systems have APIs. Most
+      &ldquo;when X, do Y&rdquo; business automation. Predictable and cheap.</li>
+    <li><strong>RPA</strong> when you must automate a system with <em>no API</em> and can only reach it through
+      its screen. Often a bridge for legacy software until a real integration exists.</li>
+    <li><strong>AI agent</strong> when the task is open-ended or needs judgment, summarizing varied documents,
+      triaging unusual requests, researching, where you can&rsquo;t enumerate every path in advance.</li>
+  </ul>
+
+  <h2>They&rsquo;re not rivals, they combine</h2>
+  <p>
+    The most reliable systems mix all three. A deterministic workflow gives you structure and guardrails, and
+    calls an <strong>agent</strong> for the one step that needs reasoning. An agent might trigger an
+    <strong>RPA</strong> robot to reach a system that has no API. The lesson isn&rsquo;t &ldquo;agents replace
+    workflows,&rdquo; it&rsquo;s &ldquo;use the model&rsquo;s judgment only where you actually need it, and keep
+    deterministic structure everywhere else.&rdquo;
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Isn&rsquo;t an AI agent just a smart workflow?</summary>
+    <p>The key difference is who chooses the steps. In a workflow you fix the path ahead of time; in an agent the
+      model chooses the path at runtime. That&rsquo;s why agents handle the unexpected and why they&rsquo;re
+      harder to make perfectly repeatable.</p>
+  </details>
+  <details class="faq"><summary>Will AI agents replace workflow automation and RPA?</summary>
+    <p>Unlikely, and not entirely. When the path is known, a deterministic workflow is cheaper, faster, and more
+      predictable than asking a model to re-derive it every time. Agents expand <em>what</em> can be automated;
+      they don&rsquo;t make structure obsolete.</p>
+  </details>
+  <details class="faq"><summary>Is RPA outdated?</summary>
+    <p>For systems with modern APIs, an API-based workflow is sturdier. RPA stays relevant precisely where APIs
+      don&rsquo;t exist, legacy and closed software, and is increasingly paired with AI to read messy screens
+      more robustly.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Start with <a href="/what-is-workflow-automation">workflow automation</a>, then <a href="/what-is-tool-calling">tool calling</a> (how agents act) and <a href="/what-is-ai-orchestration">AI orchestration</a> (coordinating the pieces). Browse <a href="/ai">AI Explained</a>.</p>
+</AiPage>

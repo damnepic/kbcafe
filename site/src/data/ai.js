@@ -38,6 +38,20 @@ export const AI = [
   { nm: "Structured Output Builder", href: "/structured-output-builder", type: "tool", tag: "Tool",
     ds: "Define fields once; generate the schema for OpenAI, Anthropic, Gemini, and plain JSON Schema.",
     rel: { related: ["/what-are-structured-outputs", "/what-is-tool-calling"] } },
+
+  // ── Automation explainers (fundamentals, AI-connected) ──
+  { nm: "What is workflow automation?", href: "/what-is-workflow-automation", type: "explainer", tag: "Automation",
+    ds: "The trigger-to-action model behind every automation, no-code tools like Zapier and n8n, and where AI fits.",
+    rel: { related: ["/cron-generator", "/webhooks-vs-polling"], next: ["/ai-agents-vs-workflows-vs-rpa"] } },
+  { nm: "AI agents vs workflows vs RPA", href: "/ai-agents-vs-workflows-vs-rpa", type: "explainer", tag: "Automation",
+    ds: "Three ways to automate work and how they differ, who decides the steps: you, a UI script, or the model.",
+    rel: { prereq: ["/what-is-workflow-automation"], related: ["/what-is-tool-calling"], next: ["/what-is-ai-orchestration"] } },
+  { nm: "Webhooks vs polling", href: "/webhooks-vs-polling", type: "explainer", tag: "Automation",
+    ds: "The two ways software learns that something happened, push vs ask, and the latency, cost, and reliability tradeoffs.",
+    rel: { related: ["/what-is-workflow-automation", "/cron-generator"] } },
+  { nm: "What is AI orchestration?", href: "/what-is-ai-orchestration", type: "explainer", tag: "Automation",
+    ds: "The layer that coordinates models, tools, and data steps into one reliable pipeline, vs a single prompt, workflow, or agent.",
+    rel: { prereq: ["/ai-agents-vs-workflows-vs-rpa"], related: ["/what-is-rag", "/what-is-tool-calling"], next: ["/ai-architecture-generator"] } },
 ];
 
 // Titles for graph targets that aren't AI[] entries (hubs).

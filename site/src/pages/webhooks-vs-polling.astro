@@ -1,0 +1,84 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="Webhooks vs Polling, explained simply | KB Cafe"
+  description="The two ways software finds out that something happened: polling (ask repeatedly) and webhooks (get pushed a notification). How each works, their trade-offs in latency, cost, and reliability, and when to use which."
+  path="/webhooks-vs-polling"
+  eyebrow="Automation · Concept"
+  h1="Webhooks vs Polling"
+  tagline="Every automation has to answer one question: how do I find out that something happened? There are two answers, keep asking (polling), or get told (webhooks), and the choice shapes latency, cost, and reliability."
+>
+  <h2>Polling: ask, repeatedly</h2>
+  <p>
+    With <strong>polling</strong>, your code checks the source on a schedule: &ldquo;any new orders?&rdquo;
+    every minute, forever. It&rsquo;s simple and works against almost anything, if a service has an API you can
+    read, you can poll it, no special setup required. The downsides are built in:
+  </p>
+  <ul>
+    <li><strong>Latency</strong>: you only learn about an event at the next check, so your delay is as long as
+      your interval. Poll every 5 minutes and news can be 5 minutes stale.</li>
+    <li><strong>Waste</strong>: the vast majority of checks find nothing and return empty, burning requests,
+      bandwidth, and often <strong>rate limit</strong> budget for no result.</li>
+  </ul>
+  <p>Polling faster cuts latency but multiplies the waste, that tension is the whole problem with polling.</p>
+
+  <h2>Webhooks: get told, instantly</h2>
+  <p>
+    A <strong>webhook</strong> inverts the relationship. Instead of you asking, the source <em>pushes</em> a
+    message to a URL you provide, the moment something happens. It&rsquo;s essentially &ldquo;don&rsquo;t call
+    us, we&rsquo;ll call you.&rdquo; The payoff is the inverse of polling&rsquo;s pain:
+  </p>
+  <ul>
+    <li><strong>Real-time</strong>: you hear about the event as it occurs, not at the next interval.</li>
+    <li><strong>Efficient</strong>: one request per actual event, no empty checks.</li>
+  </ul>
+  <p>But pushing has its own requirements:</p>
+  <ul>
+    <li><strong>You need a public endpoint</strong> for the source to reach, a hosted URL (a server, a
+      serverless function, or an automation platform that receives it for you).</li>
+    <li><strong>You must handle the messy parts of delivery</strong>: a webhook can be sent twice (so handle
+      it <strong>idempotently</strong>), or missed if your endpoint is down, and you should
+      <strong>verify the signature</strong> so you know the message is genuine and not a forged request.</li>
+  </ul>
+
+  <h2>Side by side</h2>
+  <ul>
+    <li><strong>Latency</strong>: webhook is near-instant; polling is up to one interval behind.</li>
+    <li><strong>Efficiency</strong>: webhook sends one message per event; polling makes many empty calls.</li>
+    <li><strong>Setup</strong>: polling needs only read access; webhooks need a public endpoint and the source
+      must support them.</li>
+    <li><strong>Reliability</strong>: polling naturally re-checks, so a missed beat self-heals; a missed webhook
+      is simply gone unless the sender retries.</li>
+  </ul>
+
+  <h2>When to use which</h2>
+  <p>
+    Prefer <strong>webhooks</strong> when the source supports them and you can host an endpoint, especially at
+    scale or when freshness matters. Fall back to <strong>polling</strong> when the source has no webhooks, when
+    you can&rsquo;t expose a public URL, or when a few minutes of delay simply doesn&rsquo;t matter. Many robust
+    systems do <strong>both</strong>: take webhooks for speed, and run a slow periodic poll to
+    <em>reconcile</em>, catching anything a webhook dropped. It&rsquo;s a common, honest belt-and-suspenders
+    pattern.
+  </p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Which one is better?</summary>
+    <p>Neither universally. Webhooks win on latency and efficiency; polling wins on simplicity and works
+      everywhere. The right call depends on whether the source supports webhooks, whether you can host an
+      endpoint, and how fresh the data needs to be.</p>
+  </details>
+  <details class="faq"><summary>Can I use webhooks without running a server?</summary>
+    <p>Yes, indirectly. You still need <em>something</em> to receive the request, but it can be a serverless
+      function or a no-code platform (Zapier, Make, n8n) that exposes a catch-hook URL and runs your steps when
+      it fires.</p>
+  </details>
+  <details class="faq"><summary>Why did my webhook arrive twice?</summary>
+    <p>Senders retry when they&rsquo;re unsure a delivery succeeded, so duplicates are normal. Design the
+      receiving step to be <strong>idempotent</strong>, using the event&rsquo;s ID to ignore a repeat, so
+      processing the same event twice has no extra effect.</p>
+  </details>
+
+  <h3>Related</h3>
+  <p>Webhooks and schedules are the two triggers behind <a href="/what-is-workflow-automation">workflow automation</a>. Build a polling schedule with the <a href="/cron-generator">cron generator</a>, or browse <a href="/ai">AI Explained</a>.</p>
+</AiPage>
