@@ -88,6 +88,18 @@ const WORKFLOWS = [
         </a>
       ))}
     </div>
+  </section>
+
+  <!-- BENEFITS: tucked tight, directly under the triage cards -->
+  <div class="benefits">
+    <div class="benefit"><span class="b-ic b-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/></svg></span><div><h3>100% Client-Side</h3><p>Everything runs in your browser. Nothing leaves your device.</p></div></div>
+    <div class="benefit"><span class="b-ic b-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><h3>Privacy First</h3><p>No signups. No tracking. No data collection. Ever.</p></div></div>
+    <div class="benefit"><span class="b-ic b-gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><div><h3>Blazing Fast</h3><p>Instant results. Works offline. Always available.</p></div></div>
+    <div class="benefit"><span class="b-ic b-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg></span><div><h3>Developer Friendly</h3><p>Clean UI, keyboard-friendly, and zero fluff.</p></div></div>
+  </div>
+
+  <!-- TRUST + quick links (centered) -->
+  <div class="hero-trust">
     <ul class="proof o-proof">
       <li><strong>{aiCount}</strong> AI tools</li>
       <li><strong>{explainerCount}</strong> explainers</li>
@@ -95,7 +107,7 @@ const WORKFLOWS = [
       <li><strong>100%</strong> client-side, no tracking</li>
     </ul>
     <p class="hero-quick">Not sure where to start? <a href="/search">Search every tool, concept &amp; lesson</a>, <a href="/skill-tree">take the skill tree</a>, or <a href="/tools">browse all {toolCount} tools</a>.</p>
-  </section>
+  </div>
 
   <!-- SEARCH -->
   <div class="search-wrap">
@@ -115,14 +127,6 @@ const WORKFLOWS = [
       <a class="cat" href="/tools?cat=time">Time &amp; Cron</a>
       <a class="cat" href="/tools?cat=feeds">Feeds</a>
     </div>
-  </div>
-
-  <!-- BENEFITS -->
-  <div class="benefits">
-    <div class="benefit"><span class="b-ic b-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/></svg></span><div><h3>100% Client-Side</h3><p>Everything runs in your browser. Nothing leaves your device.</p></div></div>
-    <div class="benefit"><span class="b-ic b-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><h3>Privacy First</h3><p>No signups. No tracking. No data collection. Ever.</p></div></div>
-    <div class="benefit"><span class="b-ic b-gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><div><h3>Blazing Fast</h3><p>Instant results. Works offline. Always available.</p></div></div>
-    <div class="benefit"><span class="b-ic b-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg></span><div><h3>Developer Friendly</h3><p>Clean UI, keyboard-friendly, and zero fluff.</p></div></div>
   </div>
 
   <div>
@@ -205,12 +209,12 @@ const WORKFLOWS = [
 </style>
 
 <style>
-  /* HERO (outcome-first) */
-  .hero-o{margin:40px 0 0}
+  /* HERO (outcome-first, centered intro) */
+  .hero-o{margin:40px 0 0;text-align:center}
   .hero-q{font-family:var(--font-display);font-weight:700;font-size:clamp(27px,3.5vw,45px);line-height:1.05;letter-spacing:-.035em;color:var(--ink);white-space:nowrap}
-  .o-sub{color:var(--ink-soft);font-size:17.5px;line-height:1.55;margin:18px 0 28px;max-width:none}
-  .o-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .o-card{position:relative;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);
+  .o-sub{color:var(--ink-soft);font-size:17.5px;line-height:1.55;margin:18px auto 28px;max-width:780px}
+  .o-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:left}
+  .o-card{position:relative;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);text-align:left;
     background:var(--cream);border:1.2px solid var(--line);border-radius:20px;padding:22px;
     box-shadow:0 8px 24px rgba(40,24,12,.05);transition:transform .16s,box-shadow .16s,border-color .16s}
   .o-card::before{content:"";position:absolute;top:-44px;right:-44px;width:140px;height:140px;border-radius:50%;background:var(--ac);opacity:.09;transition:opacity .18s}
@@ -223,8 +227,9 @@ const WORKFLOWS = [
   .o-tools{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
   .o-chip{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--ink-soft);background:var(--paper-2);border-radius:7px;padding:4px 8px}
   .o-go{position:relative;margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14.5px;color:var(--ac);display:inline-flex;align-items:center;gap:6px}
-  .o-proof{margin-top:16px}
-  .hero-quick{margin:13px 0 0;font-size:14px;color:var(--ink-soft)}
+  .hero-trust{text-align:center;margin:16px 0 0}
+  .o-proof{margin:0;justify-content:center}
+  .hero-quick{margin:12px 0 0;font-size:14px;color:var(--ink-soft)}
   .hero-quick a{color:var(--coral);font-weight:600;text-decoration:none}
   .hero-quick a:hover{text-decoration:underline}
   @media(max-width:920px){.hero-q{white-space:normal}}
@@ -294,9 +299,9 @@ const WORKFLOWS = [
   .cat.active .cat-new{background:rgba(255,255,255,.2);color:#fff}
 
   /* BENEFITS */
-  .benefits{max-width:1120px;margin:32px auto 60px;padding:30px 34px;border-radius:26px;background:rgba(255,255,255,.5);border:1.2px solid var(--line);box-shadow:0 12px 40px rgba(45,30,16,.06);display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
-  .benefit{display:grid;grid-template-columns:50px 1fr;gap:14px;align-items:start}
-  .b-ic{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;color:#fff}
+  .benefits{max-width:1120px;margin:16px auto 0;padding:18px 22px;border-radius:20px;background:rgba(255,255,255,.5);border:1.2px solid var(--line);box-shadow:0 10px 30px rgba(45,30,16,.05);display:grid;grid-template-columns:repeat(4,1fr);gap:22px;align-items:center}
+  .benefit{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center}
+  .b-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;color:#fff}
   .b-ic svg{width:24px;height:24px}
   .b-blue{background:linear-gradient(135deg,#3478f6,#6aa8ff)} .b-coral{background:linear-gradient(135deg,#ff4b2f,#d63e1f)}
   .b-gold{background:linear-gradient(135deg,#f4a400,#ffbd45)} .b-green{background:linear-gradient(135deg,#0f9f82,#16c8a4)}
