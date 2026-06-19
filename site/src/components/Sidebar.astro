@@ -111,13 +111,14 @@ const active = (h) => h === path;
   .sb-foot a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink-soft);border-radius:10px;padding:8px 9px;font-family:var(--font-display);font-weight:700;font-size:13.5px}
   .sb-foot a:hover{background:var(--paper-2);color:var(--ink)}
 
-  /* collapsed = icon rail (desktop) */
-  .layout-sb.sb-collapsed .kb-sb{width:54px;padding:12px 7px;align-items:center}
-  .layout-sb.sb-collapsed .sb-lbl,.layout-sb.sb-collapsed .sb-h,.layout-sb.sb-collapsed .sb-chev,.layout-sb.sb-collapsed .sb-list,.layout-sb.sb-collapsed .sb-search .sb-lbl{display:none}
-  .layout-sb.sb-collapsed .sb-bar{flex-direction:column;gap:6px}
-  .layout-sb.sb-collapsed .sb-search{flex:none;width:38px;height:38px;justify-content:center;padding:0}
-  .layout-sb.sb-collapsed .sb-item,.layout-sb.sb-collapsed .sb-toggle,.layout-sb.sb-collapsed .sb-foot a{justify-content:center;padding:9px 0}
-  .layout-sb.sb-collapsed .sb-triage{align-items:center}
+  /* collapsed = icon rail (desktop). class lives on .kb-sb so scoped CSS reaches it */
+  .kb-sb.collapsed{width:56px;padding:12px 8px;align-items:center}
+  .kb-sb.collapsed .sb-lbl,.kb-sb.collapsed .sb-h,.kb-sb.collapsed .sb-chev,.kb-sb.collapsed .sb-list{display:none}
+  .kb-sb.collapsed .sb-bar{flex-direction:column;gap:6px}
+  .kb-sb.collapsed .sb-collapse{transform:rotate(180deg)}
+  .kb-sb.collapsed .sb-search{flex:none;width:40px;height:40px;justify-content:center;padding:0}
+  .kb-sb.collapsed .sb-item,.kb-sb.collapsed .sb-toggle,.kb-sb.collapsed .sb-foot a{justify-content:center;padding:10px 0}
+  .kb-sb.collapsed .sb-triage{align-items:center}
 
   /* mobile = drawer */
   .sb-burger{display:none}
@@ -125,8 +126,11 @@ const active = (h) => h === path;
     .kb-sb{position:fixed;top:0;left:0;height:100dvh;max-height:none;z-index:60;width:280px;border-radius:0;
       transform:translateX(-105%);transition:transform .25s;box-shadow:0 0 60px rgba(16,17,18,.3)}
     .kb-sb.drawer-open{transform:translateX(0)}
-    .layout-sb.sb-collapsed .kb-sb{width:280px;padding:12px;align-items:stretch}
-    .layout-sb.sb-collapsed .sb-lbl,.layout-sb.sb-collapsed .sb-h,.layout-sb.sb-collapsed .sb-list{display:block}
+    /* on mobile the rail concept doesn't apply: always full drawer */
+    .kb-sb.collapsed{width:280px;padding:12px;align-items:stretch}
+    .kb-sb.collapsed .sb-lbl,.kb-sb.collapsed .sb-h{display:block}
+    .kb-sb.collapsed .sb-search{flex:1;width:auto;height:auto;padding:8px 11px;justify-content:flex-start}
+    .kb-sb.collapsed .sb-bar{flex-direction:row}
     .sb-collapse{display:none}
   }
 </style>
@@ -134,14 +138,13 @@ const active = (h) => h === path;
 <script is:inline>
   (function () {
     const sb = document.getElementById('kb-sb'); if (!sb) return;
-    const wrap = document.querySelector('.layout-sb');
     const ls = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
 
-    // overall collapse (desktop), remembered
-    if (ls.get('kb-sb-collapsed') === '1') wrap && wrap.classList.add('sb-collapsed');
+    // overall collapse to icon rail (desktop), remembered. Class lives on the sidebar.
+    if (ls.get('kb-sb-collapsed') === '1') sb.classList.add('collapsed');
     const collapseBtn = document.getElementById('sb-collapse');
     if (collapseBtn) collapseBtn.addEventListener('click', () => {
-      const on = wrap.classList.toggle('sb-collapsed'); ls.set('kb-sb-collapsed', on ? '1' : '0');
+      const on = sb.classList.toggle('collapsed'); ls.set('kb-sb-collapsed', on ? '1' : '0');
     });
 
     // expandable sections, remembered
@@ -151,8 +154,8 @@ const active = (h) => h === path;
       const btn = sec.querySelector('.sb-toggle');
       btn.setAttribute('aria-expanded', sec.classList.contains('open'));
       btn.addEventListener('click', () => {
-        // if collapsed to rail, expand the rail first
-        if (wrap && wrap.classList.contains('sb-collapsed') && window.innerWidth > 900) { wrap.classList.remove('sb-collapsed'); ls.set('kb-sb-collapsed', '0'); }
+        // if collapsed to the rail, expand the rail first so the list is visible
+        if (sb.classList.contains('collapsed') && window.innerWidth > 900) { sb.classList.remove('collapsed'); ls.set('kb-sb-collapsed', '0'); }
         const open = sec.classList.toggle('open'); ls.set(key, open ? '1' : '0'); btn.setAttribute('aria-expanded', open);
       });
     });

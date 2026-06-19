@@ -97,16 +97,23 @@ const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
     radial-gradient(circle at 30% 20%,rgba(118,87,255,.06),transparent 40%),
     radial-gradient(circle at 80% 80%,rgba(238,75,43,.05),transparent 40%),var(--paper-2);
     overflow:hidden;touch-action:none}
-  #graph{display:block;width:100%;height:600px;cursor:grab}
-  #graph.grabbing{cursor:grabbing}
-  #graph .edge{stroke:var(--line);stroke-width:1.4}
-  #graph .edge.ct{stroke:rgba(238,75,43,.28)}
-  #graph .node circle{cursor:pointer;transition:opacity .12s}
-  #graph .node text{font-family:var(--font-mono);font-size:11px;fill:var(--ink);pointer-events:none}
-  #graph .node.concept circle{fill:#7657ff}
-  #graph .node.tool circle{fill:#ee4b2b}
-  #graph.dim .node:not(.hi) circle{opacity:.22} #graph.dim .node:not(.hi) text{opacity:.25}
-  #graph.dim .edge:not(.hi){opacity:.08}
+  #graph{display:block;width:100%;height:660px;cursor:grab}
+  /* graph internals are created in JS, so these must be GLOBAL (scoped CSS won't reach them) */
+  :global(#graph.grabbing){cursor:grabbing}
+  :global(#graph .edge){stroke:rgba(30,24,19,.16);stroke-width:1.3}
+  :global(#graph .edge.ct){stroke:rgba(238,75,43,.22)}
+  :global(#graph .node circle){cursor:pointer;transition:opacity .12s}
+  :global(#graph .node.concept circle){fill:#7657ff}
+  :global(#graph .node.tool circle){fill:#ee4b2b}
+  /* labels get a paper-coloured halo so they stay legible over edges/nodes */
+  :global(#graph .node text){font-family:var(--font-mono);font-size:11px;fill:var(--ink);pointer-events:none;paint-order:stroke;stroke:#FEFDFB;stroke-width:3.5px;stroke-linejoin:round}
+  :global(#graph .node.concept text){font-weight:700;font-size:11.5px}
+  /* tool labels only appear on hover/highlight to cut clutter; concepts always labelled */
+  :global(#graph .node.tool text){opacity:0;transition:opacity .12s}
+  :global(#graph .node.tool:hover text):global(#graph .node.tool.hi text){opacity:1}
+  :global(#graph.dim .node:not(.hi) circle){opacity:.2}
+  :global(#graph.dim .node:not(.hi) text){opacity:.1}
+  :global(#graph.dim .edge:not(.hi)){opacity:.07}
 
   .km-index{margin-top:36px;border-top:1px solid var(--line);padding-top:26px}
   .km-index h2{font-family:var(--font-display);font-weight:800;font-size:22px;margin:0 0 16px}
@@ -126,7 +133,7 @@ const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
 
 <script is:inline define:vars={{ nodes, edges }}>
   const svg = document.getElementById('graph');
-  const W = 1000, H = 600;
+  const W = 1100, H = 660;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const SVGNS = 'http://www.w3.org/2000/svg';
 
@@ -141,8 +148,8 @@ const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
   const deg = nodes.map(() => 0); E.forEach(e => { deg[e.s]++; deg[e.t]++; });
 
   // force simulation
-  const REP = 5200, SPRING = 0.012, LEN = 120, GRAV = 0.015, DAMP = 0.85;
-  for (let it = 0; it < 320; it++) {
+  const REP = 11000, SPRING = 0.014, LEN = 150, GRAV = 0.011, DAMP = 0.85;
+  for (let it = 0; it < 440; it++) {
     for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
       let dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
       let d2 = dx * dx + dy * dy || 0.01; const d = Math.sqrt(d2);
@@ -161,7 +168,7 @@ const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
     });
   }
   // fit to viewbox
-  const pad = 70;
+  const pad = 90;
   const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
   const sx = (W - pad * 2) / (maxX - minX || 1), sy = (H - pad * 2) / (maxY - minY || 1); const s = Math.min(sx, sy);
