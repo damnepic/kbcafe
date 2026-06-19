@@ -53,12 +53,15 @@ const explainerCount = AI.filter(a => a.type === 'explainer').length; // concept
 // goal-first workflows: bundle tools by what you're trying to do (vs browsing 34 tools)
 const WORKFLOWS = [
   { title: 'Build an AI app or agent', path: '/learn-ai-agents', accent: '#7657ff',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="M12 12l8-4.5M12 12v9M12 12 4 7.5"/></svg>`,
     blurb: 'Go from idea to architecture: design the system, wire the tools, compose the agent.',
     tools: [['AI Architecture Generator', '/ai-architecture-generator'], ['AI Stack Explainer', '/ai-stack-explainer'], ['Pattern Builder', '/ai-pattern-builder'], ['MCP Config Generator', '/mcp-config-generator']] },
-  { title: 'Writing prompts that work', path: '/learn-prompting', accent: '#ee4b2b',
+  { title: 'Get great answers from AI', path: '/learn-prompting', accent: '#ee4b2b',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12Z"/><path d="M9 11h6M9 14h4"/></svg>`,
     blurb: 'Why AI gives bad answers, and how to fix it. Start here if your prompts disappoint.',
     tools: [['Prompt Simulator', '/prompt-simulator'], ['Prompt Builder', '/prompt-builder'], ['Good vs Bad Prompts', '/good-vs-bad-prompts'], ['Prompt Linter', '/prompt-linter']] },
   { title: 'Understand how AI works', path: '/learn-ai-infrastructure', accent: '#0f9f82',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 6S9 4 4 4v13c5 0 8 2 8 2s3-2 8-2V4c-5 0-8 2-8 2Z"/><path d="M12 6v15"/></svg>`,
     blurb: 'Context windows, tokens, embeddings, RAG. The infrastructure behind every AI feature.',
     tools: [['Token Counter', '/token-counter'], ['Context Budget Analyzer', '/context-budget-analyzer'], ['Agent Memory Simulator', '/agent-memory-simulator'], ['Context Window Visualizer', '/context-window-visualizer']] },
 ];
@@ -72,11 +75,12 @@ const WORKFLOWS = [
   <!-- HERO (outcome-first, wrapped in identity) -->
   <section class="hero-o">
     <div class="eyebrow">✦ The interactive AI knowledge base</div>
-    <h1 class="hero-q">What are you trying to do with <span class="ul">AI?</span></h1>
+    <h1 class="hero-q">What are you trying to do with AI?</h1>
     <p class="o-sub">Pick a goal. KB Cafe turns it into a guided path through clear explainers, hands-on tools, and developer references, all running in your browser. Nothing uploaded, nothing tracked.</p>
     <div class="o-grid">
       {WORKFLOWS.map(w => (
         <a class="o-card" href={w.path} style={`--ac:${w.accent}`}>
+          <span class="o-ic" set:html={w.icon} />
           <h2>{w.title}</h2>
           <p>{w.blurb}</p>
           <div class="o-tools">{w.tools.slice(0, 3).map(([nm]) => <span class="o-chip">{nm}</span>)}</div>
@@ -84,13 +88,13 @@ const WORKFLOWS = [
         </a>
       ))}
     </div>
-    <p class="hero-quick">Not sure where to start? <a href="/search">Search every tool, concept &amp; lesson</a>, <a href="/skill-tree">take the skill tree</a>, or <a href="/tools">browse all {toolCount} tools</a>.</p>
     <ul class="proof o-proof">
       <li><strong>{aiCount}</strong> AI tools</li>
       <li><strong>{explainerCount}</strong> explainers</li>
       <li><strong>{WORKFLOWS.length}</strong> learning paths</li>
       <li><strong>100%</strong> client-side, no tracking</li>
     </ul>
+    <p class="hero-quick">Not sure where to start? <a href="/search">Search every tool, concept &amp; lesson</a>, <a href="/skill-tree">take the skill tree</a>, or <a href="/tools">browse all {toolCount} tools</a>.</p>
   </section>
 
   <!-- SEARCH -->
@@ -202,27 +206,28 @@ const WORKFLOWS = [
 
 <style>
   /* HERO (outcome-first) */
-  .hero-o{margin:48px 0 0}
-  .hero-q{font-family:var(--font-display);font-weight:700;font-size:clamp(33px,4.4vw,54px);line-height:1.04;letter-spacing:-.035em;color:var(--ink);max-width:740px}
-  .hero-q .ul{position:relative;display:inline-block;padding-bottom:.16em;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%236F4E37'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:center bottom;background-size:100% .42em}
-  .o-sub{max-width:600px;color:var(--ink-soft);font-size:18px;line-height:1.55;margin:20px 0 30px}
+  .hero-o{margin:40px 0 0}
+  .hero-q{font-family:var(--font-display);font-weight:700;font-size:clamp(27px,3.5vw,45px);line-height:1.05;letter-spacing:-.035em;color:var(--ink);white-space:nowrap}
+  .o-sub{color:var(--ink-soft);font-size:17.5px;line-height:1.55;margin:18px 0 28px;max-width:none}
   .o-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   .o-card{position:relative;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);
-    background:rgba(255,255,255,.62);border:1.2px solid var(--line);border-radius:20px;padding:24px 22px 22px;
+    background:var(--cream);border:1.2px solid var(--line);border-radius:20px;padding:22px;
     box-shadow:0 8px 24px rgba(40,24,12,.05);transition:transform .16s,box-shadow .16s,border-color .16s}
-  .o-card::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:var(--ac)}
+  .o-card::before{content:"";position:absolute;top:-44px;right:-44px;width:140px;height:140px;border-radius:50%;background:var(--ac);opacity:.09;transition:opacity .18s}
   .o-card:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(40,24,12,.1);border-color:var(--ac)}
-  .o-card h2{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.02em;line-height:1.15;margin:6px 0 8px}
-  .o-card>p{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 14px}
-  .o-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .o-card:hover::before{opacity:.17}
+  .o-ic{position:relative;width:46px;height:46px;border-radius:14px;background:var(--ac);display:grid;place-items:center;color:#fff;margin-bottom:15px;box-shadow:0 8px 18px rgba(40,24,12,.16)}
+  .o-ic svg{width:24px;height:24px}
+  .o-card h2{position:relative;font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:-.02em;line-height:1.15;margin:0 0 8px}
+  .o-card>p{position:relative;font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 15px}
+  .o-tools{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
   .o-chip{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--ink-soft);background:var(--paper-2);border-radius:7px;padding:4px 8px}
-  .o-go{margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ac)}
-  .hero-quick{margin:24px 0 0;font-size:14.5px;color:var(--ink-soft)}
+  .o-go{position:relative;margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14.5px;color:var(--ac);display:inline-flex;align-items:center;gap:6px}
+  .o-proof{margin-top:16px}
+  .hero-quick{margin:13px 0 0;font-size:14px;color:var(--ink-soft)}
   .hero-quick a{color:var(--coral);font-weight:600;text-decoration:none}
   .hero-quick a:hover{text-decoration:underline}
-  .o-proof{margin-top:18px}
+  @media(max-width:920px){.hero-q{white-space:normal}}
   @media(max-width:760px){.o-grid{grid-template-columns:1fr}}
 
   /* HERO (legacy two-col, retained for reference) */

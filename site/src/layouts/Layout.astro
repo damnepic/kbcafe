@@ -129,14 +129,14 @@ const canonical = new URL(path, Astro.site).href;
   a{color:inherit}
 
   /* nav (cream header band, full-bleed over the off-white body) */
-  nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:22px 0 16px}
+  nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:10px 0 9px}
   nav::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:100vw;
     background:var(--header);border-bottom:1px solid var(--line);z-index:-1}
   /* brand lockup: the logo IS the "KB", wordmark is just "Cafe" (per v5 mockup) */
   .brand{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);
     font-weight:800;font-size:30px;letter-spacing:-.02em;text-decoration:none;color:var(--ink);transition:transform .15s}
   .brand:hover{transform:translateY(-1px)}
-  .brand .mark{height:50px;width:auto;display:block;filter:drop-shadow(2px 3px 0 rgba(30,24,19,.20));transition:transform .15s}
+  .brand .mark{height:42px;width:auto;display:block;filter:drop-shadow(2px 3px 0 rgba(30,24,19,.20));transition:transform .15s}
   .brand:hover .mark{transform:rotate(-3deg)}
   .brand .cf{color:var(--ink);transition:color .15s}
   .brand:hover .cf{color:var(--coral)}
