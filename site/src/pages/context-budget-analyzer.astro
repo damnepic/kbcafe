@@ -68,21 +68,30 @@ import ToolPage from '../layouts/ToolPage.astro';
   </Fragment>
 </ToolPage>
 
-<style>
+<style is:global>
+  /* global: most cards/rows on this page (.cbf, .off, .meter fill) are JS-created,
+     so scoped CSS would never reach them (no data-astro-cid). All selectors here are page-specific. */
   .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;flex-direction:column;gap:6px}
   .opt select,.opt input{font-family:var(--font-mono);font-size:13px;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--cream);color:var(--ink);outline:0}
   .opt select{min-width:320px}.opt select:focus,.opt input:focus{border-color:var(--ink)}
-  .cbf{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:13px 14px;margin-bottom:12px}
-  .cbf-top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-  .cbf-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-  .cbf-name{flex:1;min-width:0;font-family:var(--font-mono);font-size:13.5px;font-weight:700;border:1.5px solid var(--line);border-radius:9px;padding:7px 10px;background:var(--paper);color:var(--ink);outline:0}
-  .cbf-name:focus{border-color:var(--ink)}
-  .cbf-tok{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);white-space:nowrap}
+  .cbf{position:relative;border:1.2px solid var(--line);border-left:4px solid var(--fc);border-radius:14px;background:var(--cream);padding:13px 16px;margin-bottom:11px;transition:box-shadow .15s,border-color .15s}
+  .cbf:focus-within{box-shadow:0 10px 28px rgba(40,24,12,.08)}
+  .cbf-top{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+  .cbf-ic{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:color-mix(in srgb,var(--fc) 15%,transparent);color:var(--fc);flex-shrink:0}
+  .cbf-ic svg{width:16px;height:16px}
+  .cbf-name{flex:1;min-width:0;font-family:var(--font-mono);font-size:14px;font-weight:700;border:0;border-bottom:1.6px solid transparent;background:transparent;color:var(--ink);outline:0;padding:5px 2px}
+  .cbf-name::placeholder{color:#a99e90;font-weight:500}
+  .cbf-name:focus{border-bottom-color:var(--fc)}
+  .cbf-tok{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ink-soft);background:var(--paper-2);border-radius:999px;padding:4px 11px;white-space:nowrap}
   .cbf-tok b{color:var(--ink)}
-  .cbf-rm{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--coral-deep);background:none;border:0;cursor:pointer}
-  .cbf-rm:hover{text-decoration:underline}
-  .cbf textarea{width:100%;min-height:74px;resize:vertical;font-family:var(--font-mono);font-size:12.5px;line-height:1.5;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;background:var(--paper);color:var(--ink);outline:0}
-  .cbf textarea:focus{border-color:var(--ink)}
+  .cbf-rm{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;border:0;background:transparent;color:var(--ink-soft);cursor:pointer;flex-shrink:0;transition:background .12s,color .12s}
+  .cbf-rm:hover{background:rgba(214,62,31,.12);color:var(--coral-deep)}
+  .cbf-rm svg{width:15px;height:15px}
+  .cbf textarea{width:100%;min-height:86px;resize:vertical;font-family:var(--font-mono);font-size:12.5px;line-height:1.55;border:1.2px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--paper);color:var(--ink);outline:0;transition:border-color .12s,box-shadow .12s}
+  .cbf textarea::placeholder{color:#a99e90}
+  .cbf textarea:focus{border-color:var(--fc);box-shadow:0 0 0 3px color-mix(in srgb,var(--fc) 16%,transparent)}
+  #add{width:100%;justify-content:center;gap:6px;border:1.5px dashed var(--line);background:transparent;color:var(--ink-soft);font-family:var(--font-mono);font-weight:700;font-size:13px;border-radius:12px;padding:13px}
+  #add:hover{border-color:var(--coral);color:var(--coral-deep);background:rgba(238,75,43,.04);transform:none}
 
   .meter-wrap{margin-top:6px}
   .meter-head{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);margin-bottom:8px}
@@ -116,10 +125,12 @@ import ToolPage from '../layouts/ToolPage.astro';
     const box = $('files'); box.innerHTML = '';
     files.forEach((f, i) => {
       const color = PALETTE[i % PALETTE.length];
-      const el = document.createElement('div'); el.className = 'cbf';
-      el.innerHTML = `<div class="cbf-top"><span class="cbf-dot" style="background:${color}"></span>
+      const el = document.createElement('div'); el.className = 'cbf'; el.style.setProperty('--fc', color);
+      el.innerHTML = `<div class="cbf-top">
+        <span class="cbf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3Z"/><path d="M14 3v4h4"/></svg></span>
         <input class="cbf-name" placeholder="name (e.g. auth.ts)" value="${(f.name || '').replace(/"/g, '&quot;')}" />
-        <span class="cbf-tok" data-tok>0 tokens</span><button class="cbf-rm">remove</button></div>
+        <span class="cbf-tok" data-tok>0 tokens</span>
+        <button class="cbf-rm" type="button" title="Remove" aria-label="Remove file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
         <textarea spellcheck="false" placeholder="Paste this file or doc…"></textarea>`;
       el.querySelector('textarea').value = f.body;
       el.querySelector('.cbf-name').addEventListener('input', (e) => { f.name = e.target.value; calc(); });
