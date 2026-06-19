@@ -80,7 +80,9 @@ const KW = [
   </Fragment>
 </ToolPage>
 
-<style>
+<style is:global>
+  /* global: the stack layers (.layer*) are JS-created, so scoped CSS never reaches
+     them (number + content + link grid collapses). All selectors here are page-specific. */
   .se-pick{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}
   .se-custom{margin-bottom:22px}
   .se-custom input{width:100%;font-family:var(--font-body);font-size:15px;border:1.5px solid var(--line);border-radius:13px;padding:13px 16px;background:var(--cream);color:var(--ink);outline:0}

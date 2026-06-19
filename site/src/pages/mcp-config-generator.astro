@@ -72,7 +72,9 @@ import ToolPage from '../layouts/ToolPage.astro';
   </Fragment>
 </ToolPage>
 
-<style>
+<style is:global>
+  /* global: the server cards (.srv*) and findings (.find*) are JS-created, so scoped
+     CSS never reaches them. All selectors here are page-specific. */
   .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
   .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
   .mc-mode{margin-bottom:18px}
@@ -86,8 +88,6 @@ import ToolPage from '../layouts/ToolPage.astro';
   .mc-field label{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
   .mc-field textarea{min-height:84px;resize:vertical;font-family:var(--font-mono);font-size:13px;line-height:1.5;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--paper);color:var(--ink);outline:0}
   .mc-field textarea:focus{border-color:var(--ink)}
-  .srv-rm{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--coral-deep);background:none;border:0;cursor:pointer;white-space:nowrap}
-  .srv-rm:hover{text-decoration:underline}
   .ta{min-height:180px}
   .pane{display:flex;flex-direction:column;gap:9px;margin-top:4px}
   .pane-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
@@ -120,7 +120,7 @@ import ToolPage from '../layouts/ToolPage.astro';
         <div class="srv-top">
           <input class="mc-in f-name" placeholder="server name (e.g. filesystem)" value="${escAttr(s.name)}" />
           <input class="mc-in f-cmd" placeholder="command" value="${escAttr(s.command)}" style="max-width:160px" />
-          <button class="srv-rm">remove</button>
+          <button class="srv-rm kb-icbtn danger" title="Remove server" aria-label="Remove server">✕</button>
         </div>
         <div class="mc-grid">
           <div class="mc-field"><label>args (one per line)</label><textarea class="f-args" spellcheck="false" placeholder="-y&#10;@modelcontextprotocol/server-filesystem&#10;/path/to/dir">${escHtml(s.args)}</textarea></div>
