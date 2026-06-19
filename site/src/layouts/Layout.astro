@@ -96,6 +96,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     <a class="brand" href="/" aria-label="KB Cafe, home">
       <img class="mark" src="/logo.png" width="50" height="50" alt="KB Cafe, a coffee cup with an open book inside" />
       <span class="cf">Cafe</span>
+      <span class="brand-hint" aria-hidden="true">Knowledge Base</span>
     </a>
     <div class="nav-links">
       <a href="/tools">Tools</a>
@@ -169,8 +170,14 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   .site-nav::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:100vw;
     background:var(--header);border-bottom:1px solid var(--line);z-index:-1}
   /* brand lockup: the logo IS the "KB", wordmark is just "Cafe" (per v5 mockup) */
-  .brand{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);
+  .brand{position:relative;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);
     font-weight:800;font-size:30px;letter-spacing:-.02em;text-decoration:none;color:var(--ink);transition:transform .15s}
+  /* hover hint: reveals that "KB" = Knowledge Base, sized to the lockup width (desktop hover only) */
+  .brand-hint{position:absolute;left:0;top:calc(100% - 4px);width:100%;text-align:center;
+    font-family:var(--font-mono);font-weight:600;font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ink-soft);white-space:nowrap;opacity:0;transform:translateY(-3px);
+    transition:opacity .2s,transform .2s;pointer-events:none;z-index:3}
+  .brand:hover .brand-hint{opacity:.82;transform:none}
   .brand:hover{transform:translateY(-1px)}
   .brand .mark{height:42px;width:auto;display:block;filter:drop-shadow(2px 3px 0 rgba(30,24,19,.20));transition:transform .15s}
   .brand:hover .mark{transform:rotate(-3deg)}
