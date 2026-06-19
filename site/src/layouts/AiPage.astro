@@ -21,8 +21,7 @@ const toolLabel = Object.fromEntries(TOOLS.filter(t => t.href).map(t => [t.href,
 const tryTools = Object.keys(TOOL_GRAPH).filter(h => (TOOL_GRAPH[h].learn || []).includes(path));
 const appearsIn = pathsWith(path);
 ---
-<Layout title={title} description={description} path={path} sidebar={true}>
-  <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/ai">AI Explained</a> <span>/</span> <em>{h1}</em></nav>
+<Layout title={title} description={description} path={path} sidebar={true} crumb={[{label:'AI Explained', href:'/ai'}, {label: h1}]}>
 
   <article class="ref-article">
     <header class="ref-head">

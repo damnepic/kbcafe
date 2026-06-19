@@ -5,10 +5,22 @@ const {
   description = 'Fast, clean developer tools and quick references, freshly brewed. Everything runs in your browser: nothing uploaded, nothing tracked.',
   path = '/',
   bodyClass = '',
-  sidebar = false,
+  sidebar = path !== '/',          // sidebar on every page except the homepage
+  crumb = null,                    // optional deep trail: [{label, href?}, …] (last item = current page, no href)
+  crumbLabel = null,               // optional label override for the auto two-level crumb
 } = Astro.props;
 
 const canonical = new URL(path, Astro.site).href;
+
+// Breadcrumbs: every page except home. Wrappers pass `crumb`; standalone pages auto-derive "KB Cafe / Page".
+const SECTION_LABELS = {
+  ai: 'AI Explained', map: 'Knowledge Map', reference: 'Reference', learn: 'Learn',
+  feeds: 'Feeds', search: 'Search', blog: 'Blog', tools: 'Tools', about: 'About',
+  privacy: 'Privacy', terms: 'Terms', 'skill-tree': 'Skill Tree', 'ai-patterns': 'AI Patterns',
+};
+const seg = path.replace(/(^\/|\/$)/g, '').split('/').pop() || '';
+const autoLabel = SECTION_LABELS[seg] || seg.replace(/-/g, ' ').replace(/\b\w/g, m => m.toUpperCase());
+const trail = path === '/' ? null : (crumb || [{ label: crumbLabel || autoLabel }]);
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -81,8 +93,6 @@ const canonical = new URL(path, Astro.site).href;
       <a class="nav-ai" href="/ai">AI Explained <span class="nav-new">New</span></a>
       <a href="/learn">Learn</a>
       <a href="/reference">Reference</a>
-      <a href="/feeds">Feeds</a>
-      <a href="/blog">Blog</a>
       <a class="nav-search" href="/search" aria-label="Search" title="Search everything"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></a>
     </div>
   </nav>
@@ -90,7 +100,15 @@ const canonical = new URL(path, Astro.site).href;
   {sidebar ? (
     <div class="layout-sb">
       <Sidebar path={path} />
-      <main class="layout-main"><slot /></main>
+      <main class="layout-main">
+        {trail && (
+          <nav class="crumb" aria-label="Breadcrumb">
+            <a href="/">KB Cafe</a>
+            {trail.map(c => (<><span>/</span>{c.href ? <a href={c.href}>{c.label}</a> : <em>{c.label}</em>}</>))}
+          </nav>
+        )}
+        <slot />
+      </main>
       <div class="sb-overlay" id="sb-overlay"></div>
     </div>
   ) : <slot />}
@@ -102,6 +120,7 @@ const canonical = new URL(path, Astro.site).href;
     </a>
     <nav class="foot-links">
       <a href="/about">About</a>
+      <a href="/blog">Blog</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="https://github.com/damnepic/kbcafe" target="_blank" rel="noopener noreferrer">Contact</a>
@@ -171,10 +190,17 @@ const canonical = new URL(path, Astro.site).href;
   .foot-social a{color:var(--ink-soft);display:grid;place-items:center;transition:color .15s}
   .foot-social a:hover{color:var(--coral)}
   .foot-social .soon{color:var(--ink-soft);display:grid;place-items:center;opacity:.4;cursor:default}
-  .foot-copy{flex-basis:100%;font-size:12.5px;color:var(--ink-soft);opacity:.9}
+  .foot-copy{flex-basis:100%;text-align:center;font-size:12.5px;color:var(--ink-soft);opacity:.9}
   .foot-copy a{color:var(--coral);text-decoration:none;font-weight:600}
   .foot-copy a:hover{text-decoration:underline}
   @media(max-width:680px){.foot-links{margin:0;order:3;flex-basis:100%}}
+
+  /* breadcrumb (every page except home) */
+  .crumb{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);padding:20px 0 0;display:flex;gap:8px;flex-wrap:wrap}
+  .crumb a{color:var(--ink-soft);text-decoration:none}
+  .crumb a:hover{color:var(--coral)}
+  .crumb em{color:var(--ink);font-style:normal}
+  .crumb span{opacity:.5}
 
   /* sidebar layout (content pages) */
   .layout-sb{display:flex;gap:26px;align-items:flex-start;margin-top:6px}
