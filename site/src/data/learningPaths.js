@@ -14,10 +14,10 @@ export const LEARNING_PATHS = [
     steps: ['/what-is-tool-calling', '/tool-call-visualizer', '/what-are-structured-outputs', '/structured-output-builder', '/ai-patterns', '/ai-pattern-builder', '/what-is-agent-memory', '/agent-memory-simulator', '/what-is-mcp', '/mcp-config-generator', '/ai-architecture-generator'],
   },
   {
-    id: 'prompting', title: 'Master Prompting', tag: 'Craft',
+    id: 'prompting', title: 'Master Prompting', shortTitle: 'Prompting', tag: 'Craft',
     route: '/learn-prompting', minutes: 30, outcome: 'I want to get great answers out of AI',
-    blurb: 'Write prompts that behave: understand their anatomy, catch the smells, compare versions, and respect the context budget.',
-    steps: ['/what-are-structured-outputs', '/prompt-x-ray', '/prompt-linter', '/prompt-diff', '/what-is-a-context-window', '/context-budget-analyzer'],
+    blurb: 'Write prompts that behave: see what they leave to chance, build them up, x-ray the anatomy, catch the smells, compare versions, and study good vs bad.',
+    steps: ['/prompt-simulator', '/prompt-builder', '/prompt-x-ray', '/prompt-linter', '/prompt-diff', '/good-vs-bad-prompts'],
   },
   {
     id: 'automate', title: 'Automate Work', shortTitle: 'Automation', tag: 'Applied',

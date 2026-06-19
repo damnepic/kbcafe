@@ -1,17 +1,19 @@
 ---
 import Layout from '../layouts/Layout.astro';
+// `s` = the tool's index in the 'prompting' learning path (learningPaths.js), so each
+// "Try it" link carries ?p=prompting&s=<step> and the step page shows the STEP X of 6 tracker.
 const LESSONS = [
-  { n: 1, title: 'Why AI misunderstands you', tool: ['Prompt Simulator', '/prompt-simulator'],
+  { n: 1, s: 0, title: 'Why AI misunderstands you', tool: ['Prompt Simulator', '/prompt-simulator'],
     body: 'A model can&rsquo;t read your mind. Every detail you leave out, who it&rsquo;s for, what it&rsquo;s for, how long, it guesses, and guesses differently each time. Most &ldquo;bad AI answers&rdquo; are really just under-specified prompts. Start by seeing what your prompt leaves to chance.' },
-  { n: 2, title: 'Start with a goal', tool: ['Prompt Builder', '/prompt-builder'],
+  { n: 2, s: 1, title: 'Start with a goal', tool: ['Prompt Builder', '/prompt-builder'],
     body: 'Before anything else, say what success looks like. &ldquo;Write a homepage&rdquo; has no goal; &ldquo;write a homepage that gets visitors to start a free trial&rdquo; does. A goal turns vague output into output that&rsquo;s trying to do something.' },
-  { n: 3, title: 'Name your audience', tool: ['Prompt Builder', '/prompt-builder'],
+  { n: 3, s: 1, title: 'Name your audience', tool: ['Prompt Builder', '/prompt-builder'],
     body: 'The same request needs opposite answers for a beginner and an expert. Tell the model who it&rsquo;s writing for and the depth, vocabulary, and tone fall into place on their own.' },
-  { n: 4, title: 'Give it context', tool: ['Prompt X-Ray', '/prompt-x-ray'],
+  { n: 4, s: 2, title: 'Give it context', tool: ['Prompt X-Ray', '/prompt-x-ray'],
     body: 'The model only knows what&rsquo;s in the prompt. Paste the article, the code, the data, the brand voice, whatever it needs to work from. Without context it fills the gap with generic filler. X-ray your prompt to see if the context is actually there.' },
-  { n: 5, title: 'Add constraints', tool: ['Prompt Linter', '/prompt-linter'],
+  { n: 5, s: 3, title: 'Add constraints', tool: ['Prompt Linter', '/prompt-linter'],
     body: 'Constraints are where quality lives: length, what to avoid, what to include, the rules. &ldquo;In 3 bullets, no jargon&rdquo; beats &ldquo;keep it short.&rdquo; Watch out for conflicting ones (&ldquo;detailed but brief&rdquo;), the linter catches those.' },
-  { n: 6, title: 'Specify the output format', tool: ['Good vs Bad Prompts', '/good-vs-bad-prompts'],
+  { n: 6, s: 5, title: 'Specify the output format', tool: ['Good vs Bad Prompts', '/good-vs-bad-prompts'],
     body: 'Say exactly what you want back: prose, bullets, a table, JSON, a specific shape. Unspecified format is the number-one cause of &ldquo;it almost worked.&rdquo; The before/after gallery shows the difference a format line makes.' },
 ];
 ---
@@ -34,7 +36,7 @@ const LESSONS = [
           <div class="lesson-body">
             <h2>{l.title}</h2>
             <p set:html={l.body} />
-            <a class="lesson-try" href={l.tool[1]}>Try it: {l.tool[0]} <span aria-hidden="true">→</span></a>
+            <a class="lesson-try" href={`${l.tool[1]}?p=prompting&s=${l.s}`}>Try it: {l.tool[0]} <span aria-hidden="true">→</span></a>
           </div>
         </li>
       ))}

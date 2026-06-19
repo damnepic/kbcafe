@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import PathNav from '../components/PathNav.astro';
 import { PATTERNS } from '../data/patterns.js';
 ---
 <Layout
@@ -15,6 +16,7 @@ import { PATTERNS } from '../data/patterns.js';
       converging on its own. These are the recurring shapes behind agents and LLM apps: what each one does, its
       strengths and watch-outs, when to reach for it, and an example prompt. The vocabulary, made explicit.
     </p>
+    <div id="pn-top"></div>
 
     <div class="grid">
       {PATTERNS.map(p => (
@@ -43,6 +45,8 @@ import { PATTERNS } from '../data/patterns.js';
         <a href="/ai">AI Explained</a> concepts they build on.
       </p>
     </div>
+    <div id="pn-bottom"></div>
+    <PathNav />
   </section>
 </Layout>
 
