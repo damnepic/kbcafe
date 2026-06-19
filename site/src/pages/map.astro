@@ -110,7 +110,8 @@ const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
   :global(#graph .node.concept text){font-weight:700;font-size:11.5px}
   /* tool labels only appear on hover/highlight to cut clutter; concepts always labelled */
   :global(#graph .node.tool text){opacity:0;transition:opacity .12s}
-  :global(#graph .node.tool:hover text):global(#graph .node.tool.hi text){opacity:1}
+  :global(#graph .node.tool:hover text){opacity:1}
+  :global(#graph .node.tool.hi text){opacity:1}
   :global(#graph.dim .node:not(.hi) circle){opacity:.2}
   :global(#graph.dim .node:not(.hi) text){opacity:.1}
   :global(#graph.dim .edge:not(.hi)){opacity:.07}

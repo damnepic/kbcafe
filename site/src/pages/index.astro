@@ -80,8 +80,7 @@ const WORKFLOWS = [
     <div class="o-grid">
       {WORKFLOWS.map(w => (
         <a class="o-card" href={w.path} style={`--ac:${w.accent}`}>
-          <span class="o-ic" set:html={w.icon} />
-          <h2>{w.title}</h2>
+          <div class="o-head"><span class="o-ic" set:html={w.icon} /><h2>{w.title}</h2></div>
           <p>{w.blurb}</p>
           <div class="o-tools">{w.tools.slice(0, 3).map(([nm]) => <span class="o-chip">{nm}</span>)}</div>
           <span class="o-go">Get started <span aria-hidden="true">→</span></span>
@@ -217,12 +216,11 @@ const WORKFLOWS = [
   .o-card{position:relative;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);text-align:left;
     background:var(--cream);border:1.2px solid var(--line);border-radius:20px;padding:22px;
     box-shadow:0 8px 24px rgba(40,24,12,.05);transition:transform .16s,box-shadow .16s,border-color .16s}
-  .o-card::before{content:"";position:absolute;top:-44px;right:-44px;width:140px;height:140px;border-radius:50%;background:var(--ac);opacity:.09;transition:opacity .18s}
   .o-card:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(40,24,12,.1);border-color:var(--ac)}
-  .o-card:hover::before{opacity:.17}
-  .o-ic{position:relative;width:46px;height:46px;border-radius:14px;background:var(--ac);display:grid;place-items:center;color:#fff;margin-bottom:15px;box-shadow:0 8px 18px rgba(40,24,12,.16)}
-  .o-ic svg{width:24px;height:24px}
-  .o-card h2{position:relative;font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:-.02em;line-height:1.15;margin:0 0 8px}
+  .o-head{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+  .o-ic{flex-shrink:0;width:42px;height:42px;border-radius:13px;background:var(--ac);display:grid;place-items:center;color:#fff;box-shadow:0 8px 18px rgba(40,24,12,.16)}
+  .o-ic svg{width:22px;height:22px}
+  .o-card h2{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:-.02em;line-height:1.18;margin:0;color:var(--ac)}
   .o-card>p{position:relative;font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 15px}
   .o-tools{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
   .o-chip{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--ink-soft);background:var(--paper-2);border-radius:7px;padding:4px 8px}
@@ -285,7 +283,10 @@ const WORKFLOWS = [
 
   /* SEARCH */
   .search-wrap{max-width:920px;margin:38px auto 0}
-  .search{height:72px;border-radius:22px;background:var(--cream);border:1.2px solid var(--line);box-shadow:0 12px 40px rgba(45,30,16,.07);display:grid;grid-template-columns:30px 1fr auto auto;align-items:center;gap:12px;padding:0 12px 0 22px}
+  .search{height:72px;border-radius:22px;background:var(--cream);border:1.2px solid var(--line);box-shadow:0 12px 40px rgba(45,30,16,.07);display:grid;grid-template-columns:30px 1fr auto auto;align-items:center;gap:12px;padding:0 12px 0 22px;transition:border-color .16s,box-shadow .16s,transform .16s}
+  .search:hover{border-color:var(--coral);box-shadow:0 16px 48px rgba(238,75,43,.13);transform:translateY(-1px)}
+  .search:hover .s-ic{color:var(--coral-deep)}
+  .search:focus-within{border-color:var(--ink);box-shadow:0 16px 48px rgba(45,30,16,.12)}
   .search .s-ic{color:var(--coral);display:grid;place-items:center}
   .search input{border:0;outline:0;font-family:var(--font-body);font-size:16.5px;color:var(--ink);background:transparent;min-width:0}
   .search input::placeholder{color:#a99e90}

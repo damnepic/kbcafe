@@ -24,7 +24,7 @@ for (const f of files) {
   s = s.replace(new RegExp('\\s*' + dash + '\\s*', 'g'), ', ');
   // 3. cleanups
   s = s
-    .replace(/,\s*([,;:!?])/g, '$1')                                   // ", ," -> "," (NOT ",." — that is CSS rgba alpha)
+    .replace(/,\s*([,;])/g, '$1')                                      // ", ," -> "," (only ,/; — NOT ,. (rgba alpha) or ,: ,! (CSS selectors / !important))
     .replace(/\(\s*,\s*/g, '(').replace(/,\s*\)/g, ')')                // "(, " / ", )"
     .replace(/:\s*,\s*/g, ': ')                                        // ": , " -> ": "
     .replace(/,\s*(<\/(?:p|li|h[1-6]|span|a|strong|em|summary|div)>)/g, '$1'); // trailing comma before close tag
