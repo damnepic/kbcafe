@@ -60,6 +60,21 @@ const others = REFERENCE.filter(r => r.href !== path).slice(0, 3);
   .prose .faq summary{font-family:var(--font-display);font-weight:700;font-size:16px;padding:14px 0;cursor:pointer;list-style:none}
   .prose .faq summary::-webkit-details-marker{display:none}
   .prose .faq[open] summary{color:var(--coral)}
+  /* ── shared flagship elements (TOC, code, comparison table, Classic block) ── */
+  .toc{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:6px 0 26px;padding:14px 16px;border:1.2px solid var(--line);border-radius:13px;background:var(--paper-2)}
+  .toc-h{font-family:var(--font-mono);font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-right:4px}
+  .toc a{font-family:var(--font-mono);font-size:12.5px;color:var(--coral);text-decoration:none;font-weight:600}
+  .toc a:hover{text-decoration:underline}
+  .prose .code{background:#1e1813;color:#f4e9d6;border-radius:12px;padding:15px 16px;overflow-x:auto;margin:10px 0 14px;border:1px solid rgba(255,255,255,.08)}
+  .prose .code code{font-family:var(--font-mono);font-size:13px;line-height:1.6;white-space:pre;color:inherit;background:none;padding:0}
+  .prose .cmp{width:100%;border-collapse:collapse;margin:12px 0 6px;font-size:14px;display:table}
+  .prose .cmp th,.prose .cmp td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  .prose .cmp thead th{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper-2)}
+  .prose .cmp td:first-child{font-weight:700;color:var(--ink);width:150px}
+  .prose .cmp code{font-size:12.5px}
+  .classic{margin:30px 0 0;padding:16px 18px;border:1.5px solid rgba(244,132,42,.32);border-radius:14px;background:rgba(244,180,35,.1)}
+  .classic-tag{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a5b00}
+  .classic p{margin:9px 0 0;font-size:14px;line-height:1.6;color:var(--ink-soft)}
   .siblings{padding:36px 0 10px;border-top:1px solid var(--line);margin-top:30px}
   .siblings h2{font-family:var(--font-display);font-weight:800;font-size:22px;margin-bottom:16px}
   .sib-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}

@@ -1,15 +1,54 @@
 ---
 import ReferencePage from '../layouts/ReferencePage.astro';
+
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const nmapCode = `# TCP connect scan, completes the handshake, no privileges needed
+nmap -sT scanme.nmap.org
+
+# SYN / half-open scan, faster and quieter, needs root
+sudo nmap -sS scanme.nmap.org
+
+# scan specific ports only
+nmap -p 22,80,443 scanme.nmap.org
+
+# UDP scan (slow, ambiguous)
+sudo nmap -sU -p 53,123 scanme.nmap.org
+
+# identify the service + version behind each open port
+nmap -sV scanme.nmap.org`;
+
+const FAQ = [
+  { q: "Is port scanning legal?", a: "Scanning systems you own or are explicitly authorized to test (a penetration-testing engagement, a bug-bounty scope, your own infrastructure) is a normal, legitimate activity. Scanning networks you do not own or have permission to test can be unlawful and is treated as hostile reconnaissance. Keep it to your own systems or authorized engagements." },
+  { q: "What is the difference between closed and filtered?", a: "Closed means the host actively refused, it sent an RST, so it is reachable but nothing is listening on that port. Filtered means no answer at all, because a firewall silently dropped the probe, so you cannot tell whether a service is there. Filtered is itself information about the network's defenses." },
+  { q: "SYN scan vs connect scan, what is the difference?", a: "A TCP connect scan completes the full three-way handshake (SYN, SYN-ACK, ACK): reliable and needs no special privileges, but easy to log. A SYN (half-open) scan sends SYN, reads the reply, then sends RST instead of finishing: faster and quieter, but it needs raw-socket (root) privileges." },
+  { q: "Why is UDP scanning unreliable?", a: "UDP has no handshake, so an open port often just stays silent, and silence can mean open or filtered. Scanners infer state from ICMP port-unreachable errors and timeouts, which is slow and easily blocked or rate-limited." },
+  { q: "Does an open port mean I am vulnerable?", a: "No, it means a service is reachable. Risk depends on what that service is, whether it is patched, how it is configured, and whether it should be exposed to that network at all. An open port is an inventory finding, not a verdict." },
+  { q: "What tool do people use to port scan?", a: "Nmap is the de facto standard, it supports connect, SYN, and UDP scans, service and version detection, and OS fingerprinting. The examples on this page are Nmap commands run against scanme.nmap.org, a host the project provides expressly for practice." },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
 ---
 <ReferencePage
   title="Port scanning explained, ports, scan types, and what they reveal | KB Cafe"
-  description="A clear reference on port scanning: what a network port is, how a TCP scan works, the common scan types (SYN, connect, UDP), and what open/closed/filtered mean."
+  description="A clear reference on port scanning: what a network port is, how a TCP scan works, the scan types (SYN, connect, UDP) compared, open vs closed vs filtered, common ports, real Nmap commands, and the legal line."
   path="/port-scanning-explained"
   eyebrow="Reference · Networking"
   h1="Port scanning explained"
-  tagline="A port scan asks a host &ldquo;which doors are open?&rdquo; Here&rsquo;s what a port actually is, how scans work, and how to read open vs closed vs filtered."
+  tagline="A port scan asks a host &ldquo;which doors are open?&rdquo; Here is what a port actually is, how scans work, how to read open vs closed vs filtered, and how to stay on the right side of the law."
 >
-  <h2>What a port is</h2>
+  <nav class="toc" aria-label="On this page">
+    <span class="toc-h">On this page</span>
+    <a href="#what">What a port is</a>
+    <a href="#how">How a TCP scan works</a>
+    <a href="#types">Scan types</a>
+    <a href="#states">Open / closed / filtered</a>
+    <a href="#ports">Common ports</a>
+    <a href="#nmap">In practice (Nmap)</a>
+    <a href="#legal">The legal line</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <h2 id="what">What a port is</h2>
   <p>
     An IP address identifies a <em>machine</em>; a <strong>port</strong> identifies a <em>service</em> on it. Ports
     are 16-bit numbers (0&ndash;65535) that let one host run many services at once, a web server on 443, SSH on 22,
@@ -17,50 +56,80 @@ import ReferencePage from '../layouts/ReferencePage.astro';
     program receives it. A <strong>port scan</strong> simply checks which ports have something listening.
   </p>
 
-  <h2>How a TCP scan works</h2>
+  <h2 id="how">How a TCP scan works</h2>
   <p>
     TCP connections begin with a three-way handshake: the client sends <code>SYN</code>, an open port replies
-    <code>SYN-ACK</code>, and the client completes with <code>ACK</code>. A scanner exploits this:
+    <code>SYN-ACK</code>, and the client completes with <code>ACK</code>. A scanner exploits this: send a probe and
+    read what comes back.
   </p>
-  <ul>
-    <li><strong>SYN-ACK back</strong> → the port is <strong>open</strong> (a service is listening).</li>
-    <li><strong>RST back</strong> → the port is <strong>closed</strong> (nothing listening, but the host is up).</li>
-    <li><strong>no response</strong> → <strong>filtered</strong> (a firewall is silently dropping the probe).</li>
-  </ul>
 
-  <h2>Common scan types</h2>
-  <ul>
-    <li><strong>TCP connect scan</strong>: completes the full handshake. Reliable, needs no special privileges, but easy to log.</li>
-    <li><strong>SYN (half-open) scan</strong>: sends <code>SYN</code>, reads the reply, then sends <code>RST</code> instead of finishing. Faster and quieter; needs raw-socket privileges.</li>
-    <li><strong>UDP scan</strong>: slower and ambiguous, because UDP is connectionless: silence can mean open <em>or</em> filtered, so scanners infer state from ICMP &ldquo;port unreachable&rdquo; replies.</li>
-  </ul>
+  <h2 id="types">Scan types</h2>
+  <table class="cmp">
+    <thead><tr><th>Scan</th><th>What it does</th><th>Privilege</th><th>Trade-off</th></tr></thead>
+    <tbody>
+      <tr><td>TCP connect</td><td>Completes the full handshake</td><td>None</td><td>Reliable, but easy to log</td></tr>
+      <tr><td>SYN (half-open)</td><td>Sends SYN, reads reply, sends RST</td><td>Root (raw sockets)</td><td>Faster and quieter</td></tr>
+      <tr><td>UDP</td><td>Sends a UDP probe; infers from silence/ICMP</td><td>Root</td><td>Slow and ambiguous</td></tr>
+    </tbody>
+  </table>
 
-  <h2>Open vs closed vs filtered</h2>
+  <h2 id="states">Open vs closed vs filtered</h2>
+  <p>These three states are the whole point of a scan:</p>
+  <table class="cmp">
+    <thead><tr><th>State</th><th>What it means</th><th>The response</th></tr></thead>
+    <tbody>
+      <tr><td>Open</td><td>A service is listening</td><td><code>SYN-ACK</code></td></tr>
+      <tr><td>Closed</td><td>Host is up, nothing on that port</td><td><code>RST</code></td></tr>
+      <tr><td>Filtered</td><td>A firewall silently dropped the probe</td><td>No response</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="ports">Common ports worth knowing</h2>
+  <table class="cmp">
+    <thead><tr><th>Port</th><th>Service</th><th>Port</th><th>Service</th></tr></thead>
+    <tbody>
+      <tr><td>22</td><td>SSH</td><td>443</td><td>HTTPS</td></tr>
+      <tr><td>25</td><td>SMTP (<a href="/how-smtp-works">email</a>)</td><td>3306</td><td>MySQL</td></tr>
+      <tr><td>53</td><td>DNS</td><td>5432</td><td>PostgreSQL</td></tr>
+      <tr><td>80</td><td>HTTP (<a href="/http-explained">web</a>)</td><td>3389</td><td>RDP</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="nmap">In practice: Nmap</h2>
   <p>
-    These three states are the whole point. <strong>Open</strong> means a service answered.
-    <strong>Closed</strong> means the host is reachable but nothing is on that port. <strong>Filtered</strong> means
-    a firewall ate the probe, so you can&rsquo;t tell, which is itself information about the network&rsquo;s defenses.
+    <strong>Nmap</strong> is the standard tool. These run against <code>scanme.nmap.org</code>, a host the Nmap
+    project provides expressly for practice, so they are safe and authorized to try:
   </p>
+  <pre class="code"><code set:html={esc(nmapCode)} /></pre>
 
-  <h2>Use it on what you&rsquo;re allowed to</h2>
+  <h2 id="legal" style="color:var(--coral-deep)">The legal line</h2>
   <p>
     Port scanning is a core, legitimate tool for inventorying your own infrastructure, verifying firewall rules,
-    and authorized security testing. Scanning networks you don&rsquo;t own or have permission to test can be
-    unlawful and is treated as hostile reconnaissance, keep it to your own systems or engagements you&rsquo;re
-    authorized for.
+    and <strong>authorized</strong> security testing. Scanning networks you do not own or have permission to test
+    can be unlawful and is treated as hostile reconnaissance. Keep it to your own systems, lab environments, or
+    engagements you are explicitly authorized for.
   </p>
 
-  <h2>FAQ</h2>
-  <details class="faq"><summary>What&rsquo;s the difference between closed and filtered?</summary>
-    <p><strong>Closed</strong> = the host actively refused (sent <code>RST</code>); nothing is listening. <strong>Filtered</strong> = no answer at all, because a firewall dropped the probe.</p>
-  </details>
-  <details class="faq"><summary>Why is UDP scanning unreliable?</summary>
-    <p>UDP has no handshake, so an open port often just stays silent. Scanners infer state from ICMP errors and timeouts, which is slow and easily blocked.</p>
-  </details>
-  <details class="faq"><summary>Does an open port mean I&rsquo;m vulnerable?</summary>
-    <p>No, it means a service is reachable. Risk depends on what that service is, whether it&rsquo;s patched, and whether it should be exposed at all.</p>
-  </details>
+  <h2 id="faq">FAQ</h2>
+  {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
 
-  <h3>Related</h3>
-  <p>Reachability and latency is <a href="/how-ping-works">ping &amp; ICMP</a>; the web&rsquo;s port-443 protocol is <a href="/http-explained">HTTP</a>.</p>
+  <h3>Related concepts</h3>
+  <p>
+    <a href="/how-ping-works">How ping works</a> (ICMP, reachability) &middot;
+    <a href="/http-explained">HTTP explained</a> &middot;
+    <a href="/how-smtp-works">How SMTP works</a> &middot;
+    <a href="/pop3-vs-imap">POP3 vs IMAP</a> &middot;
+    <a href="/reference">all references</a>.
+  </p>
+
+  <div class="classic">
+    <span class="classic-tag">☕ KB Cafe Classic</span>
+    <p>
+      KB Cafe&rsquo;s port-scanning how-to was a long-cited networking reference, from the era of hand-built C#
+      socket code and the first widely shared Nmap recipes. This is its modern restoration: the same protocol
+      mechanics, updated tooling, and an explicit note on the line between legitimate testing and trespass.
+    </p>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 </ReferencePage>

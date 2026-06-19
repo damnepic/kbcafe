@@ -1,65 +1,133 @@
 ---
 import ReferencePage from '../layouts/ReferencePage.astro';
+
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const transcript = `S: 220 mail.example.com ESMTP ready
+C: EHLO client.example.org
+S: 250-mail.example.com Hello client.example.org
+S: 250-STARTTLS
+S: 250 AUTH LOGIN PLAIN
+C: MAIL FROM:<alice@example.org>          # the envelope sender
+S: 250 OK
+C: RCPT TO:<bob@example.com>              # one per recipient
+S: 250 OK
+C: DATA
+S: 354 End data with <CRLF>.<CRLF>
+C: From: Alice <alice@example.org>        # headers (what the inbox shows)
+C: To: Bob <bob@example.com>
+C: Subject: Hello
+C:                                        # blank line ends the headers
+C: Hi Bob, this is the message body.
+C: .                                      # a lone dot ends the message
+S: 250 OK queued as 9F3C1
+C: QUIT
+S: 221 Bye`;
+
+const FAQ = [
+  { q: "Does SMTP receive mail too?", a: "Servers receive over SMTP when relaying mail toward its destination, but end users read their mailbox with POP3 or IMAP. SMTP's job is moving mail toward the recipient, not serving a mailbox." },
+  { q: "Why port 587 instead of 25?", a: "Port 25 is for server-to-server relay and is widely blocked for client use to curb spam. Authenticated submission from an app or mail client uses port 587 (with STARTTLS) or 465 (implicit TLS)." },
+  { q: "STARTTLS vs implicit TLS, what is the difference?", a: "With STARTTLS (typically port 587) the connection starts in plaintext and upgrades to encryption with the STARTTLS command. With implicit TLS (port 465) the whole connection is encrypted from the first byte. Both end up encrypted; 465 just never has a plaintext phase." },
+  { q: "What is the difference between the envelope and the headers?", a: "The MAIL FROM and RCPT TO sent in the conversation are the envelope, that is what actually routes the mail. The From: and To: lines inside the DATA block are headers the mail client displays, and they do not have to match the envelope. That mismatch is exactly why spoofing was easy and why SPF/DKIM/DMARC exist." },
+  { q: "What is a 4xx vs a 5xx reply?", a: "Every command gets a numeric reply: 2xx means success, 4xx is a temporary failure (the sender should retry later), and 5xx is a permanent rejection (the message is refused and will not be retried)." },
+  { q: "Why does my mail land in spam or get rejected?", a: "Deliverability depends on three DNS records that prove a message is genuinely from your domain: SPF (which servers may send), DKIM (a cryptographic signature), and DMARC (a policy tying those to the visible From). Miss them and even legitimate mail is filtered or bounced with a 5xx." },
+  { q: "Can I send an email by hand?", a: "Historically yes, SMTP is line-based and human-readable, so you could type the commands over a raw TCP connection (the transcript on this page is exactly that). Today submission requires authentication and TLS, so you would go through an authenticated client, but the conversation underneath is unchanged." },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
 ---
 <ReferencePage
   title="How SMTP works, the protocol that sends email | KB Cafe"
-  description="A clear reference on SMTP: the conversation that sends every email, the envelope vs the headers, MX lookups, and why legitimate mail gets blocked (SPF, DKIM, DMARC)."
+  description="A clear reference on SMTP: the actual command-by-command conversation that sends every email, the envelope vs the headers, the ports (25/587/465), and why legitimate mail gets blocked (SPF, DKIM, DMARC)."
   path="/how-smtp-works"
   eyebrow="Reference · Email"
   h1="How SMTP works (sending email)"
-  tagline="SMTP is the protocol that moves email from sender to server to inbox. Here&rsquo;s the actual conversation it has, and why mail you send sometimes never arrives."
+  tagline="SMTP is the protocol that moves email from sender to server to inbox. Here is the actual conversation it has, command by command, and why mail you send sometimes never arrives."
 >
-  <h2>What SMTP is</h2>
+  <nav class="toc" aria-label="On this page">
+    <span class="toc-h">On this page</span>
+    <a href="#what">What SMTP is</a>
+    <a href="#convo">The conversation</a>
+    <a href="#ports">Ports &amp; encryption</a>
+    <a href="#envelope">Envelope vs headers</a>
+    <a href="#blocked">Why mail gets blocked</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <h2 id="what">What SMTP is</h2>
   <p>
-    <strong>SMTP, the Simple Mail Transfer Protocol</strong>: is how email is <em>sent</em> and relayed
-    between servers. It is a push protocol: a client hands a message to a server, which relays it toward the
+    <strong>SMTP, the Simple Mail Transfer Protocol</strong>, is how email is <em>sent</em> and relayed between
+    servers. It is a push protocol: a client hands a message to a server, which relays it toward the
     recipient&rsquo;s mail server. (Getting mail back <em>out</em> of a mailbox is a different job, see
-    <a href="/pop3-vs-imap">POP3 vs IMAP</a>.) SMTP normally runs on port 25 for server-to-server relay, and
-    ports 587 or 465 for an authenticated client submitting outgoing mail.
+    <a href="/pop3-vs-imap">POP3 vs IMAP</a>.) It rides on TCP, like <a href="/http-explained">HTTP</a>.
   </p>
 
-  <h2>The SMTP conversation</h2>
+  <h2 id="convo">The SMTP conversation</h2>
   <p>
-    SMTP is a line-based, human-readable exchange of commands and numeric replies. A simplified send looks like:
+    SMTP is a line-based, human-readable exchange of commands and numeric replies. Here is a real send, with the
+    client (<code>C:</code>) and server (<code>S:</code>) lines:
   </p>
+  <pre class="code"><code set:html={esc(transcript)} /></pre>
   <ul>
-    <li><code>HELO</code> / <code>EHLO</code>: the client greets the server and discovers its capabilities.</li>
-    <li><code>MAIL FROM:</code>: declares the envelope sender (the return-path).</li>
-    <li><code>RCPT TO:</code>: declares each recipient; repeated once per address.</li>
-    <li><code>DATA</code>: everything after this is the message itself (headers, a blank line, then the body), terminated by a line containing only a dot.</li>
+    <li><code>EHLO</code> (or <code>HELO</code>): the client greets the server and discovers its capabilities.</li>
+    <li><code>MAIL FROM</code>: declares the envelope sender (the return-path).</li>
+    <li><code>RCPT TO</code>: declares each recipient; repeated once per address.</li>
+    <li><code>DATA</code>: everything after is the message (headers, a blank line, then the body), ended by a line
+      containing only a dot.</li>
     <li><code>QUIT</code>: ends the session.</li>
   </ul>
-  <p>The server answers each command with a status code: <code>2xx</code> success, <code>4xx</code> temporary failure (try again later), <code>5xx</code> permanent rejection.</p>
 
-  <h2>Envelope vs headers, the part that confuses everyone</h2>
+  <h2 id="ports">Ports and encryption</h2>
+  <table class="cmp">
+    <thead><tr><th>Port</th><th>Used for</th><th>Encryption</th></tr></thead>
+    <tbody>
+      <tr><td>25</td><td>Server-to-server relay (MTA to MTA)</td><td>Opportunistic (STARTTLS if offered)</td></tr>
+      <tr><td>587</td><td>Authenticated client submission</td><td>STARTTLS (the modern default)</td></tr>
+      <tr><td>465</td><td>Authenticated submission</td><td>Implicit TLS (encrypted from byte one)</td></tr>
+    </tbody>
+  </table>
+  <p>Port 25 is widely blocked for end-user clients to curb spam, which is why apps submit on 587 or 465.</p>
+
+  <h2 id="envelope">Envelope vs headers, the part that confuses everyone</h2>
   <p>
-    The <code>MAIL FROM</code>/<code>RCPT TO</code> you send in the conversation are the <strong>envelope</strong>: that&rsquo;s what actually routes the mail. The <code>From:</code> and <code>To:</code> lines <em>inside</em>
-    the <code>DATA</code> block are just headers the mail client displays. They don&rsquo;t have to match the
-    envelope, which is exactly why email spoofing was easy for decades and why the anti-spoofing checks below exist.
+    The <code>MAIL FROM</code> / <code>RCPT TO</code> you send in the conversation are the <strong>envelope</strong>,
+    that is what actually routes the mail. The <code>From:</code> and <code>To:</code> lines <em>inside</em> the
+    <code>DATA</code> block are just headers the mail client displays. They do not have to match the envelope,
+    which is exactly why email spoofing was easy for decades, and why the anti-spoofing checks below exist.
   </p>
 
-  <h2>Why your mail gets blocked</h2>
-  <p>
-    Deliverability now depends on three records that prove a message is legitimately from your domain:
-  </p>
-  <ul>
-    <li><strong>SPF</strong>: a DNS record listing which servers may send for your domain.</li>
-    <li><strong>DKIM</strong>: a cryptographic signature on the message, verified against a public key in DNS.</li>
-    <li><strong>DMARC</strong>: a policy that ties SPF/DKIM to the visible <code>From:</code> domain and tells receivers what to do on failure.</li>
-  </ul>
+  <h2 id="blocked">Why your mail gets blocked</h2>
+  <p>Deliverability now depends on three DNS records that prove a message is legitimately from your domain:</p>
+  <table class="cmp">
+    <thead><tr><th>Record</th><th>What it proves</th><th>Lives in</th></tr></thead>
+    <tbody>
+      <tr><td>SPF</td><td>Which servers are allowed to send for your domain</td><td>DNS TXT record</td></tr>
+      <tr><td>DKIM</td><td>The message was cryptographically signed by your domain</td><td>DNS public key + message signature</td></tr>
+      <tr><td>DMARC</td><td>Policy tying SPF/DKIM to the visible <code>From:</code>, and what to do on failure</td><td>DNS TXT record</td></tr>
+    </tbody>
+  </table>
   <p>Miss these and even genuine mail lands in spam or is rejected outright with a <code>5xx</code>.</p>
 
-  <h2>FAQ</h2>
-  <details class="faq"><summary>Does SMTP receive mail too?</summary>
-    <p>Servers receive over SMTP when relaying, but end users read mail with POP3 or IMAP. SMTP&rsquo;s job is moving mail toward the destination, not serving a mailbox.</p>
-  </details>
-  <details class="faq"><summary>Why port 587 instead of 25?</summary>
-    <p>Port 25 is for server-to-server relay and is widely blocked for clients to curb spam. Authenticated submission from an app or mail client uses 587 (STARTTLS) or 465 (implicit TLS).</p>
-  </details>
-  <details class="faq"><summary>What&rsquo;s a 4xx vs 5xx reply?</summary>
-    <p><code>4xx</code> is temporary, the sender should retry later. <code>5xx</code> is permanent, the message is rejected and won&rsquo;t be retried.</p>
-  </details>
+  <h2 id="faq">FAQ</h2>
+  {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
 
-  <h3>Related</h3>
-  <p>Reading mail uses <a href="/pop3-vs-imap">POP3 or IMAP</a>. SMTP rides on TCP like <a href="/http-explained">HTTP</a>; encode attachments with <a href="/base64">Base64</a>.</p>
+  <h3>Related concepts</h3>
+  <p>
+    <a href="/pop3-vs-imap">POP3 vs IMAP</a> (reading mail) &middot;
+    <a href="/http-explained">HTTP explained</a> &middot;
+    <a href="/base64">Base64</a> (how attachments are encoded) &middot;
+    <a href="/what-is-rss">What is RSS</a> &middot;
+    <a href="/reference">all references</a>.
+  </p>
+
+  <div class="classic">
+    <span class="classic-tag">☕ KB Cafe Classic</span>
+    <p>
+      KB Cafe&rsquo;s &ldquo;How to SMTP&rdquo; write-ups were a go-to developer reference in the era when people
+      still spoke SMTP by hand to debug a mail server, and Rmail (RSS-to-email) ran on this very plumbing. This is
+      the modern restoration: the same protocol, the same transcript, updated for today&rsquo;s TLS and
+      deliverability rules.
+    </p>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 </ReferencePage>

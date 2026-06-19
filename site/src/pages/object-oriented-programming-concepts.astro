@@ -1,85 +1,197 @@
 ---
 import ReferencePage from '../layouts/ReferencePage.astro';
+
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const pyCode = `class BankAccount:
+    def __init__(self, balance=0):
+        self._balance = balance            # encapsulation: hidden by convention
+
+    def deposit(self, amount):             # the public interface, the only way in
+        if amount <= 0:
+            raise ValueError("amount must be positive")
+        self._balance += amount
+
+    def describe(self):                    # meant to be overridden
+        return f"Account: {self._balance}"
+
+class SavingsAccount(BankAccount):         # inheritance: a savings account IS A bank account
+    def __init__(self, balance=0, rate=0.02):
+        super().__init__(balance)
+        self.rate = rate
+
+    def describe(self):                    # polymorphism: same call, different behavior
+        return f"Savings: {self._balance} at {self.rate}"
+
+for account in [BankAccount(100), SavingsAccount(500)]:
+    print(account.describe())              # one interface, many forms`;
+
+const csCode = `public abstract class Account {
+    private decimal balance;               // encapsulation: the field is private
+
+    public Account(decimal balance) { this.balance = balance; }
+
+    public void Deposit(decimal amount) {  // public method, callers never touch the field
+        if (amount <= 0) throw new ArgumentException("positive only");
+        balance += amount;
+    }
+
+    public abstract string Describe();     // abstraction: what, not how
+}
+
+public class Savings : Account {           // inheritance
+    public Savings(decimal b) : base(b) { }
+    public override string Describe() => "Savings account";  // polymorphism
+}`;
+
+const FAQ = [
+  { q: "What is the difference between a class and an object?", a: "A class is the definition or blueprint; an object is a specific instance created from it, with its own state. One BankAccount class, many account objects, each with its own balance." },
+  { q: "What are the four pillars of OOP?", a: "Encapsulation (bundle state with behavior and hide internals), abstraction (expose what, hide how), inheritance (derive and extend an is-a relationship), and polymorphism (one interface, many implementations)." },
+  { q: "Encapsulation vs abstraction, what is the difference?", a: "They are related but not the same. Encapsulation is the mechanism: make fields private and force access through methods. Abstraction is the goal that mechanism serves: let callers use what an object does without depending on how it works." },
+  { q: "Interface vs abstract class, which do I use?", a: "An interface is a pure contract (method signatures, no implementation), and a class can implement many. An abstract class can provide shared implementation but a class extends only one. Reach for an interface to describe a capability, an abstract class to share a partial base." },
+  { q: "Why composition over inheritance?", a: "Inheritance couples a subclass tightly to its parent and gets fragile as hierarchies deepen, a change up top can break everything below. Composing small, focused objects (a has-a relationship) is more flexible and easier to change, so prefer it unless you genuinely have a stable is-a subtype." },
+  { q: "Are the four pillars language-specific?", a: "No. Encapsulation, abstraction, inheritance, and polymorphism appear across Java, C#, C++, Python, Ruby, and more. Each language expresses them differently (Python uses a leading underscore convention where Java uses the private keyword), but the ideas are the same." },
+  { q: "What is a god object, and why is it bad?", a: "A god object is a class that knows or does too much, accumulating unrelated responsibilities until everything depends on it. It defeats encapsulation and makes the code hard to change or test. Split it into focused classes, each with one job." },
+  { q: "Do I need OOP for a small script?", a: "Usually not. For a simple data transformation or a short script, plain functions over plain data are clearer. OOP earns its keep when you have real entities with rules and a codebase large enough that boundaries matter. Most modern languages let you mix both." },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
 ---
 <ReferencePage
   title="Object-Oriented Programming concepts, the 4 pillars explained | KB Cafe"
-  description="A clear reference on object-oriented programming: classes vs objects, and the four pillars, encapsulation, abstraction, inheritance, and polymorphism, with practical examples."
+  description="A complete reference on object-oriented programming: classes vs objects, the four pillars (encapsulation, abstraction, inheritance, polymorphism) with Python and C# examples, inheritance vs composition, common mistakes, and when not to use OOP."
   path="/object-oriented-programming-concepts"
   eyebrow="Reference · Concepts"
   h1="Object-Oriented Programming concepts"
-  tagline="Classes, objects, and the four pillars of OOP, encapsulation, abstraction, inheritance, and polymorphism, explained plainly, with when (and when not) to use them."
+  tagline="Classes, objects, and the four pillars of OOP, encapsulation, abstraction, inheritance, and polymorphism, explained plainly with real code, and honest about when (and when not) to reach for them."
 >
-  <h2>Classes and objects</h2>
+  <nav class="toc" aria-label="On this page">
+    <span class="toc-h">On this page</span>
+    <a href="#classes">Classes &amp; objects</a>
+    <a href="#pillars">The four pillars</a>
+    <a href="#code">In code</a>
+    <a href="#inherit">Inheritance vs composition</a>
+    <a href="#mistakes">Common mistakes</a>
+    <a href="#when">When to use OOP</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <h2 id="classes">Classes and objects</h2>
   <p>
-    Object-oriented programming (OOP) organizes code around <strong>objects</strong>: bundles of
-    data (state) and the functions that operate on it (behavior). A <strong>class</strong> is the
-    blueprint; an <strong>object</strong> is a concrete instance of it. A <code>BankAccount</code>
-    class might define a <code>balance</code> and methods like <code>deposit()</code> and
-    <code>withdraw()</code>; each open account is an object with its own balance.
+    Object-oriented programming (OOP) organizes code around <strong>objects</strong>: bundles of data (state) and
+    the functions that operate on it (behavior). A <strong>class</strong> is the blueprint; an
+    <strong>object</strong> is a concrete instance of it. A <code>BankAccount</code> class might define a
+    <code>balance</code> and methods like <code>deposit()</code> and <code>withdraw()</code>; each open account is
+    an object with its own balance.
   </p>
   <p>
-    The goal is to keep related state and behavior together, so the rest of your program talks to a
-    small, well-defined surface instead of juggling loose variables. The four ideas below are how OOP
-    delivers that.
+    The goal is to keep related state and behavior together, so the rest of your program talks to a small,
+    well-defined surface instead of juggling loose variables. The four ideas below are how OOP delivers that.
   </p>
 
-  <h2>1. Encapsulation</h2>
+  <h2 id="pillars">The four pillars at a glance</h2>
+  <table class="cmp">
+    <thead><tr><th>Pillar</th><th>What it means</th><th>How you do it</th></tr></thead>
+    <tbody>
+      <tr><td>Encapsulation</td><td>Bundle state with behavior; hide the internals</td><td>Private fields, public methods</td></tr>
+      <tr><td>Abstraction</td><td>Expose <em>what</em> it does, hide <em>how</em></td><td>Interfaces, abstract methods</td></tr>
+      <tr><td>Inheritance</td><td>Derive and extend (an <em>is-a</em> relationship)</td><td><code>extends</code> / subclassing</td></tr>
+      <tr><td>Polymorphism</td><td>One interface, many implementations</td><td>Override / implement a method</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1. Encapsulation</h3>
   <p>
     Encapsulation means <strong>bundling data with the methods that use it, and hiding the internals</strong>.
-    Callers go through a public interface (<code>deposit()</code>), not the raw fields. The class can
-    enforce its own rules, reject a negative deposit, keep <code>balance</code> consistent, because
-    nothing outside can reach in and corrupt its state. Practically: make fields private, expose
-    intent-revealing methods.
+    Callers go through a public interface (<code>deposit()</code>), not the raw fields. The class can enforce its
+    own rules, reject a negative deposit, keep <code>balance</code> consistent, because nothing outside can reach
+    in and corrupt its state. Practically: make fields private, expose intent-revealing methods.
   </p>
-
-  <h2>2. Abstraction</h2>
+  <h3>2. Abstraction</h3>
   <p>
     Abstraction is <strong>exposing what something does while hiding how it does it</strong>. You call
-    <code>account.transfer(other, 100)</code> without knowing whether it writes to a database, calls a
-    network service, or updates memory. Good abstractions let you change the implementation without
-    touching the callers. Encapsulation is the mechanism; abstraction is the design goal it serves.
+    <code>account.transfer(other, 100)</code> without knowing whether it writes to a database, calls a network
+    service, or updates memory. Good abstractions let you change the implementation without touching the callers.
+    Encapsulation is the mechanism; abstraction is the design goal it serves.
   </p>
-
-  <h2>3. Inheritance</h2>
+  <h3>3. Inheritance</h3>
   <p>
-    Inheritance lets a class <strong>derive from another</strong>, reusing its state and behavior and
-    extending or overriding parts. A <code>SavingsAccount</code> can inherit from <code>BankAccount</code>
-    and add interest. It models an &ldquo;is-a&rdquo; relationship, a savings account <em>is a</em> bank account.
+    Inheritance lets a class <strong>derive from another</strong>, reusing its state and behavior and extending or
+    overriding parts. A <code>SavingsAccount</code> can inherit from <code>BankAccount</code> and add interest. It
+    models an &ldquo;is-a&rdquo; relationship, a savings account <em>is a</em> bank account. Use it sparingly (see
+    <a href="#inherit">inheritance vs composition</a> below).
   </p>
-  <p>
-    Use it sparingly. Deep inheritance trees are brittle, and a subclass is tightly coupled to its parent.
-    The modern guidance is <strong>&ldquo;favor composition over inheritance&rdquo;</strong>: build behavior by
-    combining small objects (a &ldquo;has-a&rdquo; relationship) rather than inheriting from a tall hierarchy.
-  </p>
-
-  <h2>4. Polymorphism</h2>
+  <h3>4. Polymorphism</h3>
   <p>
     Polymorphism (&ldquo;many forms&rdquo;) means <strong>one interface, many implementations</strong>. If
-    <code>Circle</code> and <code>Square</code> both implement an <code>area()</code> method, code can loop
-    over a list of <code>Shape</code> and call <code>area()</code> on each without knowing the concrete
-    type. Add a new shape later and the loop doesn&rsquo;t change. This is what makes OOP code extensible.
+    <code>Circle</code> and <code>Square</code> both implement an <code>area()</code> method, code can loop over a
+    list of <code>Shape</code> and call <code>area()</code> on each without knowing the concrete type. Add a new
+    shape later and the loop does not change. This is what makes OOP code extensible.
   </p>
 
-  <h2>When OOP helps, and when it doesn&rsquo;t</h2>
+  <h2 id="code">All four, in code</h2>
+  <p>The same little example shows every pillar at once. Python:</p>
+  <pre class="code"><code set:html={esc(pyCode)} /></pre>
+  <p>And the same idea in C# (closer to how the original KB Cafe taught it), with explicit access modifiers:</p>
+  <pre class="code"><code set:html={esc(csCode)} /></pre>
+
+  <h2 id="inherit">Inheritance vs composition</h2>
+  <p>
+    The most common OOP mistake is over-using inheritance. The modern guidance,
+    <strong>&ldquo;favor composition over inheritance&rdquo;</strong>, means: build behavior by combining small
+    objects (a <em>has-a</em> relationship) rather than inheriting from a tall hierarchy.
+  </p>
+  <table class="cmp">
+    <thead><tr><th></th><th>Inheritance (is-a)</th><th>Composition (has-a)</th></tr></thead>
+    <tbody>
+      <tr><td>Relationship</td><td>A Savings <em>is a</em> Account</td><td>A Car <em>has an</em> Engine</td></tr>
+      <tr><td>Coupling</td><td>Tight, the subclass depends on the parent</td><td>Loose, swap parts freely</td></tr>
+      <tr><td>As it grows</td><td>Brittle, deep trees are fragile</td><td>Stays flexible</td></tr>
+      <tr><td>Reach for it when</td><td>You have a true, stable subtype</td><td>You want to reuse and combine behavior</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="mistakes">Common mistakes</h2>
   <ul>
-    <li><strong>Good fit:</strong> domains with clear entities and rules (orders, users, accounts), large
-      codebases where boundaries matter, and frameworks built around objects.</li>
-    <li><strong>Poor fit:</strong> simple data transformations and pipelines, where a functional style
-      (pure functions over plain data) is often clearer. Many modern languages mix both, use the tool
-      that fits the problem rather than forcing everything into a class.</li>
+    <li><strong>Deep inheritance trees.</strong> Three-plus levels of subclassing is usually a smell; a change at
+      the top ripples everywhere. Prefer composition.</li>
+    <li><strong>God objects.</strong> One class that knows and does everything. Split responsibilities so each
+      class has a single job.</li>
+    <li><strong>Anemic models.</strong> Classes that are just bags of public fields with no behavior, that is data,
+      not encapsulation. Put the rules <em>with</em> the data.</li>
+    <li><strong>Getters and setters for everything.</strong> Exposing every field through accessors quietly breaks
+      encapsulation; expose <em>intent</em> (<code>deposit()</code>), not raw state.</li>
   </ul>
 
-  <h2>FAQ</h2>
-  <details class="faq"><summary>What&rsquo;s the difference between a class and an object?</summary>
-    <p>A class is the definition (the blueprint); an object is a specific instance created from it, with its own state.</p>
-  </details>
-  <details class="faq"><summary>Are the four pillars language-specific?</summary>
-    <p>No, encapsulation, abstraction, inheritance, and polymorphism appear across Java, C#, C++, Python, Ruby, and more, though each language expresses them differently.</p>
-  </details>
-  <details class="faq"><summary>Why &ldquo;composition over inheritance&rdquo;?</summary>
-    <p>Inheritance couples a subclass tightly to its parent and gets fragile as hierarchies deepen. Composing small, focused objects is more flexible and easier to change.</p>
-  </details>
+  <h2 id="when">When OOP helps, and when it doesn&rsquo;t</h2>
+  <ul>
+    <li><strong>Good fit:</strong> domains with clear entities and rules (orders, users, accounts), large codebases
+      where boundaries matter, and frameworks built around objects.</li>
+    <li><strong>Poor fit:</strong> simple data transformations and pipelines, where a functional style (pure
+      functions over plain data) is often clearer. Many modern languages mix both, use the tool that fits the
+      problem rather than forcing everything into a class.</li>
+  </ul>
 
-  <h3>Related</h3>
-  <p>See <a href="/multithreading-explained">multithreading &amp; concurrency</a> and <a href="/memory-leaks-explained">memory leaks</a>, or browse the full <a href="/reference">Reference</a> and the <a href="/#menu">tools menu</a>.</p>
+  <h2 id="faq">FAQ</h2>
+  {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+
+  <h3>Related concepts</h3>
+  <p>
+    <a href="/software-design-patterns">Design patterns</a> &middot;
+    <a href="/smart-pointers-explained">Smart pointers</a> &middot;
+    <a href="/multithreading-explained">Multithreading &amp; concurrency</a> &middot;
+    <a href="/memory-leaks-explained">Memory leaks</a> &middot;
+    <a href="/cpp-type-casting">C++ type casting</a> &middot;
+    <a href="/reference">all references</a>.
+  </p>
+
+  <div class="classic">
+    <span class="classic-tag">☕ KB Cafe Classic</span>
+    <p>
+      &ldquo;OOP Concepts&rdquo; was one of <code>kbcafe.com</code>&rsquo;s most-referenced developer articles in
+      its first life, cited across forums and university course pages through the C# and Java era. This is its
+      modern restoration: the same fundamentals, rewritten with real examples and honest trade-offs for today.
+    </p>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 </ReferencePage>
