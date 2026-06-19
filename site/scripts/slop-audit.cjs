@@ -106,6 +106,8 @@ const targets = [
   ["webhooks-vs-polling.astro", "article"],
   ["what-is-ai-orchestration.astro", "article"],
   ["automation-blueprints.astro", "tool"],
+  ["json-to-typescript.astro", "tool"],
+  ["shell-scripting-explained.astro", "article"],
   ["ai.astro", "tool"],
   ["ai-patterns.astro", "tool"],
   ["ai-pattern-explorer.astro", "tool"],

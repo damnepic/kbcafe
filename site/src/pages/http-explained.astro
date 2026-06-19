@@ -1,66 +1,130 @@
 ---
 import ReferencePage from '../layouts/ReferencePage.astro';
+
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const exchange = `GET /coffee/42 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer eyJhbGciOi...
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: max-age=60
+
+{"id": 42, "name": "Flat White", "price": 4.5}`;
+
+const FAQ = [
+  { q: "What is the difference between 301 and 302?", a: "301 is a permanent move, clients and search engines update their links to the new URL. 302 (and 307) are temporary, the original URL stays canonical. Use 301 or 308 when a URL has genuinely moved for good, 302/307 when it is a short-lived redirect." },
+  { q: "Is HTTPS a different protocol?", a: "No. HTTPS is plain HTTP carried inside a TLS-encrypted connection. Same methods, same status codes, same headers, with confidentiality and integrity added underneath." },
+  { q: "What does idempotent mean?", a: "Making the same request repeatedly leaves the server in the same state as making it once. GET, PUT, and DELETE are idempotent (safe to retry); POST is not, retrying it can create duplicates, which is why retry logic treats POST carefully." },
+  { q: "GET vs POST, when do I use which?", a: "Use GET to retrieve data, it should have no side effects and its parameters go in the URL, so it can be cached and bookmarked. Use POST to create something or trigger an action with a request body. Never put sensitive data in a GET URL; it ends up in logs and history." },
+  { q: "Why is statelessness a big deal?", a: "Because the server does not remember you between requests, any server can handle any request, so you can scale horizontally behind a load balancer. The cost is that sessions must be carried explicitly, in a cookie or a token, on every request." },
+  { q: "HTTP/2 vs HTTP/3, what changed?", a: "HTTP/2 multiplexes many requests over one TCP connection (binary framing, header compression) to fix HTTP/1.1's one-at-a-time bottleneck. HTTP/3 moves off TCP onto QUIC (over UDP), which removes head-of-line blocking and speeds up connection setup, especially on flaky networks." },
+  { q: "What causes a CORS error?", a: "CORS (Cross-Origin Resource Sharing) is a browser security rule: a page can only call APIs on a different origin if that server returns the right Access-Control-Allow-Origin headers. A CORS error means the browser blocked the response because those headers were missing, it is the server's headers to fix, not your fetch code." },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
 ---
 <ReferencePage
   title="HTTP explained, methods, status codes, and the request/response cycle | KB Cafe"
-  description="A clear reference on HTTP: the request/response cycle, the methods (GET, POST, PUT, DELETE), status code families, headers, and what makes a request idempotent."
+  description="A clear reference on HTTP: the request/response cycle with a real example, the methods (GET/POST/PUT/DELETE) and idempotency, status code families, headers, HTTP/1.1 vs 2 vs 3, and CORS."
   path="/http-explained"
   eyebrow="Reference · Networking"
   h1="HTTP explained"
-  tagline="Every web page, API call, and image load is an HTTP request and response. Here&rsquo;s the cycle, the methods, and the status codes you&rsquo;ll actually deal with."
+  tagline="Every web page, API call, and image load is an HTTP request and response. Here is the cycle, the methods, the status codes, and the versions you will actually deal with."
 >
-  <h2>The request/response cycle</h2>
+  <nav class="toc" aria-label="On this page">
+    <span class="toc-h">On this page</span>
+    <a href="#cycle">Request/response</a>
+    <a href="#example">A real exchange</a>
+    <a href="#methods">The methods</a>
+    <a href="#status">Status codes</a>
+    <a href="#headers">Headers</a>
+    <a href="#versions">HTTP/1.1, 2, 3</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <h2 id="cycle">The request/response cycle</h2>
   <p>
-    <strong>HTTP, the HyperText Transfer Protocol</strong>: is a request/response protocol over TCP. A
+    <strong>HTTP, the HyperText Transfer Protocol</strong>, is a request/response protocol over TCP. A
     <strong>client</strong> (browser, app, <code>curl</code>) sends a request to a <strong>server</strong>, which
     returns a response. HTTP is <strong>stateless</strong>: each request stands alone, carrying everything the
-    server needs. Anything that feels like a &ldquo;session&rdquo; is layered on top with cookies or tokens.
+    server needs. Anything that feels like a &ldquo;session&rdquo; is layered on top with cookies or tokens. A
+    request has a <strong>method</strong>, a <strong>path</strong>, <strong>headers</strong>, and an optional
+    <strong>body</strong>; a response has a <strong>status code</strong>, headers, and usually a body.
   </p>
-  <p>A request has a <strong>method</strong>, a <strong>path</strong>, <strong>headers</strong>, and an optional <strong>body</strong>. A response has a <strong>status code</strong>, headers, and usually a body.</p>
 
-  <h2>The methods</h2>
-  <ul>
-    <li><code>GET</code>: retrieve a resource. Should have no side effects (safe).</li>
-    <li><code>POST</code>: submit data; create something or trigger an action. Not idempotent.</li>
-    <li><code>PUT</code>: replace a resource at a known URL. Idempotent.</li>
-    <li><code>PATCH</code>: partially update a resource.</li>
-    <li><code>DELETE</code>: remove a resource. Idempotent.</li>
-    <li><code>HEAD</code> / <code>OPTIONS</code>: fetch just headers / ask what&rsquo;s allowed.</li>
-  </ul>
+  <h2 id="example">A real exchange</h2>
+  <p>HTTP/1.1 is plain text, so a request and its response read like this:</p>
+  <pre class="code"><code set:html={esc(exchange)} /></pre>
+
+  <h2 id="methods">The methods</h2>
+  <table class="cmp">
+    <thead><tr><th>Method</th><th>Purpose</th><th>Safe</th><th>Idempotent</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td>Retrieve a resource</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td>POST</td><td>Create something or trigger an action</td><td>No</td><td>No</td></tr>
+      <tr><td>PUT</td><td>Replace a resource at a known URL</td><td>No</td><td>Yes</td></tr>
+      <tr><td>PATCH</td><td>Partially update a resource</td><td>No</td><td>Not necessarily</td></tr>
+      <tr><td>DELETE</td><td>Remove a resource</td><td>No</td><td>Yes</td></tr>
+      <tr><td>HEAD / OPTIONS</td><td>Headers only / what is allowed</td><td>Yes</td><td>Yes</td></tr>
+    </tbody>
+  </table>
   <p>
     <strong>Idempotent</strong> means making the same call repeatedly leaves the server in the same state, which
-    is why clients can safely retry a <code>PUT</code> or <code>DELETE</code> but must be careful retrying a
+    is why a client can safely retry a <code>PUT</code> or <code>DELETE</code> but must be careful retrying a
     <code>POST</code>.
   </p>
 
-  <h2>Status code families</h2>
-  <ul>
-    <li><strong>1xx</strong>: informational (rare; e.g. <code>101 Switching Protocols</code>).</li>
-    <li><strong>2xx</strong>: success (<code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code>).</li>
-    <li><strong>3xx</strong>: redirection (<code>301</code> permanent, <code>302/307</code> temporary, <code>304 Not Modified</code>).</li>
-    <li><strong>4xx</strong>: the client&rsquo;s fault (<code>400</code>, <code>401</code> unauthenticated, <code>403</code> forbidden, <code>404</code> not found, <code>429</code> too many requests).</li>
-    <li><strong>5xx</strong>: the server&rsquo;s fault (<code>500</code> internal error, <code>502/503/504</code> gateway/availability).</li>
-  </ul>
+  <h2 id="status">Status code families</h2>
+  <table class="cmp">
+    <thead><tr><th>Family</th><th>Meaning</th><th>You will see</th></tr></thead>
+    <tbody>
+      <tr><td>1xx</td><td>Informational (rare)</td><td><code>101 Switching Protocols</code></td></tr>
+      <tr><td>2xx</td><td>Success</td><td><code>200</code>, <code>201 Created</code>, <code>204 No Content</code></td></tr>
+      <tr><td>3xx</td><td>Redirection</td><td><code>301</code> permanent, <code>302/307</code> temporary, <code>304 Not Modified</code></td></tr>
+      <tr><td>4xx</td><td>Client&rsquo;s fault</td><td><code>400</code>, <code>401</code>, <code>403</code>, <code>404</code>, <code>429</code></td></tr>
+      <tr><td>5xx</td><td>Server&rsquo;s fault</td><td><code>500</code>, <code>502</code>, <code>503</code>, <code>504</code></td></tr>
+    </tbody>
+  </table>
 
-  <h2>Headers do the real work</h2>
+  <h2 id="headers">Headers do the real work</h2>
   <p>
     Headers carry the metadata that makes HTTP flexible: <code>Content-Type</code> describes the body,
-    <code>Authorization</code> carries credentials, <code>Cache-Control</code> governs caching, and
-    <code>Accept</code> negotiates the format the client wants. Most API behavior you debug, auth, caching,
-    CORS, content negotiation, lives in the headers, not the body.
+    <code>Authorization</code> carries credentials (often a <a href="/jwt-decoder">JWT</a> or
+    <a href="/base64">Base64</a> basic-auth string), <code>Cache-Control</code> governs caching, and
+    <code>Accept</code> negotiates the format the client wants. Most API behavior you debug, auth, caching, CORS,
+    content negotiation, lives in the headers, not the body.
   </p>
 
-  <h2>FAQ</h2>
-  <details class="faq"><summary>What&rsquo;s the difference between 301 and 302?</summary>
-    <p><code>301</code> is a permanent move (clients and search engines update their links); <code>302</code>/<code>307</code> are temporary. Use <code>301</code>/<code>308</code> when a URL has genuinely moved for good.</p>
-  </details>
-  <details class="faq"><summary>Is HTTPS a different protocol?</summary>
-    <p>No, HTTPS is HTTP carried inside a TLS-encrypted connection. Same methods, same status codes, with confidentiality and integrity added.</p>
-  </details>
-  <details class="faq"><summary>Why is &ldquo;stateless&rdquo; a big deal?</summary>
-    <p>Because the server doesn&rsquo;t remember you between requests, you can scale horizontally, any server can handle any request, and sessions must be carried explicitly via cookies or tokens.</p>
-  </details>
+  <h2 id="versions">HTTP/1.1 vs 2 vs 3</h2>
+  <table class="cmp">
+    <thead><tr><th>Version</th><th>Runs on</th><th>Key idea</th></tr></thead>
+    <tbody>
+      <tr><td>HTTP/1.1</td><td>TCP</td><td>Text, keep-alive, one request at a time per connection</td></tr>
+      <tr><td>HTTP/2</td><td>TCP</td><td>Binary, multiplexed streams on one connection, header compression</td></tr>
+      <tr><td>HTTP/3</td><td>QUIC (UDP)</td><td>No head-of-line blocking, faster handshakes on flaky networks</td></tr>
+    </tbody>
+  </table>
 
-  <h3>Related</h3>
-  <p>API tokens are often <a href="/jwt-decoder">JWTs</a>; auth headers use <a href="/base64">Base64</a>. Email rides similar TCP plumbing, see <a href="/how-smtp-works">SMTP</a>.</p>
+  <h2 id="faq">FAQ</h2>
+  {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+
+  <h3>Related concepts</h3>
+  <p>
+    <a href="/jwt-decoder">JWT decoder</a> &middot; <a href="/base64">Base64</a> (auth headers) &middot;
+    <a href="/json-to-typescript">JSON</a> (the usual body) &middot; <a href="/how-smtp-works">How SMTP works</a> &middot;
+    <a href="/port-scanning-explained">Port scanning</a> &middot; <a href="/reference">all references</a>.
+  </p>
+
+  <div class="classic">
+    <span class="classic-tag">☕ KB Cafe Classic</span>
+    <p>
+      KB Cafe&rsquo;s HTTP write-ups, including the much-linked &ldquo;HTTP Chasm,&rdquo; were a staple developer
+      reference back when people built HTTP clients by hand in C#. This is the modern restoration: the same
+      request/response fundamentals, brought up to date through HTTP/2 and HTTP/3.
+    </p>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 </ReferencePage>

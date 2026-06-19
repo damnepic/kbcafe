@@ -1,0 +1,136 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const scriptCode = `#!/usr/bin/env bash
+set -euo pipefail                 # exit on error, unset var, or failed pipe
+
+backup_dir="$HOME/backups"
+mkdir -p "$backup_dir"            # quote variables so spaces do not break them
+
+for file in *.log; do
+  if [ -f "$file" ]; then         # only regular files
+    gzip -c "$file" > "$backup_dir/$file.gz"
+    echo "backed up $file"
+  fi
+done`;
+
+const FAQ = [
+  { q: "What is the difference between bash and sh?", a: "sh is the POSIX shell standard; bash is a specific, widely installed shell that is a superset of it with many extra features (arrays, [[ ]] tests, process substitution). A script with #!/bin/sh should stick to POSIX features for portability; #!/usr/bin/env bash opts into bash's extras. On many systems /bin/sh is actually a smaller shell like dash, so bash-only syntax under a sh shebang will fail." },
+  { q: "What is the shebang line?", a: "The first line, like #!/usr/bin/env bash, that tells the OS which interpreter should run the file. #!/usr/bin/env bash finds bash on the user's PATH, which is more portable than hard-coding /bin/bash." },
+  { q: "Why do I have to quote variables?", a: "An unquoted $file splits on spaces and expands wildcards, so a filename like \"my report.log\" becomes two arguments. Always write \"$file\" (in double quotes) unless you specifically want splitting. It is the single biggest source of shell bugs." },
+  { q: "What does set -euo pipefail do?", a: "It makes a script fail loudly instead of limping on: -e exits on any command that returns an error, -u treats an unset variable as an error, and -o pipefail makes a pipeline fail if any stage fails (not just the last). It is the standard safety header for a serious bash script." },
+  { q: "How do I make a script executable?", a: "Run chmod +x script.sh to add the execute bit, then run it with ./script.sh. Without the execute bit you can still run it explicitly as bash script.sh." },
+  { q: "How do I run a script on a schedule?", a: "Use cron: add a line to your crontab describing when to run it. Build and read the schedule expression with the cron generator, then point it at your script's full path." },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+---
+<ReferencePage
+  title="Shell scripting explained, bash basics, commands & gotchas | KB Cafe"
+  description="A practical reference on shell scripting: the shebang, variables and quoting, conditionals and loops, pipes and redirection, the essential commands, a real example script, and the mistakes that bite everyone."
+  path="/shell-scripting-explained"
+  eyebrow="Reference · Shell"
+  h1="Shell scripting explained"
+  tagline="The shell turns a sequence of commands into a program. Here are the building blocks of a bash script, the essential commands, and the quoting gotchas that cause most of the bugs."
+>
+  <nav class="toc" aria-label="On this page">
+    <span class="toc-h">On this page</span>
+    <a href="#what">What is a shell script?</a>
+    <a href="#basics">Variables &amp; quoting</a>
+    <a href="#flow">Conditionals &amp; loops</a>
+    <a href="#pipes">Pipes &amp; redirection</a>
+    <a href="#commands">Essential commands</a>
+    <a href="#example">A real script</a>
+    <a href="#mistakes">Common mistakes</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <h2 id="what">What is a shell script?</h2>
+  <p>
+    A <strong>shell</strong> is the program that reads your terminal commands and runs them. A <strong>shell
+    script</strong> is just those commands saved in a file so they run as a unit, the glue that automates backups,
+    deployments, data wrangling, and the thousand small chores between bigger tools. Most scripts target
+    <strong>bash</strong>, the common default shell. A script starts with a <strong>shebang</strong> declaring its
+    interpreter, and you make it runnable with <code>chmod +x</code>:
+  </p>
+  <p><code>#!/usr/bin/env bash</code>: finds bash on the user&rsquo;s <code>PATH</code> (more portable than a hard-coded path).</p>
+
+  <h2 id="basics">Variables and quoting</h2>
+  <p>
+    Assign with <code>name="value"</code> (no spaces around <code>=</code>) and read with <code>$name</code>. The
+    golden rule: <strong>always wrap variables in double quotes</strong>, <code>"$file"</code>, so a value with
+    spaces or wildcards stays a single argument. Unquoted variables are the number-one cause of shell bugs.
+  </p>
+
+  <h2 id="flow">Conditionals and loops</h2>
+  <p>
+    Tests go inside <code>[ ... ]</code> (or bash&rsquo;s <code>[[ ... ]]</code>): <code>[ -f "$f" ]</code> (file
+    exists), <code>[ -d "$d" ]</code> (directory), <code>[ -z "$s" ]</code> (empty string),
+    <code>[ "$a" = "$b" ]</code> (string equal), <code>[ "$n" -gt 5 ]</code> (numeric greater-than). Loops come in
+    <code>for item in list; do ... done</code> and <code>while condition; do ... done</code> forms, see them
+    combined in the <a href="#example">example</a> below.
+  </p>
+
+  <h2 id="pipes">Pipes and redirection</h2>
+  <table class="cmp">
+    <thead><tr><th>Syntax</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>cmd &gt; file</code></td><td>Write stdout to a file (overwrite)</td></tr>
+      <tr><td><code>cmd &gt;&gt; file</code></td><td>Append stdout to a file</td></tr>
+      <tr><td><code>cmd &lt; file</code></td><td>Read stdin from a file</td></tr>
+      <tr><td><code>cmd 2&gt; file</code></td><td>Redirect stderr (stream 2)</td></tr>
+      <tr><td><code>a | b</code></td><td>Pipe a&rsquo;s output into b&rsquo;s input</td></tr>
+      <tr><td><code>cmd 2&gt;&amp;1</code></td><td>Merge stderr into stdout</td></tr>
+    </tbody>
+  </table>
+  <p>Pipes are the heart of the Unix philosophy: small tools, each doing one job, composed into a pipeline.</p>
+
+  <h2 id="commands">Essential commands</h2>
+  <table class="cmp">
+    <thead><tr><th>Command</th><th>Does</th><th>Command</th><th>Does</th></tr></thead>
+    <tbody>
+      <tr><td><code>grep</code></td><td>Search text by pattern</td><td><code>find</code></td><td>Search the filesystem</td></tr>
+      <tr><td><code>sed</code></td><td>Stream-edit text</td><td><code>xargs</code></td><td>Build commands from input</td></tr>
+      <tr><td><code>awk</code></td><td>Field-based text processing</td><td><code>chmod</code></td><td>Change permissions</td></tr>
+      <tr><td><code>cut</code> / <code>sort</code></td><td>Slice and order lines</td><td><code>curl</code></td><td>Make HTTP requests</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="example">A real script</h2>
+  <p>Compressing each log file into a backup folder, with the safety header and quoting in place:</p>
+  <pre class="code"><code set:html={esc(scriptCode)} /></pre>
+
+  <h2 id="mistakes">Common mistakes</h2>
+  <ul>
+    <li><strong>Unquoted variables.</strong> <code>$file</code> splits on spaces; write <code>"$file"</code>.</li>
+    <li><strong>Spaces around <code>=</code>.</strong> <code>name = "x"</code> is wrong; it must be <code>name="x"</code>.</li>
+    <li><strong>No safety header.</strong> Without <code>set -euo pipefail</code> a script keeps running after a
+      failed command, often doing damage.</li>
+    <li><strong>Assuming bash under <code>#!/bin/sh</code>.</strong> On many systems <code>/bin/sh</code> is a
+      leaner shell; bash-only syntax will fail. Match the shebang to the features you use.</li>
+    <li><strong>Parsing <code>ls</code>.</strong> Loop over a glob (<code>for f in *.log</code>) instead;
+      <code>ls</code> output is for humans, not scripts.</li>
+  </ul>
+
+  <h2 id="faq">FAQ</h2>
+  {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+
+  <h3>Related concepts</h3>
+  <p>
+    Schedule a script with the <a href="/cron-generator">cron generator</a> &middot;
+    <a href="/curl-to-code">curl to code</a> &middot; <a href="/htaccess-generator">.htaccess generator</a> &middot;
+    <a href="/multithreading-explained">Multithreading</a> &middot; <a href="/reference">all references</a>.
+  </p>
+
+  <div class="classic">
+    <span class="classic-tag">☕ KB Cafe Classic</span>
+    <p>
+      A shell how-to was part of <code>kbcafe.com</code>&rsquo;s original developer reference shelf, from the era
+      of stitching command-line tools together by hand. This is its modern restoration: the same fundamentals,
+      rewritten around today&rsquo;s bash and the quoting rules that still trip everyone up.
+    </p>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+</ReferencePage>

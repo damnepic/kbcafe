@@ -30,4 +30,7 @@ export const REFERENCE = [
     ds: "What ping really measures, the ICMP echo request/reply, TTL, and reading the results.", tag: "Networking" },
   { nm: "Port scanning explained", href: "/port-scanning-explained",
     ds: "What a network port is, how a port scan works, the common scan types, and what they reveal.", tag: "Networking" },
+  // Shell
+  { nm: "Shell scripting explained", href: "/shell-scripting-explained",
+    ds: "Bash basics, the shebang, variables and quoting, pipes and redirection, and the gotchas that bite.", tag: "Shell" },
 ];

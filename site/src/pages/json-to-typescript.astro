@@ -12,6 +12,33 @@ const sample = `{
     { "user": "linus", "stars": 4 }
   ]
 }`;
+
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const jsCode = `// parse a JSON string into an object
+const obj = JSON.parse('{"id":42,"name":"Flat White"}');
+
+// serialize an object back to JSON (the 2 is the pretty-print indent)
+const text = JSON.stringify(obj, null, 2);`;
+
+const pyCode = `import json
+
+# parse a JSON string into a dict
+data = json.loads('{"id": 42, "name": "Flat White"}')
+
+# serialize a dict back to JSON
+text = json.dumps(data, indent=2)`;
+
+const FAQ = [
+  { q: "Is my JSON sent to a server?", a: "No. The converter is plain JavaScript that runs on this page. Your input never leaves your browser, which is why it works offline once the page has loaded, safe for API responses or config you would rather not upload." },
+  { q: "What is the difference between JSON and a JavaScript object?", a: "JSON is a text format whose syntax is a strict subset of JavaScript object literals. In JSON, keys must be double-quoted strings, only six value types are allowed, and there are no comments, trailing commas, or functions. A JS object is a live in-memory value; JSON is its serialized text form." },
+  { q: "Can JSON have comments?", a: "No, standard JSON does not allow comments. If you need them in a config file, use a superset like JSONC or JSON5, or keep comments in a separate field, but strip them before any strict JSON parser sees the file." },
+  { q: "Does JSON have a date type?", a: "No. JSON has no date type, dates are conventionally written as ISO 8601 strings (\"2026-06-19T12:00:00Z\") and parsed back by your code. The same goes for big integers and binary data, which are usually strings (often Base64)." },
+  { q: "Why are some generated fields marked optional with ?", a: "When an array contains objects that do not all share the same keys, the keys missing from some elements are marked optional. You can also force every field optional with the toggle above." },
+  { q: "JSON vs XML, which should I use?", a: "JSON for APIs, configs, and anything JavaScript-native, it is compact and parses natively everywhere. XML for documents, mixed content, and feeds (RSS and Atom are XML). XML supports comments, attributes, and namespaces that JSON deliberately omits." },
+  { q: "Does it handle deeply nested JSON?", a: "Yes, nesting is unlimited. Each distinct object shape becomes its own interface, named after the key that holds it." },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
 ---
 <ToolPage
   title="JSON to TypeScript, generate typed interfaces | KB Cafe"
@@ -43,44 +70,108 @@ const sample = `{
   <p class="status" id="status"></p>
 
   <Fragment slot="explainer">
-    <h2>Turn JSON into TypeScript interfaces, instantly</h2>
+    <nav class="toc" aria-label="On this page">
+      <span class="toc-h">On this page</span>
+      <a href="#what">What is JSON?</a>
+      <a href="#types">Data types</a>
+      <a href="#code">JSON in code</a>
+      <a href="#ai">JSON in AI</a>
+      <a href="#vs-xml">JSON vs XML</a>
+      <a href="#mistakes">Common mistakes</a>
+      <a href="#tool">About this tool</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <h2 id="what">What is JSON?</h2>
     <p>
-      Paste a JSON object or array on the left and KB Cafe walks the structure to produce
-      matching <code>interface</code> declarations on the right. Nested objects become their own
-      named interfaces, arrays are typed by their elements, and mixed primitives collapse into
-      union types like <code>string | number</code>. It all happens in your browser, no request
-      is ever sent, so it is safe to paste API responses or config you would rather not upload.
+      <strong>JSON</strong> (JavaScript Object Notation) is a lightweight, text-based format for representing
+      structured data. It was derived from JavaScript object syntax but is language-independent: every major
+      language can read and write it. Its job is to move structured data between systems, API responses, config
+      files, message payloads, in a form that is both human-readable and trivially machine-parseable. That
+      combination is why it became the default data format of the modern web.
     </p>
 
-    <h3>How type inference works here</h3>
+    <h2 id="types">JSON data types</h2>
+    <p>JSON allows exactly six value types, no more:</p>
     <ul>
-      <li><strong>Objects</strong> become an <code>interface</code>; nested objects get a named child interface based on the key.</li>
+      <li><strong>string</strong> (double-quoted), <strong>number</strong>, <strong>boolean</strong>
+        (<code>true</code>/<code>false</code>), and <strong>null</strong>.</li>
+      <li><strong>array</strong> (an ordered list in <code>[ ]</code>) and <strong>object</strong> (key/value
+        pairs in <code>&#123; &#125;</code>, keys must be strings).</li>
+    </ul>
+    <p>
+      Notably absent: dates (use ISO 8601 strings), comments, trailing commas, <code>undefined</code>, and
+      functions. Those are the source of most &ldquo;why won&rsquo;t my JSON parse&rdquo; bugs (see
+      <a href="#mistakes">common mistakes</a>).
+    </p>
+
+    <h2 id="code">JSON in code</h2>
+    <p>Every language has a parse step (text to value) and a serialize step (value to text). JavaScript:</p>
+    <pre class="code"><code set:html={esc(jsCode)} /></pre>
+    <p>Python:</p>
+    <pre class="code"><code set:html={esc(pyCode)} /></pre>
+    <p>Want types for that data? That is exactly what the tool above does, paste the JSON and get TypeScript interfaces.</p>
+
+    <h2 id="ai">JSON in AI</h2>
+    <p>
+      JSON quietly became the language AI systems speak to the rest of your code. It did not exist as a concern
+      when most JSON tutorials were written, but in 2026 it is everywhere a model meets software:
+    </p>
+    <ul>
+      <li><strong>Structured outputs</strong>: models return JSON that matches a schema you define, so the result
+        drops straight into your program. See <a href="/what-are-structured-outputs">structured outputs</a> and
+        build one with the <a href="/structured-output-builder">Structured Output Builder</a>.</li>
+      <li><strong>Tool / function calling</strong>: when a model calls a tool, its arguments come back as JSON, see
+        <a href="/what-is-tool-calling">tool calling</a>.</li>
+      <li><strong>MCP</strong>: the <a href="/what-is-mcp">Model Context Protocol</a> is built on JSON-RPC.</li>
+      <li><strong>API responses</strong>: the data you feed a model, and get back, is almost always JSON.</li>
+    </ul>
+
+    <h2 id="vs-xml">JSON vs XML</h2>
+    <table class="cmp">
+      <thead><tr><th></th><th>JSON</th><th>XML</th></tr></thead>
+      <tbody>
+        <tr><td>Shape</td><td>Key/value + arrays</td><td>Nested tags + attributes</td></tr>
+        <tr><td>Verbosity</td><td>Compact</td><td>Heavier (closing tags)</td></tr>
+        <tr><td>Types</td><td>string, number, bool, null, array, object</td><td>Text only (everything is a string)</td></tr>
+        <tr><td>Comments</td><td>Not allowed</td><td>Allowed</td></tr>
+        <tr><td>Best for</td><td>APIs, configs, JS-native data</td><td>Documents, mixed content, <a href="/feeds">feeds (RSS/Atom)</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="mistakes">Common mistakes</h2>
+    <ul>
+      <li><strong>Trailing commas.</strong> Valid in JavaScript, invalid in JSON. <code>[1, 2,]</code> will not parse.</li>
+      <li><strong>Single quotes.</strong> JSON strings and keys must use <em>double</em> quotes.</li>
+      <li><strong>Comments.</strong> Not allowed in standard JSON; strip them first.</li>
+      <li><strong>Unquoted keys.</strong> <code>&#123; name: "x" &#125;</code> is a JS object, not JSON; keys must be quoted.</li>
+      <li><strong>Wrong types for dates / big numbers.</strong> Use strings; very large integers can lose precision as JSON numbers.</li>
+    </ul>
+
+    <h2 id="tool">About this tool</h2>
+    <p>
+      Paste a JSON object or array on the left and KB Cafe walks the structure to produce matching
+      <code>interface</code> declarations on the right, entirely in your browser. The inference rules:
+    </p>
+    <ul>
+      <li><strong>Objects</strong> become an <code>interface</code>; nested objects get a named child interface from the key.</li>
       <li><strong>Arrays</strong> are typed by merging every element, <code>[1, 2]</code> is <code>number[]</code>, and an array of objects merges their keys (missing keys become optional).</li>
-      <li><strong>null</strong> values widen a field to <code>… | null</code> rather than guessing.</li>
+      <li><strong>null</strong> values widen a field to <code>&hellip; | null</code> rather than guessing.</li>
       <li><strong>Empty arrays / objects</strong> fall back to <code>unknown[]</code> and <code>Record&lt;string, unknown&gt;</code> so nothing is silently wrong.</li>
     </ul>
 
-    <h3>Example</h3>
+    <h2 id="faq">FAQ</h2>
+    {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+
+    <h3>Related</h3>
     <p>
-      Given a coffee record with an <code>origin</code> object and a list of <code>reviews</code>,
-      you get a root <code>interface</code> plus an <code>Origin</code> and <code>Review</code>
-      interface, drop them straight into your <code>.ts</code> file. Click <em>load sample</em>
-      above to try it.
+      <a href="/json-to-go">JSON → Go</a> &middot; <a href="/csv-to-json">CSV → JSON</a> &middot;
+      <a href="/yaml-to-json">YAML → JSON</a> &middot; <a href="/jwt-decoder">JWT decoder</a> (Base64URL JSON) &middot;
+      <a href="/base64">Base64</a> &middot; <a href="/http-explained">HTTP</a> &middot;
+      <a href="/structured-output-builder">Structured Output Builder</a>.
     </p>
 
-    <h2>FAQ</h2>
-    <details class="faq"><summary>Is my JSON sent to a server?</summary>
-      <p>No. The converter is plain JavaScript that runs on this page. Your input never leaves your browser, which is why it works offline once the page has loaded.</p>
-    </details>
-    <details class="faq"><summary>Why are some fields marked optional with <code>?</code>?</summary>
-      <p>When an array contains objects that don&rsquo;t all share the same keys, the keys that are missing from some elements are marked optional. You can also force every field optional with the toggle above.</p>
-    </details>
-    <details class="faq"><summary>Does it handle deeply nested JSON?</summary>
-      <p>Yes, nesting is unlimited. Each distinct object shape becomes its own interface, named after the key that holds it.</p>
-    </details>
-
-    <h3>Related references</h3>
-    <p>Reading an API token alongside your JSON? Try the <a href="/jwt-decoder">JWT decoder</a>. Scheduling a job that emits this payload? See the <a href="/cron-generator">cron generator</a>.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </Fragment>
 </ToolPage>
 
