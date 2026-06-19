@@ -91,10 +91,10 @@ const WORKFLOWS = [
 
   <!-- BENEFITS: tucked tight, directly under the triage cards -->
   <div class="benefits">
-    <div class="benefit"><span class="b-ic b-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/></svg></span><div><h3>100% Client-Side</h3><p>Everything runs in your browser. Nothing leaves your device.</p></div></div>
-    <div class="benefit"><span class="b-ic b-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><h3>Privacy First</h3><p>No signups. No tracking. No data collection. Ever.</p></div></div>
-    <div class="benefit"><span class="b-ic b-gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><div><h3>Blazing Fast</h3><p>Instant results. Works offline. Always available.</p></div></div>
-    <div class="benefit"><span class="b-ic b-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg></span><div><h3>Developer Friendly</h3><p>Clean UI, keyboard-friendly, and zero fluff.</p></div></div>
+    <div class="benefit"><div class="b-head"><span class="b-ic b-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/></svg></span><h3>100% Client-Side</h3></div><p>Everything runs in your browser. Nothing leaves your device.</p></div>
+    <div class="benefit"><div class="b-head"><span class="b-ic b-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Privacy First</h3></div><p>No signups. No tracking. No data collection. Ever.</p></div>
+    <div class="benefit"><div class="b-head"><span class="b-ic b-gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><h3>Blazing Fast</h3></div><p>Instant results. Works offline. Always available.</p></div>
+    <div class="benefit"><div class="b-head"><span class="b-ic b-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg></span><h3>Developer Friendly</h3></div><p>Clean UI, keyboard-friendly, and zero fluff.</p></div>
   </div>
 
   <!-- TRUST + quick links (centered) -->
@@ -302,13 +302,14 @@ const WORKFLOWS = [
   .cat.active .cat-new{background:rgba(255,255,255,.2);color:#fff}
 
   /* BENEFITS */
-  .benefits{max-width:1120px;margin:16px auto 0;padding:18px 22px;border-radius:20px;background:rgba(255,255,255,.5);border:1.2px solid var(--line);box-shadow:0 10px 30px rgba(45,30,16,.05);display:grid;grid-template-columns:repeat(4,1fr);gap:22px;align-items:center}
-  .benefit{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center}
-  .b-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;color:#fff}
+  .benefits{max-width:1120px;margin:16px auto 0;padding:18px 22px;border-radius:20px;background:rgba(255,255,255,.5);border:1.2px solid var(--line);box-shadow:0 10px 30px rgba(45,30,16,.05);display:grid;grid-template-columns:repeat(4,1fr);gap:22px;align-items:start}
+  .benefit{min-width:0}
+  .b-head{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+  .b-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;flex-shrink:0}
   .b-ic svg{width:24px;height:24px}
   .b-blue{background:linear-gradient(135deg,#3478f6,#6aa8ff)} .b-coral{background:linear-gradient(135deg,#ff4b2f,#d63e1f)}
   .b-gold{background:linear-gradient(135deg,#f4a400,#ffbd45)} .b-green{background:linear-gradient(135deg,#0f9f82,#16c8a4)}
-  .benefit h3{font-family:var(--font-display);font-weight:800;font-size:16.5px;letter-spacing:-.02em;margin:2px 0 5px}
+  .benefit h3{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.02em;margin:0;line-height:1.15}
   .benefit p{margin:0;color:var(--ink-soft);line-height:1.45;font-size:13.5px}
 
   /* SECTIONS */

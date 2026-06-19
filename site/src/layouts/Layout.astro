@@ -224,5 +224,10 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   }
 
   @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-  @media(max-width:520px){.nav-links a:not(.since){display:none}}
+  @media(max-width:520px){
+    /* phone: hide inline nav, center the brand; burger floats left out of flow so the logo is truly centered */
+    .nav-links{display:none}
+    .site-nav{justify-content:center}
+    .sb-burger{position:absolute;left:0;top:50%;transform:translateY(-50%);margin:0;z-index:2}
+  }
 </style>
