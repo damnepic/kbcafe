@@ -130,7 +130,7 @@ const WORKFLOWS = [
 
   <div>
     <!-- AI EXPLAINED -->
-    <section class="home-sec">
+    <section class="home-sec" style="margin-top:36px">
       <div class="sec-head">
         <div class="sec-title">
           <span class="kicker kicker-ai">AI Explained <span class="cat-new">New</span></span>
@@ -141,8 +141,10 @@ const WORKFLOWS = [
       <div class="ai-grid">
         {aiCards.map(c => (
           <a class="ai-card" href={c.href}>
-            <span class="ai-ic" style={`background:${c.bg}`} set:html={c.icon} />
-            <h3 set:html={c.nm} />
+            <div class="ai-head">
+              <span class="ai-ic" style={`background:${c.bg}`} set:html={c.icon} />
+              <h3 set:html={c.nm} />
+            </div>
             <p>{c.ds}</p>
             <span class="read">Read more →</span>
           </a>
@@ -323,9 +325,10 @@ const WORKFLOWS = [
   .ai-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
   .ai-card{display:flex;flex-direction:column;min-height:320px;padding:28px 24px;border-radius:20px;background:rgba(255,255,255,.6);border:1.2px solid var(--line);box-shadow:0 8px 24px rgba(40,24,12,.045);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s}
   .ai-card:hover{transform:translateY(-5px);box-shadow:0 20px 45px rgba(40,24,12,.09);border-color:rgba(238,75,43,.35)}
-  .ai-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;color:#fff;margin-bottom:26px}
-  .ai-ic svg{width:23px;height:23px}
-  .ai-card h3{font-family:var(--font-display);font-weight:800;font-size:17px;line-height:1.24;letter-spacing:-.02em;margin:0 0 12px}
+  .ai-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:14px}
+  .ai-ic{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;color:#fff;flex-shrink:0;margin-top:2px}
+  .ai-ic svg{width:12px;height:12px}
+  .ai-card h3{font-family:var(--font-display);font-weight:800;font-size:17px;line-height:1.24;letter-spacing:-.02em;margin:0}
   .ai-card p{color:var(--ink-soft);line-height:1.55;font-size:13px;margin:0 0 18px}
   .read{margin-top:auto;color:var(--coral);font-family:var(--font-display);font-weight:800;font-size:13.5px}
 
