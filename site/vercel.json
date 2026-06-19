@@ -91,10 +91,9 @@
     { "source": "/csharp/:path*", "destination": "/reference", "permanent": true },
     { "source": "/quality/:path*", "destination": "/", "permanent": true },
 
-    { "source": "/iBLOGthere4iM", "destination": "/", "permanent": true },
-    { "source": "/iBLOGthere4iM/:path*", "destination": "/", "permanent": true },
-    { "source": "/iblogthere4im", "destination": "/", "permanent": true },
-    { "source": "/iblogthere4im/:path*", "destination": "/", "permanent": true },
+    { "source": "/iBLOGthere4iM/:path+", "destination": "/iBLOGthere4iM", "permanent": true },
+    { "source": "/iblogthere4im", "destination": "/iBLOGthere4iM", "permanent": true },
+    { "source": "/iblogthere4im/:path+", "destination": "/iBLOGthere4iM", "permanent": true },
     { "source": "/iBLOGthere4IM", "destination": "/", "permanent": true },
     { "source": "/iBLOGthere4IM/:path*", "destination": "/", "permanent": true },
 
