@@ -23,7 +23,7 @@ export const LEARNING_PATHS = [
     id: 'automate', title: 'Automate Work', shortTitle: 'Automation', tag: 'Applied',
     route: '/learn-ai-automation', minutes: 40, outcome: 'I want to automate work with AI',
     blurb: 'From manual busywork to systems that run themselves: the trigger-to-action model, the agents-vs-workflows-vs-RPA map, how automations fire, and how AI orchestrates the steps.',
-    steps: ['/what-is-workflow-automation', '/cron-generator', '/webhooks-vs-polling', '/ai-agents-vs-workflows-vs-rpa', '/what-is-tool-calling', '/tool-call-visualizer', '/what-is-ai-orchestration', '/ai-architecture-generator'],
+    steps: ['/what-is-workflow-automation', '/automation-blueprints', '/cron-generator', '/webhooks-vs-polling', '/ai-agents-vs-workflows-vs-rpa', '/what-is-tool-calling', '/tool-call-visualizer', '/what-is-ai-orchestration', '/ai-architecture-generator'],
   },
 ];
 

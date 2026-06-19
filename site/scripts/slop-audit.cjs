@@ -105,6 +105,7 @@ const targets = [
   ["ai-agents-vs-workflows-vs-rpa.astro", "article"],
   ["webhooks-vs-polling.astro", "article"],
   ["what-is-ai-orchestration.astro", "article"],
+  ["automation-blueprints.astro", "tool"],
   ["ai.astro", "tool"],
   ["ai-patterns.astro", "tool"],
   ["ai-pattern-explorer.astro", "tool"],

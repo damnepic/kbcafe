@@ -1,0 +1,157 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Automation Blueprint Explorer, see how real workflows are built | KB Cafe"
+  description="Five real automation blueprints, scheduled report, customer support, lead capture, incident alert, content pipeline, broken into clickable steps. See the trigger, the actions, the AI steps, and the human checkpoints, each one explained."
+  path="/automation-blueprints"
+  eyebrow="Automation"
+  h1="Automation Blueprint Explorer"
+  tagline="Real automations, taken apart. Pick a blueprint and click any step to see what it does, what kind of step it is (trigger, action, AI, human, integration), and the concept behind it."
+>
+  <div class="bp-pick" id="picks"></div>
+  <div class="bp-cols">
+    <div class="bp-flow" id="flow"></div>
+    <aside class="bp-panel" id="panel"></aside>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>The anatomy of an automation</h2>
+    <p>
+      Automations look intimidating until you see that they&rsquo;re all made of the same handful of parts. A
+      <strong>trigger</strong> starts the flow (a schedule or an event). A series of <strong>actions</strong> do
+      deterministic work. Some steps are <strong>AI</strong> (a model summarizing, classifying, or drafting), some
+      are <strong>integrations</strong> (writing to a CRM, posting to Slack), and the good ones include a
+      <strong>human</strong> checkpoint where it matters. Once you can spot those five kinds of step, every
+      workflow you meet becomes readable.
+    </p>
+    <h3>The five blueprints</h3>
+    <ul>
+      <li><strong>Scheduled Report</strong>: a clock-triggered digest, fetch, analyze, summarize, deliver.</li>
+      <li><strong>Customer Support</strong>: triage and draft on a new ticket, with a human approving before send.</li>
+      <li><strong>Lead Capture</strong>: turn a form submission into an enriched, scored, routed lead.</li>
+      <li><strong>Incident Alert</strong>: react to an error event, categorize, branch on severity, notify.</li>
+      <li><strong>Content Pipeline</strong>: turn a firehose of sources into reviewed, published output.</li>
+    </ul>
+    <p>
+      Notice how often the pattern is the same: structure and guardrails from deterministic steps, with AI used
+      for the <em>one</em> fuzzy task in the middle and a human kept in the loop for anything consequential. To
+      build the schedule behind a trigger, use the <a href="/cron-generator">cron generator</a>. To understand
+      how steps fire, see <a href="/webhooks-vs-polling">webhooks vs polling</a>. For the bigger picture, read
+      <a href="/what-is-workflow-automation">what is workflow automation</a> and
+      <a href="/what-is-ai-orchestration">AI orchestration</a>.
+    </p>
+  </Fragment>
+</ToolPage>
+
+<style is:global> /* JS-created flow nodes need unscoped CSS, see context-budget-analyzer */
+  .bp-pick{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px}
+  .bp-chip{font-family:var(--font-mono);font-size:12.5px;font-weight:700;border:1.5px solid var(--line);border-radius:999px;
+    padding:7px 14px;background:var(--cream);color:var(--ink-soft);cursor:pointer;transition:all .14s}
+  .bp-chip:hover{border-color:var(--ink-soft);color:var(--ink)}
+  .bp-chip.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .bp-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  .bp-flow{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .bp-node{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-left-width:5px;border-radius:13px;
+    background:var(--cream);padding:13px 15px;cursor:pointer;transition:transform .14s,box-shadow .14s,border-color .14s}
+  .bp-node:hover{transform:translateX(3px)}
+  .bp-node.on{box-shadow:0 10px 26px rgba(40,24,12,.1)}
+  .bp-n{font-family:var(--font-mono);font-size:11px;font-weight:800;color:var(--ink-soft);min-width:18px}
+  .bp-nm{font-family:var(--font-display);font-weight:800;font-size:15.5px;letter-spacing:-.01em;flex:1}
+  .bp-kind{font-family:var(--font-mono);font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .bp-arrow{align-self:center;width:2px;height:18px;background:var(--ink-soft);opacity:.4;margin:2px 0}
+  /* kinds */
+  .k-trigger{border-left-color:var(--gold)} .k-trigger .bp-kind{background:rgba(244,180,35,.18);color:#9a7400}
+  .k-action{border-left-color:#3478f6} .k-action .bp-kind{background:rgba(52,120,246,.14);color:#2b5cc4}
+  .k-ai{border-left-color:#7657ff} .k-ai .bp-kind{background:rgba(118,87,255,.14);color:#5a3fd6}
+  .k-human{border-left-color:var(--coral)} .k-human .bp-kind{background:rgba(238,75,43,.14);color:var(--coral-deep)}
+  .k-integration{border-left-color:#0f9f82} .k-integration .bp-kind{background:rgba(15,159,130,.14);color:#0f7d68}
+  .bp-node.on.k-trigger{border-color:var(--gold)} .bp-node.on.k-action{border-color:#3478f6}
+  .bp-node.on.k-ai{border-color:#7657ff} .bp-node.on.k-human{border-color:var(--coral)} .bp-node.on.k-integration{border-color:#0f9f82}
+
+  .bp-panel{position:sticky;top:84px;border:1.5px solid var(--line);border-radius:16px;background:var(--paper-2);padding:20px}
+  .bp-p-kind{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;display:inline-block;padding:3px 9px;border-radius:6px;margin-bottom:11px}
+  .bp-p-nm{font-family:var(--font-display);font-weight:800;font-size:21px;letter-spacing:-.02em;margin:0 0 10px}
+  .bp-p-detail{font-size:14.5px;line-height:1.6;color:var(--ink);margin:0}
+  .bp-p-link{display:inline-block;margin-top:14px;font-family:var(--font-display);font-weight:800;font-size:13.5px;color:var(--coral);text-decoration:none}
+  .bp-p-link:hover{text-decoration:underline}
+  .bp-legend{display:flex;flex-wrap:wrap;gap:7px 14px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft)}
+  .bp-legend span{display:inline-flex;align-items:center;gap:5px}
+  .bp-dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+  @media(max-width:760px){.bp-cols{grid-template-columns:1fr}.bp-panel{position:static}}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const KIND = {
+    trigger: 'Trigger', action: 'Action', ai: 'AI step', human: 'Human', integration: 'Integration',
+  };
+  const KCOLOR = { trigger: 'var(--gold)', action: '#3478f6', ai: '#7657ff', human: 'var(--coral)', integration: '#0f9f82' };
+
+  const BLUEPRINTS = [
+    { id: 'report', name: 'Scheduled Report', nodes: [
+      { label: 'Cron schedule', kind: 'trigger', link: '/cron-generator', detail: 'A time-based trigger. The workflow runs on a fixed schedule (every weekday at 8am, say) with no event required, the clock is the trigger.' },
+      { label: 'Fetch data', kind: 'action', detail: 'Pull the raw numbers from your sources (an API, a database, a sheet) for the period being reported on.' },
+      { label: 'Analyze', kind: 'action', detail: 'Aggregate and compute: totals, deltas versus last period, the few things worth highlighting. Plain deterministic code, not a model.' },
+      { label: 'Summarize with AI', kind: 'ai', link: '/what-are-structured-outputs', detail: 'Hand the numbers to a model to write the narrative ("revenue up 8%, driven by…"). The one fuzzy step a person used to do. Ask for structured output if later steps need fields.' },
+      { label: 'Email the report', kind: 'integration', detail: 'Deliver the finished digest to an inbox, a channel, or a doc. The workflow ends with something a human actually reads.' },
+    ] },
+    { id: 'support', name: 'Customer Support', nodes: [
+      { label: 'New ticket', kind: 'trigger', link: '/webhooks-vs-polling', detail: 'A webhook from your help desk fires the instant a ticket is created, so triage starts in seconds rather than at the next poll.' },
+      { label: 'Classify issue', kind: 'ai', link: '/what-are-structured-outputs', detail: 'A model reads the ticket and returns a category and priority as structured fields the next steps can branch on (billing vs bug vs how-to).' },
+      { label: 'Draft response', kind: 'ai', link: '/what-is-rag', detail: 'The model drafts a reply grounded in your help docs via retrieval (RAG), so it cites real articles instead of inventing them.' },
+      { label: 'Human approval', kind: 'human', detail: 'A person reviews the draft before it goes out. The pause that keeps an AI step from sending something wrong to a customer.' },
+      { label: 'Send reply', kind: 'integration', detail: 'Post the approved response back to the ticket and log the outcome, so you can see which categories safely auto-resolve over time.' },
+    ] },
+    { id: 'lead', name: 'Lead Capture', nodes: [
+      { label: 'Form submitted', kind: 'trigger', link: '/webhooks-vs-polling', detail: 'A new form submission (webhook) starts the flow, the lead is captured the instant they hit submit.' },
+      { label: 'Create CRM record', kind: 'integration', detail: 'Write the lead into your CRM first, so there is a single source of truth before any enrichment happens.' },
+      { label: 'Enrich with AI', kind: 'ai', detail: 'A model (often paired with a lookup) infers company size, industry, and intent from the handful of fields the form captured.' },
+      { label: 'Score the lead', kind: 'action', detail: 'Apply your scoring rules to the enriched data. Deterministic, so "hot" means the same thing on every run.' },
+      { label: 'Notify sales', kind: 'integration', detail: 'Drop a Slack message for high-scoring leads so a human follows up while interest is still fresh.' },
+    ] },
+    { id: 'incident', name: 'Incident Alert', nodes: [
+      { label: 'Error event', kind: 'trigger', detail: 'Monitoring catches a problem, a spike, a failed health check, a thrown exception.' },
+      { label: 'Webhook fires', kind: 'trigger', link: '/webhooks-vs-polling', detail: 'The monitor pushes the event to your workflow via webhook, the fastest way to react to something going wrong.' },
+      { label: 'Categorize', kind: 'ai', detail: 'A model (or rules) reads the error and tags severity and likely component, so noise and real incidents are handled differently.' },
+      { label: 'Escalate?', kind: 'action', detail: 'A branch: low severity logs quietly, high severity pages the on-call. One workflow handles both without a human triaging every alert.' },
+      { label: 'Notify the team', kind: 'integration', detail: 'Post to the incident channel (and page on-call if needed) with the context already gathered.' },
+    ] },
+    { id: 'content', name: 'Content Pipeline', nodes: [
+      { label: 'New source item', kind: 'trigger', link: '/cron-generator', detail: 'A scheduled poll (or an RSS feed) checks for new source material, articles, releases, transcripts, to process.' },
+      { label: 'Extract & clean', kind: 'action', detail: 'Strip the content to plain text: remove boilerplate, ads, and markup so the model sees signal, not noise.' },
+      { label: 'Summarize with AI', kind: 'ai', link: '/what-is-rag', detail: 'A model condenses or rewrites the content for your audience. For long sources, chunk it first (the RAG chunking problem).' },
+      { label: 'Review', kind: 'human', detail: 'A person checks the draft for accuracy and tone before anything is published under your name.' },
+      { label: 'Publish', kind: 'integration', detail: 'Push the approved piece to your CMS, newsletter, or social queue. The pipeline turns a firehose of sources into finished output.' },
+    ] },
+  ];
+
+  let bi = 0, ni = 0;
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  function renderPicks() {
+    $('picks').innerHTML = BLUEPRINTS.map((b, i) => `<button class="bp-chip ${i === bi ? 'on' : ''}" data-b="${i}" type="button">${esc(b.name)}</button>`).join('');
+  }
+  function renderFlow() {
+    const nodes = BLUEPRINTS[bi].nodes;
+    $('flow').innerHTML = nodes.map((n, i) => {
+      const node = `<div class="bp-node k-${n.kind} ${i === ni ? 'on' : ''}" data-n="${i}"><span class="bp-n">${i + 1}</span><span class="bp-nm">${esc(n.label)}</span><span class="bp-kind">${KIND[n.kind]}</span></div>`;
+      return node + (i < nodes.length - 1 ? '<div class="bp-arrow"></div>' : '');
+    }).join('');
+  }
+  function renderPanel() {
+    const n = BLUEPRINTS[bi].nodes[ni];
+    const legend = Object.keys(KIND).map(k => `<span><i class="bp-dot" style="background:${KCOLOR[k]}"></i>${KIND[k]}</span>`).join('');
+    $('panel').innerHTML =
+      `<div class="bp-p-kind" style="background:${KCOLOR[n.kind]}22;color:${KCOLOR[n.kind]}">${KIND[n.kind]}</div>` +
+      `<h3 class="bp-p-nm">${esc(n.label)}</h3>` +
+      `<p class="bp-p-detail">${esc(n.detail)}</p>` +
+      (n.link ? `<a class="bp-p-link" href="${n.link}">Learn the concept &rarr;</a>` : '') +
+      `<div class="bp-legend">${legend}</div>`;
+  }
+  function draw() { renderPicks(); renderFlow(); renderPanel(); }
+
+  $('picks').addEventListener('click', (e) => { const b = e.target.closest('[data-b]'); if (!b) return; bi = +b.dataset.b; ni = 0; draw(); });
+  $('flow').addEventListener('click', (e) => { const n = e.target.closest('[data-n]'); if (!n) return; ni = +n.dataset.n; renderFlow(); renderPanel(); });
+  draw();
+</script>

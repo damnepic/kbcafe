@@ -28,6 +28,11 @@ export const TOOL_GRAPH = {
     related: ['/ai-pattern-builder', '/tool-call-visualizer'],
     next: '/ai-pattern-builder',
   },
+  '/automation-blueprints': {
+    learn: ['/what-is-workflow-automation', '/ai-agents-vs-workflows-vs-rpa'],
+    related: ['/cron-generator', '/ai-pattern-explorer'],
+    next: '/what-is-ai-orchestration',
+  },
   '/rag-chunking-visualizer': {
     learn: ['/what-is-rag', '/what-are-embeddings', '/what-is-a-vector-database'],
     related: ['/embedding-explorer', '/context-budget-analyzer'],

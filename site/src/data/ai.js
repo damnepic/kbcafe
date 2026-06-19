@@ -52,6 +52,9 @@ export const AI = [
   { nm: "What is AI orchestration?", href: "/what-is-ai-orchestration", type: "explainer", tag: "Automation",
     ds: "The layer that coordinates models, tools, and data steps into one reliable pipeline, vs a single prompt, workflow, or agent.",
     rel: { prereq: ["/ai-agents-vs-workflows-vs-rpa"], related: ["/what-is-rag", "/what-is-tool-calling"], next: ["/ai-architecture-generator"] } },
+  { nm: "Automation Blueprint Explorer", href: "/automation-blueprints", type: "tool", tag: "Automation",
+    ds: "Five real automation blueprints broken into clickable steps, trigger, action, AI, human, and integration.",
+    rel: { prereq: ["/what-is-workflow-automation"], related: ["/cron-generator", "/ai-pattern-explorer"], next: ["/what-is-ai-orchestration"] } },
 ];
 
 // Titles for graph targets that aren't AI[] entries (hubs).
