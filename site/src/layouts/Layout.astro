@@ -68,7 +68,7 @@ const canonical = new URL(path, Astro.site).href;
 </defs></svg>
 
 <div class="wrap">
-  <nav>
+  <nav class="site-nav">
     <a class="brand" href="/" aria-label="KB Cafe, home">
       <img class="mark" src="/logo.png" width="50" height="50" alt="KB Cafe, a coffee cup with an open book inside" />
       <span class="cf">Cafe</span>
@@ -128,8 +128,8 @@ const canonical = new URL(path, Astro.site).href;
   a{color:inherit}
 
   /* nav (cream header band, full-bleed over the off-white body) */
-  nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:10px 0 9px}
-  nav::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:100vw;
+  .site-nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:10px 0 9px}
+  .site-nav::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:100vw;
     background:var(--header);border-bottom:1px solid var(--line);z-index:-1}
   /* brand lockup: the logo IS the "KB", wordmark is just "Cafe" (per v5 mockup) */
   .brand{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);

@@ -26,7 +26,7 @@ const ICONS = {
 ---
 <aside class={`share ${variant}`} data-share>
   {variant === 'prominent' ? (
-    <div class="share-copy"><strong>Find this tool helpful?</strong><span>Share it with a friend, it&rsquo;s free and runs in the browser.</span></div>
+    <div class="share-copy"><strong>Find this tool helpful?</strong><span><b>Share</b> it with a friend, it&rsquo;s free and runs in the browser. No data <b>ever</b> stored. 100% <b>private</b>.</span></div>
   ) : (
     <span class="share-label">Share</span>
   )}
@@ -49,6 +49,7 @@ const ICONS = {
   .share-copy{display:flex;flex-direction:column;gap:2px}
   .share-copy strong{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink)}
   .share-copy span{font-size:13px;color:var(--ink-soft)}
+  .share-copy span b{font-weight:800;color:var(--ink)}
   .share-label{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
   .share-btns{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .sh{display:grid;place-items:center;border:1.5px solid var(--line);border-radius:11px;background:var(--paper);color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:transform .12s,border-color .12s,color .12s,background .12s}
