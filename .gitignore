@@ -15,6 +15,14 @@ kbcafe-homepage-v*.html
 kbcafe-logo.png
 kbcafe.svg
 kbtrans.png
+# scratch screenshots / loose images at the repo root (real assets live in site/public/)
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
+/*.gif
+/*.bundle
+/*.pdf
 
 # ── build output & deps ────────────────────────────────────────────
 node_modules/
