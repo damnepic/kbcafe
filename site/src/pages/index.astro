@@ -110,9 +110,9 @@ const WORKFLOWS = [
   <!-- TRUST + quick links (centered) -->
   <div class="hero-trust">
     <ul class="proof o-proof">
-      <li><strong>{aiCount}</strong> AI tools</li>
-      <li><strong>{explainerCount}</strong> explainers</li>
-      <li><strong>{WORKFLOWS.length}</strong> learning paths</li>
+      <li><a href="/tools?cat=ai"><strong>{aiCount}</strong> AI tools</a></li>
+      <li><a href="/ai"><strong>{explainerCount}</strong> explainers</a></li>
+      <li><a href="/learn"><strong>{WORKFLOWS.length}</strong> learning paths</a></li>
       <li><strong>100%</strong> client-side, no tracking</li>
     </ul>
     <p class="hero-quick">Not sure where to start? <a href="/search">Search every tool, concept &amp; lesson</a>, <a href="/skill-tree">take the skill tree</a>, or <a href="/tools">browse all {toolCount} tools</a>.</p>
@@ -268,6 +268,9 @@ const WORKFLOWS = [
   .proof li{position:relative;font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--ink-soft);letter-spacing:.01em}
   .proof li+li::before{content:"";position:absolute;left:-12px;top:50%;width:4px;height:4px;border-radius:50%;background:var(--coral);transform:translateY(-50%);opacity:.55}
   .proof strong{color:var(--ink);font-weight:800}
+  .proof a{color:inherit;text-decoration:none;text-underline-offset:3px;transition:color .14s}
+  .proof a:hover{color:var(--coral-deep);text-decoration:underline;text-decoration-color:rgba(238,75,43,.5)}
+  .proof a:hover strong{color:var(--coral-deep)}
 
   /* HERO AI CARD */
   .hero-ai{position:relative;min-height:380px;border-radius:30px;padding:34px;overflow:hidden;text-decoration:none;color:#fff;display:block;
@@ -390,12 +393,14 @@ const WORKFLOWS = [
   .nl-ic{color:var(--gold);border-color:rgba(244,180,35,.22)}
   .nl-card h3{display:flex;align-items:center;gap:8px}
   .nl-cup{font-size:16px}
-  .gh-card{display:grid;grid-template-columns:48px 1fr;gap:16px;align-items:center;text-decoration:none;transition:transform .16s,box-shadow .16s;
-    background:
-      radial-gradient(circle at 90% 18%,rgba(244,180,35,.20),transparent 46%),
-      radial-gradient(circle at 8% 110%,rgba(111,78,55,.42),transparent 56%),
-      linear-gradient(135deg,#26180f,#17100b)}
-  .gh-card:hover{transform:translateY(-3px);box-shadow:0 26px 56px rgba(16,17,18,.22)}
+  /* GitHub card: light cream with a dark outline (secondary CTA; keeps the page airy) */
+  .gh-card{display:grid;grid-template-columns:48px 1fr;gap:16px;align-items:center;text-decoration:none;color:var(--ink);
+    background:var(--cream);border:1.6px solid var(--ink);box-shadow:0 8px 24px rgba(40,24,12,.06);
+    transition:transform .16s,box-shadow .16s}
+  .gh-card:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(40,24,12,.12)}
+  .cta .gh-card h3{color:var(--ink)}
+  .cta .gh-card p{color:var(--ink-soft)}
+  .gh-card .gh-ic{background:var(--ink);border-color:var(--ink);color:var(--gold)}
   .nl-ic,.gh-ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--gold)}
   .nl-ic svg,.gh-ic svg{width:24px;height:24px}
   .nl-card h3,.gh-card h3{font-family:var(--font-display);font-weight:800;margin:0 0 5px;font-size:18px}
