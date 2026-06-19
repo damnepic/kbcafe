@@ -64,6 +64,10 @@ const WORKFLOWS = [
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 6S9 4 4 4v13c5 0 8 2 8 2s3-2 8-2V4c-5 0-8 2-8 2Z"/><path d="M12 6v15"/></svg>`,
     blurb: 'Context windows, tokens, embeddings, RAG. The infrastructure behind every AI feature.',
     tools: [['Token Counter', '/token-counter'], ['Context Budget Analyzer', '/context-budget-analyzer'], ['Agent Memory Simulator', '/agent-memory-simulator'], ['Context Window Visualizer', '/context-window-visualizer']] },
+  { title: 'Automate work', path: '/learn-ai-automation', accent: '#e0911a',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="14.5" y="13.5" width="6.5" height="6.5" rx="1.5"/><path d="M9.5 7.25h4.3a2 2 0 0 1 2 2v4.3"/></svg>`,
+    blurb: 'Connect triggers, schedules, tools, and AI into workflows that run themselves.',
+    tools: [['Blueprint Explorer', '/automation-blueprints'], ['Cron Generator', '/cron-generator'], ['Agents vs Workflows', '/ai-agents-vs-workflows-vs-rpa'], ['Webhooks vs Polling', '/webhooks-vs-polling']] },
 ];
 ---
 <Layout
@@ -76,7 +80,7 @@ const WORKFLOWS = [
   <section class="hero-o">
     <div class="eyebrow">✦ The interactive AI knowledge base</div>
     <h1 class="hero-q">What are you trying to do with AI?</h1>
-    <p class="o-sub">Pick a goal. KB Cafe turns it into a guided path through clear explainers, hands-on tools, and developer references, all running in your browser. Nothing uploaded, nothing tracked.</p>
+    <p class="o-sub">Learn prompting, agents, automation, MCP, RAG, and the systems powering modern AI, with clear explainers and hands-on tools that run entirely in your browser. Nothing uploaded, nothing tracked.</p>
     <div class="o-grid">
       {WORKFLOWS.map(w => (
         <a class="o-card" href={w.path} style={`--ac:${w.accent}`}>
@@ -224,9 +228,9 @@ const WORKFLOWS = [
   .hero-o{margin:40px 0 0;text-align:center}
   .hero-q{font-family:var(--font-display);font-weight:700;font-size:clamp(27px,3.5vw,45px);line-height:1.05;letter-spacing:-.035em;color:var(--ink);white-space:nowrap}
   .o-sub{color:var(--ink-soft);font-size:17.5px;line-height:1.55;margin:18px auto 28px;max-width:780px}
-  .o-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:left}
+  .o-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;text-align:left}
   .o-card{position:relative;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);text-align:left;
-    background:var(--cream);border:1.2px solid var(--line);border-radius:20px;padding:22px;
+    background:var(--cream);border:1.2px solid var(--line);border-radius:18px;padding:19px;
     box-shadow:0 8px 24px rgba(40,24,12,.05);transition:transform .16s,box-shadow .16s,border-color .16s}
   .o-card:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(40,24,12,.1);border-color:var(--ac)}
   .o-head{display:flex;align-items:center;gap:12px;margin-bottom:13px}
@@ -244,7 +248,8 @@ const WORKFLOWS = [
   .hero-quick a{color:var(--coral);font-weight:600;text-decoration:none}
   .hero-quick a:hover{text-decoration:underline}
   @media(max-width:920px){.hero-q{white-space:normal}}
-  @media(max-width:760px){.o-grid{grid-template-columns:1fr}}
+  @media(max-width:1020px){.o-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.o-grid{grid-template-columns:1fr}}
 
   /* HERO (legacy two-col, retained for reference) */
   .hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr);gap:54px;align-items:center;margin:50px 0 0}
