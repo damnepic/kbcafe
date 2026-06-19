@@ -40,19 +40,19 @@ import ToolPage from '../layouts/ToolPage.astro';
     <h3>Notes that trip people up</h3>
     <ul>
       <li><strong>JSON is valid YAML.</strong> YAML is a superset, which is why a <code>.json</code> file usually parses as YAML too.</li>
-      <li><strong>Types matter.</strong> Unquoted <code>yes</code>, <code>no</code>, <code>on</code>, <code>off</code>, and bare numbers become booleans/numbers. Quote them if you meant strings.</li>
+      <li><strong>Types matter.</strong> Unquoted <code>true</code>/<code>false</code> and bare numbers become booleans/numbers. This parser follows YAML 1.2, so <code>yes</code>, <code>no</code>, <code>on</code>, <code>off</code> stay <em>strings</em> (unlike YAML 1.1). Quote anything you want kept as text.</li>
       <li><strong>Indentation is structure</strong> in YAML, tabs are not allowed for indentation; use spaces.</li>
     </ul>
 
     <h2>FAQ</h2>
     <details class="faq"><summary>Does it support all YAML features?</summary>
-      <p>It uses a complete YAML 1.1 parser, so anchors/aliases, block and flow styles, multi-line scalars, and typed values are all handled.</p>
+      <p>It uses a complete YAML 1.2 parser (js-yaml), so anchors/aliases, block and flow styles, multi-line scalars, and typed values are all handled.</p>
     </details>
     <details class="faq"><summary>Is my config uploaded?</summary>
       <p>No, conversion runs entirely in your browser, so secrets in a config stay local and the tool works offline.</p>
     </details>
-    <details class="faq"><summary>Why did my <code>on:</code> key become <code>true</code>?</summary>
-      <p>YAML reads bare <code>on</code>/<code>off</code>/<code>yes</code>/<code>no</code> as booleans. Wrap them in quotes (<code>"on"</code>) to keep them as strings, a classic gotcha in GitHub Actions files.</p>
+    <details class="faq"><summary>Is my <code>on:</code> value a boolean or a string?</summary>
+      <p>This parser follows <strong>YAML 1.2</strong>, where only <code>true</code>/<code>false</code> are booleans, bare <code>on</code>/<code>off</code>/<code>yes</code>/<code>no</code> stay strings. YAML 1.1 (and tools like GitHub Actions) treat them as booleans, which is a classic source of confusion. Write <code>true</code>/<code>false</code> when you need an actual boolean.</p>
     </details>
 
     <h3>Related</h3>

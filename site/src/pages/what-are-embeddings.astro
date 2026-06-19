@@ -39,8 +39,8 @@ import AiPage from '../layouts/AiPage.astro';
   <h2>How similarity is measured</h2>
   <p>
     Once content is vectors, &ldquo;similar&rdquo; becomes a distance you can compute. The most common
-    measure is <strong>cosine similarity</strong>: the angle between two vectors (1.0 means identical
-    direction, 0 means unrelated). <strong>Dot product</strong> and <strong>Euclidean distance</strong> are
+    measure is <strong>cosine similarity</strong>: the cosine of the angle between two vectors (1.0 means
+    identical direction, 0 means unrelated). <strong>Dot product</strong> and <strong>Euclidean distance</strong> are
     also used. To find the best matches for a query, you embed the query the same way and look for its
     <strong>nearest neighbors</strong> in the vector space.
   </p>

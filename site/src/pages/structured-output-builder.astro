@@ -47,8 +47,9 @@ import ToolPage from '../layouts/ToolPage.astro';
       <li><strong>Anthropic</strong>: a tool whose <code>input_schema</code> is your schema (the model &ldquo;calls&rdquo; it with the data).</li>
       <li><strong>Gemini</strong>: a <code>responseSchema</code> (uppercase OpenAPI types) plus <code>responseMimeType</code>.</li>
     </ul>
-    <p class="note">Tip for OpenAI strict mode: it expects <em>every</em> property to be listed as required. For a
-      genuinely optional field, make its type nullable rather than dropping it from <code>required</code>.</p>
+    <p class="note">Tip for OpenAI strict mode: it expects <em>every</em> property to be listed as required. This builder
+      handles that for you, any field you leave unchecked is emitted as nullable (<code>["type", "null"]</code>) in the OpenAI tab,
+      which keeps the schema valid instead of dropping it from <code>required</code>.</p>
 
     <h3>Field types</h3>
     <p>string, number, integer, boolean, an <strong>enum</strong> (comma-separated values → a closed set),
@@ -167,13 +168,26 @@ import ToolPage from '../layouts/ToolPage.astro';
     }
     return s;
   }
+  // OpenAI strict mode requires EVERY property in `required`; optional fields are expressed as nullable instead.
+  function toOpenAIStrict(schema){
+    const req = new Set(schema.required || []);
+    const properties = {};
+    for(const [k,v] of Object.entries(schema.properties)){
+      if(req.has(k)){ properties[k] = v; continue; }
+      const t = v.type;
+      const nv = { ...v, type: Array.isArray(t) ? (t.includes('null') ? t : [...t,'null']) : [t,'null'] };
+      if(Array.isArray(nv.enum) && !nv.enum.includes(null)) nv.enum = [...nv.enum, null];
+      properties[k] = nv;
+    }
+    return { type:'object', properties, required: Object.keys(schema.properties), additionalProperties:false };
+  }
   function regen(){
     const schema = buildSchema();
     const name = ($('root').value || 'extracted_data').trim();
     const desc = $('desc').value.trim();
     let out;
     if(tab === 'jsonschema') out = schema;
-    else if(tab === 'openai') out = { type:'json_schema', json_schema: { name, ...(desc?{description:desc}:{}), strict:true, schema } };
+    else if(tab === 'openai') out = { type:'json_schema', json_schema: { name, ...(desc?{description:desc}:{}), strict:true, schema: toOpenAIStrict(schema) } };
     else if(tab === 'anthropic') out = { name, ...(desc?{description:desc}:{}), input_schema: schema };
     else out = { responseMimeType:'application/json', responseSchema: toGemini(schema) };
     $('out').value = JSON.stringify(out, null, 2);

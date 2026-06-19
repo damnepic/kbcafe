@@ -86,7 +86,7 @@ import ToolPage from '../layouts/ToolPage.astro';
   const inEl = $('in'), outEl = $('out'), statusEl = $('status');
   let mode = 'encode';
   const SAMPLE_TEXT = 'KB Cafe ☕, knowledge base, freshly brewed.';
-  const SAMPLE_B64 = 'S0IgQ2FmZSAtIGtub3dsZWRnZSBiYXNlLCBmcmVzaGx5IGJyZXdlZC4=';
+  const SAMPLE_B64 = 'S0IgQ2FmZSDimJUsIGtub3dsZWRnZSBiYXNlLCBmcmVzaGx5IGJyZXdlZC4=';
 
   function toUrlSafe(s){ return s.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
   function fromUrlSafe(s){ s = s.replace(/-/g, '+').replace(/_/g, '/'); while(s.length % 4) s += '='; return s; }

@@ -153,7 +153,9 @@ import ToolPage from '../layouts/ToolPage.astro';
     });
     return joinList(parts);
   }
-  function ordinalStep(n){ return n === 1 ? 'unit' : n + (n===2?'nd':n===3?'rd':'th'); }
+  function ordSuffix(n){ const t = n % 100; if(t >= 11 && t <= 13) return 'th'; return ({1:'st',2:'nd',3:'rd'})[n % 10] || 'th'; }
+  function ordinal(n){ return n + ordSuffix(n); }
+  function ordinalStep(n){ return n === 1 ? 'unit' : ordinal(n); }
   function joinList(a){ return a.length <= 1 ? a[0] : a.slice(0,-1).join(', ') + ' and ' + a[a.length-1]; }
   function pad(n){ return String(n).padStart(2,'0'); }
 
@@ -173,8 +175,8 @@ import ToolPage from '../layouts/ToolPage.astro';
     const dowStr = describeField(dow, 4, DOW);
 
     let dayPart = '';
-    if(domStr && dowStr) dayPart = ` on day-of-month ${domStr} <b>and</b> on ${dowStr}`;
-    else if(domStr) dayPart = ` on the ${domStr}${/^\d+$/.test(dom)?'th':''} of the month`;
+    if(domStr && dowStr) dayPart = ` on day-of-month ${domStr} <b>or</b> on ${dowStr}`;
+    else if(domStr) dayPart = /^\d+$/.test(dom) ? ` on the ${ordinal(+dom)} of the month` : ` on day-of-month ${domStr}`;
     else if(dowStr) dayPart = ` on <b>${dowStr}</b>`;
     const monPart = monStr ? ` in ${monStr}` : '';
     return `Runs ${timePart}${dayPart}${monPart}.`;

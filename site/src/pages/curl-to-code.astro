@@ -105,7 +105,8 @@ import ToolPage from '../layouts/ToolPage.astro';
     if(!r.method) r.method = (r.data != null) ? 'POST' : 'GET';
     return r;
   }
-  function headerObj(r){ const o = {}; r.headers.forEach(h => { const idx = h.indexOf(':'); if(idx > 0) o[h.slice(0, idx).trim()] = h.slice(idx + 1).trim(); }); if(r.auth) o['Authorization'] = 'Basic <base64 ' + r.auth + '>'; return o; }
+  const b64 = s => btoa(unescape(encodeURIComponent(String(s))));
+  function headerObj(r){ const o = {}; r.headers.forEach(h => { const idx = h.indexOf(':'); if(idx > 0) o[h.slice(0, idx).trim()] = h.slice(idx + 1).trim(); }); if(r.auth) o['Authorization'] = 'Basic ' + b64(r.auth); return o; }
   function isJSON(r){ const o = headerObj(r); const ct = Object.keys(o).find(k => k.toLowerCase() === 'content-type'); return ct && /json/i.test(o[ct]) && r.data; }
   const q = s => "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
   const ind = (o, n) => JSON.stringify(o, null, 2).split('\n').map((l, i) => i ? ' '.repeat(n) + l : l).join('\n');

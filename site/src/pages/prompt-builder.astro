@@ -104,7 +104,8 @@ import ToolPage from '../layouts/ToolPage.astro';
     const tone = $('tone').value, length = $('length').value, format = $('format').value, extra = $('extra').value.trim();
     const none = (v) => !v || v.startsWith('(');
 
-    let p = `You are an ${role}.`;
+    const article = /^[aeiou]/i.test(role.trim()) ? 'an' : 'a';
+    let p = `You are ${article} ${role}.`;
     p += ` ${task} ${subject || '[describe what you want]'}`;
     if (audience) p += ` for ${audience}`;
     p += '.';

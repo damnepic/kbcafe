@@ -15,7 +15,10 @@ import AiPage from '../layouts/AiPage.astro';
     chatty preamble, a markdown <code>```json</code> fence, a trailing comma, or a field renamed on a whim.
     Then your parser throws and you&rsquo;re writing fragile regex to clean it up. <strong>Structured
     outputs</strong> fix this at the source: you give the model a <strong>schema</strong>, and the API
-    constrains generation so the result <em>always</em> conforms, right field names, right types, valid JSON.
+    constrains generation to it, right field names, right types, valid JSON. With true constrained
+    decoding (OpenAI <code>strict</code>, Gemini <code>responseSchema</code>) the structure is enforced;
+    Anthropic&rsquo;s tool-schema approach steers strongly but isn&rsquo;t hard-constrained, and any
+    provider can still truncate at the token limit and cut a response short.
   </p>
 
   <h2>JSON mode vs structured outputs</h2>
@@ -44,7 +47,7 @@ import AiPage from '../layouts/AiPage.astro';
 
   <h2>Why it matters</h2>
   <ul>
-    <li><strong>Reliable parsing.</strong> No defensive string-munging; the shape is guaranteed.</li>
+    <li><strong>Reliable parsing.</strong> No defensive string-munging; with constrained decoding the shape is enforced (barring truncation).</li>
     <li><strong>Fewer retries.</strong> You stop re-prompting because the JSON came back malformed.</li>
     <li><strong>It powers real features.</strong> Data extraction, classification, form-filling, and
       <a href="/what-is-tool-calling">tool-call arguments</a> are all structured-output problems.</li>
