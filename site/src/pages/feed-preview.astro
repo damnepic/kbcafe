@@ -1,0 +1,155 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Feed Preview, read any RSS or Atom feed as a clean list | KB Cafe"
+  description="Paste an RSS or Atom feed and read it as a clean, human-friendly list, titles, dates, and summaries. Fully client-side, nothing uploaded."
+  path="/feed-preview"
+  eyebrow="Feeds"
+  h1="Feed Preview"
+  tagline="Paste an RSS or Atom feed and read it the way a reader would, a clean list of titles, dates, and summaries. Runs entirely in your browser."
+>
+  <div class="pane" style="margin-bottom:14px">
+    <div class="pane-label"><span>Feed XML</span><button class="link-btn" id="sample" type="button">load sample</button></div>
+    <textarea id="in" class="ta" style="min-height:150px" spellcheck="false" placeholder="Paste RSS or Atom XML here…"></textarea>
+  </div>
+  <p id="status" class="status"></p>
+  <div id="preview" class="fp"></div>
+
+  <Fragment slot="explainer">
+    <h2>See a feed the way a reader does</h2>
+    <p>
+      Raw feed XML is hard to skim. Paste it here and this tool parses it in your browser, detects
+      <strong>RSS 2.0</strong> or <strong>Atom</strong>, and lays it out as a clean reading list: the feed&rsquo;s
+      title and description up top, then each item with its title (linked), date, categories, and a plain-text
+      summary. Handy for sanity-checking a feed you just generated.
+    </p>
+    <h3>Notes</h3>
+    <ul>
+      <li>Summaries are shown as <strong>plain text</strong> (HTML stripped), so a feed you paste can&rsquo;t run any
+        markup in the page, it stays safe and readable.</li>
+      <li>Need the data instead of a preview? Use <a href="/rss-to-json">RSS → JSON</a>. Checking a feed is valid?
+        Use the <a href="/rss-validator">RSS / Atom Validator</a>.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Why paste XML instead of a URL?</summary>
+      <p>Browsers block reading most cross-origin URLs (CORS), so a client-side tool can&rsquo;t fetch an arbitrary
+        feed. Use <em>View Source</em> on the feed and paste the XML, everything then stays local and private.</p>
+    </details>
+  </Fragment>
+</ToolPage>
+
+<style is:global> /* JS-created preview items need unscoped CSS, see context-budget-analyzer */
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+  .fp{margin-top:8px}
+  .fp-head{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin-bottom:14px}
+  .fp-type{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+  .fp-ftitle{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.02em;margin:6px 0 4px}
+  .fp-ftitle a{color:var(--ink);text-decoration:none}.fp-ftitle a:hover{color:var(--coral)}
+  .fp-fdesc{font-size:13.5px;color:var(--ink-soft);line-height:1.45}
+  .fp-list{display:flex;flex-direction:column;gap:10px}
+  .fp-item{border:1.2px solid var(--line);border-radius:13px;background:var(--cream);padding:14px 16px;transition:border-color .14s,box-shadow .14s}
+  .fp-item:hover{border-color:rgba(238,75,43,.35);box-shadow:0 10px 26px rgba(40,24,12,.06)}
+  .fp-title{font-family:var(--font-display);font-weight:800;font-size:16.5px;letter-spacing:-.01em;line-height:1.3;color:var(--ink);text-decoration:none}
+  .fp-title:hover{color:var(--coral)}
+  .fp-meta{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:6px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft)}
+  .fp-cat{background:var(--paper-2);border-radius:999px;padding:2px 9px}
+  .fp-sum{margin:9px 0 0;font-size:14px;line-height:1.55;color:var(--ink-soft)}
+  .fp-empty{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);text-align:center;padding:24px 0}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const inEl = $('in'), statusEl = $('status'), box = $('preview');
+
+  const SAMPLE = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>KB Cafe</title>
+    <link>https://kbcafe.com/</link>
+    <description>Tools, references, and an interactive AI knowledge base, freshly brewed.</description>
+    <item>
+      <title>Feeds for Machines: RSS as the Structured Layer for AI</title>
+      <link>https://kbcafe.com/blog/rss-and-ai</link>
+      <pubDate>Tue, 16 Jun 2026 12:00:00 GMT</pubDate>
+      <category>AI</category>
+      <description>LLMs are starving for clean, structured, permissioned content.</description>
+    </item>
+    <item>
+      <title>The Return of KB Cafe</title>
+      <link>https://kbcafe.com/blog/the-return-of-kb-cafe</link>
+      <pubDate>Thu, 18 Jun 2026 12:00:00 GMT</pubDate>
+      <category>News</category>
+      <description>kbcafe.com was a go-to developer resource in the early 2000s.</description>
+    </item>
+  </channel>
+</rss>`;
+
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const stripHtml = (s) => { const d = document.createElement('div'); d.innerHTML = s; return (d.textContent || '').trim(); };
+  const txt = (n, sel) => { const e = n && n.querySelector(sel); return e ? e.textContent.trim() : ''; };
+  const atomLink = (n) => {
+    const links = [...n.querySelectorAll(':scope > link')];
+    const alt = links.find(l => l.getAttribute('rel') === 'alternate') || links.find(l => !l.getAttribute('rel')) || links[0];
+    return alt ? (alt.getAttribute('href') || '') : '';
+  };
+  const fmtDate = (s) => { if (!s) return ''; const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }); };
+
+  function parseFeed(xml) {
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const perr = doc.querySelector('parsererror');
+    if (perr) throw new Error('Not well-formed XML: ' + (perr.textContent || '').split('\n')[0]);
+    const channel = doc.querySelector('rss > channel') || doc.querySelector('channel');
+    const feed = doc.querySelector('feed');
+    if (channel) {
+      const items = [...channel.querySelectorAll(':scope > item')].map(it => ({
+        title: txt(it, 'title'), link: txt(it, 'link'), date: txt(it, 'pubDate'),
+        categories: [...it.querySelectorAll('category')].map(c => c.textContent.trim()).filter(Boolean),
+        summary: stripHtml(txt(it, 'description')),
+      }));
+      return { type: 'RSS 2.0', title: txt(channel, 'title'), link: txt(channel, 'link'), description: txt(channel, 'description'), items };
+    }
+    if (feed) {
+      const items = [...feed.querySelectorAll(':scope > entry')].map(en => ({
+        title: txt(en, 'title'), link: atomLink(en), date: txt(en, 'updated') || txt(en, 'published'),
+        categories: [...en.querySelectorAll('category')].map(c => c.getAttribute('term')).filter(Boolean),
+        summary: stripHtml(txt(en, 'summary') || txt(en, 'content')),
+      }));
+      return { type: 'Atom', title: txt(feed, 'title'), link: atomLink(feed), description: txt(feed, 'subtitle'), items };
+    }
+    throw new Error('No <channel> (RSS) or <feed> (Atom) element found.');
+  }
+
+  function clamp(s, n) { return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, '') + '…' : s; }
+
+  function render() {
+    const raw = inEl.value.trim();
+    statusEl.className = 'status'; statusEl.textContent = ''; inEl.classList.remove('err'); box.innerHTML = '';
+    if (!raw) return;
+    let f;
+    try { f = parseFeed(raw); }
+    catch (e) { inEl.classList.add('err'); statusEl.className = 'status bad'; statusEl.textContent = e.message; return; }
+
+    statusEl.className = 'status ok'; statusEl.textContent = `${f.type} · ${f.items.length} item${f.items.length !== 1 ? 's' : ''}`;
+    const titleEl = f.link ? `<a href="${esc(f.link)}" target="_blank" rel="noopener noreferrer nofollow">${esc(f.title || 'Untitled feed')}</a>` : esc(f.title || 'Untitled feed');
+    let html = `<div class="fp-head"><div class="fp-type">${f.type}</div><div class="fp-ftitle">${titleEl}</div>${f.description ? `<div class="fp-fdesc">${esc(f.description)}</div>` : ''}</div>`;
+    if (!f.items.length) { html += `<div class="fp-empty">No items in this feed.</div>`; }
+    else {
+      html += '<div class="fp-list">' + f.items.map(it => {
+        const t = esc(it.title || '(untitled)');
+        const titleHtml = it.link ? `<a class="fp-title" href="${esc(it.link)}" target="_blank" rel="noopener noreferrer nofollow">${t}</a>` : `<span class="fp-title">${t}</span>`;
+        const meta = [];
+        if (it.date) meta.push(`<span>${esc(fmtDate(it.date))}</span>`);
+        it.categories.slice(0, 4).forEach(c => meta.push(`<span class="fp-cat">${esc(c)}</span>`));
+        return `<div class="fp-item">${titleHtml}${meta.length ? `<div class="fp-meta">${meta.join('')}</div>` : ''}${it.summary ? `<p class="fp-sum">${esc(clamp(it.summary, 280))}</p>` : ''}</div>`;
+      }).join('') + '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  inEl.addEventListener('input', render);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; render(); });
+  inEl.value = SAMPLE; render();
+</script>

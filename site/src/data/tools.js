@@ -38,4 +38,6 @@ export const TOOLS = [
   { cat:"text",     ctl:"Text",        nm:"case converter",    ds:"camelCase, snake_case, kebab, PascalCase.",       color:"c-cream", href:"/case-converter" },
   { cat:"feeds",    ctl:"Feeds",       nm:"rss validator",     ds:"Check any feed against the spec.",                color:"c-gold", heritage:true, href:"/rss-validator" },
   { cat:"feeds",    ctl:"Feeds",       nm:"opml converter",    ds:"Import, view & convert OPML subscription lists.",  color:"c-ink",   heritage:true, href:"/opml-converter" },
+  { cat:"feeds",    ctl:"Feeds",       nm:"rss to json",       ds:"Turn any RSS or Atom feed into clean JSON.",       color:"c-coral", heritage:true, href:"/rss-to-json" },
+  { cat:"feeds",    ctl:"Feeds",       nm:"feed preview",      ds:"Read any feed as a clean, human-friendly list.",   color:"c-green", heritage:true, href:"/feed-preview" },
 ];

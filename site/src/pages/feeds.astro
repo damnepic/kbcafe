@@ -5,10 +5,10 @@ import Layout from '../layouts/Layout.astro';
 // landing for the aged /rss/, /Rmail, and /juice backlink equity. Tools ship over time;
 // the page is a real, content-bearing 200 from day one so the link equity lands well.
 const tools = [
-  { nm: 'RSS / Atom validator', ds: 'Check any feed against the RSS 2.0 and Atom specs, see exactly what is malformed and where.', soon: true },
-  { nm: 'OPML converter', ds: 'Import, view, and convert OPML subscription lists to and from JSON.', soon: true },
-  { nm: 'RSS → JSON', ds: 'Turn any feed into clean JSON for your app, no server round-trip.', soon: true },
-  { nm: 'Feed preview', ds: 'Paste a feed URL or XML and read it as a clean, human-friendly list.', soon: true },
+  { nm: 'RSS / Atom validator', ds: 'Check any feed against the RSS 2.0 and Atom specs, see exactly what is malformed and where.', href: '/rss-validator' },
+  { nm: 'OPML converter', ds: 'Import, view, and convert OPML subscription lists to and from JSON.', href: '/opml-converter' },
+  { nm: 'RSS → JSON', ds: 'Turn any feed into clean JSON for your app, no server round-trip.', href: '/rss-to-json' },
+  { nm: 'Feed preview', ds: 'Paste a feed and read it as a clean, human-friendly list.', href: '/feed-preview' },
 ];
 ---
 <Layout
@@ -25,14 +25,19 @@ const tools = [
       JSON. Everything runs in your browser: paste a feed and nothing is uploaded.
     </p>
 
+    <a class="subscribe" href="/feed.xml">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="18" r="2.3"/><path d="M4 11a9 9 0 0 1 9 9h-3A6 6 0 0 0 4 14v-3Z"/><path d="M4 5a15 15 0 0 1 15 15h-3A12 12 0 0 0 4 8V5Z"/></svg>
+      <span><strong>Subscribe to the KB Cafe feed</strong>: new tools, courses, and posts delivered to your reader.</span>
+    </a>
+
     <div class="grid">
       {tools.map(t => (
-        <div class="card">
+        <a class="card" href={t.href}>
           <div class="ct">Feeds</div>
           <div class="nm">{t.nm}</div>
           <div class="ds">{t.ds}</div>
-          <div class="dm">{t.soon ? 'soon on the menu' : 'kbcafe.com'}</div>
-        </div>
+          <div class="dm">open →</div>
+        </a>
       ))}
     </div>
 
@@ -60,12 +65,13 @@ const tools = [
         once the page has loaded.
       </p>
 
-      <h3>On the way</h3>
+      <h3>All four are live</h3>
       <p>
-        The validator, OPML converter, RSS-to-JSON, and feed preview tools are being built in the
-        order above. In the meantime, browse the <a href="/#menu">full menu of tools</a>, including
-        the <a href="/json-to-typescript">JSON → TypeScript</a> converter, which pairs well with the
-        coming RSS-to-JSON output.
+        The <a href="/rss-validator">validator</a>, <a href="/opml-converter">OPML converter</a>,
+        <a href="/rss-to-json">RSS → JSON</a>, and <a href="/feed-preview">feed preview</a> tools are all
+        shipped and client-side. And KB Cafe now publishes its <a href="/feed.xml">own feed</a>, so you can
+        follow new tools, courses, and posts in any reader, or read them on <a href="/whats-new">What&rsquo;s New</a>.
+        The <a href="/json-to-typescript">JSON → TypeScript</a> converter pairs well with the RSS → JSON output.
       </p>
     </div>
   </section>
@@ -80,12 +86,21 @@ const tools = [
     background-repeat:no-repeat;background-position:center bottom;background-size:100% .2em}
   .lede{margin-top:22px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:640px}
 
-  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:34px 0 10px}
-  .card{background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:18px 18px 16px;opacity:.92}
+  .subscribe{display:flex;align-items:center;gap:12px;margin-top:26px;padding:14px 18px;border-radius:14px;
+    background:rgba(244,180,35,.13);border:1.2px solid rgba(244,132,42,.3);text-decoration:none;color:var(--ink);transition:background .14s}
+  .subscribe:hover{background:rgba(244,180,35,.22)}
+  .subscribe svg{width:20px;height:20px;color:#c2540b;flex-shrink:0}
+  .subscribe span{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+  .subscribe strong{color:var(--ink);font-weight:700}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:18px 0 10px}
+  .card{display:block;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:18px 18px 16px;
+    text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(40,24,12,.09);border-color:rgba(238,75,43,.35)}
   .card .ct{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--coral)}
-  .card .nm{font-family:var(--font-mono);font-weight:700;font-size:17px;margin:11px 0 7px}
+  .card .nm{font-family:var(--font-mono);font-weight:700;font-size:17px;margin:11px 0 7px;color:var(--ink)}
   .card .ds{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
-  .card .dm{font-family:var(--font-mono);font-size:10.5px;margin-top:12px;opacity:.6}
+  .card .dm{font-family:var(--font-mono);font-size:11px;margin-top:12px;color:var(--coral);font-weight:700}
 
   .prose{max-width:720px;padding:30px 0 8px;border-top:1px solid var(--line);margin-top:34px}
   .prose h2{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:-.02em;margin:26px 0 12px}

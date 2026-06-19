@@ -1,0 +1,140 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="RSS to JSON, convert any feed to clean JSON | KB Cafe"
+  description="Paste an RSS or Atom feed and get clean, structured JSON, channel info and every item. Fully client-side, nothing uploaded, works offline."
+  path="/rss-to-json"
+  eyebrow="Feeds"
+  h1="RSS → JSON"
+  tagline="Paste an RSS or Atom feed and turn it into clean, structured JSON, no server round-trip. Everything runs in your browser."
+>
+  <div class="pane" style="margin-bottom:14px">
+    <div class="pane-label"><span>Feed XML</span><button class="link-btn" id="sample" type="button">load sample</button></div>
+    <textarea id="in" class="ta" style="min-height:170px" spellcheck="false" placeholder="Paste RSS or Atom XML here…"></textarea>
+  </div>
+  <div class="pane">
+    <div class="pane-label"><span>JSON</span><button class="link-btn" id="copy" type="button">copy</button></div>
+    <textarea id="out" class="ta" style="min-height:220px;background:var(--paper-2)" readonly spellcheck="false"></textarea>
+  </div>
+  <p id="status" class="status"></p>
+
+  <Fragment slot="explainer">
+    <h2>A feed, as data your app can use</h2>
+    <p>
+      RSS and Atom are XML, which is awkward to work with in a JavaScript app. This tool parses the feed in your
+      browser, detects whether it&rsquo;s <strong>RSS 2.0</strong> or <strong>Atom</strong>, and returns a clean,
+      predictable JSON shape: the channel/feed metadata plus an <code>items</code> array with title, link, date,
+      author, categories, and description for each entry.
+    </p>
+    <h3>The shape you get</h3>
+    <ul>
+      <li><strong>type</strong>: <code>"RSS 2.0"</code> or <code>"Atom"</code>, so you can branch if you need to.</li>
+      <li><strong>title / link / description</strong>: the channel (RSS) or feed (Atom) header.</li>
+      <li><strong>items</strong>: each post, with <code>link</code> resolved from <code>&lt;link&gt;</code> (RSS) or the
+        alternate <code>href</code> (Atom), and the date from <code>pubDate</code> / <code>updated</code>.</li>
+    </ul>
+    <p>Pairs well with <a href="/json-to-typescript">JSON → TypeScript</a> if you want typed feed data.</p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Can I paste a feed URL instead of XML?</summary>
+      <p>No, browsers block reading most cross-origin URLs (CORS), so a purely client-side tool can&rsquo;t fetch an
+        arbitrary feed. Open the feed and use <em>View Source</em>, or paste the XML you already have. Everything then
+        stays local and private.</p>
+    </details>
+    <details class="faq"><summary>Is my feed uploaded anywhere?</summary>
+      <p>No, parsing happens entirely in your browser. The feed you paste never leaves your machine, and the tool keeps
+        working offline once loaded.</p>
+    </details>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const inEl = $('in'), outEl = $('out'), statusEl = $('status');
+
+  const SAMPLE = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>KB Cafe</title>
+    <link>https://kbcafe.com/</link>
+    <description>Tools, references, and an interactive AI knowledge base.</description>
+    <item>
+      <title>RSS Didn't Die, The Open Web Just Got Quiet</title>
+      <link>https://kbcafe.com/blog/rss-and-the-open-web-in-2026</link>
+      <pubDate>Wed, 17 Jun 2026 12:00:00 GMT</pubDate>
+      <category>Open Web</category>
+      <description>Everyone declared RSS dead a decade ago.</description>
+    </item>
+  </channel>
+</rss>`;
+
+  const txt = (n, sel) => { const e = n && n.querySelector(sel); return e ? e.textContent.trim() : ''; };
+  const atomLink = (n) => {
+    const links = [...n.querySelectorAll(':scope > link')];
+    const alt = links.find(l => l.getAttribute('rel') === 'alternate') || links.find(l => !l.getAttribute('rel')) || links[0];
+    return alt ? (alt.getAttribute('href') || '') : '';
+  };
+
+  function parseFeed(xml) {
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const perr = doc.querySelector('parsererror');
+    if (perr) throw new Error('Not well-formed XML: ' + (perr.textContent || '').split('\n')[0]);
+    const channel = doc.querySelector('rss > channel') || doc.querySelector('channel');
+    const feed = doc.querySelector('feed');
+
+    if (channel) {
+      const items = [...channel.querySelectorAll(':scope > item')].map(it => ({
+        title: txt(it, 'title'),
+        link: txt(it, 'link'),
+        pubDate: txt(it, 'pubDate'),
+        guid: txt(it, 'guid'),
+        author: txt(it, 'author'),
+        categories: [...it.querySelectorAll('category')].map(c => c.textContent.trim()).filter(Boolean),
+        description: txt(it, 'description'),
+      }));
+      return { type: 'RSS 2.0', title: txt(channel, 'title'), link: txt(channel, 'link'), description: txt(channel, 'description'), items };
+    }
+    if (feed) {
+      const entries = [...feed.querySelectorAll(':scope > entry')].map(en => ({
+        title: txt(en, 'title'),
+        link: atomLink(en),
+        updated: txt(en, 'updated') || txt(en, 'published'),
+        id: txt(en, 'id'),
+        author: txt(en, 'author > name'),
+        categories: [...en.querySelectorAll('category')].map(c => c.getAttribute('term')).filter(Boolean),
+        summary: txt(en, 'summary') || txt(en, 'content'),
+      }));
+      return { type: 'Atom', title: txt(feed, 'title'), link: atomLink(feed), description: txt(feed, 'subtitle'), items: entries };
+    }
+    throw new Error('No <channel> (RSS) or <feed> (Atom) element found.');
+  }
+
+  function run() {
+    const raw = inEl.value.trim();
+    statusEl.className = 'status'; statusEl.textContent = ''; inEl.classList.remove('err');
+    if (!raw) { outEl.value = ''; return; }
+    try {
+      const data = parseFeed(raw);
+      outEl.value = JSON.stringify(data, null, 2);
+      statusEl.className = 'status ok'; statusEl.textContent = `${data.type} · ${data.items.length} item${data.items.length !== 1 ? 's' : ''}`;
+    } catch (e) {
+      outEl.value = ''; inEl.classList.add('err');
+      statusEl.className = 'status bad'; statusEl.textContent = e.message;
+    }
+  }
+
+  inEl.addEventListener('input', run);
+  $('sample').addEventListener('click', () => { inEl.value = SAMPLE; run(); });
+  $('copy').addEventListener('click', async () => {
+    if (!outEl.value) return;
+    try { await navigator.clipboard.writeText(outEl.value); statusEl.className = 'status ok'; statusEl.textContent = 'Copied.'; }
+    catch { outEl.select(); document.execCommand('copy'); }
+  });
+  inEl.value = SAMPLE; run();
+</script>
