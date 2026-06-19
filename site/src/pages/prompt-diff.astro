@@ -59,7 +59,7 @@ const B = `You are a tech editor. Summarize the article below in exactly 3 bulle
   </Fragment>
 </ToolPage>
 
-<style>
+<style is:global> /* JS-created elements need unscoped CSS, see context-budget-analyzer */
   .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
   .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
   .pd-ins{display:grid;grid-template-columns:1fr 1fr;gap:16px}

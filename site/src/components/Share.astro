@@ -36,7 +36,7 @@ const ICONS = {
     <a class="sh" href={share.hn} target="_blank" rel="noopener noreferrer" aria-label="Share on Hacker News" title="Share on Hacker News" set:html={ICONS.hn} />
     <a class="sh" href={share.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" title="Share on LinkedIn" set:html={ICONS.linkedin} />
     <a class="sh" href={share.email} aria-label="Share by email" title="Share by email" set:html={ICONS.email} />
-    <button class="sh js-copylink" type="button" aria-label="Copy link for Discord" title="Copy link (paste into Discord)" set:html={ICONS.discord} />
+    <button class="sh js-copylink" data-discord type="button" aria-label="Copy link for Discord" title="Copy link (paste into Discord)" set:html={ICONS.discord} />
     <button class="sh js-copylink" type="button" aria-label="Copy link" title="Copy link" set:html={ICONS.link} />
     <span class="share-done" hidden>Link copied</span>
   </div>
@@ -69,7 +69,10 @@ const ICONS = {
       const b = e.target.closest('.js-copylink'); if (!b) return;
       try { await navigator.clipboard.writeText(location.href); } catch {}
       const done = b.closest('[data-share]')?.querySelector('.share-done');
-      if (done) { done.hidden = false; setTimeout(() => { done.hidden = true; }, 1800); }
+      if (done) {
+        done.textContent = b.hasAttribute('data-discord') ? 'Page URL copied, open Discord to share.' : 'Link copied';
+        done.hidden = false; setTimeout(() => { done.hidden = true; }, 2400);
+      }
     });
   }
 </script>

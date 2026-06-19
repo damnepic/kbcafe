@@ -84,7 +84,7 @@ const SAMPLE = `You are a helpful coding assistant for the ACME app. Always answ
   </Fragment>
 </ToolPage>
 
-<style>
+<style is:global> /* JS-created elements need unscoped CSS, see context-budget-analyzer */
   .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer;margin-left:8px}
   .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
   .opt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:flex;flex-direction:column;gap:6px}

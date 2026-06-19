@@ -74,7 +74,7 @@ const sample = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiw
   </Fragment>
 </ToolPage>
 
-<style>
+<style is:global> /* JS-injected claims table needs unscoped CSS, see context-budget-analyzer */
   .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
     color:var(--coral);background:none;border:0;cursor:pointer}
   .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
