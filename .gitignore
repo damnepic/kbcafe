@@ -40,3 +40,6 @@ site/.env*
 Thumbs.db
 *.log
 *.zip
+
+# backlink exports + analysis scratch (internal)
+/data/

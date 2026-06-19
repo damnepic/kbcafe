@@ -1,28 +1,46 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-// The Feeds pillar, honors kbcafe.com's RSS-era heritage and is the canonical
-// landing for the aged /rss/, /Rmail, and /juice backlink equity. Tools ship over time;
-// the page is a real, content-bearing 200 from day one so the link equity lands well.
+// The Feeds pillar: the modern restoration of kbcafe.com's RSS-era heritage ("The RSS Blog",
+// Rmail, the feed utilities) and the canonical landing for the aged /rss/, /Rmail, /juice
+// backlink equity, by far the largest on-topic link cluster pointing at the domain.
 const tools = [
   { nm: 'RSS / Atom validator', ds: 'Check any feed against the RSS 2.0 and Atom specs, see exactly what is malformed and where.', href: '/rss-validator' },
   { nm: 'OPML converter', ds: 'Import, view, and convert OPML subscription lists to and from JSON.', href: '/opml-converter' },
   { nm: 'RSS → JSON', ds: 'Turn any feed into clean JSON for your app, no server round-trip.', href: '/rss-to-json' },
   { nm: 'Feed preview', ds: 'Paste a feed and read it as a clean, human-friendly list.', href: '/feed-preview' },
 ];
+
+const FAQ = [
+  { q: 'Is RSS dead?', a: 'No, it just got quiet. Every podcast is an RSS feed, most newsletters and blogs still publish one, and the fediverse runs on the same publish-and-subscribe idea. The web stopped talking about RSS around the time Google Reader closed in 2013, but the format never stopped working.' },
+  { q: 'RSS vs Atom, which should I use?', a: 'Both work in every modern reader. Atom (an IETF standard) is stricter and cleaner if you are publishing a new feed; RSS 2.0 is more widespread and what most tools expect. If you are just consuming feeds, you rarely need to care which one a site uses.' },
+  { q: 'What is OPML for?', a: 'OPML is a simple outline format for moving a whole list of subscriptions between readers. Export your feeds from one app as OPML, import that file into another, and your subscriptions come with you.' },
+  { q: 'How do I subscribe to a feed?', a: 'Copy the feed URL (often linked as an RSS icon, or auto-discovered from the page) and paste it into a feed reader like Feedly, Inoreader, or NewsBlur. The reader checks the URL for you and shows new items as they appear.' },
+  { q: 'How often does a reader check a feed?', a: 'On a schedule it chooses, usually every few minutes to an hour. Feeds are pull-based: the reader polls the URL rather than the site pushing to it. That is the opposite of a webhook.' },
+  { q: 'Is a podcast really just an RSS feed?', a: 'Yes. A podcast is an RSS feed whose items carry an <enclosure> pointing at an audio file. Your podcast app is a feed reader that knows how to play the attachments.' },
+  { q: 'Can I turn a feed into JSON for my app?', a: 'Yes, paste the feed into the RSS to JSON tool and you get clean, structured JSON, channel info plus every item, with no server round-trip.' },
+  { q: 'Why will not my feed validate?', a: 'Usually unescaped characters (a raw & instead of &amp;), a missing required element, or a mismatched tag. Paste it into the RSS / Atom validator to see exactly what and where.' },
+  { q: 'Does KB Cafe have its own feed?', a: 'Yes, subscribe at /feed.xml. Fitting, given the domain’s history: new tools, courses, and posts arrive in your reader automatically.' },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 ---
 <Layout
-  title="Feeds, RSS, Atom & OPML tools | KB Cafe"
-  description="Modern, client-side RSS, Atom, and OPML tools, validate feeds, convert OPML, turn feeds into JSON. Honoring kbcafe.com's long heritage as an RSS-era developer resource."
+  title="RSS, Atom & OPML, the complete guide + free feed tools | KB Cafe"
+  description="What RSS, Atom, and OPML are, how web feeds actually work, RSS vs Atom compared, and why feeds are quietly everywhere in 2026, plus free, client-side tools to validate, convert, and read any feed."
   path="/feeds"
 >
   <section class="feeds">
     <div class="eyebrow">☕ on the menu · Feeds</div>
-    <h1>Feed tools, <span class="mk">freshly brewed.</span></h1>
+    <h1>RSS, Atom &amp; OPML, <span class="mk">freshly brewed.</span></h1>
     <p class="lede">
-      Fast, private, client-side tools for <strong>RSS</strong>, <strong>Atom</strong>, and
-      <strong>OPML</strong>: validate a feed, convert a subscription list, or turn a feed into
-      JSON. Everything runs in your browser: paste a feed and nothing is uploaded.
+      The complete, modern guide to <strong>web feeds</strong>, what RSS, Atom, and OPML are, how they work, and
+      why they are quietly everywhere in 2026, plus fast, private, client-side tools to validate, convert, and read
+      any feed. Everything runs in your browser: paste a feed and nothing is uploaded.
     </p>
 
     <a class="subscribe" href="/feed.xml">
@@ -30,6 +48,18 @@ const tools = [
       <span><strong>Subscribe to the KB Cafe feed</strong>: new tools, courses, and posts delivered to your reader.</span>
     </a>
 
+    <nav class="toc" aria-label="On this page">
+      <span class="toc-h">On this page</span>
+      <a href="#tools">Feed tools</a>
+      <a href="#what">What is a feed?</a>
+      <a href="#how">How feeds work</a>
+      <a href="#rss-atom">RSS vs Atom</a>
+      <a href="#opml">OPML</a>
+      <a href="#2026">Feeds in 2026</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <h2 id="tools">The tools</h2>
     <div class="grid">
       {tools.map(t => (
         <a class="card" href={t.href}>
@@ -42,38 +72,112 @@ const tools = [
     </div>
 
     <div class="prose">
-      <h2>A feed-native corner of the web</h2>
+      <h2 id="what">What is a web feed?</h2>
       <p>
-        <code>kbcafe.com</code> has been a developer resource since the early RSS era, when
-        feeds were how the web's writing actually moved around. That heritage is why the Feeds
-        section exists: it is the most on-topic part of the site's history, and it is being
-        rebuilt with modern, no-tracking tooling rather than left to rot.
+        A <strong>feed</strong> is a machine-readable version of a site&rsquo;s latest content, a structured list
+        of items (posts, episodes, releases) that software can read without scraping the HTML. Publish one and any
+        reader, podcast app, or script can follow your site and pull updates automatically. Three formats matter:
       </p>
-
-      <h3>The pieces of a feed</h3>
       <ul>
-        <li><strong>RSS 2.0</strong>: the classic <code>&lt;channel&gt;</code> / <code>&lt;item&gt;</code> format most blogs still publish.</li>
-        <li><strong>Atom</strong>: the IETF-standard alternative (<code>&lt;feed&gt;</code> / <code>&lt;entry&gt;</code>), stricter and namespaced.</li>
-        <li><strong>OPML</strong>: the outline format used to import and export whole lists of feed subscriptions between readers.</li>
+        <li><strong>RSS</strong> (Really Simple Syndication): the classic format, a <code>&lt;channel&gt;</code> of
+          <code>&lt;item&gt;</code> entries. What most blogs and every podcast still publish. New to it? Start with
+          <a href="/what-is-rss">what is RSS</a>.</li>
+        <li><strong>Atom</strong>: the IETF-standardized alternative (<code>&lt;feed&gt;</code> of
+          <code>&lt;entry&gt;</code>), stricter and cleaner.</li>
+        <li><strong>OPML</strong>: not a feed itself but an outline format for moving whole <em>lists</em> of feed
+          subscriptions between readers.</li>
       </ul>
 
-      <h3>Why client-side</h3>
+      <h2 id="how">How feeds work</h2>
       <p>
-        A feed often contains URLs, tokens in query strings, or content you would rather not hand
-        to a third-party service. KB Cafe's feed tools parse everything locally in your browser,
-        so a feed you paste here never leaves your machine, and the tools keep working offline
-        once the page has loaded.
+        Feeds are <strong>pull-based</strong>. The publisher writes an XML file at a stable URL; a reader
+        <strong>polls</strong> that URL on its own schedule and shows you whatever is new since last time. Nothing
+        is pushed to you, which is the opposite of a <a href="/webhooks-vs-polling">webhook</a>, and it is exactly
+        what makes feeds so durable: no account, no API key, no platform in the middle, just a file and whoever
+        chooses to read it.
+      </p>
+      <p>A minimal RSS 2.0 feed is just this:</p>
+      <pre class="code"><code>&lt;rss version="2.0"&gt;
+  &lt;channel&gt;
+    &lt;title&gt;KB Cafe&lt;/title&gt;
+    &lt;link&gt;https://kbcafe.com/&lt;/link&gt;
+    &lt;description&gt;Tools and an interactive AI knowledge base.&lt;/description&gt;
+    &lt;item&gt;
+      &lt;title&gt;A new tool shipped&lt;/title&gt;
+      &lt;link&gt;https://kbcafe.com/feed-preview&lt;/link&gt;
+      &lt;pubDate&gt;Tue, 16 Jun 2026 12:00:00 GMT&lt;/pubDate&gt;
+      &lt;description&gt;Read any feed as a clean list.&lt;/description&gt;
+    &lt;/item&gt;
+  &lt;/channel&gt;
+&lt;/rss&gt;</code></pre>
+      <p>Paste a real one into <a href="/feed-preview">Feed Preview</a> to see it as a reader would, or
+        <a href="/rss-to-json">turn it into JSON</a> for your own app.</p>
+
+      <h2 id="rss-atom">RSS vs Atom</h2>
+      <p>Both describe the same thing, a list of dated items, and every modern reader handles both. The differences:</p>
+      <table class="cmp">
+        <thead><tr><th></th><th>RSS 2.0</th><th>Atom</th></tr></thead>
+        <tbody>
+          <tr><td>Root</td><td><code>&lt;rss&gt;</code> → <code>&lt;channel&gt;</code> → <code>&lt;item&gt;</code></td><td><code>&lt;feed&gt;</code> → <code>&lt;entry&gt;</code></td></tr>
+          <tr><td>Standardized by</td><td>A spec led by Dave Winer (2002)</td><td>The IETF, RFC 4287 (2005)</td></tr>
+          <tr><td>Strictness</td><td>Looser, more forgiving</td><td>Stricter, fully namespaced</td></tr>
+          <tr><td>Dates</td><td><code>pubDate</code> (RFC 822)</td><td><code>updated</code> (ISO 8601)</td></tr>
+          <tr><td>Content type</td><td>Implied (usually HTML)</td><td>Explicit (<code>type="html"</code> etc.)</td></tr>
+          <tr><td>Best when</td><td>Maximum compatibility</td><td>Publishing a clean new feed</td></tr>
+        </tbody>
+      </table>
+      <p>Validate either against its spec with the <a href="/rss-validator">RSS / Atom validator</a>.</p>
+
+      <h2 id="opml">OPML: your subscriptions, portable</h2>
+      <p>
+        <strong>OPML</strong> (Outline Processor Markup Language) is how you move a whole reading list between apps.
+        Export your subscriptions from one reader as a single <code>.opml</code> file, import it into another, and
+        every feed comes along, no re-adding them one by one. It is also how &ldquo;blogrolls&rdquo; and curated
+        feed bundles get shared. Convert one to and from JSON with the <a href="/opml-converter">OPML converter</a>.
       </p>
 
-      <h3>All four are live</h3>
+      <h2 id="2026">Feeds in 2026: not dead, just quiet</h2>
       <p>
-        The <a href="/rss-validator">validator</a>, <a href="/opml-converter">OPML converter</a>,
-        <a href="/rss-to-json">RSS → JSON</a>, and <a href="/feed-preview">feed preview</a> tools are all
-        shipped and client-side. And KB Cafe now publishes its <a href="/feed.xml">own feed</a>, so you can
-        follow new tools, courses, and posts in any reader, or read them on <a href="/whats-new">What&rsquo;s New</a>.
-        The <a href="/json-to-typescript">JSON → TypeScript</a> converter pairs well with the RSS → JSON output.
+        The web declared RSS dead when <strong>Google Reader closed in 2013</strong>. It was wrong. Feeds quietly
+        kept running the open parts of the internet: <strong>every podcast</strong> is an RSS feed, most
+        <strong>newsletters</strong> have one, and the <strong>fediverse</strong> is built on the same
+        publish-and-subscribe idea. And there is a new reason to care, <strong>AI</strong>: language models are
+        starving for clean, structured, permissioned content, and a 25-year-old format turns out to be a very good
+        way to deliver it. We wrote about that in
+        <a href="/blog/rss-and-ai">Feeds for Machines</a>, and on why
+        <a href="/blog/rss-and-the-open-web-in-2026">the open web just got quiet</a>.
       </p>
+      <p>
+        Why client-side tools? A feed often contains URLs, tokens in query strings, or content you would rather not
+        hand to a third party. KB Cafe&rsquo;s feed tools parse everything <strong>locally in your browser</strong>,
+        so a feed you paste never leaves your machine and the tools keep working offline.
+      </p>
+
+      <h2 id="faq">FAQ</h2>
+      {FAQ.map(f => (
+        <details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>
+      ))}
+
+      <h3>Related</h3>
+      <p>
+        <a href="/what-is-rss">What is RSS</a> &middot; <a href="/rss-validator">RSS / Atom validator</a> &middot;
+        <a href="/opml-converter">OPML converter</a> &middot; <a href="/rss-to-json">RSS → JSON</a> &middot;
+        <a href="/feed-preview">Feed preview</a> &middot; <a href="/feed.xml">our RSS feed</a> &middot;
+        <a href="/whats-new">What&rsquo;s new</a> &middot; <a href="/webhooks-vs-polling">webhooks vs polling</a>.
+      </p>
+
+      <div class="classic">
+        <span class="classic-tag">☕ KB Cafe Classic</span>
+        <p>
+          In its first life, <code>kbcafe.com</code> was one of the RSS era&rsquo;s landmark developer resources,
+          home of <strong>The RSS Blog</strong>, the <strong>Rmail</strong> RSS-to-email service, and a shelf of
+          feed utilities, linked across the early open web. This Feeds section is its modern restoration: the same
+          subject, rebuilt with private, no-tracking tooling for 2026 rather than left to rot.
+        </p>
+      </div>
     </div>
+
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </section>
 </Layout>
 
@@ -84,7 +188,7 @@ const tools = [
   .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.24em;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%23c0905a' fill-opacity='0.55'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:center bottom;background-size:100% .2em}
-  .lede{margin-top:22px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:640px}
+  .lede{margin-top:22px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:660px}
 
   .subscribe{display:flex;align-items:center;gap:12px;margin-top:26px;padding:14px 18px;border-radius:14px;
     background:rgba(244,180,35,.13);border:1.2px solid rgba(244,132,42,.3);text-decoration:none;color:var(--ink);transition:background .14s}
@@ -93,7 +197,13 @@ const tools = [
   .subscribe span{font-size:14px;line-height:1.45;color:var(--ink-soft)}
   .subscribe strong{color:var(--ink);font-weight:700}
 
-  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:18px 0 10px}
+  .toc{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:24px 0 10px;padding:14px 16px;border:1.2px solid var(--line);border-radius:13px;background:var(--paper-2)}
+  .toc-h{font-family:var(--font-mono);font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-right:4px}
+  .toc a{font-family:var(--font-mono);font-size:12.5px;color:var(--coral);text-decoration:none;font-weight:600}
+  .toc a:hover{text-decoration:underline}
+
+  .feeds > h2{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:30px 0 14px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:4px 0 10px}
   .card{display:block;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:18px 18px 16px;
     text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s}
   .card:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(40,24,12,.09);border-color:rgba(238,75,43,.35)}
@@ -102,15 +212,33 @@ const tools = [
   .card .ds{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
   .card .dm{font-family:var(--font-mono);font-size:11px;margin-top:12px;color:var(--coral);font-weight:700}
 
-  .prose{max-width:720px;padding:30px 0 8px;border-top:1px solid var(--line);margin-top:34px}
-  .prose h2{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:-.02em;margin:26px 0 12px}
-  .prose h2:first-child{margin-top:0}
-  .prose h3{font-family:var(--font-display);font-weight:700;font-size:18px;margin:22px 0 8px}
+  .prose{max-width:760px;padding:18px 0 8px;border-top:1px solid var(--line);margin-top:34px}
+  .prose h2{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:-.02em;margin:30px 0 12px}
+  .prose h2:first-child{margin-top:4px}
+  .prose h3{font-family:var(--font-display);font-weight:700;font-size:19px;margin:24px 0 9px}
   .prose p{font-size:16px;line-height:1.65;color:var(--ink-soft);margin:0 0 14px}
   .prose ul{margin:0 0 16px;padding-left:22px}
   .prose li{font-size:16px;line-height:1.6;color:var(--ink-soft);margin-bottom:7px}
   .prose code{font-family:var(--font-mono);font-size:13.5px;background:var(--paper-2);padding:2px 6px;border-radius:6px;color:var(--ink)}
+  .prose strong{color:var(--ink)}
   .prose a{color:var(--coral);font-weight:600;text-decoration:none}
   .prose a:hover{text-decoration:underline}
+  .prose .faq{border:1px solid var(--line);border-radius:14px;padding:4px 18px;margin-bottom:10px;background:var(--cream)}
+  .prose .faq summary{font-family:var(--font-display);font-weight:700;font-size:16px;padding:14px 0;cursor:pointer;list-style:none}
+  .prose .faq summary::-webkit-details-marker{display:none}
+  .prose .faq[open] summary{color:var(--coral)}
+
+  .code{background:#1e1813;color:#f4e9d6;border-radius:12px;padding:15px 16px;overflow-x:auto;margin:10px 0 14px;border:1px solid rgba(255,255,255,.08)}
+  .code code{font-family:var(--font-mono);font-size:12.5px;line-height:1.6;white-space:pre;color:inherit;background:none;padding:0}
+
+  .cmp{width:100%;border-collapse:collapse;margin:12px 0 6px;font-size:14px}
+  .cmp th,.cmp td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  .cmp thead th{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper-2)}
+  .cmp td:first-child{font-weight:700;color:var(--ink);width:130px}
+  .cmp code{font-family:var(--font-mono);font-size:12px;background:var(--paper-2);padding:1px 5px;border-radius:5px}
+
+  .classic{margin:30px 0 0;padding:16px 18px;border:1.5px solid rgba(244,132,42,.32);border-radius:14px;background:rgba(244,180,35,.1)}
+  .classic-tag{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a5b00}
+  .classic p{margin:9px 0 0;font-size:14px;line-height:1.6;color:var(--ink-soft)}
   @media(max-width:620px){.grid{grid-template-columns:1fr}}
 </style>
