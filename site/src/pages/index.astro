@@ -390,8 +390,12 @@ const WORKFLOWS = [
   .nl-ic{color:var(--gold);border-color:rgba(244,180,35,.22)}
   .nl-card h3{display:flex;align-items:center;gap:8px}
   .nl-cup{font-size:16px}
-  .gh-card{display:grid;grid-template-columns:48px 1fr;gap:16px;align-items:center;text-decoration:none;transition:transform .16s}
-  .gh-card:hover{transform:translateY(-3px)}
+  .gh-card{display:grid;grid-template-columns:48px 1fr;gap:16px;align-items:center;text-decoration:none;transition:transform .16s,box-shadow .16s;
+    background:
+      radial-gradient(circle at 90% 18%,rgba(244,180,35,.20),transparent 46%),
+      radial-gradient(circle at 8% 110%,rgba(111,78,55,.42),transparent 56%),
+      linear-gradient(135deg,#26180f,#17100b)}
+  .gh-card:hover{transform:translateY(-3px);box-shadow:0 26px 56px rgba(16,17,18,.22)}
   .nl-ic,.gh-ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--gold)}
   .nl-ic svg,.gh-ic svg{width:24px;height:24px}
   .nl-card h3,.gh-card h3{font-family:var(--font-display);font-weight:800;margin:0 0 5px;font-size:18px}
