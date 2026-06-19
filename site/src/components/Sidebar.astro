@@ -15,11 +15,15 @@ const I = {
   search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>`,
   map: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2Z"/><path d="M9 3v16M15 5v16"/></svg>`,
   chevron: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
+  gear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>`,
+  briefcase: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>`,
 };
 const TRIAGE = [
-  { label: 'Build', ds: 'an AI app or agent', href: '/learn-ai-agents', icon: I.build },
-  { label: 'Get better answers', ds: 'from AI', href: '/learn-prompting', icon: I.chat },
-  { label: 'Learn the basics', ds: 'how AI works', href: '/learn-ai-infrastructure', icon: I.book },
+  { label: 'Learn AI', ds: 'the fundamentals', href: '/learn-ai-infrastructure', icon: I.book },
+  { label: 'Build AI Agents', ds: 'apps & agents', href: '/learn-ai-agents', icon: I.build },
+  { label: 'Get Better Answers', ds: 'prompting', href: '/learn-prompting', icon: I.chat },
+  { label: 'Automation', ds: 'coming soon', icon: I.gear, soon: true },
+  { label: 'AI Business', ds: 'coming soon', icon: I.briefcase, soon: true },
 ];
 const active = (h) => h === path;
 ---
@@ -31,8 +35,13 @@ const active = (h) => h === path;
 
   <nav class="sb-triage">
     <span class="sb-h">What are you doing?</span>
-    {TRIAGE.map(t => (
-      <a class={`sb-item${active(t.href) ? ' on' : ''}`} href={t.href} title={`${t.label} ${t.ds}`}>
+    {TRIAGE.map(t => t.soon ? (
+      <span class="sb-item soon" title={`${t.label}, coming soon`}>
+        <span class="sb-ic" set:html={t.icon} />
+        <span class="sb-lbl"><b>{t.label}</b><small>coming soon</small></span>
+      </span>
+    ) : (
+      <a class={`sb-item${active(t.href) ? ' on' : ''}`} href={t.href} title={`${t.label}, ${t.ds}`}>
         <span class="sb-ic" style={`color:var(--coral)`} set:html={t.icon} />
         <span class="sb-lbl"><b>{t.label}</b><small>{t.ds}</small></span>
       </a>
@@ -78,6 +87,9 @@ const active = (h) => h === path;
   .sb-item{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink);border-radius:10px;padding:8px 9px;transition:background .12s}
   .sb-item:hover{background:var(--paper-2)}
   .sb-item.on{background:#ffe5dd}
+  .sb-item.soon{opacity:.5;cursor:default}
+  .sb-item.soon .sb-ic{color:var(--ink-soft)}
+  .sb-item.soon .sb-lbl small{color:var(--coral);opacity:.8;font-weight:700}
   .sb-item .sb-lbl{display:flex;flex-direction:column;line-height:1.15}
   .sb-item .sb-lbl b{font-family:var(--font-display);font-weight:800;font-size:14px}
   .sb-item .sb-lbl small{font-size:11px;color:var(--ink-soft)}
