@@ -90,12 +90,22 @@ const WORKFLOWS = [
   </section>
 
   <!-- BENEFITS: tucked tight, directly under the triage cards -->
-  <div class="benefits">
+  <div class="benefits" id="benefits">
     <div class="benefit"><div class="b-head"><span class="b-ic b-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/></svg></span><h3>100% Client-Side</h3></div><p>Everything runs in your browser. Nothing leaves your device.</p></div>
     <div class="benefit"><div class="b-head"><span class="b-ic b-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Privacy First</h3></div><p>No signups. No tracking. No data collection. Ever.</p></div>
     <div class="benefit"><div class="b-head"><span class="b-ic b-gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><h3>Blazing Fast</h3></div><p>Instant results. Works offline. Always available.</p></div>
     <div class="benefit"><div class="b-head"><span class="b-ic b-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg></span><h3>Developer Friendly</h3></div><p>Clean UI, keyboard-friendly, and zero fluff.</p></div>
+    <button class="b-hide" id="b-hide" type="button" title="Hide this section">Got it, hide me! ✕</button>
   </div>
+  <script is:inline>
+    /* Let repeat/power users dismiss the benefits strip; remembered locally, no tracking. */
+    (function () {
+      var key = 'kb-hide-benefits', box = document.getElementById('benefits'), btn = document.getElementById('b-hide');
+      if (!box) return;
+      try { if (localStorage.getItem(key) === '1') box.style.display = 'none'; } catch (e) {}
+      if (btn) btn.addEventListener('click', function () { box.style.display = 'none'; try { localStorage.setItem(key, '1'); } catch (e) {} });
+    })();
+  </script>
 
   <!-- TRUST + quick links (centered) -->
   <div class="hero-trust">
@@ -226,7 +236,8 @@ const WORKFLOWS = [
   .o-card>p{position:relative;font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 15px}
   .o-tools{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
   .o-chip{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--ink-soft);background:var(--paper-2);border-radius:7px;padding:4px 8px}
-  .o-go{position:relative;margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14.5px;color:var(--ac);display:inline-flex;align-items:center;gap:6px}
+  .o-go{position:relative;margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14.5px;color:var(--ac);display:inline-flex;align-items:center;gap:6px;opacity:0;transform:translateY(4px);transition:opacity .16s,transform .16s}
+  .o-card:hover .o-go,.o-card:focus-within .o-go{opacity:1;transform:none}
   .hero-trust{text-align:center;margin:16px 0 0}
   .o-proof{margin:0;justify-content:center}
   .hero-quick{margin:12px 0 0;font-size:14px;color:var(--ink-soft)}
@@ -310,28 +321,32 @@ const WORKFLOWS = [
   .b-blue{background:linear-gradient(135deg,#3478f6,#6aa8ff)} .b-coral{background:linear-gradient(135deg,#ff4b2f,#d63e1f)}
   .b-gold{background:linear-gradient(135deg,#f4a400,#ffbd45)} .b-green{background:linear-gradient(135deg,#0f9f82,#16c8a4)}
   .benefit h3{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.02em;margin:0;line-height:1.15}
-  .benefit p{margin:0;color:var(--ink-soft);line-height:1.45;font-size:13.5px}
+  .benefit p{margin:0;color:var(--ink-soft);line-height:1.4;font-size:12px}
+  .b-hide{grid-column:1/-1;justify-self:end;margin-top:-8px;background:none;border:0;cursor:pointer;
+    font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);opacity:.6;transition:opacity .14s,color .14s;padding:0}
+  .b-hide:hover{opacity:1;color:var(--coral-deep)}
 
   /* SECTIONS */
   .home-sec,.results{max-width:1120px;margin:0 auto 52px}
   .sec-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px}
   .sec-title{display:flex;flex-direction:column;gap:8px}
-  .sec-sub{margin:0;font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em;color:var(--ink);max-width:560px;line-height:1.25}
+  .sec-sub{margin:0;font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em;color:var(--ink);line-height:1.25;white-space:nowrap}
   .kicker{font-family:var(--font-mono);font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);display:inline-flex;align-items:center}
   .kicker-ai{color:var(--coral)}
   .sec-head .sec-link{margin-top:2px;white-space:nowrap}
   .sec-link{font-family:var(--font-display);font-weight:800;font-size:14.5px;color:var(--ink);text-decoration:none;background:none;border:0;cursor:pointer}
   .sec-link:hover{color:var(--coral)}
 
-  .ai-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
-  .ai-card{display:flex;flex-direction:column;min-height:320px;padding:28px 24px;border-radius:20px;background:rgba(255,255,255,.6);border:1.2px solid var(--line);box-shadow:0 8px 24px rgba(40,24,12,.045);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s}
+  .ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .ai-card{display:flex;flex-direction:column;min-height:0;padding:26px 26px 24px;border-radius:20px;background:rgba(255,255,255,.6);border:1.2px solid var(--line);box-shadow:0 8px 24px rgba(40,24,12,.045);text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s}
   .ai-card:hover{transform:translateY(-5px);box-shadow:0 20px 45px rgba(40,24,12,.09);border-color:rgba(238,75,43,.35)}
   .ai-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:14px}
   .ai-ic{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;color:#fff;flex-shrink:0;margin-top:2px}
   .ai-ic svg{width:12px;height:12px}
   .ai-card h3{font-family:var(--font-display);font-weight:800;font-size:17px;line-height:1.24;letter-spacing:-.02em;margin:0}
   .ai-card p{color:var(--ink-soft);line-height:1.55;font-size:13px;margin:0 0 18px}
-  .read{margin-top:auto;color:var(--coral);font-family:var(--font-display);font-weight:800;font-size:13.5px}
+  .read{margin-top:auto;color:var(--coral);font-family:var(--font-display);font-weight:800;font-size:13.5px;opacity:0;transform:translateY(4px);transition:opacity .16s,transform .16s}
+  .ai-card:hover .read,.ai-card:focus-visible .read{opacity:1;transform:none}
 
   /* workflow cards */
   .wf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -405,5 +420,8 @@ const WORKFLOWS = [
     .benefits{grid-template-columns:1fr;padding:24px}
     .ai-grid,.tool-grid{grid-template-columns:1fr}
     .ai-card{min-height:0}
+    .sec-sub{white-space:normal}
+    /* touch devices have no hover: always show the CTAs */
+    .read,.o-go{opacity:1;transform:none}
   }
 </style>

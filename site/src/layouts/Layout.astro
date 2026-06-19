@@ -38,6 +38,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+<link rel="alternate" type="application/rss+xml" title="KB Cafe" href="/feed.xml" />
 <!-- favicon = the KB cup mark (generated from logo.png via scripts/gen-favicon.cjs) -->
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
