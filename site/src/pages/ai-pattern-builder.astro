@@ -69,7 +69,9 @@ import ToolPage from '../layouts/ToolPage.astro';
   </Fragment>
 </ToolPage>
 
-<style>
+<style is:global>
+  /* global: the flow nodes (.node*) are JS-created, so scoped CSS never reaches them.
+     All selectors here are page-specific. */
   .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
   .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
   .pb-cols{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
@@ -88,9 +90,7 @@ import ToolPage from '../layouts/ToolPage.astro';
   .node .nlink{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--coral);text-decoration:none}
   .node .nlink:hover{text-decoration:underline}
   .node.fixed{border-style:solid;background:var(--ink);color:var(--cream)}
-  .node .nctl{display:flex;gap:6px;margin-left:auto}
-  .node .nb{font-family:var(--font-mono);font-size:12px;background:none;border:0;cursor:pointer;color:var(--ink-soft);line-height:1}
-  .node .nb:hover{color:var(--coral-deep)}
+  .node .nctl{display:flex;align-items:center;gap:6px;margin-left:auto}
   .arrow{width:2px;height:20px;background:var(--ink-soft);position:relative;opacity:.5}
   .arrow::after{content:"";position:absolute;bottom:0;left:-3px;border:4px solid transparent;border-top-color:var(--ink-soft)}
   .pb-empty{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);text-align:center;padding:30px 0}
@@ -135,7 +135,7 @@ import ToolPage from '../layouts/ToolPage.astro';
       else if (id === '__answer') node = `<div class="node fixed"><span class="nn">Answer</span></div>`;
       else { const b = BLOCKS[id], pos = i - 1;
         node = `<div class="node"><span class="ndot" style="background:${b.color}"></span><span class="nn">${b.name}</span>
-          <span class="nctl"><a class="nlink" href="${b.link}">learn</a><button class="nb" data-up="${pos}" title="up">▲</button><button class="nb" data-down="${pos}" title="down">▼</button><button class="nb" data-rm="${pos}" title="remove">✕</button></span></div>`; }
+          <span class="nctl"><a class="nlink" href="${b.link}">learn</a><button class="kb-icbtn" data-up="${pos}" title="Move up" aria-label="Move up">▲</button><button class="kb-icbtn" data-down="${pos}" title="Move down" aria-label="Move down">▼</button><button class="kb-icbtn danger" data-rm="${pos}" title="Remove" aria-label="Remove">✕</button></span></div>`; }
       return node + (i < seq.length - 1 ? '<div class="arrow"></div>' : '');
     }).join('');
     if (!pipe.length) flow.insertAdjacentHTML('afterbegin', '');

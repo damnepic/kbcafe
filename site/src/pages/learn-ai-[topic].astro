@@ -15,7 +15,7 @@ const { p } = Astro.props;
 const resolve = {};
 TOOLS.forEach(t => { if (t.href) resolve[t.href] = { href: t.href, label: t.nm, ds: t.ds, kind: 'Tool' }; });
 AI.forEach(a => { resolve[a.href] = { href: a.href, label: a.nm, ds: a.ds, kind: 'Concept' }; });
-const EXTRA = { '/ai-patterns': { label: 'AI Patterns Library', ds: 'Reflection, Router, Judge, Verification, Human-in-the-loop.', kind: 'Concept' } };
+const EXTRA = { '/ai-patterns': { href: '/ai-patterns', label: 'AI Patterns Library', ds: 'Reflection, Router, Judge, Verification, Human-in-the-loop.', kind: 'Concept' } };
 const get = (h) => resolve[h] || EXTRA[h] || { href: h, label: h, ds: '', kind: 'Concept' };
 const steps = p.steps.map(get);
 const tools = steps.filter(s => s.kind === 'Tool').length;

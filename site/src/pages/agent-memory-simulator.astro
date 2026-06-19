@@ -75,7 +75,9 @@ import ToolPage from '../layouts/ToolPage.astro';
   </Fragment>
 </ToolPage>
 
-<style>
+<style is:global>
+  /* global: the conversation cards (.msg*) and "what the model sees" blocks (.blk*) are
+     JS-created, so scoped CSS never reaches them. All selectors here are page-specific. */
   .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
   .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
   .am-controls{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end;margin-bottom:20px}
@@ -89,16 +91,20 @@ import ToolPage from '../layouts/ToolPage.astro';
   .am-tok{text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-soft)}
   .am-tok b{color:var(--ink)}
 
-  .msg{border:1.5px solid var(--line);border-radius:12px;background:var(--cream);padding:10px 12px;margin-bottom:9px;transition:opacity .15s}
-  .msg.evicted{opacity:.42}
-  .msg-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-  .msg-role{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:5px}
+  .msg{border:1.5px solid var(--line);border-radius:12px;background:var(--cream);padding:11px 12px;margin-bottom:10px;transition:opacity .15s,box-shadow .15s}
+  .msg:focus-within{box-shadow:0 8px 22px rgba(40,24,12,.07)}
+  .msg.evicted{opacity:.5}
+  .msg-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .msg-meta{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
+  .msg-role{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px;flex-shrink:0}
   .msg-role.user{background:rgba(238,75,43,.14);color:var(--coral-deep)} .msg-role.assistant{background:rgba(52,120,246,.14);color:#2b5cc4}
-  .msg-pin{margin-left:auto;font-size:15px;background:none;border:0;cursor:pointer;color:var(--ink-soft);line-height:1}
-  .msg-pin.on{color:var(--gold)}
-  .msg-rm{font-size:11px;font-family:var(--font-mono);color:var(--coral-deep);background:none;border:0;cursor:pointer}
-  .msg textarea{width:100%;border:0;outline:0;background:transparent;resize:vertical;min-height:20px;font-family:var(--font-body);font-size:14px;line-height:1.4;color:var(--ink)}
-  .msg-tag{font-family:var(--font-mono);font-size:10px;color:var(--ink-soft)}
+  .msg-tag{font-family:var(--font-mono);font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);
+    background:var(--paper-2);border-radius:999px;padding:3px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .msg-ctl{display:flex;align-items:center;gap:6px;flex-shrink:0}
+  .msg textarea{width:100%;border:1px solid var(--line);border-radius:9px;outline:0;background:var(--paper);resize:vertical;min-height:40px;
+    font-family:var(--font-body);font-size:14px;line-height:1.45;color:var(--ink);padding:8px 10px;transition:border-color .12s,box-shadow .12s}
+  .msg textarea::placeholder{color:#a99e90}
+  .msg textarea:focus{border-color:var(--coral);box-shadow:0 0 0 3px rgba(238,75,43,.12)}
 
   #seen{display:flex;flex-direction:column;gap:9px}
   .blk{border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--cream)}
@@ -137,11 +143,13 @@ import ToolPage from '../layouts/ToolPage.astro';
     const box = $('messages'); box.innerHTML = '';
     msgs.forEach((m) => {
       const el = document.createElement('div'); el.className = 'msg' + (evictedIds.has(m.id) ? ' evicted' : '');
-      el.innerHTML = `<div class="msg-top"><span class="msg-role ${m.role}">${m.role}</span>
-        ${evictedIds.has(m.id) ? '<span class="msg-tag">out of window</span>' : ''}
-        <button class="msg-pin ${m.fact ? 'on' : ''}" title="Pin as a fact (eligible for retrieval)">${m.fact ? '★' : '☆'}</button>
-        <button class="msg-rm" title="remove">✕</button></div>
-        <textarea rows="1"></textarea>`;
+      el.innerHTML = `<div class="msg-top">
+        <div class="msg-meta"><span class="msg-role ${m.role}">${m.role}</span>${evictedIds.has(m.id) ? '<span class="msg-tag">out of window</span>' : ''}</div>
+        <div class="msg-ctl">
+          <button class="kb-icbtn star msg-pin ${m.fact ? 'on' : ''}" title="Pin as a fact (eligible for retrieval)" aria-label="Pin as fact">${m.fact ? '★' : '☆'}</button>
+          <button class="kb-icbtn danger msg-rm" title="Remove message" aria-label="Remove">✕</button>
+        </div></div>
+        <textarea rows="1" placeholder="Type a message…"></textarea>`;
       const ta = el.querySelector('textarea'); ta.value = m.text;
       ta.addEventListener('input', (e) => { m.text = e.target.value; calc(); });
       el.querySelector('.msg-pin').addEventListener('click', () => { m.fact = !m.fact; calc(); });
