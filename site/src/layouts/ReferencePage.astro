@@ -6,7 +6,7 @@ import { REFERENCE } from '../data/reference.js';
 const { title, description, path, eyebrow, h1, tagline, updated = '2026' } = Astro.props;
 const others = REFERENCE.filter(r => r.href !== path).slice(0, 3);
 ---
-<Layout title={title} description={description} path={path}>
+<Layout title={title} description={description} path={path} sidebar={true}>
   <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/reference">Reference</a> <span>/</span> <em>{h1}</em></nav>
 
   <article class="ref-article">

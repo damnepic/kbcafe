@@ -7,7 +7,7 @@ const { title, description, slug, tag, date } = Astro.props;
 const path = `/blog/${slug}`;
 const others = POSTS.filter(p => p.slug !== slug).slice(0, 3);
 ---
-<Layout title={`${title} | KB Cafe Blog`} description={description} path={path}>
+<Layout title={`${title} | KB Cafe Blog`} description={description} path={path} sidebar={true}>
   <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/blog">Blog</a> <span>/</span> <em>{title}</em></nav>
 
   <article class="post">

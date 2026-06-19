@@ -21,7 +21,7 @@ const next = g && g.next ? resolve[g.next] : null;
 // tools with no graph entry fall back to category siblings
 const siblings = !g ? TOOLS.filter(t => t.href && t.href !== path).slice(0, 4) : [];
 ---
-<Layout title={title} description={description} path={path}>
+<Layout title={title} description={description} path={path} sidebar={true}>
   <nav class="crumb"><a href="/">KB Cafe</a> <span>/</span> <a href="/tools">Tools</a> <span>/</span> <em>{h1}</em></nav>
 
   <header class="tool-head">
