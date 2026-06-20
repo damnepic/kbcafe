@@ -1,0 +1,228 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const FAQ = [
+  { q: "How much does an aged domain cost?", a: "It varies enormously, from tens of dollars at a drop auction to five or six figures for a premium name. KB Cafe was won for $460 on GoDaddy Auctions (not including the mandatory renewal fee). Price tracks the strength and relevance of the backlink profile, not the age alone." },
+  { q: "How long until a restored aged domain ranks?", a: "Months, not days. A realistic window is 6 to 18 months of consistent on-topic content and clean technical work. The aged authority makes you rank faster than a brand-new domain, but it does not leapfrog entrenched competitors overnight. Anyone promising instant rankings is selling something." },
+  { q: "Is buying an aged domain against Google's rules?", a: "Buying one is fine. Abusing one is not. Restoring on-topic content and mapping old links to relevant modern pages is legitimate. Redirecting unrelated old URLs to your homepage to harvest their equity, or reposting stale content wholesale, are the abuse patterns search engines penalize." },
+  { q: "Why not just repost the original content?", a: "Because reposting decades-old pages reads as duplicate, thin, or expired-domain abuse. The value was in the topics that earned the links, not the literal old text. You restore by rewriting those topics as genuinely modern, useful pages." },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const BRIEFCASE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>`;
+---
+<Layout
+  title="How we restored KB Cafe, an aged-domain case study | KB Cafe"
+  description="The exact process we used to restore a 20-year-old developer domain: the aged-domain bet and its honest caveats, auditing before building, restore-don't-republish, preserving link equity with a three-gate framework, the technical foundation, and measuring. Documented from day one."
+  path="/case-studies/kbcafe"
+  crumb={[{ label: 'AI Business', href: '/ai-business' }, { label: 'Case Study: KB Cafe' }]}
+>
+  <article class="cs">
+    <div class="eyebrow">AI Business · Case Study #1 · build in public</div>
+    <h1>How we restored KB Cafe</h1>
+    <p class="tagline">
+      An aged domain, a real process, and no growth hacks. This is exactly how this site was rebuilt, the parts
+      that are teachable shared in full, documented from day one with zero traffic.
+    </p>
+
+    <nav class="toc" aria-label="On this page">
+      <span class="toc-h">On this page</span>
+      <a href="#bet">The bet</a>
+      <a href="#audit">Step 0: audit first</a>
+      <a href="#restore">Restore, don't republish</a>
+      <a href="#equity">Preserve the equity</a>
+      <a href="#stack">Under the hood</a>
+      <a href="#tech">Technical foundation</a>
+      <a href="#measure">Measure</a>
+      <a href="#now">Where we are</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <div class="prose">
+      <h2 id="bet">The bet</h2>
+      <p>
+        KB Cafe runs on an <strong>aged domain</strong>, roughly two decades old, that was a respected developer
+        site in the RSS era. We won it at auction on
+        <a href="https://auctions.godaddy.com/beta" target="_blank" rel="noopener">GoDaddy Auctions</a> for
+        <strong>$460</strong> (not including the mandatory renewal fee). The reason: aged domains carry
+        something a new domain cannot buy, <strong>existing backlink authority</strong>. Links from places like the
+        W3C validator, Wikipedia, and old-school dev blogs accrued over twenty years, and those links are a trust
+        signal search engines already recognize.
+      </p>
+      <p>
+        Here is the anti-guru part, the caveats nobody selling &ldquo;aged domain secrets&rdquo; mentions:
+        authority shortcuts the <strong>trust</strong> problem, not the <strong>competition</strong> problem. A
+        restored domain ranks faster than a cold one; it does not leapfrog entrenched competitors. And the value is
+        <strong>quality, not volume</strong>, a handful of high-authority, relevant links beats thousands of junk
+        ones. Budget 6 to 18 months, not a weekend.
+      </p>
+
+      <h2 id="audit">Step 0: audit before you build</h2>
+      <p>
+        The first move is not building, it is <strong>verifying</strong>. A cheap aged domain can be quietly
+        poisoned, hit with a past penalty, or stuffed with spam links by a previous owner. So before writing a
+        single page we:
+      </p>
+      <ul>
+        <li>checked <strong>Google Search Console for Manual Actions</strong> (penalties), it came back clean;</li>
+        <li>pulled the <strong>full backlink profile</strong> to see what actually links here, and whether those links are real and on-topic;</li>
+        <li>confirmed the authority was <strong>genuine, not a mirage</strong> of expired spam.</li>
+      </ul>
+      <p>
+        If that audit had surfaced a penalty or a toxic profile, the correct move is to walk away or disavow, not
+        build on poisoned ground. Skipping Step 0 is how people pay for &ldquo;authority&rdquo; that is actually a
+        liability.
+      </p>
+
+      <h2 id="restore">Restore, don&rsquo;t republish</h2>
+      <p>
+        The original content was twenty years stale. Reposting it would be duplicate, thin, and a fast track to
+        looking like expired-domain abuse. So we <strong>restore</strong> instead: take the topics that earned the
+        original links and rewrite them as genuinely modern, genuinely useful pages. Same topic, new substance.
+      </p>
+      <p>
+        Every page is held to a strict quality bar, <strong>mechanism-first, no filler</strong>, written to actually
+        answer the question rather than pad a word count. (The specific tooling we use to enforce that bar stays
+        in-house; the bar itself is simple: would a working developer find this the clearest explanation they have
+        read?)
+      </p>
+
+      <h2 id="equity">Preserve the link equity</h2>
+      <p>
+        Those two decades of backlinks point at old URLs that no longer exist. Let them 404 and the equity
+        evaporates. So every valuable legacy URL gets a <strong>permanent (301) redirect</strong> to its modern
+        equivalent. The judgment call, which URL goes where, follows one framework we apply to every link:
+      </p>
+      <table class="cmp">
+        <thead><tr><th>When a legacy link is&hellip;</th><th>What we do</th></tr></thead>
+        <tbody>
+          <tr><td>High authority + on-topic + still searched</td><td>Restore it as its own dedicated page</td></tr>
+          <tr><td>High authority + dead topic today</td><td>Redirect to the closest relevant hub</td></tr>
+          <tr><td>Off-topic to the site</td><td><strong>Leave it to a clean 404</strong>, deliberately</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Three signals drive that table: <strong>authority</strong> (how many distinct sites link to it),
+        <strong>topical fit</strong> (what the link is actually about, judged from the anchor text and context, not
+        the URL slug), and <strong>modern demand</strong> (does anyone search for this today). The last row is the
+        one most people get wrong: redirecting unrelated old links to your homepage to &ldquo;catch&rdquo; their
+        equity is a classic expired-domain-abuse signal, and search engines are good at spotting it.
+        <strong>Restraint is part of the craft.</strong>
+      </p>
+
+      <h2 id="stack">Under the hood</h2>
+      <p>
+        In the spirit of transparency, here is exactly what KB Cafe is built on. The source was purposefully made
+        <a href="https://github.com/damnepic/kbcafe" target="_blank" rel="noopener">public on GitHub</a>, so none
+        of this is secret:
+      </p>
+      <ul>
+        <li><strong>A static site built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>,
+          deployed on Vercel.</strong> No backend, no database, no server to babysit. Static means fast pages, near-zero
+          hosting cost, and almost nothing to hack.</li>
+        <li><strong>Tools run 100% in your browser.</strong> Nothing you paste is uploaded. The DNS and WHOIS
+          lookups go straight from your browser to public resolvers (DNS-over-HTTPS and RDAP), never through us, a
+          privacy feature that also happens to cost nothing to run.</li>
+        <li><strong>Data-driven content.</strong> Pages are generated from structured data files, and a small graph
+          of those files powers the cross-linking (related guides, &ldquo;learn the concept,&rdquo; next steps) so
+          the content reinforces itself instead of sitting as orphan pages.</li>
+        <li><strong>The link-equity restoration lives in one config file.</strong> Every 301 redirect from the
+          section above is a line in <code>vercel.json</code>.</li>
+        <li><strong>Privacy-friendly by construction.</strong> Analytics is cookieless and aggregate; your reading
+          progress is stored only in your browser, never sent anywhere.</li>
+      </ul>
+      <p>
+        Showing the stack is just the start, <strong>you need to build your own moat.</strong> Anyone can run Astro
+        on Vercel. What compounds is the content, the recovered authority, the process, and consistent, quality
+        linkable updates.
+      </p>
+
+      <h2 id="tech">The technical foundation</h2>
+      <p>
+        With content and redirects in place: a clean <strong>sitemap</strong>, <strong>structured data</strong>
+        where it earns rich results, <strong>canonical URLs</strong>, and fast, no-bloat pages. Then submit the
+        sitemap to <strong>Search Console</strong> and request indexing on the highest-value pages, so discovery is
+        not left entirely to chance.
+      </p>
+
+      <h2 id="measure">Measure honestly</h2>
+      <p>
+        We run <strong>privacy-friendly, aggregate analytics</strong>, no cookies, no personal tracking, just counts
+        and trends. Enough to learn which pages pull and which tools get used, without building a profile of anyone.
+        The data decides where we dig next.
+      </p>
+
+      <h2 id="now">Where we are (the honest part)</h2>
+      <p>
+        As of writing, the site is <strong>days old with minimal traffic.</strong> That is not a failure to
+        hide, it is the <strong>starting line</strong>, and the whole point of documenting in public. The
+        interesting story is not &ldquo;we already won,&rdquo; it is &ldquo;watch what happens from zero.&rdquo;
+        We&rsquo;ll share the real numbers, traffic and rough revenue, as they accrue.
+      </p>
+
+      <div class="cs-cta">
+        Be sure to <strong>bookmark this page</strong> and <strong>share it with friends</strong>, so you and they
+        can follow along on an exciting journey to learn about the process. It&rsquo;s going to be a wild, fun,
+        rollercoaster of a ride filled with wins and losses. But one thing is guaranteed: it will be jam-packed
+        with <strong>truth, transparency, and education.</strong>
+      </div>
+
+      <div class="cs-note">
+        <strong>What we keep in-house.</strong> The process above is the real process, in full, and the shipped
+        code is <a href="https://github.com/damnepic/kbcafe" target="_blank" rel="noopener">open</a>. What stays
+        private is narrower: the backlink-audit scripts we wrote to rank and triage thousands of legacy links, our
+        research and roadmap, and a couple of tactical edges. Honest, not naive: you&rsquo;re getting the real
+        playbook and the real codebase, minus the few parts that are genuinely ours.
+      </div>
+
+      <h2 id="faq">FAQ</h2>
+      {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+
+      <p class="cs-back">
+        This is case study #1. More portfolio teardowns are coming, each a different play.<br />
+        Jump back in to <a class="cs-back-link" href="/ai-business"><span class="cs-back-ic" set:html={BRIEFCASE} />AI Business</a>.
+      </p>
+    </div>
+  </article>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+</Layout>
+
+<style>
+  .cs{max-width:760px;padding:34px 0 20px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--coral);margin-bottom:14px}
+  .cs h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.03;font-size:clamp(34px,5.5vw,52px);margin:0}
+  .tagline{margin-top:16px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:680px}
+
+  .toc{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:24px 0 26px;padding:14px 16px;border:1.2px solid var(--line);border-radius:13px;background:var(--paper-2)}
+  .toc-h{font-family:var(--font-mono);font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-right:4px}
+  .toc a{font-family:var(--font-mono);font-size:12.5px;color:var(--coral);text-decoration:none;font-weight:600}
+  .toc a:hover{text-decoration:underline}
+
+  .prose{max-width:720px}
+  .prose h2{font-family:var(--font-display);font-weight:800;font-size:25px;letter-spacing:-.02em;margin:30px 0 12px}
+  .prose p{font-size:16.5px;line-height:1.7;color:var(--ink-soft);margin:0 0 14px}
+  .prose ul{margin:0 0 16px;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+  .prose li{font-size:16.5px;line-height:1.55;color:var(--ink-soft)}
+  .prose strong{color:var(--ink)}
+  .prose a{color:var(--coral);font-weight:600;text-decoration:none}.prose a:hover{text-decoration:underline}
+
+  .cmp{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:14.5px}
+  .cmp th,.cmp td{border:1px solid var(--line);padding:10px 13px;text-align:left;vertical-align:top}
+  .cmp thead th{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper-2)}
+  .cmp td:first-child{font-weight:600;color:var(--ink);width:48%}
+
+  .cs-note{margin:24px 0;padding:16px 18px;border:1.5px solid rgba(244,132,42,.32);border-radius:14px;background:rgba(244,180,35,.1);font-size:15px;line-height:1.6;color:var(--ink-soft)}
+  .cs-note strong{color:var(--ink)}
+  .cs-cta{margin:22px 0;padding:18px 20px;border:1.5px solid rgba(238,75,43,.3);border-radius:14px;background:rgba(238,75,43,.06);font-size:16px;line-height:1.62;color:var(--ink-soft)}
+  .cs-cta strong{color:var(--ink)}
+
+  .faq{border:1px solid var(--line);border-radius:14px;padding:4px 18px;margin-bottom:10px;background:var(--cream)}
+  .faq summary{font-family:var(--font-display);font-weight:700;font-size:16px;padding:14px 0;cursor:pointer;list-style:none}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq[open] summary{color:var(--coral)}
+  .faq p{font-size:15.5px;line-height:1.6;margin:0 0 14px}
+  .cs-back{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-size:15px;line-height:1.9}
+  .cs-back-link{font-weight:700}
+  .cs-back-ic{display:inline-flex;width:16px;height:16px;vertical-align:-3px;margin-right:5px;color:var(--coral)}
+  .cs-back-ic svg{width:100%;height:100%}
+</style>

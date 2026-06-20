@@ -1,6 +1,7 @@
 ---
 import Layout from './Layout.astro';
 import Share from '../components/Share.astro';
+import ReadingEnhancers from '../components/ReadingEnhancers.astro';
 import { POSTS, fmtDate } from '../data/blog.js';
 
 const { title, description, slug, tag, date } = Astro.props;
@@ -33,6 +34,8 @@ const others = POSTS.filter(p => p.slug !== slug).slice(0, 3);
       ))}
     </div>
   </aside>
+
+  <ReadingEnhancers />
 </Layout>
 
 <style is:global>

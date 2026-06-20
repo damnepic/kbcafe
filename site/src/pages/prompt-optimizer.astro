@@ -1,0 +1,274 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="Prompt Optimizer, score, fix & restructure any prompt | KB Cafe"
+  description="Paste any prompt and get an instant health score, the missing pieces (audience, goal, format, constraints), and a stronger, structured version, all in your browser. Optional: let AI rewrite it with your own key."
+  path="/prompt-optimizer"
+  eyebrow="AI Explained · Tool"
+  h1="Prompt Optimizer"
+  tagline="Paste a prompt. Prompt Doc scores it, finds what's missing, and hands back a stronger, structured version, instantly, in your browser. No account, no key required."
+>
+  <div class="po">
+    <div class="po-icon"><svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="12" y="11" width="40" height="47" rx="5" fill="#FFFCF5" stroke="#1E1813" stroke-width="2"/>
+      <rect x="25" y="6.5" width="14" height="9" rx="2.5" fill="#EE4B2B"/>
+      <rect x="19" y="23" width="26" height="3.2" rx="1.6" fill="#d8cbb4"/>
+      <rect x="19" y="31" width="20" height="3.2" rx="1.6" fill="#d8cbb4"/>
+      <rect x="19" y="39" width="24" height="3.2" rx="1.6" fill="#d8cbb4"/>
+      <circle cx="46" cy="50" r="11" fill="#16a34a" stroke="#FBF4E9" stroke-width="2.5"/>
+      <path d="M40.6 50.3 l3.7 3.7 L52 46.4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></div>
+    <div class="po-intro">
+      Meet <strong>Prompt Doc</strong>, the Prompt Optimizer. Paste a prompt and get an instant checkup: a health
+      score, the missing pieces, and a restructured version you can copy. All client-side, nothing leaves your
+      browser.
+    </div>
+
+    <div class="pane">
+      <div class="pane-label"><span>Your prompt</span><button class="link-btn" id="po-sample">sample</button></div>
+      <textarea id="po-in" class="ta" spellcheck="false" placeholder="Paste your prompt, e.g. write me a landing page"></textarea>
+    </div>
+    <div class="row" style="margin:14px 0"><button class="btn" id="po-go">Optimize</button></div>
+
+    <div class="po-results" id="po-results" hidden></div>
+
+    <details class="po-adv">
+      <summary><span class="po-adv-t">Advanced: let AI rewrite it for you</span><span class="po-adv-tag">bring your own key</span></summary>
+      <div class="po-adv-body">
+        <p class="po-adv-note">Optional and off by default. The free tool above already optimizes your prompt with no key. This step calls a real model to rewrite it, using <strong>your</strong> API key, kept in your browser and sent straight to your provider, never to KB Cafe.</p>
+        <div class="row po-prov" id="po-prov">
+          <button class="chip active" data-p="openai" type="button">OpenAI</button>
+          <button class="chip" data-p="anthropic" type="button">Anthropic</button>
+        </div>
+        <div class="po-keyrow">
+          <input id="po-key" type="password" placeholder="sk-… (your API key)" autocomplete="off" />
+          <input id="po-model" type="text" class="po-model" />
+          <button class="link-btn" id="po-forget" type="button">forget</button>
+        </div>
+        <div class="row" style="margin:12px 0 0"><button class="btn" id="po-rewrite" type="button">Rewrite with AI</button><span class="po-status" id="po-status"></span></div>
+        <div class="po-ai" id="po-ai" hidden></div>
+      </div>
+    </details>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>What Prompt Doc checks</h2>
+    <p>
+      A strong prompt isn&rsquo;t about magic words, it&rsquo;s about giving the model the pieces it needs to stop
+      guessing. Prompt Doc looks for eight of them, scores what&rsquo;s there, and flags what&rsquo;s missing:
+    </p>
+    <ul>
+      <li><strong>Goal</strong> and <strong>output format</strong>, what you want and how it should look.</li>
+      <li><strong>Audience</strong>, <strong>role</strong>, and <strong>tone</strong>, who it&rsquo;s for and who the model should be.</li>
+      <li><strong>Context</strong>, <strong>constraints</strong>, and <strong>examples</strong>, the background and the guardrails.</li>
+    </ul>
+    <p>
+      The <strong>score is a transparent rubric</strong>, every point is shown and tied to a piece that&rsquo;s
+      present or missing. No black box. Then it restructures your prompt into a template you can copy and fill.
+    </p>
+
+    <h2>One tool, built from many</h2>
+    <p>
+      Prompt Doc is the all-in-one. If you&rsquo;d rather learn each piece on its own, the focused tools it&rsquo;s
+      built from are still here: the <a href="/prompt-builder">Prompt Builder</a>,
+      <a href="/prompt-linter">Linter</a>, <a href="/prompt-x-ray">X-Ray</a>,
+      <a href="/prompt-diff">Diff</a>, and <a href="/good-vs-bad-prompts">good vs bad examples</a>. New to
+      prompting? Start with the <a href="/learn-prompting">Learn Prompting</a> course.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Does it send my prompt anywhere?</summary>
+      <p>No. The scoring and restructuring run entirely in your browser. Nothing is uploaded. The only exception is the optional &ldquo;Rewrite with AI&rdquo; step, which goes straight from your browser to your provider with your own key, never through KB Cafe.</p>
+    </details>
+    <details class="faq"><summary>Do I need an API key?</summary>
+      <p>No. The score, the missing-elements checklist, and the structured rewrite all work with no key and no account. The key only unlocks the optional AI rewrite if you want it.</p>
+    </details>
+    <details class="faq"><summary>How is the score calculated?</summary>
+      <p>It&rsquo;s a fixed rubric: each of the eight prompt elements is worth a set number of points, shown next to it. Detected elements earn their points; the total is the sum. Deterministic and fully visible, not an opaque &ldquo;AI rating.&rdquo;</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Estimate what a prompt costs with the <a href="/token-counter">Token Counter</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<script is:inline>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var inEl = $('po-in'), out = $('po-results');
+
+    var ELS = [
+      { k: 'goal', label: 'Goal / task', pts: 20, why: 'What you actually want produced. Without it, the model guesses.', test: /\b(write|create|build|generate|make|draft|design|explain|summari[sz]e|list|analy[sz]e|produce|rewrite|translate|give me|help me|act as)\b/i },
+      { k: 'format', label: 'Output format', pts: 16, why: 'Structure and length, e.g. a 5-bullet list, JSON, 200 words.', test: /\b(format|json|markdown|table|bullet|numbered|in \d+ words|paragraphs?|steps?|csv|yaml|sections?|headings?|outline|\d+ words?)\b/i },
+      { k: 'audience', label: 'Audience', pts: 14, why: 'Who it is for, which changes vocabulary and depth.', test: /\b(audience|for (a |an )?(beginner|expert|developer|engineer|kid|child|student|customer|user|marketer|founder|exec|teen)|target reader|readers?)\b/i },
+      { k: 'role', label: 'Role / persona', pts: 12, why: 'Who the model should be, e.g. "act as a senior copywriter".', test: /\b(act as|you are|as an?\s+\w+|persona|the role of)\b/i },
+      { k: 'constraints', label: 'Constraints', pts: 12, why: 'Limits and rules, e.g. under 200 words, no jargon.', test: /\b(don'?t|do not|avoid|only|no more than|under \d+|at most|fewer than|limit|keep it|max|within|must|should not|exclude|no fluff)\b/i },
+      { k: 'context', label: 'Context', pts: 12, why: 'Background the model needs, e.g. your product, your data.', test: /\b(context|background|here (is|are)|given that|my |our |i'm |i am |we're |we are |the following|based on)\b/i },
+      { k: 'tone', label: 'Tone', pts: 8, why: 'The voice, e.g. confident, friendly, plain.', test: /\b(tone|formal|casual|friendly|professional|playful|concise|simple|witty|persuasive|conversational|plain|warm|serious)\b/i },
+      { k: 'examples', label: 'Examples', pts: 6, why: 'A sample of what good looks like (few-shot).', test: /\b(for example|e\.g\.|example|such as|like this|few[- ]shot|sample)\b/i },
+    ];
+    var SAMPLE = 'write me a landing page';
+
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+    function analyze(p) {
+      var present = {}, total = 0;
+      ELS.forEach(function (e) { var ok = e.test.test(p); present[e.k] = ok; if (ok) total += e.pts; });
+      return { present: present, total: Math.min(100, total) };
+    }
+
+    function rewrite(p, present) {
+      var parts = [];
+      if (!present.role) parts.push('Act as [a relevant expert, e.g. a senior SaaS copywriter].');
+      parts.push('Task: ' + p.trim());
+      var gaps = [];
+      if (!present.audience) gaps.push('Audience: [who is this for?]');
+      if (!present.context) gaps.push('Context: [background the model should know, e.g. your product or data]');
+      if (!present.format) gaps.push('Output format: [structure & length, e.g. headline + 3 sections + CTA, or a 5-bullet list]');
+      if (!present.tone) gaps.push('Tone: [e.g. confident, friendly, no jargon]');
+      if (!present.constraints) gaps.push('Constraints: [limits, e.g. under 300 words, no buzzwords]');
+      if (!present.examples) gaps.push('Example of the style you want: [paste a short sample, optional]');
+      if (gaps.length) parts.push(gaps.join('\n'));
+      return parts.join('\n\n');
+    }
+
+    function render(p) {
+      var a = analyze(p);
+      var grade = a.total >= 80 ? 'ok' : a.total >= 50 ? 'warn' : 'bad';
+      var rows = ELS.map(function (e) {
+        var ok = a.present[e.k];
+        return '<div class="po-row po-' + (ok ? 'ok' : 'bad') + '"><span class="po-sym">' + (ok ? '✓' : '✗') + '</span>' +
+          '<span class="po-row-l"><strong>' + e.label + '</strong><span class="po-why">' + esc(e.why) + '</span></span>' +
+          '<span class="po-row-pts">' + (ok ? '+' + e.pts : '0') + '</span></div>';
+      }).join('');
+      var rw = rewrite(p, a.present);
+      out.innerHTML =
+        '<div class="po-card po-grade-' + grade + '">' +
+          '<div class="po-score"><span class="po-score-n">' + a.total + '</span><span class="po-score-d">/ 100</span></div>' +
+          '<div class="po-score-for">Prompt health<span class="po-score-note">transparent rubric, every point shown below</span></div>' +
+        '</div>' +
+        '<div class="po-rows">' + rows + '</div>' +
+        '<div class="po-ba">' +
+          '<div class="po-box"><div class="po-box-h">Your prompt</div><pre class="po-pre">' + esc(p.trim()) + '</pre></div>' +
+          '<div class="po-box po-box-after"><div class="po-box-h">Structured version <button class="po-copy" id="po-copy" type="button">Copy</button></div><pre class="po-pre" id="po-rw">' + esc(rw) + '</pre><p class="po-fill">Fill the [bracketed] gaps and you have a far stronger prompt. Want AI to do it for you? Use the Advanced panel below.</p></div>' +
+        '</div>';
+      out.hidden = false;
+      var cp = $('po-copy');
+      if (cp) cp.addEventListener('click', function () {
+        var t = $('po-rw').innerText;
+        var done = function () { cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy'; }, 1500); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(function () {});
+      });
+    }
+
+    $('po-go').addEventListener('click', function () { var p = inEl.value.trim(); if (!p) { inEl.focus(); return; } render(p); });
+    $('po-sample').addEventListener('click', function () { inEl.value = SAMPLE; render(SAMPLE); });
+
+    // ---- optional BYO-key AI rewrite ----
+    var DEFAULTS = { openai: 'gpt-4o-mini', anthropic: 'claude-sonnet-4-6' };
+    var prov = 'openai';
+    var SYS = 'You are an expert prompt engineer. Rewrite the user’s prompt so it is clear and effective: add a suitable role, audience, an explicit goal, an output format, a tone, and sensible constraints, while preserving the user’s original intent. Return ONLY the improved prompt as plain text, with no preamble, no explanation, and no markdown code fences.';
+    function keyId() { return 'kbcafe-key-' + prov; }
+    function loadKey() { try { $('po-key').value = localStorage.getItem(keyId()) || ''; } catch (e) {} $('po-model').value = DEFAULTS[prov]; }
+    function saveKey() { try { localStorage.setItem(keyId(), $('po-key').value.trim()); } catch (e) {} }
+
+    $('po-prov').addEventListener('click', function (e) {
+      var b = e.target.closest('.chip'); if (!b) return;
+      document.querySelectorAll('#po-prov .chip').forEach(function (c) { c.classList.remove('active'); });
+      b.classList.add('active'); prov = b.dataset.p; loadKey();
+    });
+    $('po-key').addEventListener('change', saveKey);
+    $('po-forget').addEventListener('click', function () { try { localStorage.removeItem(keyId()); } catch (e) {} $('po-key').value = ''; $('po-status').textContent = 'Key forgotten.'; });
+
+    $('po-rewrite').addEventListener('click', async function () {
+      var key = $('po-key').value.trim(), model = $('po-model').value.trim() || DEFAULTS[prov], p = inEl.value.trim();
+      if (!p) { $('po-status').textContent = 'Paste a prompt above first.'; return; }
+      if (!key) { $('po-status').textContent = 'Enter your API key.'; return; }
+      saveKey(); $('po-rewrite').disabled = true; $('po-status').textContent = 'Rewriting…'; $('po-ai').hidden = true;
+      try {
+        var text;
+        if (prov === 'openai') {
+          var r = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+            body: JSON.stringify({ model: model, temperature: 0.4, messages: [{ role: 'system', content: SYS }, { role: 'user', content: p }] }),
+          });
+          var d = await r.json(); if (!r.ok) throw new Error(d.error ? d.error.message : ('HTTP ' + r.status));
+          text = d.choices[0].message.content;
+        } else {
+          var r2 = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+            body: JSON.stringify({ model: model, max_tokens: 1200, system: SYS, messages: [{ role: 'user', content: p }] }),
+          });
+          var d2 = await r2.json(); if (!r2.ok) throw new Error(d2.error ? d2.error.message : ('HTTP ' + r2.status));
+          text = d2.content[0].text;
+        }
+        $('po-ai').innerHTML = '<div class="po-box po-box-after"><div class="po-box-h">AI-rewritten prompt <button class="po-copy" id="po-aicopy" type="button">Copy</button></div><pre class="po-pre" id="po-aitext">' + esc(text.trim()) + '</pre></div>';
+        $('po-ai').hidden = false; $('po-status').textContent = 'Done. (You paid your provider for this call.)';
+        var ac = $('po-aicopy');
+        if (ac) ac.addEventListener('click', function () { var t = $('po-aitext').innerText; if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { ac.textContent = 'Copied'; setTimeout(function () { ac.textContent = 'Copy'; }, 1500); }); });
+      } catch (e) {
+        $('po-status').textContent = 'Error: ' + ((e && e.message) || 'request failed') + '. Check the key, model name, and your account.';
+      } finally { $('po-rewrite').disabled = false; }
+    });
+    loadKey();
+  })();
+</script>
+
+<style is:global>
+  .po{max-width:720px}
+  .po-icon{width:66px;height:66px;margin:0 0 16px}
+  .po-icon svg{width:100%;height:100%;display:block}
+  .po-intro{font-size:15.5px;line-height:1.6;color:var(--ink-soft);background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:15px 17px;margin-bottom:18px}
+  .po-intro strong{color:var(--ink)}
+  .po .ta{min-height:130px}
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+
+  .po-results{margin-top:8px}
+  .po-card{display:flex;align-items:center;gap:20px;padding:18px 22px;border-radius:18px;border:1.5px solid var(--line);background:var(--cream);margin-bottom:16px}
+  .po-grade-ok{border-color:#15a06f;background:rgba(21,160,111,.08)}
+  .po-grade-warn{border-color:#d98a12;background:rgba(244,180,35,.12)}
+  .po-grade-bad{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .po-score{display:flex;align-items:baseline;gap:4px;flex:0 0 auto}
+  .po-score-n{font-family:var(--font-display);font-weight:800;font-size:50px;line-height:1;letter-spacing:-.03em;color:var(--ink)}
+  .po-grade-ok .po-score-n{color:#0f8a5f}.po-grade-warn .po-score-n{color:#b9740a}.po-grade-bad .po-score-n{color:var(--coral-deep)}
+  .po-score-d{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--ink-soft)}
+  .po-score-for{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--ink)}
+  .po-score-note{display:block;font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-top:5px}
+
+  .po-rows{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+  .po-row{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:11px;border:1.2px solid var(--line);background:var(--paper-2)}
+  .po-sym{flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;margin-top:1px}
+  .po-ok .po-sym{background:#15a06f}.po-bad .po-sym{background:var(--coral)}
+  .po-row-l{flex:1;display:flex;flex-direction:column;gap:2px}
+  .po-row-l strong{font-family:var(--font-display);font-size:14.5px;color:var(--ink)}
+  .po-why{font-size:12.5px;color:var(--ink-soft);line-height:1.4}
+  .po-row-pts{flex:0 0 auto;font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--ink-soft);margin-top:2px}
+
+  .po-ba{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .po-box{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);overflow:hidden}
+  .po-box-after{border-color:var(--coral)}
+  .po-box-h{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:11px 14px;border-bottom:1px solid var(--line);background:var(--paper-2)}
+  .po-pre{font-family:var(--font-mono);font-size:13px;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word;padding:13px 14px;margin:0}
+  .po-fill{font-size:12.5px;color:var(--ink-soft);line-height:1.5;padding:0 14px 13px;margin:0}
+  .po-copy{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--coral);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:pointer}
+  .po-copy:hover{border-color:var(--coral)}
+
+  .po-adv{margin-top:20px;border:1.5px solid var(--line);border-radius:14px;background:var(--paper-2);overflow:hidden}
+  .po-adv summary{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;list-style:none}
+  .po-adv summary::-webkit-details-marker{display:none}
+  .po-adv-t{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--ink)}
+  .po-adv-tag{font-family:var(--font-mono);font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);background:rgba(238,75,43,.1);border-radius:6px;padding:3px 7px}
+  .po-adv-body{padding:0 16px 16px}
+  .po-adv-note{font-family:var(--font-mono);font-size:11.5px;line-height:1.55;color:var(--ink-soft);margin:0 0 13px}
+  .po-adv-note strong{color:var(--ink)}
+  .po-prov{margin-bottom:11px}
+  .po-keyrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .po-keyrow input{font-family:var(--font-mono);font-size:13.5px;border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--cream);color:var(--ink);outline:0}
+  #po-key{flex:1;min-width:200px}.po-model{width:190px}
+  .po-keyrow input:focus{border-color:var(--ink)}
+  .po-status{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+  .po-ai{margin-top:14px}
+  @media(max-width:620px){.po-ba{grid-template-columns:1fr}.po-card{flex-direction:column;align-items:flex-start;gap:10px}}
+</style>

@@ -8,6 +8,8 @@ const I = {
   doc: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 16h6M9 8h2"/></svg>`,
   clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>`,
   rss: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5.5" cy="18.5" r="1.7" fill="currentColor" stroke="none"/><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 5a15 15 0 0 1 15 15"/></svg>`,
+  mail: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>`,
+  globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>`,
 };
 
 export const CAT_META = {
@@ -18,10 +20,12 @@ export const CAT_META = {
   text:     { label: 'Text',        bg: '#8a63ff', icon: I.doc },
   time:     { label: 'Time & Cron', bg: '#0f9f82', icon: I.clock },
   feeds:    { label: 'Feeds',       bg: '#f4842a', icon: I.rss },
+  email:    { label: 'Email',       bg: '#d63e1f', icon: I.mail },
+  network:  { label: 'Network',     bg: '#3478f6', icon: I.globe },
 };
 
 // display order for grouped views
-export const CAT_ORDER = ['ai', 'json', 'encoding', 'convert', 'text', 'time', 'feeds'];
+export const CAT_ORDER = ['ai', 'json', 'encoding', 'convert', 'text', 'time', 'feeds', 'email', 'network'];
 
 // tools that get a "New" badge
-export const NEW_TOOLS = ['/token-counter', '/context-budget-analyzer', '/rag-chunking-visualizer', '/mcp-config-generator', '/prompt-linter', '/prompt-diff', '/llm-vram-calculator', '/llm-cost-calculator', '/agent-memory-simulator', '/ai-pattern-builder', '/ai-stack-explainer', '/tool-call-visualizer', '/prompt-x-ray', '/embedding-explorer', '/claim-checker', '/scope-sorter', '/launch-rubric', '/ai-architecture-generator', '/prompt-simulator', '/prompt-builder', '/good-vs-bad-prompts'];
+export const NEW_TOOLS = ['/mcp-inspector', '/ai-profit-calculator', '/prompt-optimizer', '/whois-lookup', '/dns-lookup', '/email-deliverability-checker', '/token-counter', '/context-budget-analyzer', '/rag-chunking-visualizer', '/mcp-config-generator', '/prompt-linter', '/prompt-diff', '/llm-vram-calculator', '/llm-cost-calculator', '/agent-memory-simulator', '/ai-pattern-builder', '/ai-stack-explainer', '/tool-call-visualizer', '/prompt-x-ray', '/embedding-explorer', '/claim-checker', '/scope-sorter', '/launch-rubric', '/ai-architecture-generator', '/prompt-simulator', '/prompt-builder', '/good-vs-bad-prompts'];

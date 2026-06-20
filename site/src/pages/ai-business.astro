@@ -1,0 +1,208 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const STAGES = [
+  { n: '01', label: 'Learn', ds: 'Understand how AI actually works.', href: '/learn', live: true },
+  { n: '02', label: 'Build', ds: 'Ship tools, agents, and automations.', href: '/learn-ai-agents', live: true },
+  { n: '03', label: 'Grow', ds: 'Get users and traffic. (Marketing)', href: null, live: false },
+  { n: '04', label: 'Monetize', ds: 'Make money, honestly. (Monetization)', href: null, live: false },
+];
+
+const PORTFOLIO = [
+  { nm: 'KB Cafe', ds: 'This site. An aged dev-domain restored into a knowledge base + tools. Read the full teardown.', href: '/case-studies/kbcafe', tag: 'Case study #1' },
+  { nm: 'astrologybay.com', ds: 'A restored Buzzle-era astrology domain on the same aged-domain playbook.', href: 'https://astrologybay.com', tag: 'Live' },
+  { nm: 'catnames.com', ds: 'An expired domain, rebuilt as a custom cat-naming site with its own tools.', href: 'https://catnames.com', tag: 'Live' },
+  { nm: 'combovideos.com', ds: 'A fighting-game combo hub and archive. The deepest engineering build of the set.', href: 'https://combovideos.com', tag: 'Live' },
+  { nm: 'thumbcrafted.com', ds: 'A thumbnail editor and tool suite.', href: 'https://thumbcrafted.com', tag: 'Live' },
+  { nm: 'csscreme.com', ds: 'Another aged-domain restoration, arriving soon. Teardown to follow.', href: null, tag: 'Coming' },
+];
+
+const ICONS = {
+  megaphone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>`,
+  coin: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.3a3 3 0 0 0-2.8-1.6c-1.7 0-3 .9-3 2.2 0 1.4 1.4 1.9 3 2.4s3 1 3 2.4c0 1.3-1.3 2.2-3 2.2a3 3 0 0 1-2.8-1.6"/><path d="M12 6.5v11"/></svg>`,
+};
+---
+<Layout
+  title="AI Business, grow & monetize what you built | KB Cafe"
+  description="The honest, mechanism-first guide to the part nobody teaches well: getting traffic and making money from what you build. No growth hacks, no make-money slop, real processes from real sites we've built."
+  path="/ai-business"
+  crumbLabel="AI Business"
+>
+  <section class="ab">
+    <div class="eyebrow">AI Business · the part nobody teaches honestly</div>
+    <h1>You built the thing. <span class="mk">Now what?</span></h1>
+    <p class="lede">
+      Learning AI and building with it is the easy half of the story. The hard half, the half drowning in hype, is
+      what comes next: <strong>how do you get users, and how do you make money?</strong> This is where KB Cafe goes
+      next, and it will explain those the same way it explains DMARC, Base64, and MCP: <strong>mechanism first,
+      real numbers, no guru nonsense.</strong>
+    </p>
+    <p class="ab-live">
+      <span class="ab-live-dot" aria-hidden="true"></span><strong>A live build-in-public journey.</strong>
+      We&rsquo;re documenting the sites in our very own portfolio as they&rsquo;re built and grown, from day one,
+      with actual strategy and real numbers. Follow along for the ride.
+    </p>
+
+    <div class="stages">
+      {STAGES.map(s => (
+        s.href ? (
+          <a class="stage live" href={s.href}>
+            <span class="stage-n">{s.n}</span>
+            <span class="stage-l">{s.label}</span>
+            <span class="stage-d">{s.ds}</span>
+          </a>
+        ) : (
+          <div class="stage next">
+            <span class="stage-n">{s.n}</span>
+            <span class="stage-l">{s.label} <em>next</em></span>
+            <span class="stage-d">{s.ds}</span>
+          </div>
+        )
+      ))}
+    </div>
+
+    <div class="prose">
+      <h2>The anti-guru promise</h2>
+      <p>
+        Search &ldquo;how to get traffic&rdquo; or &ldquo;how to make money with AI&rdquo; and you drown in
+        <em>10x your growth</em>, <em>passive income</em>, and screenshots of dashboards that may or may not be real.
+        The internet has ten million versions of that. It has almost none of the thing that actually helps:
+        <strong>how it really works.</strong> How search ranks. How a launch channel rewards you or punishes you.
+        How pricing and margins actually behave once an AI API bill is involved. That is the gap KB Cafe fills here,
+        and the bar is the same as the rest of the site: if a page can&rsquo;t be honest and concrete, it
+        doesn&rsquo;t ship.
+      </p>
+
+      <h2>Taught from real sites, not theory</h2>
+      <p>
+        The difference here is simple: <strong>we are actually doing this.</strong> KB Cafe is not an article written
+        by someone who has never shipped, it is a live worked example you are reading right now. This exact site was:
+      </p>
+      <ul>
+        <li>bought as an <strong>aged domain</strong> for its backlink authority, then <strong>restored</strong> rather than rebuilt;</li>
+        <li>filled with <strong>flagship references and client-side tools</strong> (the email, DNS, and WHOIS clusters you can use today);</li>
+        <li><strong>audited for trapped backlink equity</strong>, with on-topic URLs recovered and off-topic ones deliberately left alone;</li>
+        <li>submitted to <strong>Search Console</strong> and <strong>instrumented with privacy-friendly analytics</strong> to measure what works.</li>
+      </ul>
+      <p>
+        Every claim in the Marketing and Monetization guides will be backed by something real, from this site or
+        another we&rsquo;ve built. The first full teardown is live:
+        <a href="/case-studies/kbcafe"><strong>how we restored KB Cafe</strong></a>. We&rsquo;ll show the
+        <strong>process and the mechanics</strong> in detail; a few specific
+        &ldquo;secret sauce&rdquo; tactics we&rsquo;ll describe in shape rather than hand over wholesale. Honest, not
+        naive.
+      </p>
+
+      <h2>The worked examples</h2>
+      <p>A portfolio of real sites this section will draw its lessons from, each with its own unique strategy and purpose:</p>
+    </div>
+
+    <div class="port">
+      {PORTFOLIO.map(p => (
+        p.href ? (
+          <a class="port-card" href={p.href} target={p.href.startsWith('http') ? '_blank' : null} rel={p.href.startsWith('http') ? 'noopener' : null}>
+            <span class="port-tag">{p.tag}</span>
+            <span class="port-nm">{p.nm}</span>
+            <span class="port-ds">{p.ds}</span>
+          </a>
+        ) : (
+          <div class="port-card soon">
+            <span class="port-tag">{p.tag}</span>
+            <span class="port-nm">{p.nm}</span>
+            <span class="port-ds">{p.ds}</span>
+          </div>
+        )
+      ))}
+    </div>
+
+    <div class="prose">
+      <h2>What&rsquo;s coming</h2>
+      <p>Two tracks, each built the way the rest of KB Cafe is, hub-and-spoke, mechanism-first, paired with tools:</p>
+      <div class="tracks">
+        <div class="track">
+          <div class="track-h"><span class="track-ic" set:html={ICONS.megaphone} />Marketing</div>
+          <p class="track-s">Get users &amp; traffic.</p>
+          <ul>
+            <li>SEO &amp; search, how ranking actually works</li>
+            <li>Launch channels (Hacker News, Product Hunt, Reddit)</li>
+            <li>Email marketing (built on the deliverability cluster)</li>
+            <li>Content &amp; distribution</li>
+            <li>Measuring growth without vanity metrics</li>
+          </ul>
+        </div>
+        <div class="track">
+          <div class="track-h"><span class="track-ic" set:html={ICONS.coin} />Monetization</div>
+          <p class="track-s">Make money, honestly.</p>
+          <ul>
+            <li>Pricing models and their real tradeoffs</li>
+            <li>Unit economics &amp; the AI API-cost reality</li>
+            <li>Freemium: where to draw the free/paid line</li>
+            <li>Subscriptions &amp; usage-based pricing</li>
+            <li>Payments and the fees nobody mentions</li>
+          </ul>
+        </div>
+      </div>
+      <p class="closing">
+        This page is the promise; the guides are the proof. Start from the top of the journey any time:
+        <a href="/learn">Learn AI</a>, then <a href="/learn-ai-agents">build with it</a>. Grow and Monetize are next.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .ab{max-width:880px;padding:34px 0 20px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .ab h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.02;font-size:clamp(36px,6vw,60px);margin:0}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.18em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%23EE4B2B' fill-opacity='0.5'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .2em}
+  .lede{margin-top:20px;font-size:18px;line-height:1.6;color:var(--ink-soft);max-width:680px}
+  .lede strong{color:var(--ink)}
+  .ab-live{margin:18px 0 0;padding:13px 17px;max-width:680px;
+    border:1.5px solid rgba(238,75,43,.3);border-radius:12px;background:rgba(238,75,43,.06);
+    font-size:15px;line-height:1.6;color:var(--ink-soft)}
+  .ab-live strong{color:var(--ink)}
+  .ab-live-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--coral);margin-right:10px;vertical-align:middle;position:relative;top:-1px}
+  @media(prefers-reduced-motion:no-preference){.ab-live-dot{animation:abpulse 2s infinite}}
+  @keyframes abpulse{0%{box-shadow:0 0 0 0 rgba(238,75,43,.45)}70%{box-shadow:0 0 0 8px rgba(238,75,43,0)}100%{box-shadow:0 0 0 0 rgba(238,75,43,0)}}
+
+  .stages{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:30px 0 8px}
+  .stage{display:flex;flex-direction:column;gap:4px;padding:16px 16px 18px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .stage.live:hover{transform:translateY(-3px);box-shadow:6px 7px 0 rgba(30,24,19,.08);border-color:var(--ink)}
+  .stage.next{background:var(--paper-2);border-style:dashed;opacity:.92}
+  .stage-n{font-family:var(--font-mono);font-size:12px;font-weight:800;color:var(--coral);letter-spacing:.08em}
+  .stage-l{font-family:var(--font-display);font-weight:800;font-size:19px;color:var(--ink)}
+  .stage-l em{font-style:normal;font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);background:var(--cream);border:1px solid var(--line);border-radius:5px;padding:2px 6px;margin-left:4px;vertical-align:middle}
+  .stage-d{font-size:13px;color:var(--ink-soft);line-height:1.4}
+
+  .prose{max-width:720px;padding:6px 0}
+  .prose h2{font-family:var(--font-display);font-weight:800;font-size:25px;letter-spacing:-.02em;margin:32px 0 12px}
+  .prose p{font-size:16.5px;line-height:1.7;color:var(--ink-soft);margin:0 0 14px}
+  .prose ul{margin:0 0 16px;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+  .prose li{font-size:16.5px;line-height:1.55;color:var(--ink-soft)}
+  .prose strong{color:var(--ink)} .prose em{color:var(--ink)}
+  .prose a{color:var(--coral);font-weight:600;text-decoration:none}.prose a:hover{text-decoration:underline}
+
+  .port{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 10px}
+  .port-card{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .port-card:not(.soon):hover{transform:translateY(-3px);box-shadow:6px 7px 0 rgba(30,24,19,.08);border-color:var(--ink)}
+  .port-card.soon{background:var(--paper-2);border-style:dashed}
+  .port-tag{font-family:var(--font-mono);font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--coral);width:fit-content}
+  .port-card.soon .port-tag{color:var(--ink-soft)}
+  .port-nm{font-family:var(--font-mono);font-weight:700;font-size:15px;color:var(--ink)}
+  .port-ds{font-size:12.5px;color:var(--ink-soft);line-height:1.45}
+
+  .tracks{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:8px 0 10px}
+  .track{padding:18px 20px;border-radius:16px;border:1.5px solid var(--line);background:var(--cream)}
+  .track-h{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:800;font-size:19px;color:var(--ink)}
+  .track-ic{display:inline-flex;flex:0 0 auto;width:22px;height:22px;color:var(--coral)}
+  .track-ic svg{width:100%;height:100%}
+  .track-s{font-size:14px;color:var(--ink-soft);margin:4px 0 12px}
+  .track ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
+  .track li{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+  .closing{margin-top:20px}
+
+  @media(max-width:760px){.stages{grid-template-columns:1fr 1fr}.port{grid-template-columns:1fr 1fr}.tracks{grid-template-columns:1fr}}
+  @media(max-width:480px){.port{grid-template-columns:1fr}}
+</style>

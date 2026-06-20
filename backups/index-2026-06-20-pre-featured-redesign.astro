@@ -69,16 +69,6 @@ const WORKFLOWS = [
     blurb: 'Connect triggers, schedules, tools, and AI into workflows that run themselves.',
     tools: [['Blueprint Explorer', '/automation-blueprints'], ['Cron Generator', '/cron-generator'], ['Agents vs Workflows', '/ai-agents-vs-workflows-vs-rpa'], ['Webhooks vs Polling', '/webhooks-vs-polling']] },
 ];
-
-// ── Featured tools (3 hero tools, each with its own illustration) ──
-const SVG_BUILDER = `<svg viewBox="0 0 64 64"><rect x="8" y="10" width="42" height="34" rx="5" fill="#FFFCF5" stroke="#1E1813" stroke-width="2"/><rect x="14" y="18" width="22" height="3" rx="1.5" fill="#d8cbb4"/><rect x="14" y="25" width="16" height="3" rx="1.5" fill="#d8cbb4"/><rect x="14" y="32" width="19" height="3" rx="1.5" fill="#d8cbb4"/><g transform="translate(45,46) rotate(38) scale(.6)"><rect x="-2.4" y="-1" width="4.8" height="21" rx="2.4" fill="#F4B423" stroke="#1E1813" stroke-width="3"/><rect x="-10" y="-10" width="20" height="9.5" rx="2.5" fill="#1E1813"/><rect x="4.5" y="-10" width="5.5" height="9.5" rx="2.5" fill="#EE4B2B"/></g></svg>`;
-const SVG_CLIPBOARD = `<svg viewBox="0 0 64 64"><rect x="12" y="11" width="40" height="47" rx="5" fill="#FFFCF5" stroke="#1E1813" stroke-width="2"/><rect x="25" y="6.5" width="14" height="9" rx="2.5" fill="#EE4B2B"/><rect x="19" y="23" width="26" height="3.2" rx="1.6" fill="#d8cbb4"/><rect x="19" y="31" width="20" height="3.2" rx="1.6" fill="#d8cbb4"/><rect x="19" y="39" width="24" height="3.2" rx="1.6" fill="#d8cbb4"/><circle cx="46" cy="50" r="11" fill="#16a34a" stroke="#FBF4E9" stroke-width="2.5"/><path d="M40.6 50.3 l3.7 3.7 L52 46.4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const SVG_PROFIT = `<svg viewBox="0 0 64 64"><rect x="8" y="18" width="44" height="34" rx="6" fill="#FFFCF5" stroke="#1E1813" stroke-width="2"/><rect x="15" y="40" width="6.5" height="7" rx="1.6" fill="#16a34a"/><rect x="24.5" y="35" width="6.5" height="12" rx="1.6" fill="#16a34a"/><rect x="34" y="29" width="6.5" height="18" rx="1.6" fill="#16a34a"/><circle cx="49" cy="18" r="9.5" fill="#EE4B2B" stroke="#FBF4E9" stroke-width="2.5"/><text x="49" y="22.6" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="13" fill="#fff">$</text></svg>`;
-const FEATURED = [
-  { href: '/prompt-builder', name: 'Prompt Builder', desc: 'Answer a few questions and get a clear, well-structured prompt, built from scratch.', icon: SVG_BUILDER },
-  { href: '/prompt-optimizer', name: 'Prompt Optimizer', desc: 'Paste any prompt for a health score, the missing pieces, and a stronger version.', icon: SVG_CLIPBOARD },
-  { href: '/ai-profit-calculator', name: 'AI Profit Calculator', desc: 'Price, users, and usage in. Monthly margin and your break-even point out.', icon: SVG_PROFIT },
-];
 ---
 <Layout
   title="KB Cafe, the interactive AI knowledge base"
@@ -103,40 +93,34 @@ const FEATURED = [
     </div>
   </section>
 
-  <!-- TRUST STRIP (compact divider bar) -->
-  <div class="trust">
-    <div class="tr-item"><span class="tr-ic b1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/></svg></span><div><b>Client-side</b><small>Runs in your browser</small></div></div>
-    <span class="tr-dv"></span>
-    <div class="tr-item"><span class="tr-ic b2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>Private</b><small>No signups or cookies</small></div></div>
-    <span class="tr-dv"></span>
-    <div class="tr-item"><span class="tr-ic b3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><div><b>Fast</b><small>Instant, works offline</small></div></div>
-    <span class="tr-dv"></span>
-    <div class="tr-item"><span class="tr-ic b4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg></span><div><b>Dev-friendly</b><small>Clean &amp; keyboard-first</small></div></div>
+  <!-- BENEFITS: tucked tight, directly under the triage cards -->
+  <div class="benefits" id="benefits">
+    <div class="benefit"><div class="b-head"><span class="b-ic b-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z"/></svg></span><h3>100% Client-Side</h3></div><p>Everything runs in your browser. Nothing leaves your device.</p></div>
+    <div class="benefit"><div class="b-head"><span class="b-ic b-coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Privacy First</h3></div><p>No signups, no ads, no cookies. Your data stays in your browser.</p></div>
+    <div class="benefit"><div class="b-head"><span class="b-ic b-gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span><h3>Blazing Fast</h3></div><p>Instant results. Works offline. Always available.</p></div>
+    <div class="benefit"><div class="b-head"><span class="b-ic b-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg></span><h3>Developer Friendly</h3></div><p>Clean UI, keyboard-friendly, and zero fluff.</p></div>
+    <button class="b-hide" id="b-hide" type="button" title="Hide this section">Got it, hide me! ✕</button>
   </div>
+  <script is:inline>
+    /* Let repeat/power users dismiss the benefits strip; remembered locally, no tracking. */
+    (function () {
+      var key = 'kb-hide-benefits', box = document.getElementById('benefits'), btn = document.getElementById('b-hide');
+      if (!box) return;
+      try { if (localStorage.getItem(key) === '1') box.style.display = 'none'; } catch (e) {}
+      if (btn) btn.addEventListener('click', function () { box.style.display = 'none'; try { localStorage.setItem(key, '1'); } catch (e) {} });
+    })();
+  </script>
 
-  <!-- FEATURED TOOLS -->
-  <section class="home-sec featured">
-    <div class="sec-head feat-head">
-      <span class="kicker kicker-ai">Featured tools</span>
-      <ul class="proof feat-proof">
-        <li><a href="/tools?cat=ai"><strong>{aiCount}</strong> AI tools</a></li>
-        <li><a href="/ai"><strong>{explainerCount}</strong> explainers</a></li>
-        <li><a href="/learn"><strong>{WORKFLOWS.length}</strong> learning paths</a></li>
-        <li><strong>100%</strong> client-side, no signups</li>
-      </ul>
-      <a class="sec-link" href="/tools">View all {toolCount} tools →</a>
-    </div>
-    <div class="feat-grid">
-      {FEATURED.map(f => (
-        <a class="feat" href={f.href}>
-          <span class="feat-ic" set:html={f.icon} />
-          <h3>{f.name}</h3>
-          <p>{f.desc}</p>
-          <span class="feat-go">Open <span aria-hidden="true">→</span></span>
-        </a>
-      ))}
-    </div>
-  </section>
+  <!-- TRUST + quick links (centered) -->
+  <div class="hero-trust">
+    <ul class="proof o-proof">
+      <li><a href="/tools?cat=ai"><strong>{aiCount}</strong> AI tools</a></li>
+      <li><a href="/ai"><strong>{explainerCount}</strong> explainers</a></li>
+      <li><a href="/learn"><strong>{WORKFLOWS.length}</strong> learning paths</a></li>
+      <li><strong>100%</strong> client-side, no signups</li>
+    </ul>
+    <p class="hero-quick">Not sure where to start? <a href="/search">Search every tool, concept &amp; lesson</a>, <a href="/skill-tree">take the skill tree</a>, or <a href="/tools">browse all {toolCount} tools</a>.</p>
+  </div>
 
   <!-- SEARCH -->
   <div class="search-wrap">
@@ -168,11 +152,15 @@ const FEATURED = [
         </div>
         <a class="sec-link" href="/ai">View all AI topics →</a>
       </div>
-      <div class="compact-grid ai-col">
-        {aiCards.slice(0, 4).map(c => (
-          <a class="crow" href={c.href}>
-            <span class="crow-ic" style={`background:${c.bg}`} set:html={c.icon} />
-            <span class="crow-b"><span class="crow-nm" set:html={c.nm} /><span class="crow-ds">{c.ds}</span></span>
+      <div class="ai-grid">
+        {aiCards.map(c => (
+          <a class="ai-card" href={c.href}>
+            <div class="ai-head">
+              <span class="ai-ic" style={`background:${c.bg}`} set:html={c.icon} />
+              <h3 set:html={c.nm} />
+            </div>
+            <p>{c.ds}</p>
+            <span class="read">Read more →</span>
           </a>
         ))}
       </div>
@@ -182,11 +170,14 @@ const FEATURED = [
     <!-- POPULAR TOOLS -->
     <section class="home-sec" id="menu">
       <div class="sec-head"><span class="kicker">Popular Tools</span><a class="sec-link" href="/tools">View all {toolCount} tools →</a></div>
-      <div class="compact-grid">
+      <div class="tool-grid">
         {popular.map(t => (
-          <a class="crow" href={t.href}>
-            <span class="crow-ic" style={`background:${t.bg}`} set:html={t.icon} />
-            <span class="crow-b"><span class="crow-nm">{t.nm}{t.isNew && <span class="new-tag">New</span>}</span><span class="crow-ds">{t.ds}</span></span>
+          <a class="tool-card" href={t.href}>
+            <span class="tool-ic" style={`background:${t.bg}`} set:html={t.icon} />
+            <div class="tc-body">
+              <h3>{t.nm}{t.isNew && <span class="new-tag">New</span>}</h3>
+              <p>{t.ds}</p>
+            </div>
           </a>
         ))}
       </div>
@@ -199,8 +190,8 @@ const FEATURED = [
     <div class="nl-card">
       <span class="nl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4Z"/><path d="M16 11h2.4a2.4 2.4 0 0 1 0 4.8H16"/><path d="M8 3.2c-.8 1-.8 1.9 0 2.9M12 3.2c-.8 1-.8 1.9 0 2.9"/></svg></span>
       <div class="nl-text"><h3>The Friday Brew <span class="nl-cup" aria-hidden="true">☕</span></h3><p>Pull up a chair. One genuinely useful tool, reference, or idea, brewed fresh every Friday. No spam, just the good stuff.</p></div>
-      <form class="nl-form" id="nlform" onsubmit="return false" title="Coming soon">
-        <input id="nlemail" type="text" readonly placeholder="you@example.com" />
+      <form class="nl-form" id="nlform" onsubmit="return false">
+        <input id="nlemail" type="email" placeholder="you@example.com" />
         <button type="submit">Subscribe</button>
       </form>
     </div>
@@ -216,18 +207,17 @@ const FEATURED = [
     document.addEventListener('keydown', e => {
       if(e.key === '/' && document.activeElement !== qEl && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); qEl.focus(); }
     });
-    // newsletter: coming soon (no backend yet). Reveal on focus/click or submit.
+    // newsletter: honest no-backend acknowledgement
     const nlform = document.getElementById('nlform');
-    const nlEmail = document.getElementById('nlemail');
-    function nlSoon(){ if(nlform.dataset.soon) return; nlform.dataset.soon = '1'; nlform.innerHTML = '<p class="nl-done">The Friday Brew is launching soon. ☕</p>'; }
-    nlform.addEventListener('submit', nlSoon);
-    if(nlEmail){ nlEmail.addEventListener('focus', nlSoon); nlEmail.addEventListener('click', nlSoon); }
+    nlform.addEventListener('submit', () => {
+      nlform.innerHTML = '<p class="nl-done">Thanks. The newsletter is launching soon. ☕</p>';
+    });
   </script>
 </Layout>
 
 <style is:global>
-  /* homepage-only warm background + darker (charcoal) card outlines so things stand out */
-  body.home{--line:#4a443d;background:
+  /* homepage-only warm background */
+  body.home{background:
     radial-gradient(circle at 18% -2%, rgba(255,201,120,.14), transparent 30%),
     radial-gradient(circle at 92% 10%, rgba(238,75,43,.05), transparent 24%),
     var(--bg) fixed}
@@ -331,17 +321,19 @@ const FEATURED = [
   .cat-new{margin-left:6px;padding:2px 7px;background:#ffe5dd;color:var(--coral-deep);font-size:9.5px}
   .cat.active .cat-new{background:rgba(255,255,255,.2);color:#fff}
 
-  /* TRUST STRIP (compact divider bar, centered) */
-  .trust{max-width:1120px;margin:16px auto 0;display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;
-    border:1.2px solid rgba(30,24,19,.1);border-radius:14px;padding:13px 22px;background:rgba(255,255,255,.42);box-shadow:0 8px 22px rgba(45,30,16,.04)}
-  .tr-item{display:flex;align-items:center;gap:10px;min-width:0}
-  .tr-ic{width:20px;height:20px;flex:0 0 auto;display:grid;place-items:center}
-  .tr-ic svg{width:100%;height:100%}
-  .tr-ic.b1{color:#3478f6}.tr-ic.b2{color:#ee4b2b}.tr-ic.b3{color:#e0911a}.tr-ic.b4{color:#0f9f82}
-  .trust b{font-family:var(--font-display);font-weight:800;font-size:13px;display:block;line-height:1.12;color:var(--ink)}
-  .trust small{font-size:11px;color:var(--ink-soft)}
-  .tr-dv{width:1px;height:26px;background:rgba(30,24,19,.14);flex:0 0 auto}
-  @media(max-width:760px){.trust{gap:14px 18px}.tr-dv{display:none}}
+  /* BENEFITS */
+  .benefits{max-width:1120px;margin:16px auto 0;padding:18px 22px;border-radius:20px;background:rgba(255,255,255,.5);border:1.2px solid var(--line);box-shadow:0 10px 30px rgba(45,30,16,.05);display:grid;grid-template-columns:repeat(4,1fr);gap:22px;align-items:start}
+  .benefit{min-width:0}
+  .b-head{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+  .b-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;flex-shrink:0}
+  .b-ic svg{width:24px;height:24px}
+  .b-blue{background:linear-gradient(135deg,#3478f6,#6aa8ff)} .b-coral{background:linear-gradient(135deg,#ff4b2f,#d63e1f)}
+  .b-gold{background:linear-gradient(135deg,#f4a400,#ffbd45)} .b-green{background:linear-gradient(135deg,#0f9f82,#16c8a4)}
+  .benefit h3{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.02em;margin:0;line-height:1.15}
+  .benefit p{margin:0;color:var(--ink-soft);line-height:1.4;font-size:12px}
+  .b-hide{grid-column:1/-1;justify-self:end;margin-top:-8px;background:none;border:0;cursor:pointer;
+    font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);opacity:.6;transition:opacity .14s,color .14s;padding:0}
+  .b-hide:hover{opacity:1;color:var(--coral-deep)}
 
   /* SECTIONS */
   .home-sec,.results{max-width:1120px;margin:0 auto 52px}
@@ -400,14 +392,11 @@ const FEATURED = [
   .nl-card,.gh-card{border-radius:24px;color:#fff;padding:26px;box-shadow:0 20px 50px rgba(16,17,18,.18);
     background:radial-gradient(circle at 88% 50%,rgba(238,75,43,.26),transparent 36%),linear-gradient(135deg,#141517,#1a120d)}
   .nl-card{display:grid;grid-template-columns:54px 1fr minmax(240px,340px);gap:18px;align-items:center;
-    color:var(--ink);background:var(--cream);border:1.6px solid var(--ink);box-shadow:0 8px 24px rgba(40,24,12,.06)}
-  .cta .nl-card h3{color:var(--ink)}
-  .cta .nl-card p{color:var(--ink-soft)}
-  .nl-card .nl-ic{background:var(--ink);border-color:var(--ink);color:var(--gold)}
-  .nl-card .nl-form{background:linear-gradient(135deg,#2c1d12,#3a2616);border:1px solid rgba(30,24,19,.28);transition:opacity .15s}
-  .nl-card .nl-form:hover{opacity:.55;cursor:not-allowed}
-  .nl-card .nl-form input{cursor:not-allowed}
-  .nl-card .nl-done{color:var(--ink-soft)}
+    background:
+      radial-gradient(circle at 92% 16%,rgba(244,180,35,.22),transparent 44%),
+      radial-gradient(circle at 6% 108%,rgba(111,78,55,.55),transparent 52%),
+      linear-gradient(135deg,#2c1d12,#3a2616)}
+  .nl-ic{color:var(--gold);border-color:rgba(244,180,35,.22)}
   .nl-card h3{display:flex;align-items:center;gap:8px}
   .nl-cup{font-size:16px}
   /* GitHub card: light cream with a dark outline (secondary CTA; keeps the page airy) */
@@ -427,41 +416,6 @@ const FEATURED = [
   .nl-form input::placeholder{color:rgba(255,255,255,.5)}
   .nl-form button{border:0;border-radius:999px;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:800;padding:0 20px;cursor:pointer}
   .nl-done{margin:0;font-family:var(--font-mono);font-size:13px;color:var(--gold)}
-
-  /* proof stats centered in the Featured header row */
-  .feat-head{align-items:center}
-  .feat-proof{flex:1;justify-content:center;margin:0;font-size:11.5px;color:#8a7e6e}
-  .feat-proof li{color:#8a7e6e;font-weight:600}
-  .feat-proof strong{color:var(--ink-soft)}
-  .feat-proof a{color:inherit}
-  .feat-proof a:hover strong{color:var(--coral-deep)}
-  .feat-proof li+li::before{background:#b9ab95;opacity:.8}
-  @media(max-width:820px){.feat-head{flex-wrap:wrap}.feat-proof{flex:1 1 100%;order:3;justify-content:flex-start;margin-top:8px}}
-
-  /* FEATURED tools (3 hero tools) */
-  .featured{margin-top:34px;margin-bottom:0}
-  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .feat{display:flex;flex-direction:column;text-decoration:none;color:var(--ink);background:var(--cream);border:1.4px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 8px 24px rgba(40,24,12,.05);transition:transform .16s,box-shadow .16s,border-color .16s}
-  .feat:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(40,24,12,.1);border-color:var(--coral)}
-  .feat-ic{width:62px;height:62px;margin-bottom:14px;display:block}
-  .feat-ic svg{width:100%;height:100%;display:block}
-  .feat h3{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.02em;margin:0 0 7px;line-height:1.15}
-  .feat p{font-size:14px;color:var(--ink-soft);line-height:1.5;margin:0 0 16px}
-  .feat-go{margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--coral);display:inline-flex;align-items:center;gap:6px}
-
-  /* COMPACT lists (AI Explained + Popular Tools) */
-  .compact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
-  .compact-grid.ai-col{grid-template-columns:1fr}
-  .crow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.6);border:1.2px solid #635c52;text-decoration:none;color:var(--ink);transition:transform .14s,border-color .14s,box-shadow .14s}
-  .crow:hover{transform:translateY(-2px);border-color:rgba(238,75,43,.4);box-shadow:0 10px 24px rgba(40,24,12,.07)}
-  .crow-ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#fff}
-  .crow-ic svg{width:18px;height:18px}
-  .crow-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-  .crow-nm{font-family:var(--font-display);font-weight:800;font-size:14px;letter-spacing:-.01em;line-height:1.2;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .crow-ds{font-size:12px;color:var(--ink-soft);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  @media(max-width:880px){.feat-grid{grid-template-columns:1fr}}
-  @media(max-width:1020px){.compact-grid{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:560px){.compact-grid{grid-template-columns:1fr}.crow-ds{white-space:normal}}
 
   @media(max-width:1020px){
     .hero{grid-template-columns:1fr;gap:34px}

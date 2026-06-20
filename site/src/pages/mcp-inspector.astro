@@ -1,0 +1,142 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="MCP Inspector, validate & audit an MCP server config | KB Cafe"
+  description="Paste your MCP server config and get it checked: JSON errors, missing or wrong fields, hardcoded secrets, over-broad filesystem access, and unrecognized keys. Runs entirely in your browser, nothing uploaded."
+  path="/mcp-inspector"
+  eyebrow="AI Explained · Tool"
+  h1="MCP Inspector"
+  tagline="Paste an MCP server config and Inspector audits it: structural errors, missing fields, hardcoded secrets, over-broad access, and typos. All in your browser, nothing uploaded."
+>
+  <div class="mi">
+    <div class="pane">
+      <div class="pane-label"><span>Your MCP config (JSON)</span><button class="link-btn" id="mi-sample">sample</button></div>
+      <textarea id="mi-in" class="ta" spellcheck="false" placeholder='{ "mcpServers": { "github": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-github"] } } }'></textarea>
+    </div>
+    <div class="row" style="margin:14px 0"><button class="btn" id="mi-go">Inspect</button></div>
+    <div class="mi-results" id="mi-results" hidden></div>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>What Inspector checks</h2>
+    <p>
+      A broken or risky <a href="/what-is-mcp">MCP</a> config usually fails for a small set of reasons. Inspector
+      reads your config locally and flags them:
+    </p>
+    <ul>
+      <li><strong>Structure</strong>, valid JSON, the <code>mcpServers</code> object, and each server having a <code>command</code> (local) or <code>url</code> (remote).</li>
+      <li><strong>Field types</strong>, <code>args</code> as an array, <code>env</code> as an object, and unrecognized keys that hint at a typo.</li>
+      <li><strong>Secrets</strong>, values that look like live tokens hardcoded into the file, which leak the moment you share it.</li>
+      <li><strong>Access</strong>, over-broad filesystem paths (like <code>/</code>) that grant far more than you meant to.</li>
+    </ul>
+    <p>
+      Need to <em>create</em> a config instead of check one? Use the
+      <a href="/mcp-config-generator">MCP Config Generator</a>. New to the protocol? Start with
+      <a href="/what-is-mcp">what MCP is</a>.
+    </p>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Is my config uploaded anywhere?</summary>
+      <p>No. The check runs entirely in your browser with JavaScript on the page. Your config, including any secrets in it, never leaves your device and is never sent to KB Cafe.</p>
+    </details>
+    <details class="faq"><summary>Why does it flag secrets if MCP env vars are normal?</summary>
+      <p>Putting a token in <code>env</code> is fine to run locally. The flag is about <em>sharing</em>: configs get pasted into issues, chats, and gists, and a hardcoded token goes with them. Inspector nudges you to use a placeholder and set the real value in your environment.</p>
+    </details>
+    <details class="faq"><summary>Does a clean result mean it will work?</summary>
+      <p>It means the structure is sound and nothing obvious is wrong. It can&rsquo;t confirm the server package exists, your token is valid, or the path is correct, those are runtime checks. Inspector catches the config-level mistakes before you even start the server.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Build one with the <a href="/mcp-config-generator">MCP Config Generator</a>, learn the protocol in <a href="/what-is-mcp">What is MCP</a>, or browse <a href="/ai">AI Explained</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<script is:inline>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var inEl = $('mi-in'), out = $('mi-results');
+    var SAMPLE = '{\n  "mcpServers": {\n    "github": {\n      "command": "npx",\n      "args": ["-y", "@modelcontextprotocol/server-github"],\n      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_exampleLiveToken1234567890abcdEFGH" }\n    },\n    "filesystem": {\n      "command": "npx",\n      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/"]\n    }\n  }\n}';
+
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+    function looksSecret(v) {
+      if (typeof v !== 'string') return false;
+      if (/\$\{?[A-Za-z_][A-Za-z0-9_]*\}?/.test(v)) return false; // env var reference = good
+      if (/^(ghp_|gho_|ghs_|github_pat_|sk-[A-Za-z0-9]|xox[baprs]-|AIza[0-9A-Za-z\-_]|AKIA[0-9A-Z]|glpat-)/.test(v)) return true;
+      if (/^[A-Za-z0-9+/_\-]{32,}$/.test(v)) return true; // long opaque blob
+      return false;
+    }
+
+    function inspect(raw) {
+      var f = [];
+      var root;
+      try { root = JSON.parse(raw); }
+      catch (e) { return { f: [{ s: 'error', l: 'JSON', m: 'Invalid JSON: ' + e.message }], n: 0 }; }
+      if (!root || typeof root !== 'object' || Array.isArray(root)) { return { f: [{ s: 'error', l: 'root', m: 'The top level must be a JSON object.' }], n: 0 }; }
+      var servers = root.mcpServers;
+      if (!servers || typeof servers !== 'object' || Array.isArray(servers)) { return { f: [{ s: 'error', l: 'mcpServers', m: 'Missing the top-level "mcpServers" object. MCP clients look for this exact key.' }], n: 0 }; }
+      var names = Object.keys(servers);
+      if (!names.length) f.push({ s: 'warn', l: 'mcpServers', m: 'No servers defined. The config is valid but does nothing.' });
+      var allowed = { command: 1, args: 1, env: 1, url: 1, type: 1, headers: 1, disabled: 1, cwd: 1, timeout: 1, description: 1 };
+
+      names.forEach(function (n) {
+        var c = servers[n], before = f.length;
+        if (!c || typeof c !== 'object' || Array.isArray(c)) { f.push({ s: 'error', l: n, m: 'Server entry must be an object.' }); return; }
+        if (!c.command && !c.url) f.push({ s: 'error', l: n, m: 'Has neither "command" (local server) nor "url" (remote server).' });
+        if (c.command != null && typeof c.command !== 'string') f.push({ s: 'error', l: n + '.command', m: '"command" must be a string.' });
+        if (c.args != null && !Array.isArray(c.args)) f.push({ s: 'error', l: n + '.args', m: '"args" must be an array.' });
+        if (c.env != null && (typeof c.env !== 'object' || Array.isArray(c.env))) f.push({ s: 'error', l: n + '.env', m: '"env" must be an object of key/value pairs.' });
+        if (c.env && typeof c.env === 'object' && !Array.isArray(c.env)) {
+          Object.keys(c.env).forEach(function (k) { if (looksSecret(c.env[k])) f.push({ s: 'warn', l: n + '.env.' + k, m: 'Looks like a hardcoded secret. Anyone you share this config with gets the live credential, use a placeholder and set the real value in your environment.' }); });
+        }
+        if (Array.isArray(c.args)) c.args.forEach(function (a) { if (typeof a === 'string' && (a === '/' || a === '~' || /^\/(Users|home)\/?$/.test(a) || /^[A-Za-z]:\\?$/.test(a))) f.push({ s: 'warn', l: n, m: 'Exposes a very broad path ("' + a + '"). That grants wide filesystem access, scope it to the specific folder you need.' }); });
+        Object.keys(c).forEach(function (k) { if (!allowed[k]) f.push({ s: 'warn', l: n + '.' + k, m: 'Unrecognized key "' + k + '". The client may ignore it, check for a typo.' }); });
+        var hadErr = f.slice(before).some(function (x) { return x.s === 'error'; });
+        if (!hadErr) f.push({ s: 'ok', l: n, m: (c.url ? 'remote (url)' : 'local (' + (c.command || '?') + ')') + ' server, structure looks valid.' });
+      });
+      return { f: f, n: names.length };
+    }
+
+    function render(raw) {
+      var r = inspect(raw);
+      var errs = r.f.filter(function (x) { return x.s === 'error'; }).length;
+      var warns = r.f.filter(function (x) { return x.s === 'warn'; }).length;
+      var grade = errs ? 'bad' : warns ? 'warn' : 'ok';
+      var banner = errs ? (errs + ' issue' + (errs > 1 ? 's' : '') + ' will stop this config working')
+        : warns ? ('Valid, with ' + warns + ' warning' + (warns > 1 ? 's' : '') + ' worth a look')
+        : ('Looks valid. ' + r.n + ' server' + (r.n === 1 ? '' : 's') + ' checked, nothing flagged.');
+      var rows = r.f.map(function (x) {
+        var sym = x.s === 'error' ? '✗' : x.s === 'warn' ? '!' : '✓';
+        return '<div class="mi-row mi-' + x.s + '"><span class="mi-sym">' + sym + '</span>' +
+          '<span class="mi-row-b"><code class="mi-loc">' + esc(x.l) + '</code><span class="mi-msg">' + esc(x.m) + '</span></span></div>';
+      }).join('');
+      out.innerHTML = '<div class="mi-banner mi-grade-' + grade + '">' + banner + '</div><div class="mi-rows">' + rows + '</div>';
+      out.hidden = false;
+    }
+
+    $('mi-go').addEventListener('click', function () { var v = inEl.value.trim(); if (!v) { inEl.focus(); return; } render(v); });
+    $('mi-sample').addEventListener('click', function () { inEl.value = SAMPLE; render(SAMPLE); });
+  })();
+</script>
+
+<style is:global>
+  .mi{max-width:720px}
+  .mi .ta{min-height:200px}
+  .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
+  .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
+
+  .mi-results{margin-top:6px}
+  .mi-banner{font-family:var(--font-display);font-weight:800;font-size:17px;padding:14px 18px;border-radius:14px;border:1.5px solid var(--line);margin-bottom:14px}
+  .mi-grade-ok{border-color:#15a06f;background:rgba(21,160,111,.08);color:#0f8a5f}
+  .mi-grade-warn{border-color:#d98a12;background:rgba(244,180,35,.12);color:#b9740a}
+  .mi-grade-bad{border-color:var(--coral);background:rgba(238,75,43,.08);color:var(--coral-deep)}
+
+  .mi-rows{display:flex;flex-direction:column;gap:6px}
+  .mi-row{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border-radius:11px;border:1.2px solid var(--line);background:var(--paper-2)}
+  .mi-sym{flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;margin-top:1px}
+  .mi-error .mi-sym{background:var(--coral)}.mi-warn .mi-sym{background:#e0911a}.mi-ok .mi-sym{background:#15a06f}
+  .mi-row-b{flex:1;display:flex;flex-direction:column;gap:4px}
+  .mi-loc{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink);background:var(--cream);border:1px solid var(--line);border-radius:5px;padding:1px 7px;width:fit-content}
+  .mi-msg{font-size:14px;line-height:1.5;color:var(--ink-soft)}
+</style>

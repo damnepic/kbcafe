@@ -1,0 +1,167 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+import { PRICE_TIERS, AS_OF } from '../data/aiModels.js';
+---
+<ToolPage
+  title="AI SaaS Profitability Calculator, margin & break-even | KB Cafe"
+  description="Charging $19/mo for an AI app? Find out if you're making money. Enter price, users, usage, and model cost; get monthly revenue, API cost, gross margin, per-user economics, and the break-even point. Runs in your browser."
+  path="/ai-profit-calculator"
+  eyebrow="AI Explained · Tool"
+  h1="AI SaaS Profitability Calculator"
+  tagline="Every AI builder eventually asks: at $19/mo with users sending 50 messages a day, am I making money or losing it? Enter your numbers and find out, with the break-even point spelled out."
+>
+  <div class="pc">
+    <div class="pc-grid">
+      <label class="pc-f"><span>Price / paying user <em>$/mo</em></span><input type="number" id="pc-price" value="19" min="0" step="1" /></label>
+      <label class="pc-f"><span>Total users</span><input type="number" id="pc-users" value="100" min="0" step="1" /></label>
+      <label class="pc-f"><span>On free tier <em>%</em></span><input type="number" id="pc-free" value="0" min="0" max="100" step="1" /></label>
+      <label class="pc-f"><span>Messages / user / day</span><input type="number" id="pc-msgs" value="50" min="0" step="1" /></label>
+      <label class="pc-f"><span>Tokens in / message</span><input type="number" id="pc-tin" value="500" min="0" step="50" /></label>
+      <label class="pc-f"><span>Tokens out / message</span><input type="number" id="pc-tout" value="500" min="0" step="50" /></label>
+      <label class="pc-f pc-f-wide"><span>Model cost tier</span>
+        <select id="pc-tier">
+          {PRICE_TIERS.map(t => <option value={t.id} data-in={t.in} data-out={t.out}>{t.label} (${t.in} in / ${t.out} out per 1M)</option>)}
+        </select>
+      </label>
+      <label class="pc-f"><span>Input <em>$/1M tok</em></span><input type="number" id="pc-in" value="0.10" min="0" step="0.05" /></label>
+      <label class="pc-f"><span>Output <em>$/1M tok</em></span><input type="number" id="pc-out" value="0.40" min="0" step="0.05" /></label>
+      <label class="pc-f"><span>Fixed costs <em>$/mo</em></span><input type="number" id="pc-fixed" value="0" min="0" step="10" /></label>
+    </div>
+
+    <div class="pc-results" id="pc-results"></div>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>Why AI SaaS margins are different</h2>
+    <p>
+      Traditional software costs roughly the same whether a user logs in once or a thousand times. AI is the
+      opposite: <strong>every message costs you tokens</strong>, so your costs scale with <em>usage</em>, not just
+      headcount. That&rsquo;s why a price that looks fine on paper can quietly lose money once power users start
+      hammering the model. This calculator makes that visible: revenue, API cost, gross margin, and the
+      <strong>break-even point</strong>, the usage level where a paying user stops being profitable.
+    </p>
+    <h3>The honest caveats</h3>
+    <ul>
+      <li>The default prices are <strong>illustrative tiers</strong> (as of {AS_OF}), editable. Put in your model&rsquo;s real numbers.</li>
+      <li>Real token counts are usually <strong>higher</strong> than you think: system prompts, conversation history, <a href="/what-is-rag">RAG</a> context, and retries all add tokens. Estimate a single call with the <a href="/token-counter">Token Counter</a>.</li>
+      <li>This is <strong>gross</strong> margin on model cost. It ignores salaries, marketing, and Stripe fees, real businesses have more costs than tokens.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Is this a real quote for my model?</summary>
+      <p>No. The tiers are round-number bands reflecting common pricing, not a live price sheet. Every field is editable, paste your provider&rsquo;s actual per-million-token rates for an accurate result.</p>
+    </details>
+    <details class="faq"><summary>What's the "break-even messages" number?</summary>
+      <p>The messages-per-day at which one paying user&rsquo;s token cost equals what they pay you. Below it you profit on that user; above it you lose money on them. It&rsquo;s the single most useful number for pricing an AI product.</p>
+    </details>
+    <details class="faq"><summary>How do I handle a free tier?</summary>
+      <p>Set the &ldquo;on free tier %.&rdquo; Free users generate token cost but no revenue, so they drag your margin. The calculator shows how much that free usage is costing you.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>Cost a single call with the <a href="/token-counter">Token Counter</a> or the <a href="/llm-cost-calculator">Cost Calculator</a>; see where this fits in <a href="/ai-business">AI Business</a>.</p>
+  </Fragment>
+</ToolPage>
+
+<script is:inline>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var out = $('pc-results');
+    var ids = ['pc-price', 'pc-users', 'pc-free', 'pc-msgs', 'pc-tin', 'pc-tout', 'pc-in', 'pc-out', 'pc-fixed'];
+    var num = function (id) { var v = parseFloat($(id).value); return isNaN(v) ? 0 : v; };
+    var money = function (n) {
+      var abs = Math.abs(n);
+      var s = abs >= 1000 ? abs.toLocaleString('en-US', { maximumFractionDigits: 0 }) : abs.toFixed(2);
+      return (n < 0 ? '-$' : '$') + s;
+    };
+
+    function calc() {
+      var price = num('pc-price'), users = num('pc-users'), free = num('pc-free') / 100,
+        msgs = num('pc-msgs'), tin = num('pc-tin'), tout = num('pc-tout'),
+        inP = num('pc-in'), outP = num('pc-out'), fixed = num('pc-fixed');
+
+      var paying = users * (1 - free);
+      var revenue = paying * price;
+      var perMsg = (tin * inP + tout * outP) / 1e6;
+      var msgsMonth = msgs * 30.4;
+      var costPerUser = perMsg * msgsMonth;          // one user's own monthly token cost
+      var apiCost = users * costPerUser;             // ALL users (free + paid) burn tokens
+      var totalCost = apiCost + fixed;
+      var profit = revenue - totalCost;
+      var margin = revenue > 0 ? (profit / revenue) * 100 : (totalCost > 0 ? -100 : 0);
+      var marginPerUser = price - costPerUser;
+      var beMsgs = perMsg > 0 ? price / (perMsg * 30.4) : Infinity;
+      var usersForFixed = marginPerUser > 0 ? Math.ceil(fixed / marginPerUser) : Infinity;
+      var freeCost = users * free * costPerUser;
+
+      var grade = profit > 0 && margin >= 40 ? 'ok' : profit >= 0 ? 'warn' : 'bad';
+      var verdict = profit >= 0
+        ? 'You make <strong>' + money(profit) + '</strong>/mo'
+        : 'You <strong>lose ' + money(Math.abs(profit)) + '</strong>/mo';
+
+      function row(k, v, cls) { return '<div class="pc-row' + (cls ? ' ' + cls : '') + '"><span>' + k + '</span><span class="pc-v">' + v + '</span></div>'; }
+
+      var insights = [];
+      insights.push('<li>Each paid user pays <strong>' + money(price) + '</strong> and costs about <strong>' + money(costPerUser) + '</strong> in tokens, so you keep <strong class="' + (marginPerUser >= 0 ? 'pc-pos' : 'pc-neg') + '">' + money(marginPerUser) + '</strong> per user' + (price > 0 ? ' (' + Math.round(marginPerUser / price * 100) + '%)' : '') + '.</li>');
+      if (isFinite(beMsgs)) insights.push('<li>A paid user turns <strong>unprofitable above ' + (beMsgs >= 1000 ? Math.round(beMsgs).toLocaleString('en-US') : beMsgs.toFixed(1)) + ' messages/day</strong> at this price.' + (msgs > beMsgs ? ' Your ' + msgs + '/day is past that, each user loses money.' : '') + '</li>');
+      if (fixed > 0) insights.push('<li>' + (isFinite(usersForFixed) ? 'You need <strong>' + usersForFixed.toLocaleString('en-US') + ' paying users</strong> to cover ' + money(fixed) + ' in fixed costs.' : 'At a negative per-user margin, more users won&rsquo;t cover your fixed costs, fix the unit economics first.') + '</li>');
+      if (free > 0) insights.push('<li>Free users burn <strong>' + money(freeCost) + '</strong>/mo in tokens with no revenue.</li>');
+
+      out.innerHTML =
+        '<div class="pc-card pc-grade-' + grade + '"><div class="pc-verdict">' + verdict + '</div>' +
+          '<div class="pc-margin">' + (revenue > 0 ? Math.round(margin) + '% gross margin' : 'no revenue yet') + '</div></div>' +
+        '<div class="pc-rows">' +
+          row('Monthly revenue', money(revenue)) +
+          row('API cost', '-' + money(apiCost).replace('-', '')) +
+          (fixed > 0 ? row('Fixed costs', '-' + money(fixed).replace('-', '')) : '') +
+          row('Monthly profit', money(profit), 'pc-row-total ' + (profit >= 0 ? 'pc-pos' : 'pc-neg')) +
+        '</div>' +
+        '<ul class="pc-insights">' + insights.join('') + '</ul>' +
+        '<p class="pc-note">Gross margin on model cost only. Token estimates exclude system prompts, history, and retries, real usage runs higher. Prices are editable illustrative tiers.</p>';
+    }
+
+    $('pc-tier').addEventListener('change', function () {
+      var o = this.options[this.selectedIndex];
+      $('pc-in').value = o.getAttribute('data-in');
+      $('pc-out').value = o.getAttribute('data-out');
+      calc();
+    });
+    ids.forEach(function (id) { $(id).addEventListener('input', calc); });
+    calc();
+  })();
+</script>
+
+<style is:global>
+  .pc{max-width:720px}
+  .pc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px}
+  .pc-f{display:flex;flex-direction:column;gap:6px}
+  .pc-f-wide{grid-column:span 3}
+  .pc-f span{font-family:var(--font-mono);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+  .pc-f span em{font-style:normal;color:var(--coral);font-weight:700}
+  .pc-f input,.pc-f select{font-family:var(--font-mono);font-size:14px;color:var(--ink);background:var(--cream);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;outline:0}
+  .pc-f input:focus,.pc-f select:focus{border-color:var(--ink)}
+
+  .pc-results{margin-top:22px}
+  .pc-card{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 22px;border-radius:18px;border:1.5px solid var(--line);background:var(--cream);margin-bottom:16px}
+  .pc-grade-ok{border-color:#15a06f;background:rgba(21,160,111,.08)}
+  .pc-grade-warn{border-color:#d98a12;background:rgba(244,180,35,.12)}
+  .pc-grade-bad{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .pc-verdict{font-family:var(--font-display);font-weight:700;font-size:24px;letter-spacing:-.02em;color:var(--ink)}
+  .pc-verdict strong{font-weight:800}
+  .pc-grade-ok .pc-verdict strong{color:#0f8a5f}.pc-grade-bad .pc-verdict strong{color:var(--coral-deep)}.pc-grade-warn .pc-verdict strong{color:#b9740a}
+  .pc-margin{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--ink-soft)}
+
+  .pc-rows{display:flex;flex-direction:column;gap:0;border:1.2px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
+  .pc-row{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--line);background:var(--paper-2);font-size:14.5px;color:var(--ink-soft)}
+  .pc-row:last-child{border-bottom:0}
+  .pc-v{font-family:var(--font-mono);font-weight:700;color:var(--ink)}
+  .pc-row-total{background:var(--cream);font-weight:800;color:var(--ink)}
+  .pc-row-total span{font-size:15.5px}
+  .pc-pos .pc-v,.pc-pos{color:#0f8a5f}.pc-neg .pc-v,.pc-neg{color:var(--coral-deep)}
+
+  .pc-insights{margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+  .pc-insights li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+  .pc-insights strong{color:var(--ink)}
+  .pc-note{font-size:12.5px;color:var(--ink-soft);line-height:1.5;background:var(--paper-2);border-radius:10px;padding:11px 14px;margin:0}
+  @media(max-width:620px){.pc-grid{grid-template-columns:1fr 1fr}.pc-f-wide{grid-column:span 2}.pc-card{flex-direction:column;align-items:flex-start;gap:6px}}
+</style>

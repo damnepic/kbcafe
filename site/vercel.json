@@ -11,6 +11,8 @@
   "redirects": [
     { "source": "/:path*", "has": [{ "type": "host", "value": "www.kbcafe.com" }], "destination": "https://kbcafe.com/:path*", "permanent": true },
 
+    { "source": "/ai-saas-profitability-calculator", "destination": "/ai-profit-calculator", "permanent": true },
+
     { "source": "/tips", "destination": "/reference", "permanent": true },
     { "source": "/tips/kb.cgi", "destination": "/reference", "permanent": true },
     { "source": "/tips/:path*", "destination": "/reference", "permanent": true },
@@ -31,6 +33,17 @@
     { "source": "/juice", "destination": "/feeds", "permanent": true },
     { "source": "/juice/:path*", "destination": "/feeds", "permanent": true },
     { "source": "/articles.xml", "destination": "/feeds", "permanent": true },
+
+    { "source": "/xml", "destination": "/what-is-xml", "permanent": true },
+    { "source": "/xml/:path*", "destination": "/what-is-xml", "permanent": true },
+    { "source": "/atom", "destination": "/feeds", "permanent": true },
+    { "source": "/atom.xml", "destination": "/feeds", "permanent": true },
+    { "source": "/atom.xsd", "destination": "/feeds", "permanent": true },
+    { "source": "/atom.xsd.xml", "destination": "/feeds", "permanent": true },
+    { "source": "/AtomApi", "destination": "/feeds", "permanent": true },
+    { "source": "/rss.xml", "destination": "/feeds", "permanent": true },
+    { "source": "/rss.opml", "destination": "/feeds", "permanent": true },
+    { "source": "/blogroll.xml", "destination": "/feeds", "permanent": true },
 
     { "source": "/articles/HowTo.Base64.pdf", "destination": "/base64", "permanent": true },
     { "source": "/articles/howto.base64.pdf", "destination": "/base64", "permanent": true },
@@ -87,8 +100,7 @@
     { "source": "/articles", "destination": "/", "permanent": true },
     { "source": "/articles.htm", "destination": "/", "permanent": true },
     { "source": "/articles/:path*", "destination": "/", "permanent": true },
-    { "source": "/csharp", "destination": "/reference", "permanent": true },
-    { "source": "/csharp/:path*", "destination": "/reference", "permanent": true },
+    { "source": "/csharp/:path+", "destination": "/csharp", "permanent": true },
     { "source": "/quality/:path*", "destination": "/", "permanent": true },
 
     { "source": "/iBLOGthere4iM/:path+", "destination": "/iBLOGthere4iM", "permanent": true },
@@ -104,8 +116,8 @@
     { "source": "/blogs.aspx/:path*", "destination": "/", "permanent": true },
     { "source": "/adwords", "destination": "/", "permanent": true },
     { "source": "/adwords/:path*", "destination": "/", "permanent": true },
-    { "source": "/spam", "destination": "/", "permanent": true },
-    { "source": "/spam/:path*", "destination": "/", "permanent": true },
+    { "source": "/spam", "destination": "/iBLOGthere4iM", "permanent": true },
+    { "source": "/spam/:path+", "destination": "/iBLOGthere4iM", "permanent": true },
     { "source": "/network.aspx", "destination": "/", "permanent": true }
   ]
 }

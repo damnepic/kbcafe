@@ -2,6 +2,7 @@
 import Layout from './Layout.astro';
 import Share from '../components/Share.astro';
 import PathNav from '../components/PathNav.astro';
+import ReadingEnhancers from '../components/ReadingEnhancers.astro';
 import { AI, titleFor } from '../data/ai.js';
 import { TOOLS } from '../data/tools.js';
 import { TOOL_GRAPH } from '../data/toolGraph.js';
@@ -86,6 +87,8 @@ const appearsIn = pathsWith(path);
       ))}
     </div>
   </aside>
+
+  <ReadingEnhancers />
 </Layout>
 
 <style is:global>

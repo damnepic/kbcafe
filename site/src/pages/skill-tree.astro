@@ -16,14 +16,14 @@ const tiers = [...new Set(SKILLS.map(s => s.tier))];
 ---
 <Layout
   title="AI Skill Tree, learn modern AI, level by level | KB Cafe"
-  description="An interactive skill tree for learning modern AI, from prompting to agents and MCP. Read the concept, try the tool, mark it done. Progress saved locally, no account, no tracking."
+  description="An interactive skill tree for learning modern AI, from prompting to agents and MCP. Read the concept, try the tool, mark it done. Progress saved locally in your browser, no account needed."
   path="/skill-tree"
 >
   <section class="st">
     <header class="st-head">
       <div class="eyebrow">☕ Skill tree</div>
       <h1>Learn modern AI, <span class="mk">level by level.</span></h1>
-      <p class="lede">Eight skills take you from &ldquo;write me a prompt&rdquo; to building AI agents. Each one: read the concept, try the tool, mark it done. Your progress is saved <strong>in this browser only</strong>, no account, no tracking, ever.</p>
+      <p class="lede">Eight skills take you from &ldquo;write me a prompt&rdquo; to building AI agents. Each one: read the concept, try the tool, mark it done. Your progress is saved <strong>in this browser only</strong>, no account needed.</p>
       <div class="st-prog">
         <div class="st-prog-h"><span><strong id="done">0</strong> of {SKILLS.length} skills</span><button class="st-reset" id="reset" hidden>reset</button></div>
         <div class="st-bar"><i id="bar"></i></div>

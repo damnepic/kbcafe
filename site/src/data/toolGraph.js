@@ -3,6 +3,31 @@
 // every ToolPage so the tools form a graph, not a graveyard. Hrefs resolve against
 // tools.js (tools), ai.js (explainers), and reference.js (references).
 export const TOOL_GRAPH = {
+  '/prompt-optimizer': {
+    learn: [],
+    related: ['/prompt-builder', '/prompt-linter', '/prompt-x-ray', '/prompt-diff'],
+    next: '/good-vs-bad-prompts',
+  },
+  '/ai-profit-calculator': {
+    learn: [],
+    related: ['/llm-cost-calculator', '/token-counter', '/context-budget-analyzer'],
+    next: '/llm-cost-calculator',
+  },
+  '/email-deliverability-checker': {
+    learn: ['/email-deliverability', '/dmarc-explained', '/spf-explained', '/dkim-explained'],
+    related: ['/dns-lookup', '/how-smtp-works'],
+    next: '/dmarc-explained',
+  },
+  '/dns-lookup': {
+    learn: ['/what-is-dns'],
+    related: ['/whois-lookup', '/email-deliverability-checker'],
+    next: '/what-is-dns',
+  },
+  '/whois-lookup': {
+    learn: ['/what-is-whois'],
+    related: ['/dns-lookup', '/what-is-dns'],
+    next: '/what-is-whois',
+  },
   '/token-counter': {
     learn: ['/what-is-a-context-window'],
     related: ['/context-window-visualizer', '/context-budget-analyzer', '/llm-cost-calculator'],
@@ -40,8 +65,13 @@ export const TOOL_GRAPH = {
   },
   '/mcp-config-generator': {
     learn: ['/what-is-mcp', '/what-is-tool-calling'],
-    related: ['/tool-call-visualizer', '/ai-pattern-builder'],
-    next: '/tool-call-visualizer',
+    related: ['/mcp-inspector', '/tool-call-visualizer', '/ai-pattern-builder'],
+    next: '/mcp-inspector',
+  },
+  '/mcp-inspector': {
+    learn: ['/what-is-mcp'],
+    related: ['/mcp-config-generator', '/tool-call-visualizer'],
+    next: '/mcp-config-generator',
   },
   '/prompt-linter': {
     learn: ['/what-are-structured-outputs'],

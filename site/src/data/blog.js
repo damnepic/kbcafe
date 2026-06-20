@@ -1,6 +1,15 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "building-the-prompt-optimizer", title: "How We Built the Prompt Optimizer: Six Tools Into One",
+    date: "2026-06-19", tag: "Build in Public",
+    excerpt: "We turned six focused prompt tools into one flagship, without deleting any of them. The real product decision behind composing tools into a mega-tool." },
+  { slug: "introducing-ai-business", title: "Introducing AI Business, and Building in Public",
+    date: "2026-06-19", tag: "Build in Public",
+    excerpt: "We've opened a new section, AI Business, to cover the half of the journey nobody teaches honestly: getting traffic and making money. Plus our first case study is live." },
+  { slug: "the-blog-that-lived-at-this-address", title: "The Blog That Used to Live at This Address",
+    date: "2026-06-19", tag: "Open Web",
+    excerpt: "Before KB Cafe was an AI knowledge base, this domain ran one of the early web's RSS blogs. The story of iBLOGthere4iM, and where it lives on." },
   { slug: "the-return-of-kb-cafe", title: "The Return of KB Cafe",
     date: "2026-06-18", tag: "News",
     excerpt: "kbcafe.com was a go-to developer resource in the early 2000s. Here's what it is now, and why we brought it back." },

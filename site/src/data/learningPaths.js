@@ -16,8 +16,8 @@ export const LEARNING_PATHS = [
   {
     id: 'prompting', title: 'Master Prompting', shortTitle: 'Prompting', tag: 'Craft',
     route: '/learn-prompting', minutes: 30, outcome: 'I want to get great answers out of AI',
-    blurb: 'Write prompts that behave: see what they leave to chance, build them up, x-ray the anatomy, catch the smells, compare versions, and study good vs bad.',
-    steps: ['/prompt-simulator', '/prompt-builder', '/prompt-x-ray', '/prompt-linter', '/prompt-diff', '/good-vs-bad-prompts'],
+    blurb: 'Write prompts that behave: see what they leave to chance, build them up, x-ray the anatomy, catch the smells, compare versions, study good vs bad, then put it all together in the Prompt Optimizer.',
+    steps: ['/prompt-simulator', '/prompt-builder', '/prompt-x-ray', '/prompt-linter', '/prompt-diff', '/good-vs-bad-prompts', '/prompt-optimizer'],
   },
   {
     id: 'automate', title: 'Automate Work', shortTitle: 'Automation', tag: 'Applied',

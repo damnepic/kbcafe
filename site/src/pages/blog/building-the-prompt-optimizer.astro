@@ -1,0 +1,78 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="How We Built the Prompt Optimizer: Six Tools Into One"
+  description="We turned six focused prompt tools into one flagship Prompt Optimizer, without deleting any of them. The real product decision behind composing small tools into a mega-tool, and the tradeoffs."
+  slug="building-the-prompt-optimizer"
+  tag="Build in Public"
+  date="2026-06-19"
+>
+  <p>
+    We just shipped the <a href="/prompt-optimizer">Prompt Optimizer</a>, and we built it almost entirely out of
+    tools we already had. That sounds like a shortcut. It was actually a real product decision, the kind every
+    builder hits eventually: <strong>when do a pile of small tools want to become one big one?</strong>
+  </p>
+
+  <h2>Six tools, or one?</h2>
+  <p>
+    KB Cafe already had six focused prompt tools: a <a href="/prompt-builder">builder</a>, a
+    <a href="/prompt-linter">linter</a>, an <a href="/prompt-x-ray">x-ray</a>, a
+    <a href="/prompt-diff">diff</a>, a <a href="/prompt-simulator">simulator</a>, and a
+    <a href="/good-vs-bad-prompts">good-vs-bad gallery</a>. Useful on their own. But step back and a pattern
+    appears: <strong>that&rsquo;s not six products, it&rsquo;s six features of one</strong>, prompt quality, sliced
+    six ways.
+  </p>
+
+  <h2>Learning tools and working tools are different</h2>
+  <p>
+    Here&rsquo;s the insight that decided everything. A focused tool is great when you&rsquo;re
+    <strong>learning</strong>, you want one idea at a time, try it, move on. But someone who already gets it
+    doesn&rsquo;t want six stops. They have a prompt, they want it fixed, now, in one place. Same domain, completely
+    different job. <strong>Learning tools and working tools aren&rsquo;t the same product</strong>, even when they
+    cover the same ground.
+  </p>
+
+  <h2>Additive, not destructive</h2>
+  <p>
+    So the move was <em>not</em> to merge the six and delete them. That would wreck the learning path that walks
+    through them one by one. Instead we built a new flagship on top: the Prompt Optimizer composes all six into a
+    single paste-and-fix flow, while every focused tool stays exactly where it was. The learner walks the path; the
+    practitioner lands on the Optimizer. Two products, one set of ideas.
+  </p>
+
+  <h2>The tradeoffs nobody mentions</h2>
+  <p>Composing tools isn&rsquo;t free. Three things to weigh:</p>
+  <ul>
+    <li><strong>SEO.</strong> Six tools target six keywords; one mega-tool targets &ldquo;prompt optimizer.&rdquo;
+      Folding them together would surrender the individual targets. We kept all of them, so we get both. And timing
+      matters: a brand-new site with no rankings can consolidate with nothing to lose; an established one can&rsquo;t.</li>
+    <li><strong>The clutter line.</strong> A seventh tool that does what six already do can be pure sprawl, the
+      &ldquo;tool graveyard.&rdquo; What makes it composition instead of clutter is a clear hierarchy (learn vs work)
+      and cross-linking, not just shipping another box.</li>
+    <li><strong>Maintenance.</strong> The mega-tool repeats logic the six already contain. Duplicate it and every
+      fix lives in two places. The honest answer is to factor the shared logic into one module, which is the cleanup
+      on our list.</li>
+  </ul>
+
+  <h2>The result</h2>
+  <p>
+    The <a href="/prompt-optimizer">Prompt Optimizer</a> is now the <strong>work</strong> tool: paste a prompt, get
+    a transparent health score, the missing pieces, and a restructured version, in one screen. The six focused tools
+    are the <strong>learn</strong> tools, and the Optimizer&rsquo;s building blocks. Everything cross-links both ways,
+    and the Optimizer is the capstone of the <a href="/learn-prompting">prompting path</a>.
+  </p>
+
+  <p>
+    The takeaway, if you&rsquo;re sitting on a pile of small tools: ask whether they&rsquo;re separate products or
+    features of one. If they&rsquo;re features, build the flagship, but <strong>additively</strong>, with a clear
+    learn-versus-work split, an eye on SEO timing, and shared logic underneath. That&rsquo;s the decision; the
+    Prompt Optimizer is the worked example.
+  </p>
+
+  <h3>Related</h3>
+  <p>
+    Try the <a href="/prompt-optimizer">Prompt Optimizer</a>, see where it fits in
+    <a href="/ai-business">AI Business</a>, or read <a href="/case-studies/kbcafe">how we restored this whole site</a>.
+  </p>
+</BlogPost>

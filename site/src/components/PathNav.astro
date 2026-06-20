@@ -26,7 +26,6 @@ LEARNING_PATHS.forEach(p => {
     const here = location.pathname.replace(/\/+$/, '') || '/';
     const qp = new URLSearchParams(location.search);
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const mark = (h) => { try { window.kbProgress && window.kbProgress.set(h, true); } catch (e) {} };
     const stepUrl = (id, i) => PATHS[id].steps[i].href + '?p=' + id + '&s=' + i;
 
     let path = null, idx = -1;
@@ -42,45 +41,90 @@ LEARNING_PATHS.forEach(p => {
     }
     if (!path || idx < 0 || idx >= path.steps.length) return;
 
-    const total = path.steps.length, n = idx + 1, pct = Math.round((n / total) * 100), last = idx === total - 1;
+    const total = path.steps.length, n = idx + 1, last = idx === total - 1;
+
+    // Progress is driven by what's actually been READ, not by position. A step is
+    // marked read once the reader reaches ~70% of it (ReadingEnhancers.astro), which
+    // then calls window.__kbPathNavRender() to live-refresh this component.
+    // render() recomputes from kbProgress every time, so re-runs are cheap + correct.
+    render();
+    window.__kbPathNavRender = render;
+
+    // When a learning path is active, PathNav's "Next unread" is the authoritative
+    // forward step, so suppress the toolGraph's dark "NEXT step" hero (it can point
+    // to a DIFFERENT target and double up the CTA). Cold/standalone tool pages have
+    // no PathNav, so their dark card stays. The "Learn the concept" / "Related tools"
+    // columns are untouched (not redundant with PathNav). tg-next is below the fold,
+    // so hiding it after DOM-ready causes no visible flash.
+    function hideTgNext() { var t = document.querySelector('.tg-next'); if (t) t.style.display = 'none'; }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hideTgNext);
+    else hideTgNext();
+
+  function render() {
+    const done = (window.kbProgress ? window.kbProgress.all() : new Set());
+    const isRead = (h) => done.has(h);
+    const doneCount = path.steps.filter((st) => isRead(st.href)).length;
+    const pct = Math.round((doneCount / total) * 100);
+    const allRead = doneCount >= total;
+    const firstUnread = path.steps.findIndex((st) => !isRead(st.href));
+
+    // analytics: Path Start (first step read) + Path Complete (all read), once per user per path
+    try {
+      const ps = 'kbcafe-ps-' + path.id, pc = 'kbcafe-pc-' + path.id;
+      if (doneCount >= 1 && !localStorage.getItem(ps)) { localStorage.setItem(ps, '1'); window.kbTrack && window.kbTrack('Path Start', { path: path.id }); }
+      if (allRead && !localStorage.getItem(pc)) { localStorage.setItem(pc, '1'); window.kbTrack && window.kbTrack('Path Complete', { path: path.id }); }
+    } catch (e) {}
 
     if (topEl) {
       topEl.innerHTML =
         '<a class="pn-top-path" href="' + path.route + '">' + esc(path.title) + ' path</a>' +
         '<div class="pn-bar"><i style="width:' + pct + '%"></i></div>' +
-        '<span class="pn-top-step">Step ' + n + ' of ' + total + '</span>';
+        '<span class="pn-top-step">' + doneCount + ' of ' + total + ' read</span>';
       topEl.className = 'pn-top';
     }
 
     if (botEl) {
-      if (last) {
-        mark(here);
+      if (allRead) {
         const others = Object.keys(PATHS).map((k) => PATHS[k]).filter((p) => p.id !== path.id);
         botEl.innerHTML =
           '<div class="pn-confetti">🎉</div>' +
           '<div class="pn-done-h">Path complete</div>' +
-          '<p class="pn-done-sub">You finished <strong>' + esc(path.title) + '</strong>.</p>' +
+          '<p class="pn-done-sub">You&rsquo;ve read all ' + total + ' steps of <strong>' + esc(path.title) + '</strong>.</p>' +
           '<div class="pn-bar pn-bar-lg"><i style="width:100%"></i></div>' +
           '<div class="pn-continue-h">Continue learning</div>' +
           '<div class="pn-continue">' + others.map((p) => '<a href="' + p.route + '">' + esc(p.title) + ' &rarr;</a>').join('') + '</div>';
         botEl.className = 'pn-bottom pn-done';
       } else {
-        const nextStep = path.steps[idx + 1];
+        const remaining = total - doneCount;
+        const stepsList = path.steps.map((st, i) => {
+          const read = isRead(st.href), hereStep = i === idx;
+          return '<a class="pn-step' + (read ? ' is-read' : '') + (hereStep ? ' is-here' : '') + '" href="' + stepUrl(path.id, i) + '">' +
+            '<span class="pn-step-dot">' + (read ? '&#10003;' : (i + 1)) + '</span>' +
+            '<span class="pn-step-label">' + esc(st.label) + '</span>' +
+            (hereStep ? '<span class="pn-step-here">You are here</span>' : (read ? '<span class="pn-step-tag">Read</span>' : '')) +
+            '</a>';
+        }).join('');
+        const note = last
+          ? '<p class="pn-note">This is the last step in the sequence, but you haven&rsquo;t read ' + remaining + ' of the ' + total + ' steps yet. Pick up the unread ones below to really finish the path.</p>'
+          : '';
         const prev = idx > 0 ? '<a class="pn-prev" href="' + stepUrl(path.id, idx - 1) + '">&larr; Previous</a>' : '<span></span>';
+        const nextBtn = firstUnread >= 0
+          ? '<a class="pn-next" href="' + stepUrl(path.id, firstUnread) + '">Next unread: ' + esc(path.steps[firstUnread].label) + ' &rarr;</a>'
+          : '<span></span>';
         botEl.innerHTML =
           '<div class="pn-eyebrow">' + esc(path.title) + ' &middot; learning path</div>' +
           '<div class="pn-big">STEP ' + n + ' OF ' + total + '</div>' +
           '<div class="pn-bar pn-bar-lg"><i style="width:' + pct + '%"></i></div>' +
-          '<div class="pn-pct">' + pct + '% complete</div>' +
-          '<div class="pn-actions">' + prev +
-          '<a class="pn-next" href="' + stepUrl(path.id, idx + 1) + '">Next: ' + esc(nextStep.label) + ' &rarr;</a></div>';
+          '<div class="pn-pct">' + doneCount + ' of ' + total + ' read &middot; ' + pct + '%</div>' +
+          note +
+          '<div class="pn-steps">' + stepsList + '</div>' +
+          '<div class="pn-actions">' + prev + nextBtn + '</div>';
         botEl.className = 'pn-bottom';
-        const nx = botEl.querySelector('.pn-next');
-        if (nx) nx.addEventListener('click', () => mark(here));
       }
     }
+  }
 
-    function renderChooser(list) {
+  function renderChooser(list) {
       if (!botEl) return;
       botEl.innerHTML =
         '<div class="pn-eyebrow">This page is part of ' + list.length + ' learning paths</div>' +
@@ -123,6 +167,19 @@ LEARNING_PATHS.forEach(p => {
   .pn-done .pn-bar{max-width:340px;margin:14px auto 0}
   .pn-continue-h{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 11px}
   .pn-continue{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  /* read-progress note + step checklist (real progress, not position) */
+  .pn-note{font-size:14px;line-height:1.55;color:var(--ink);margin:13px 0 0;background:rgba(244,180,35,.12);border:1.2px solid rgba(244,132,42,.34);border-radius:11px;padding:11px 14px}
+  .pn-steps{display:flex;flex-direction:column;gap:6px;margin:16px 0 2px}
+  .pn-step{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1.2px solid var(--line);background:var(--paper-2);text-decoration:none;transition:border-color .14s,background .14s}
+  .pn-step:hover{border-color:var(--coral)}
+  .pn-step-dot{flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;font-weight:700;background:var(--cream);border:1.4px solid var(--line);color:var(--ink-soft)}
+  .pn-step.is-read .pn-step-dot{background:var(--coral);border-color:var(--coral);color:#fff}
+  .pn-step-label{flex:1;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink)}
+  .pn-step.is-read .pn-step-label{color:var(--ink-soft)}
+  .pn-step.is-here{border-color:var(--coral);background:var(--cream)}
+  .pn-step-here,.pn-step-tag{flex:none;font-family:var(--font-mono);font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:6px}
+  .pn-step-here{color:var(--coral);background:rgba(238,75,43,.1)}
+  .pn-step-tag{color:var(--ink-soft);background:var(--cream);border:1px solid var(--line)}
   .pn-choose{text-align:left}.pn-choose .pn-continue{justify-content:flex-start}
   .pn-continue a{font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);background:var(--paper-2);border:1.2px solid var(--line);border-radius:11px;padding:10px 16px;text-decoration:none;transition:border-color .14s,color .14s}
   .pn-continue a:hover{border-color:var(--coral);color:var(--coral-deep)}

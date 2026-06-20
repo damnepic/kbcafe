@@ -43,3 +43,6 @@ Thumbs.db
 
 # backlink exports + analysis scratch (internal)
 /data/
+
+# local recovery backups (do not commit)
+recovery_dist_*/

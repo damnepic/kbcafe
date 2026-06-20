@@ -2,6 +2,7 @@
 import Layout from './Layout.astro';
 import Share from '../components/Share.astro';
 import PathNav from '../components/PathNav.astro';
+import ReadingEnhancers from '../components/ReadingEnhancers.astro';
 import { TOOLS } from '../data/tools.js';
 import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
@@ -13,7 +14,7 @@ const { title, description, path, eyebrow, h1, tagline } = Astro.props;
 const resolve = {};
 TOOLS.forEach(t => { if (t.href) resolve[t.href] = { href: t.href, label: t.nm, ds: t.ds, kind: 'Tool' }; });
 AI.forEach(a => { resolve[a.href] = { href: a.href, label: a.nm, ds: a.ds, kind: 'Concept' }; });
-REFERENCE.forEach(r => { resolve[r.href] = { href: r.href, label: r.nm, ds: r.ds, kind: 'Reference' }; });
+REFERENCE.forEach(r => { resolve[r.href] = { href: r.href, label: r.nm, ds: r.ds, kind: 'Knowledge Base' }; });
 
 const g = TOOL_GRAPH[path];
 const learn = g ? g.learn.map(h => resolve[h]).filter(Boolean) : [];
@@ -108,6 +109,19 @@ const siblings = !g ? TOOLS.filter(t => t.href && t.href !== path).slice(0, 4) :
       var x = document.getElementById('pc-x'); if (x) x.addEventListener('click', hide);
     })();
   </script>
+  <script is:inline>
+    // analytics: "Tool Used" fires once per page on the first real interaction
+    // (a primary button, a copy button, or a sample chip), covering every tool.
+    (function () {
+      var fired = false;
+      document.addEventListener('click', function (e) {
+        if (fired || !e.target.closest('.btn, .btn-copy, .chip')) return;
+        fired = true;
+        window.kbTrack && window.kbTrack('Tool Used', { tool: location.pathname.replace(/^\/+/, '') });
+      });
+    })();
+  </script>
+  <ReadingEnhancers />
 </Layout>
 
 <style is:global>

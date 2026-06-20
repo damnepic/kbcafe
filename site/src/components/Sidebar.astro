@@ -23,7 +23,7 @@ const TRIAGE = [
   { label: 'Build AI Agents', ds: 'apps & agents', href: '/learn-ai-agents', icon: I.build },
   { label: 'Get Better Answers', ds: 'prompting', href: '/learn-prompting', icon: I.chat },
   { label: 'Automation', ds: 'workflows & agents', href: '/learn-ai-automation', icon: I.gear },
-  { label: 'AI Business', ds: 'coming soon', icon: I.briefcase, soon: true },
+  { label: 'AI Business', ds: 'grow & monetize', href: '/ai-business', icon: I.briefcase },
 ];
 const active = (h) => h === path;
 ---
@@ -72,7 +72,7 @@ const active = (h) => h === path;
 </aside>
 
 <style>
-  .kb-sb{position:sticky;top:14px;align-self:start;width:236px;flex-shrink:0;max-height:calc(100vh - 28px);overflow-y:auto;
+  .kb-sb{position:sticky;top:78px;align-self:start;width:260px;flex-shrink:0;max-height:calc(100vh - 92px);overflow-y:auto;
     background:var(--cream);border:1.2px solid var(--line);border-radius:16px;padding:12px 12px 14px;display:flex;flex-direction:column;gap:6px;
     scrollbar-width:thin}
   .sb-bar{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -113,7 +113,7 @@ const active = (h) => h === path;
   .sb-foot a:hover{background:var(--paper-2);color:var(--ink)}
 
   /* collapsed = icon rail (desktop). class lives on .kb-sb so scoped CSS reaches it */
-  .kb-sb.collapsed{width:56px;padding:12px 8px;align-items:center}
+  .kb-sb.collapsed{width:72px;padding:12px 10px;align-items:center}
   .kb-sb.collapsed .sb-lbl,.kb-sb.collapsed .sb-h,.kb-sb.collapsed .sb-chev,.kb-sb.collapsed .sb-list{display:none}
   .kb-sb.collapsed .sb-bar{flex-direction:column;gap:6px}
   .kb-sb.collapsed .sb-collapse{transform:rotate(180deg)}

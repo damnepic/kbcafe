@@ -12,9 +12,12 @@ const {
 
 const canonical = new URL(path, Astro.site).href;
 
+// nav active state: home is exact; others match the section (e.g. /learn + /learn-*)
+const navActive = (href) => href === '/' ? path === '/' : (path === href || path.startsWith(href));
+
 // Breadcrumbs: every page except home. Wrappers pass `crumb`; standalone pages auto-derive "KB Cafe / Page".
 const SECTION_LABELS = {
-  ai: 'AI Explained', map: 'Knowledge Map', reference: 'Reference', learn: 'Learn',
+  ai: 'AI Explained', map: 'Knowledge Map', reference: 'Knowledge Base', learn: 'Learn',
   feeds: 'Feeds', search: 'Search', blog: 'Blog', tools: 'Tools', about: 'About',
   privacy: 'Privacy', terms: 'Terms', 'skill-tree': 'Skill Tree', 'ai-patterns': 'AI Patterns',
 };
@@ -70,6 +73,15 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     count() { return this.all().size },
   };
 </script>
+<!-- Privacy-friendly analytics by Plausible (cookieless, no personal data, aggregate only) -->
+<script is:inline async src="https://plausible.io/js/pa-jVkxTQgljXyiSvPl7VnJU.js"></script>
+<script is:inline>
+  window.plausible = window.plausible || function () { (plausible.q = plausible.q || []).push(arguments) };
+  plausible.init = plausible.init || function (i) { plausible.o = i || {} };
+  plausible.init();
+  // safe wrapper for our 3 aggregate events (Path Start / Path Complete / Tool Used)
+  window.kbTrack = function (name, props) { try { window.plausible(name, props ? { props: props } : undefined); } catch (e) {} };
+</script>
 </head>
 <body class={bodyClass}>
 <!-- reusable marks -->
@@ -90,23 +102,33 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   </symbol>
 </defs></svg>
 
-<div class="wrap">
-  <nav class="site-nav">
+<nav class="site-nav">
     {sidebar && <button class="sb-burger" id="sb-burger" type="button" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>}
     <a class="brand" href="/" aria-label="KB Cafe, home">
       <img class="mark" src="/logo.png" width="50" height="50" alt="KB Cafe, a coffee cup with an open book inside" />
       <span class="cf">Cafe</span>
       <span class="brand-hint" aria-hidden="true">Knowledge Base</span>
     </a>
+    <div class="nav-center" id="nav-center"></div>
     <div class="nav-links">
-      <a href="/tools">Tools</a>
-      <a class="nav-ai" href="/ai">AI Explained <span class="nav-new">New</span></a>
-      <a href="/learn">Learn</a>
-      <a href="/reference">Reference</a>
-      <a class="nav-search" href="/search" aria-label="Search" title="Search everything"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></a>
+      <a href="/" class={navActive('/') ? 'on' : ''}>Home</a>
+      <a href="/reference" class={navActive('/reference') ? 'on' : ''}>Knowledge Base</a>
+      <a href="/tools" class={navActive('/tools') ? 'on' : ''}>Tools</a>
+      <a href="/learn" class={navActive('/learn') ? 'on' : ''}>Learn</a>
+      <div class="nav-search" id="navsearch">
+        <button class="ns-toggle" id="ns-toggle" type="button" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <span class="ns-text">Search</span><kbd class="ns-key">⌘K</kbd>
+        </button>
+        <form class="ns-form" id="ns-form" action="/search" method="get" role="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="ns-input" name="q" type="text" placeholder="Search tools, references &amp; AI…" autocomplete="off" />
+        </form>
+      </div>
     </div>
-  </nav>
+</nav>
 
+<div class={sidebar ? "wrap wrap-sb" : "wrap"}>
   {sidebar ? (
     <div class="layout-sb">
       <Sidebar path={path} />
@@ -143,6 +165,25 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     <div class="foot-copy">&copy; 1999&ndash;2026 KB Cafe &middot; part of the family with <a href="https://yank.info" target="_blank" rel="noopener noreferrer">yank.info</a></div>
   </footer>
 </div>
+<script is:inline>
+  // Nav search: ⌘K box on Mac, plain magnifier elsewhere; click/shortcut expands an inline bar.
+  (function () {
+    var wrap = document.getElementById('navsearch'); if (!wrap) return;
+    var toggle = document.getElementById('ns-toggle'), input = document.getElementById('ns-input');
+    var isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || '') || /Mac OS X|Macintosh/.test(navigator.userAgent || '');
+    if (isMac) wrap.classList.add('mac');
+    function open() { wrap.classList.add('open'); if (input) input.focus(); }
+    function close() { wrap.classList.remove('open'); }
+    if (toggle) toggle.addEventListener('click', open);
+    if (input) {
+      input.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); if (toggle) toggle.focus(); } });
+      input.addEventListener('blur', function () { if (!input.value) close(); });
+    }
+    document.addEventListener('keydown', function (e) {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); open(); }
+    });
+  })();
+</script>
 </body>
 </html>
 
@@ -151,24 +192,34 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     --paper:#FBF4E9; --paper-2:#F4E9D6; --ink:#1E1813; --ink-soft:#574b3f;
     --coral:#EE4B2B; --coral-deep:#D63E1F; --orange:#F4842A; --gold:#F4B423;
     --cream:#FFFCF5; --line:rgba(30,24,19,.12); --shadow:18px 18px 0 rgba(30,24,19,.06);
-    --bg:#FEFDFB; --header:#F7EEDB;
+    --bg:#FEFDFB; --header:#FCFBF9;
     --font-display:"Sora",system-ui,sans-serif;
     --font-body:"Hanken Grotesk",system-ui,sans-serif;
     --font-mono:"JetBrains Mono",ui-monospace,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
+  /* offset anchor jumps so headings clear the sticky header */
+  :where(h2,h3)[id]{scroll-margin-top:96px}
   body{font-family:var(--font-body);background:var(--bg);color:var(--ink);
     -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
   .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 28px}
+  /* sidebar pages go full-width so the sidebar's left edge meets the far-left logo (34px gutter) */
+  .wrap-sb{max-width:none;padding:0 34px}
+  .wrap-sb > footer{max-width:1186px}
   a{color:inherit}
 
   /* nav (cream header band, full-bleed over the off-white body) */
-  .site-nav{position:relative;display:flex;align-items:center;justify-content:space-between;padding:10px 0 9px}
-  .site-nav::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:100vw;
-    background:var(--header);border-bottom:1px solid var(--line);z-index:-1}
+  /* sticky full-width header: logo far left, nav far right, faint border everywhere */
+  .site-nav{position:sticky;top:0;z-index:50;--line:rgba(30,24,19,.12);
+    display:flex;align-items:center;justify-content:space-between;gap:18px;padding:11px 34px;
+    background:var(--header);border-bottom:1px solid var(--line)}
+  /* center slot holds the page's "On this page" TOC (moved here by JS on flagship pages) */
+  .nav-center{flex:1;display:flex;justify-content:center;align-items:center;min-width:0}
+  .nav-center:empty{display:none}
+  .nav-center .toc{position:static;border:0;background:none;padding:0;margin:0;box-shadow:none;border-radius:0;max-height:none;overflow:visible;flex-wrap:wrap;justify-content:center;gap:3px 11px}
   /* brand lockup: the logo IS the "KB", wordmark is just "Cafe" (per v5 mockup) */
   .brand{position:relative;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);
     font-weight:800;font-size:30px;letter-spacing:-.02em;text-decoration:none;color:var(--ink);transition:transform .15s}
@@ -183,12 +234,27 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   .brand:hover .mark{transform:rotate(-3deg)}
   .brand .cf{color:var(--ink);transition:color .15s}
   .brand:hover .cf{color:var(--coral)}
-  .nav-links{display:flex;align-items:center;gap:24px;font-weight:600;font-size:14.5px}
-  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:color .15s}
-  .nav-links a:hover{color:var(--coral)}
-  .nav-ai{display:inline-flex;align-items:center}
-  .nav-search{display:inline-grid;place-items:center;color:var(--ink-soft)}
-  .nav-search:hover{color:var(--coral)}
+  .nav-links{display:flex;align-items:center;gap:26px;font-weight:600;font-size:14.5px}
+  .nav-links a{position:relative;color:var(--ink-soft);text-decoration:none;padding:5px 0;transition:color .15s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a.on{color:var(--ink);font-weight:700}
+  .nav-links a.on::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:2.5px;border-radius:2px;background:var(--coral)}
+  /* search: magnifier by default; ⌘K box on Mac; expands to an inline bar */
+  .nav-search{position:relative;display:flex;align-items:center}
+  .ns-toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;background:none;border:0;color:var(--ink-soft);padding:6px;border-radius:10px;transition:color .15s,border-color .15s}
+  .ns-toggle:hover{color:var(--ink)}
+  .ns-toggle svg{width:18px;height:18px}
+  .ns-text,.ns-key{display:none}
+  .nav-search.mac .ns-toggle{gap:8px;padding:7px 12px;border:1.2px solid var(--line);background:var(--cream)}
+  .nav-search.mac .ns-toggle:hover{border-color:var(--ink)}
+  .nav-search.mac .ns-toggle svg{width:15px;height:15px}
+  .nav-search.mac .ns-text{display:inline;font-size:13.5px;font-weight:600}
+  .nav-search.mac .ns-key{display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:var(--ink-soft);border:1px solid var(--line);border-radius:5px;padding:1px 5px;background:var(--paper-2)}
+  .ns-form{display:none;align-items:center;gap:8px;border:1.2px solid var(--ink);border-radius:11px;padding:7px 12px;background:var(--cream)}
+  .ns-form svg{width:16px;height:16px;color:var(--ink-soft);flex:0 0 auto}
+  .ns-form input{border:0;outline:0;background:transparent;font-family:var(--font-body);font-size:14px;color:var(--ink);width:230px;max-width:46vw}
+  .nav-search.open .ns-toggle{display:none}
+  .nav-search.open .ns-form{display:flex}
   .nav-new{display:inline-flex;align-items:center;margin-left:6px;padding:2px 8px;border-radius:999px;
     background:#ffe5dd;color:var(--coral-deep);font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.02em}
   .since{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink-soft);
@@ -230,7 +296,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
 
   /* sidebar layout (content pages) */
   .layout-sb{display:flex;gap:26px;align-items:flex-start;margin-top:6px}
-  .layout-main{flex:1;min-width:0}
+  .layout-main{flex:1;min-width:0;max-width:900px}
   .sb-burger{display:none;place-items:center;width:38px;height:38px;border-radius:10px;border:1.2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;margin-right:14px}
   .sb-burger svg{width:20px;height:20px}
   .sb-overlay{display:none}
