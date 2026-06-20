@@ -74,8 +74,12 @@ const schema = {
     // funnel metric: did the quick definition send them deeper?
     document.querySelectorAll('[data-dict-next], .d-ladder, .d-chip').forEach(function (a) {
       a.addEventListener('click', function () {
+        var term = location.pathname.replace('/dictionary/', '');
         var to = a.getAttribute('data-dict-next') ? 'next-step' : (a.className.indexOf('ladder') > -1 ? 'explainer' : 'related-term');
-        window.kbTrack && window.kbTrack('Dictionary Click', { term: location.pathname.replace('/dictionary/', ''), to: to });
+        // every onward click (incl. lateral related-term hops)
+        window.kbTrack && window.kbTrack('Dictionary Click', { term: term, to: to });
+        // "went deeper" = left the dictionary for a real explainer/tool (next-step button OR go-deeper ladder)
+        if (to !== 'related-term') window.kbTrack && window.kbTrack('Dictionary Next Step', { term: term, via: to });
       });
     });
   </script>
