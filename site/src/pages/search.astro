@@ -5,6 +5,10 @@ import { REFERENCE } from '../data/reference.js';
 import { AI } from '../data/ai.js';
 import { PATTERNS } from '../data/patterns.js';
 import { POSTS } from '../data/blog.js';
+import { DICT, KIND_META as DICT_KINDS } from '../data/dictionary.js';
+
+// plain-text definition for the search card + match string
+const dplain = (s) => s.replace(/<[^>]+>/g, '').replace(/&ldquo;|&rdquo;/g, '"').replace(/&rsquo;|&lsquo;/g, "'").replace(/&amp;/g, '&').replace(/&[a-z]+;/g, '').replace(/\s+/g, ' ').trim();
 
 // Unified, client-searchable index across every content destination.
 // kind drives the colored badge + the filter chips.
@@ -14,8 +18,9 @@ const KIND_META = {
   ai:        { label: 'AI',        bg: '#7657ff' },
   pattern:   { label: 'Pattern',   bg: '#0f9f82' },
   blog:      { label: 'Blog',      bg: '#e0911a' },
+  dictionary:{ label: 'Dictionary',bg: '#c0791a' },
 };
-const KIND_ORDER = ['tool', 'reference', 'ai', 'pattern', 'blog'];
+const KIND_ORDER = ['tool', 'reference', 'dictionary', 'ai', 'pattern', 'blog'];
 
 const INDEX = [
   ...TOOLS.filter(t => t.href).map(t => ({ kind: 'tool', title: t.nm, ds: t.ds, href: t.href, tag: t.ctl })),
@@ -23,6 +28,7 @@ const INDEX = [
   ...AI.map(a => ({ kind: 'ai', title: a.nm, ds: a.ds, href: a.href, tag: a.tag })),
   ...PATTERNS.map(p => ({ kind: 'pattern', title: `${p.name} pattern`, ds: p.tagline, href: `/ai-patterns/${p.slug}`, tag: p.tag })),
   ...POSTS.map(p => ({ kind: 'blog', title: p.title, ds: p.excerpt, href: `/blog/${p.slug}`, tag: p.tag })),
+  ...DICT.map(d => ({ kind: 'dictionary', title: d.term, ds: dplain(d.answer), href: `/dictionary/${d.slug}`, tag: DICT_KINDS[d.kind].label })),
 ];
 const total = INDEX.length;
 const counts = Object.fromEntries(KIND_ORDER.map(k => [k, INDEX.filter(i => i.kind === k).length]));
@@ -36,7 +42,7 @@ const counts = Object.fromEntries(KIND_ORDER.map(k => [k, INDEX.filter(i => i.ki
     <header class="sp-head">
       <div class="eyebrow">☕ Search the cafe</div>
       <h1>Find <span class="mk">anything.</span></h1>
-      <p class="lede">{total} tools, references, and AI explainers in one box. Filtering happens entirely in your browser, so it is instant and nothing you type is sent anywhere.</p>
+      <p class="lede">{total} tools, references, AI explainers, and plain-English definitions in one box. Filtering happens entirely in your browser, so it is instant and nothing you type is sent anywhere.</p>
 
       <div class="sp-search">
         <span class="s-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
