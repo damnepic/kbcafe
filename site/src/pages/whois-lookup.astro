@@ -1,19 +1,134 @@
 ---
 import ToolPage from '../layouts/ToolPage.astro';
-// NOTE: source recovered from build output 2026-06-20; slots + script injected verbatim.
-const STAGE = "  <div class=\"wl\"> <form class=\"wl-form\" id=\"wl-form\"> <div class=\"wl-inputs\"> <input class=\"wl-domain\" id=\"wl-domain\" type=\"text\" placeholder=\"example.com\" autocomplete=\"off\" autocapitalize=\"off\" spellcheck=\"false\" aria-label=\"Domain to look up\"> <button class=\"btn wl-go\" id=\"wl-go\" type=\"submit\">Look up</button> </div> <div class=\"wl-samples\"> <span class=\"wl-samples-lbl\">Try one:</span> <button class=\"chip\" type=\"button\" data-d=\"google.com\">google.com</button> <button class=\"chip\" type=\"button\" data-d=\"github.com\">github.com</button> <button class=\"chip\" type=\"button\" data-d=\"wikipedia.org\">wikipedia.org</button> <button class=\"chip\" type=\"button\" data-d=\"openai.com\">openai.com</button> </div> </form> <div class=\"wl-results\" id=\"wl-results\" hidden></div> </div>   ";
-const EXPLAINER = " <div class=\"prose\"> <h2>What this tool shows</h2> <p>\nIt fetches a domain&rsquo;s registration record <strong>live, in your browser</strong>, over\n<strong>RDAP</strong>, the structured JSON successor to WHOIS, and lays out the parts that are public:\n</p> <ul> <li><strong>Registrar</strong> and key <strong>dates</strong> (registered, expires, updated).</li> <li><strong>Status codes</strong> (like <code>clientTransferProhibited</code>, the healthy registrar lock).</li> <li><strong>Nameservers</strong> and whether <strong>DNSSEC</strong> is enabled.</li> </ul> <p>\nTwo honest limits: registrant <strong>personal contact data is redacted</strong> for privacy (GDPR), and a few\n      TLDs don&rsquo;t expose browser-accessible RDAP, those return a clear notice rather than a wrong answer. New to\n      this? Read <a href=\"/what-is-whois\">what WHOIS is</a>. To see where the domain points, use the\n<a href=\"/dns-lookup\">DNS lookup</a>.\n</p> </div> ";
-const TOOLJS = "\n  (function () {\n    var form = document.getElementById('wl-form');\n    if (!form) return;\n    var domEl = document.getElementById('wl-domain');\n    var out = document.getElementById('wl-results');\n\n    var STATUS_NOTE = {\n      clienttransferprohibited: 'registrar lock (good)', servertransferprohibited: 'registry lock (good)',\n      clientupdateprohibited: 'update lock', clientdeleteprohibited: 'delete lock',\n      clienthold: 'suspended, not in DNS', serverhold: 'suspended by registry',\n      pendingdelete: 'about to drop', redemptionperiod: 'expired, recoverable',\n      autorenewperiod: 'recently renewed', addperiod: 'newly registered', ok: 'no restrictions', active: 'no restrictions',\n    };\n\n    function clean(d) {\n      return (d || '').trim().toLowerCase()\n        .replace(/^https?:\\/\\//, '').replace(/\\/.*$/, '')\n        .replace(/^www\\./, '').replace(/[^a-z0-9.-]/g, '');\n    }\n    function esc(s) { return String(s).replace(/[&<>\"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[c]; }); }\n\n    function vcardFn(e) {\n      var v = e.vcardArray && e.vcardArray[1];\n      if (!v) return e.handle || null;\n      var fn = v.find(function (p) { return p[0] === 'fn'; });\n      return fn ? fn[3] : (e.handle || null);\n    }\n    function registrar(d) {\n      var e = (d.entities || []).find(function (x) { return (x.roles || []).indexOf('registrar') >= 0; });\n      return e ? vcardFn(e) : null;\n    }\n    function evt(d, a) {\n      var e = (d.events || []).find(function (x) { return x.eventAction === a; });\n      return e ? e.eventDate.slice(0, 10) : null;\n    }\n\n    function row(label, val) {\n      if (!val) return '';\n      return '<div class=\"wl-row\"><span class=\"wl-k\">' + label + '</span><span class=\"wl-v\">' + val + '</span></div>';\n    }\n\n    function render(domain, d) {\n      var reg = registrar(d);\n      var created = evt(d, 'registration');\n      var expires = evt(d, 'expiration');\n      var updated = evt(d, 'last changed');\n      var ns = (d.nameservers || []).map(function (n) { return (n.ldhName || '').toLowerCase(); }).filter(Boolean);\n      var dnssec = d.secureDNS && d.secureDNS.delegationSigned;\n      var status = (d.status || []);\n\n      var expHtml = expires;\n      if (expires) {\n        var days = Math.round((new Date(expires + 'T00:00:00Z') - new Date()) / 86400000);\n        if (!isNaN(days)) {\n          if (days < 0) expHtml = expires + ' <span class=\"wl-flag bad\">expired</span>';\n          else if (days < 30) expHtml = expires + ' <span class=\"wl-flag warn\">in ' + days + ' days</span>';\n          else expHtml = expires + ' <span class=\"wl-flag ok\">in ' + days + ' days</span>';\n        }\n      }\n      var statusHtml = status.length\n        ? '<div class=\"wl-status\">' + status.map(function (s) {\n            var note = STATUS_NOTE[String(s).toLowerCase().replace(/\\s+/g, '')];\n            return '<span class=\"wl-chip\" title=\"' + esc(note || s) + '\">' + esc(s) + (note ? '<em> · ' + esc(note) + '</em>' : '') + '</span>';\n          }).join('') + '</div>'\n        : '';\n      var nsHtml = ns.length ? '<div class=\"wl-ns\">' + ns.map(function (n) { return '<code>' + esc(n) + '</code>'; }).join('') + '</div>' : '';\n\n      out.innerHTML =\n        '<div class=\"wl-card\">' +\n          '<div class=\"wl-for\">' + esc((d.ldhName || domain).toLowerCase()) + '</div>' +\n          row('Registrar', reg ? esc(reg) : null) +\n          row('Registered', created) +\n          row('Expires', expHtml) +\n          row('Updated', updated) +\n          (statusHtml ? '<div class=\"wl-row wl-row-block\"><span class=\"wl-k\">Status</span>' + statusHtml + '</div>' : '') +\n          (nsHtml ? '<div class=\"wl-row wl-row-block\"><span class=\"wl-k\">Nameservers</span>' + nsHtml + '</div>' : '') +\n          row('DNSSEC', dnssec === true ? 'Signed' : dnssec === false ? 'Not signed' : null) +\n        '</div>' +\n        '<p class=\"wl-note\">Registrant, admin, and tech contacts are redacted for privacy (GDPR). The registrar can relay contact via its own form. Source: RDAP, queried live from your browser.</p>';\n      out.hidden = false;\n    }\n\n    async function go(domain) {\n      out.hidden = false;\n      out.innerHTML = '<div class=\"wl-loading\">Looking up <strong>' + esc(domain) + '</strong>…</div>';\n      try {\n        var r = await fetch('https://rdap.org/domain/' + encodeURIComponent(domain), { headers: { accept: 'application/rdap+json' } });\n        if (r.status === 404) { out.innerHTML = '<div class=\"wl-empty\">No registration found for <strong>' + esc(domain) + '</strong>. It may be available, or this TLD&rsquo;s registry doesn&rsquo;t publish RDAP.</div>'; return; }\n        if (!r.ok) throw new Error('rdap ' + r.status);\n        render(domain, await r.json());\n      } catch (e) {\n        out.innerHTML = '<div class=\"wl-err\">Couldn&rsquo;t fetch registration for <strong>' + esc(domain) + '</strong>. Some TLDs don&rsquo;t allow browser (RDAP) lookups, try the registry&rsquo;s own WHOIS page for those.</div>';\n      }\n    }\n\n    form.addEventListener('submit', function (e) {\n      e.preventDefault();\n      var d = clean(domEl.value);\n      if (!d || d.indexOf('.') < 0) { domEl.focus(); return; }\n      go(d);\n    });\n    Array.prototype.forEach.call(document.querySelectorAll('.wl-samples .chip'), function (b) {\n      b.addEventListener('click', function () { domEl.value = b.getAttribute('data-d'); go(b.getAttribute('data-d')); });\n    });\n  })();\n";
+// NOTE: source recovered + cleaned from build output 2026-06-20. UI + explainer are inline markup.
 ---
 <ToolPage
-  title={"WHOIS Lookup, domain registrar, dates & status (via RDAP) | KB Cafe"}
-  description={"Look up any domain's registration, free and in your browser. Registrar, creation and expiry dates, status codes, nameservers, and DNSSEC, fetched live over RDAP (the modern WHOIS). Honest about redacted data and unsupported TLDs."}
+  title="WHOIS Lookup, domain registrar, dates &amp; status (via RDAP) | KB Cafe"
+  description="Look up any domain's registration, free and in your browser. Registrar, creation and expiry dates, status codes, nameservers, and DNSSEC, fetched live over RDAP (the modern WHOIS). Honest about redacted data and unsupported TLDs."
   path="/whois-lookup"
-  eyebrow={"Knowledge Base · Networking · Tool"}
-  h1={"WHOIS Lookup"}
-  tagline={"Enter a domain to see its registration: registrar, key dates, status, and nameservers. Fetched live over RDAP (the modern WHOIS) in your browser, nothing is sent to KB Cafe."}
+  eyebrow="Knowledge Base · Networking · Tool"
+  h1="WHOIS Lookup"
+  tagline="Enter a domain to see its registration: registrar, key dates, status, and nameservers. Fetched live over RDAP (the modern WHOIS) in your browser, nothing is sent to KB Cafe."
 >
-  <Fragment set:html={STAGE} />
-  <Fragment slot="explainer" set:html={EXPLAINER} />
-  <script is:inline set:html={TOOLJS} />
+  <div class="wl"> <form class="wl-form" id="wl-form"> <div class="wl-inputs"> <input class="wl-domain" id="wl-domain" type="text" placeholder="example.com" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Domain to look up"> <button class="btn wl-go" id="wl-go" type="submit">Look up</button> </div> <div class="wl-samples"> <span class="wl-samples-lbl">Try one:</span> <button class="chip" type="button" data-d="google.com">google.com</button> <button class="chip" type="button" data-d="github.com">github.com</button> <button class="chip" type="button" data-d="wikipedia.org">wikipedia.org</button> <button class="chip" type="button" data-d="openai.com">openai.com</button> </div> </form> <div class="wl-results" id="wl-results" hidden></div> </div>
+
+  <Fragment slot="explainer">
+  <div class="prose"> <h2>What this tool shows</h2> <p>
+It fetches a domain&rsquo;s registration record <strong>live, in your browser</strong>, over
+<strong>RDAP</strong>, the structured JSON successor to WHOIS, and lays out the parts that are public:
+</p> <ul> <li><strong>Registrar</strong> and key <strong>dates</strong> (registered, expires, updated).</li> <li><strong>Status codes</strong> (like <code>clientTransferProhibited</code>, the healthy registrar lock).</li> <li><strong>Nameservers</strong> and whether <strong>DNSSEC</strong> is enabled.</li> </ul> <p>
+Two honest limits: registrant <strong>personal contact data is redacted</strong> for privacy (GDPR), and a few
+      TLDs don&rsquo;t expose browser-accessible RDAP, those return a clear notice rather than a wrong answer. New to
+      this? Read <a href="/what-is-whois">what WHOIS is</a>. To see where the domain points, use the
+<a href="/dns-lookup">DNS lookup</a>.
+</p> </div>
+  </Fragment>
+
+  <script is:inline>
+  (function () {
+    var form = document.getElementById('wl-form');
+    if (!form) return;
+    var domEl = document.getElementById('wl-domain');
+    var out = document.getElementById('wl-results');
+
+    var STATUS_NOTE = {
+      clienttransferprohibited: 'registrar lock (good)', servertransferprohibited: 'registry lock (good)',
+      clientupdateprohibited: 'update lock', clientdeleteprohibited: 'delete lock',
+      clienthold: 'suspended, not in DNS', serverhold: 'suspended by registry',
+      pendingdelete: 'about to drop', redemptionperiod: 'expired, recoverable',
+      autorenewperiod: 'recently renewed', addperiod: 'newly registered', ok: 'no restrictions', active: 'no restrictions',
+    };
+
+    function clean(d) {
+      return (d || '').trim().toLowerCase()
+        .replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+        .replace(/^www\./, '').replace(/[^a-z0-9.-]/g, '');
+    }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+    function vcardFn(e) {
+      var v = e.vcardArray && e.vcardArray[1];
+      if (!v) return e.handle || null;
+      var fn = v.find(function (p) { return p[0] === 'fn'; });
+      return fn ? fn[3] : (e.handle || null);
+    }
+    function registrar(d) {
+      var e = (d.entities || []).find(function (x) { return (x.roles || []).indexOf('registrar') >= 0; });
+      return e ? vcardFn(e) : null;
+    }
+    function evt(d, a) {
+      var e = (d.events || []).find(function (x) { return x.eventAction === a; });
+      return e ? e.eventDate.slice(0, 10) : null;
+    }
+
+    function row(label, val) {
+      if (!val) return '';
+      return '<div class="wl-row"><span class="wl-k">' + label + '</span><span class="wl-v">' + val + '</span></div>';
+    }
+
+    function render(domain, d) {
+      var reg = registrar(d);
+      var created = evt(d, 'registration');
+      var expires = evt(d, 'expiration');
+      var updated = evt(d, 'last changed');
+      var ns = (d.nameservers || []).map(function (n) { return (n.ldhName || '').toLowerCase(); }).filter(Boolean);
+      var dnssec = d.secureDNS && d.secureDNS.delegationSigned;
+      var status = (d.status || []);
+
+      var expHtml = expires;
+      if (expires) {
+        var days = Math.round((new Date(expires + 'T00:00:00Z') - new Date()) / 86400000);
+        if (!isNaN(days)) {
+          if (days < 0) expHtml = expires + ' <span class="wl-flag bad">expired</span>';
+          else if (days < 30) expHtml = expires + ' <span class="wl-flag warn">in ' + days + ' days</span>';
+          else expHtml = expires + ' <span class="wl-flag ok">in ' + days + ' days</span>';
+        }
+      }
+      var statusHtml = status.length
+        ? '<div class="wl-status">' + status.map(function (s) {
+            var note = STATUS_NOTE[String(s).toLowerCase().replace(/\s+/g, '')];
+            return '<span class="wl-chip" title="' + esc(note || s) + '">' + esc(s) + (note ? '<em> · ' + esc(note) + '</em>' : '') + '</span>';
+          }).join('') + '</div>'
+        : '';
+      var nsHtml = ns.length ? '<div class="wl-ns">' + ns.map(function (n) { return '<code>' + esc(n) + '</code>'; }).join('') + '</div>' : '';
+
+      out.innerHTML =
+        '<div class="wl-card">' +
+          '<div class="wl-for">' + esc((d.ldhName || domain).toLowerCase()) + '</div>' +
+          row('Registrar', reg ? esc(reg) : null) +
+          row('Registered', created) +
+          row('Expires', expHtml) +
+          row('Updated', updated) +
+          (statusHtml ? '<div class="wl-row wl-row-block"><span class="wl-k">Status</span>' + statusHtml + '</div>' : '') +
+          (nsHtml ? '<div class="wl-row wl-row-block"><span class="wl-k">Nameservers</span>' + nsHtml + '</div>' : '') +
+          row('DNSSEC', dnssec === true ? 'Signed' : dnssec === false ? 'Not signed' : null) +
+        '</div>' +
+        '<p class="wl-note">Registrant, admin, and tech contacts are redacted for privacy (GDPR). The registrar can relay contact via its own form. Source: RDAP, queried live from your browser.</p>';
+      out.hidden = false;
+    }
+
+    async function go(domain) {
+      out.hidden = false;
+      out.innerHTML = '<div class="wl-loading">Looking up <strong>' + esc(domain) + '</strong>…</div>';
+      try {
+        var r = await fetch('https://rdap.org/domain/' + encodeURIComponent(domain), { headers: { accept: 'application/rdap+json' } });
+        if (r.status === 404) { out.innerHTML = '<div class="wl-empty">No registration found for <strong>' + esc(domain) + '</strong>. It may be available, or this TLD&rsquo;s registry doesn&rsquo;t publish RDAP.</div>'; return; }
+        if (!r.ok) throw new Error('rdap ' + r.status);
+        render(domain, await r.json());
+      } catch (e) {
+        out.innerHTML = '<div class="wl-err">Couldn&rsquo;t fetch registration for <strong>' + esc(domain) + '</strong>. Some TLDs don&rsquo;t allow browser (RDAP) lookups, try the registry&rsquo;s own WHOIS page for those.</div>';
+      }
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var d = clean(domEl.value);
+      if (!d || d.indexOf('.') < 0) { domEl.focus(); return; }
+      go(d);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.wl-samples .chip'), function (b) {
+      b.addEventListener('click', function () { domEl.value = b.getAttribute('data-d'); go(b.getAttribute('data-d')); });
+    });
+  })();
+  </script>
 </ToolPage>
