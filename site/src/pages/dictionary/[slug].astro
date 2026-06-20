@@ -1,0 +1,124 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { DICT, findTerm, KIND_META } from '../../data/dictionary.js';
+
+export function getStaticPaths() {
+  return DICT.map((t) => ({ params: { slug: t.slug }, props: { entry: t } }));
+}
+const { entry } = Astro.props;
+const k = KIND_META[entry.kind];
+const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
+const related = (entry.related || []).map(findTerm).filter(Boolean);
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: entry.term,
+  description: plain(entry.answer),
+  inDefinedTermSet: { '@type': 'DefinedTermSet', name: 'Plain-English Tech Dictionary', url: 'https://kbcafe.com/dictionary' },
+};
+---
+<Layout
+  title={`What is ${entry.term}? A plain-English definition | KB Cafe`}
+  description={plain(entry.answer)}
+  path={`/dictionary/${entry.slug}`}
+  sidebar={true}
+  crumb={[{ label: 'Dictionary', href: '/dictionary' }, { label: entry.term }]}
+>
+  <article class="dict" style={`--accent:${k.color}`}>
+    <div class="d-top">
+      <span class="d-badge">Quick definition · 2 min</span>
+      <a class="d-kind" href={`/dictionary#${entry.kind}`}>{k.label} term</a>
+    </div>
+    <h1>{entry.term}</h1>
+    <p class="d-answer" set:html={entry.answer} />
+
+    <div class="d-block"><div class="d-h">Think of it like</div><p set:html={entry.analogy} /></div>
+    <div class="d-block"><div class="d-h">Example</div><p set:html={entry.example} /></div>
+    <div class="d-block"><div class="d-h">Why it matters</div><p set:html={entry.why} /></div>
+
+    <div class="d-block"><div class="d-h">Where you&rsquo;ll see it</div>
+      <div class="d-where">
+        {entry.where.map((w) => <span set:html={w} />)}
+        {entry.whereOurs && <a class="ours" href={entry.whereOurs.href} set:html={entry.whereOurs.label} />}
+      </div>
+    </div>
+
+    {entry.ladder && (
+      <a class="d-ladder" href={entry.ladder.href}>
+        <span class="dl-h">Go deeper</span>
+        <span class="dl-t" set:html={entry.ladder.label + ' &rarr;'} />
+        <span class="dl-d">The full explainer. This quick definition is just the on-ramp.</span>
+      </a>
+    )}
+
+    <a class="d-next" href={entry.next.href} data-dict-next={entry.slug}>
+      <span class="dn-l">Next step</span>
+      <span class="dn-t" set:html={entry.next.label + ' &rarr;'} />
+      <span class="dn-d" set:html={entry.next.desc} />
+    </a>
+
+    {related.length > 0 && (
+      <div class="d-rel">
+        <div class="d-rel-h">Related terms</div>
+        <div class="d-chips">
+          {related.map((r) => <a class="d-chip" href={`/dictionary/${r.slug}`}>{r.term}</a>)}
+        </div>
+      </div>
+    )}
+
+    <a class="d-all" href="/dictionary">&larr; All terms in the dictionary</a>
+  </article>
+
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <script is:inline>
+    // funnel metric: did the quick definition send them deeper?
+    document.querySelectorAll('[data-dict-next], .d-ladder, .d-chip').forEach(function (a) {
+      a.addEventListener('click', function () {
+        var to = a.getAttribute('data-dict-next') ? 'next-step' : (a.className.indexOf('ladder') > -1 ? 'explainer' : 'related-term');
+        window.kbTrack && window.kbTrack('Dictionary Click', { term: location.pathname.replace('/dictionary/', ''), to: to });
+      });
+    });
+  </script>
+</Layout>
+
+<style>
+  .dict{max-width:660px;margin:0 auto;padding:8px 0 30px}
+  .d-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .d-badge{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent);background:color-mix(in srgb, var(--accent) 12%, transparent);border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-radius:999px;padding:4px 11px}
+  .d-kind{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);text-decoration:none}
+  .d-kind:hover{color:var(--accent)}
+  .dict h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.02;font-size:clamp(34px,5.5vw,50px)}
+  .d-answer{font-size:19px;line-height:1.5;color:var(--ink);margin-top:15px;font-weight:500}
+  .d-answer strong{color:var(--accent)}
+  .d-answer code,.d-block code{font-family:var(--font-mono);font-size:.86em;background:var(--paper-2);padding:2px 6px;border-radius:5px;color:var(--ink)}
+  .d-block{margin-top:22px}
+  .d-h{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px;display:flex;align-items:center;gap:8px}
+  .d-h::before{content:"";width:14px;height:2px;background:var(--accent);border-radius:2px}
+  .d-block p{font-size:15.5px;line-height:1.62;color:var(--ink-soft)}
+  .d-where{display:flex;flex-wrap:wrap;gap:8px}
+  .d-where span,.d-where a{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--ink-soft);background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:5px 11px;text-decoration:none}
+  .d-where a.ours{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb, var(--accent) 7%, #fff)}
+  .d-where a.ours:hover{background:color-mix(in srgb, var(--accent) 14%, #fff)}
+  .d-ladder{display:flex;flex-direction:column;gap:3px;margin-top:22px;text-decoration:none;
+    background:color-mix(in srgb, var(--accent) 8%, #fff);border:1.3px solid color-mix(in srgb, var(--accent) 28%, transparent);border-radius:14px;padding:15px 18px}
+  .dl-h{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  .dl-t{font-family:var(--font-display);font-weight:800;font-size:17px;color:var(--ink)}
+  .dl-d{font-size:13px;color:var(--ink-soft)}
+  .d-next{display:flex;flex-direction:column;gap:3px;margin-top:22px;text-decoration:none;color:#fff;border-radius:16px;padding:18px 22px;
+    background:radial-gradient(circle at 88% 25%,rgba(238,75,43,.30),transparent 45%),linear-gradient(135deg,#1c1410,#241813);
+    box-shadow:0 16px 38px rgba(16,17,18,.18);transition:transform .15s,box-shadow .15s}
+  .d-next:hover{transform:translateY(-2px);box-shadow:0 22px 48px rgba(16,17,18,.24)}
+  .dn-l{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+  .dn-t{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.01em}
+  .dn-d{font-size:13px;color:rgba(255,255,255,.72)}
+  .d-rel{margin-top:24px;border-top:1px solid var(--line);padding-top:18px}
+  .d-rel-h{font-family:var(--font-display);font-weight:800;font-size:14px;margin-bottom:11px}
+  .d-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .d-chip{font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:var(--ink);background:var(--cream);border:1.3px solid var(--line);border-radius:9px;padding:6px 12px;text-decoration:none;transition:border-color .14s,transform .14s}
+  .d-chip::before{content:"\2192 ";color:var(--accent);font-weight:700}
+  .d-chip:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .d-all{display:inline-block;margin-top:22px;font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:var(--ink-soft);text-decoration:none}
+  .d-all:hover{color:var(--accent)}
+</style>
