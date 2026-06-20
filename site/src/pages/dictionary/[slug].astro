@@ -51,11 +51,13 @@ const schema = {
       </a>
     )}
 
-    <a class="d-next" href={entry.next.href} data-dict-next={entry.slug}>
-      <span class="dn-l">Next step</span>
-      <span class="dn-t" set:html={entry.next.label + ' &rarr;'} />
-      <span class="dn-d" set:html={entry.next.desc} />
-    </a>
+    {entry.next && (
+      <a class="d-next" href={entry.next.href} data-dict-next={entry.slug}>
+        <span class="dn-l">Next step</span>
+        <span class="dn-t" set:html={entry.next.label + ' &rarr;'} />
+        <span class="dn-d" set:html={entry.next.desc} />
+      </a>
+    )}
 
     {related.length > 0 && (
       <div class="d-rel">

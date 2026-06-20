@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { DICT, byKind, KIND_META, KIND_ORDER } from '../../data/dictionary.js';
+import { DICT, byKind, KIND_META, KIND_ORDER, POPULAR, findTerm } from '../../data/dictionary.js';
 
 const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
 const gloss = (e) => { const p = plain(e.answer).replace(/^An?\s+|^The\s+/i, ''); return p.length > 52 ? p.slice(0, 52).replace(/\s+\S*$/, '') + '…' : p; };
@@ -33,13 +33,26 @@ const schema = {
     </div>
     <p class="dh-empty" id="dh-empty" hidden>No match yet. Try a shorter word, or <a href="/search">search the whole site &rarr;</a></p>
 
+    <div class="dh-pop-wrap">
+      <div class="dh-cat-h"><span class="dh-dot" style="background:var(--coral)"></span>Start here</div>
+      <p class="dh-pop-sub">The words beginners get stuck on first. New to one? It is a 2-minute read.</p>
+      <div class="dh-grid">
+        {POPULAR.map(findTerm).filter(Boolean).map((e) => (
+          <a class="dh-term dh-pop" href={`/dictionary/${e.slug}`} style={`--accent:${KIND_META[e.kind].color}`}>
+            <span class="dh-t">{e.term}</span>
+            <span class="dh-g">{gloss(e)}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+
     {built.map((kind) => {
       const meta = KIND_META[kind];
       return (
         <div class="dh-cat" data-cat={kind} id={kind}>
           <div class="dh-cat-h"><span class="dh-dot" style={`background:${meta.dot}`}></span>{meta.label} terms</div>
           <div class="dh-grid">
-            {byKind(kind).map((e) => (
+            {byKind(kind).slice().sort((a, b) => a.term.localeCompare(b.term)).map((e) => (
               <a class="dh-term" href={`/dictionary/${e.slug}`} data-name={`${e.term.toLowerCase()} ${e.slug}`} style={`--accent:${meta.color}`}>
                 <span class="dh-t">{e.term}</span>
                 <span class="dh-g">{gloss(e)}</span>
@@ -66,8 +79,9 @@ const schema = {
     (function () {
       var q = document.getElementById('dq'), empty = document.getElementById('dh-empty');
       if (!q) return;
-      var terms = Array.prototype.slice.call(document.querySelectorAll('.dh-term'));
+      var terms = Array.prototype.slice.call(document.querySelectorAll('.dh-cat .dh-term'));
       var cats = Array.prototype.slice.call(document.querySelectorAll('.dh-cat'));
+      var pop = document.querySelector('.dh-pop-wrap');
       q.addEventListener('input', function () {
         var v = q.value.trim().toLowerCase(); var any = false;
         terms.forEach(function (t) {
@@ -78,7 +92,8 @@ const schema = {
           var visible = c.querySelectorAll('.dh-term:not([style*="none"])').length;
           c.style.display = visible ? '' : 'none';
         });
-        empty.hidden = any;
+        if (pop) pop.style.display = v ? 'none' : '';
+        empty.hidden = any || !v;
       });
     })();
   </script>
@@ -94,6 +109,9 @@ const schema = {
   .dh-search input{flex:1;border:0;outline:0;background:transparent;font-family:var(--font-body);font-size:15px;color:var(--ink)}
   .dh-empty{margin-top:12px;font-size:14px;color:var(--ink-soft)}
   .dh-empty a{color:var(--coral);font-weight:600;text-decoration:none}
+  .dh-pop-wrap{margin-top:30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+  .dh-pop-sub{font-size:13.5px;color:var(--ink-soft);margin:2px 0 13px}
+  .dh-pop{border-color:rgba(238,75,43,.28)}
   .dh-cat{margin-top:30px}
   .dh-cat-h{font-family:var(--font-display);font-weight:800;font-size:18px;display:flex;align-items:center;gap:9px;margin-bottom:13px}
   .dh-dot{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
