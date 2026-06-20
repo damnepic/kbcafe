@@ -43,6 +43,8 @@ const reads = steps.length - tools;
       </div>
     </header>
 
+    {p.intro && <p class="lpp-primer" set:html={p.intro} />}
+
     <ol class="lpp-steps">
       {steps.map((x, i) => (
         <li class="lpp-step" data-href={x.href}>
@@ -78,6 +80,7 @@ const reads = steps.length - tools;
   .lpp-bar{height:10px;border-radius:6px;background:var(--paper-2);overflow:hidden}
   .lpp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16a37e,#0f9f82);transition:width .35s}
 
+  .lpp-primer{margin:26px 0 0;padding:16px 19px;background:var(--cream);border:1.3px solid var(--line);border-radius:14px;font-size:15px;line-height:1.62;color:var(--ink-soft);max-width:640px}
   .lpp-steps{list-style:none;margin:34px 0 0;padding:0}
   .lpp-step{display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:center;margin-bottom:10px}
   .lpp-check{position:relative;width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:var(--paper);cursor:pointer;display:grid;place-items:center}

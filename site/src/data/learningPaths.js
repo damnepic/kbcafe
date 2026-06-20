@@ -5,6 +5,7 @@ export const LEARNING_PATHS = [
     id: 'infra', title: 'AI Infrastructure', shortTitle: 'AI Infrastructure', tag: 'Foundations',
     route: '/learn-ai-infrastructure', minutes: 35, outcome: 'I want to understand how AI systems work under the hood',
     blurb: 'The plumbing behind every AI feature: how text becomes tokens and vectors, and how models are grounded in real data.',
+    intro: '<span class="lpp-primer-h">New to the lingo?</span> Every AI reads text as <a class="kb-term" href="/dictionary/token">tokens</a>, and only so many fit in its <a class="kb-term" href="/dictionary/context-window">context window</a> at once. To work with more, text is turned into <a class="kb-term" href="/dictionary/embedding">embeddings</a> and stored in a <a class="kb-term" href="/dictionary/vector-database">vector database</a> the model can search. Hit a word you do not know? Click it for a 2-minute definition, then come right back.',
     steps: ['/what-is-a-context-window', '/token-counter', '/what-are-embeddings', '/embedding-explorer', '/what-is-a-vector-database', '/what-is-rag', '/rag-chunking-visualizer'],
   },
   {
