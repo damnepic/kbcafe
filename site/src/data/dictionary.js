@@ -260,6 +260,42 @@ export const DICT = [
     next: { label: 'Reduce it with better prompts: Learn Prompting', href: '/learn-prompting', desc: 'Clear prompts and grounding cut hallucinations.' },
     related: ['prompt', 'rag', 'llm'],
   },
+  {
+    slug: 'conversational-ai', term: 'Conversational AI', kind: 'ai',
+    answer: '<strong>Conversational AI</strong> is AI you talk to in plain language, back and forth, like ChatGPT or a voice assistant.',
+    analogy: 'A helpful person at an information desk: you ask in normal words, they answer, you ask a follow-up.',
+    example: 'ChatGPT, Claude, Gemini, Siri, and Alexa are all conversational AI. You type or speak; they respond in kind.',
+    why: 'It is the kind of AI most people meet first. Knowing the term connects the everyday &ldquo;chatbot&rdquo; to the bigger picture.',
+    where: ['ChatGPT', 'Claude', 'Siri', 'Alexa'],
+    related: ['llm', 'agent', 'prompt'],
+  },
+  {
+    slug: 'temperature', term: 'Temperature', kind: 'ai',
+    answer: '<strong>Temperature</strong> is a setting that controls how random or focused an AI&rsquo;s answers are.',
+    analogy: 'A creativity dial. Low temperature is careful and predictable; high temperature is loose and surprising.',
+    example: 'Low temperature suits facts and code; higher temperature suits brainstorming and creative writing.',
+    why: 'When an answer feels too bland or too wild, temperature is often the knob behind it. Many tools let you adjust it.',
+    where: ['OpenAI API', 'AI playgrounds'],
+    related: ['model', 'inference', 'prompt'],
+  },
+  {
+    slug: 'multimodal', term: 'Multimodal', kind: 'ai',
+    answer: '<strong>Multimodal</strong> AI can handle more than one kind of input or output: text, images, sound, even video.',
+    analogy: 'A person who can read, see, and listen, not just read. It works across senses, not only one.',
+    example: 'Show a multimodal model a photo and ask &ldquo;what is wrong with this recipe?&rdquo; and it reads the picture and replies in words.',
+    why: 'Modern AI is increasingly multimodal. It is why you can now paste an image into a chat and ask about it.',
+    where: ['GPT-4o', 'Gemini', 'Claude'],
+    related: ['model', 'diffusion-model', 'token'],
+  },
+  {
+    slug: 'diffusion-model', term: 'Diffusion model', kind: 'ai',
+    answer: 'A <strong>diffusion model</strong> is the kind of AI that makes images. It starts from random noise and refines it into a picture based on your prompt.',
+    analogy: 'A sculptor starting from TV static, gradually clearing the noise into the image you asked for.',
+    example: 'Type &ldquo;a cat in a spacesuit&rdquo; into an image tool and a diffusion model turns noise into that picture, step by step.',
+    why: 'Diffusion models power almost all AI image generators. The word explains how text becomes a picture.',
+    where: ['Midjourney', 'DALL&middot;E', 'Stable Diffusion'],
+    related: ['model', 'prompt', 'multimodal'],
+  },
 
   // ── Coding ──
   {
