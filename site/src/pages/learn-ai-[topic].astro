@@ -4,6 +4,7 @@ import Share from '../components/Share.astro';
 import { TOOLS } from '../data/tools.js';
 import { AI } from '../data/ai.js';
 import { LEARNING_PATHS } from '../data/learningPaths.js';
+import DictHover from '../components/DictHover.astro';
 
 export function getStaticPaths() {
   return LEARNING_PATHS
@@ -44,6 +45,7 @@ const reads = steps.length - tools;
     </header>
 
     {p.intro && <p class="lpp-primer" set:html={p.intro} />}
+    {p.intro && <DictHover />}
 
     <ol class="lpp-steps">
       {steps.map((x, i) => (

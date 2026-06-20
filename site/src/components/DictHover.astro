@@ -1,0 +1,63 @@
+---
+// Hover-preview for dictionary term links. Include <DictHover /> on any page that has
+// .kb-term links (learning paths, explainers). Hovering/focusing a term shows its one-line
+// definition in a shared tooltip; clicking still opens the full entry. Single source: the
+// definition map is generated from the dictionary data, so it never drifts.
+import { DICT } from '../data/dictionary.js';
+const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&ldquo;|&rdquo;/g, '"').replace(/&rsquo;|&lsquo;/g, "'").replace(/&amp;/g, '&').replace(/&[a-z]+;/g, '').replace(/\s+/g, ' ').trim();
+const MAP = Object.fromEntries(DICT.map((t) => [t.slug, { t: t.term, d: plain(t.answer) }]));
+---
+<div id="kb-tip" class="kb-tip" hidden role="tooltip">
+  <span class="kb-tip-t"></span>
+  <span class="kb-tip-d"></span>
+  <span class="kb-tip-go">Click to learn more &rarr;</span>
+</div>
+
+<script define:vars={{ MAP }}>
+  (function () {
+    var tip = document.getElementById('kb-tip');
+    if (!tip) return;
+    var tEl = tip.querySelector('.kb-tip-t'), dEl = tip.querySelector('.kb-tip-d');
+    var cur = null;
+    function slugOf(a) { var m = (a.getAttribute('href') || '').match(/\/dictionary\/([^\/?#]+)/); return m ? m[1] : null; }
+    function show(a) {
+      var s = slugOf(a), e = s && MAP[s];
+      if (!e) return;
+      tEl.textContent = e.t; dEl.textContent = e.d;
+      tip.hidden = false;
+      var r = a.getBoundingClientRect(), tr = tip.getBoundingClientRect();
+      var top = r.top - tr.height - 9;
+      if (top < 8) top = r.bottom + 9;                    // flip below if no room above
+      var left = r.left + r.width / 2 - tr.width / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
+      tip.style.top = (top + window.scrollY) + 'px';
+      tip.style.left = (left + window.scrollX) + 'px';
+      cur = a;
+    }
+    function hide() { tip.hidden = true; cur = null; }
+    document.addEventListener('mouseover', function (e) {
+      var a = e.target.closest && e.target.closest('a.kb-term[href*="/dictionary/"]');
+      if (a && a !== cur) show(a);
+    });
+    document.addEventListener('mouseout', function (e) {
+      var a = e.target.closest && e.target.closest('a.kb-term');
+      var to = e.relatedTarget;
+      if (a && (!to || !to.closest || !to.closest('a.kb-term'))) hide();
+    });
+    document.addEventListener('focusin', function (e) {
+      var a = e.target.closest && e.target.closest('a.kb-term[href*="/dictionary/"]');
+      if (a) show(a);
+    });
+    document.addEventListener('focusout', hide);
+    window.addEventListener('scroll', hide, { passive: true });
+  })();
+</script>
+
+<style is:global>
+  .kb-tip{position:absolute;z-index:200;max-width:280px;display:flex;flex-direction:column;gap:5px;
+    background:#15120e;color:#e9e2d4;border-radius:11px;padding:11px 13px;
+    box-shadow:0 14px 34px rgba(20,12,4,.3);font-family:var(--font-body);pointer-events:none}
+  .kb-tip-t{font-family:var(--font-display);font-weight:800;font-size:13.5px;color:#fff}
+  .kb-tip-d{font-size:12.5px;line-height:1.45;color:#d7cfc0}
+  .kb-tip-go{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:var(--gold);letter-spacing:.03em}
+</style>
