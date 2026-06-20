@@ -1,0 +1,165 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="How an AI Agent Blanked 26 Files, and the One Question That Saved Me"
+  description="A build-in-public postmortem: an AI coding agent null-wrote 26 of my source files. Why git only saved half, how I rebuilt the rest from build output and verified every byte, and the rule I locked in so it cannot happen again."
+  slug="ai-agent-blanked-26-files"
+  tag="Build in Public"
+  date="2026-06-20"
+>
+  <p>
+    I build KB Cafe fast, with an AI coding agent doing a lot of the hands-on work: edit, build,
+    deploy, repeat. Most days that is a superpower. In the early hours of plugging away on homepage
+    code optimizations and design changes, it nearly cost me thirteen files, and almost 24 hours of
+    hard work. The failure, the catch, and the recovery are all worth writing down for you to learn
+    from, so here&rsquo;s exactly what happened, and what to do if you run into something similar in
+    your own AI coding (or vibe coding) travels.
+  </p>
+
+  <h2>The mistake</h2>
+  <p>
+    I was mid-redesign on the homepage and header. To rename a label across a couple dozen pages,
+    the agent reached for a quick scripted find-and-replace. The replacement expression was malformed:
+    instead of returning a string it threw an error, which left the target variable empty, and the
+    script then wrote that empty value straight back to disk. Twenty-six page files, each blanked to
+    zero bytes, in a single loop.
+  </p>
+  <p>
+    A blank source file is not a syntax error. It builds. It just builds to nothing. Moments later the
+    agent came back with the scope of what it had just done:
+  </p>
+
+  <div class="kb-term">
+    <div class="kb-a"><span class="kb-who">the agent</span>
+      <p>I caused a destructive error <span class="emd"></span> a botched PowerShell replace null-wrote 26 files; 13 were restored from <code>git</code>, but 13 untracked files are blanked. The good news: the last successful build&rsquo;s <code>dist/*.html</code> still has their full rendered content, so they&rsquo;re recoverable.</p>
+    </div>
+  </div>
+
+  <h2>The question that saved me</h2>
+  <p>Before the agent could take its (catastrophic) next step, since I was watching the session, I was able to <strong>stop</strong> auto mode and cut in:</p>
+
+  <div class="kb-term">
+    <div class="kb-q">wait. STOP. if you didn't deploy live yet, what's live currently hasn't been overwritten by your destructive error correct?</div>
+  </div>
+
+  <p>
+    That single question did two things. First, it was right: nothing had been deployed, so the live
+    site was untouched. Second, and more importantly, it stopped the agent&rsquo;s default next move,
+    which was to build and deploy. The next build would have regenerated the output folder using the
+    blank pages, overwriting the one clean copy I still had, and a deploy after that would have pushed
+    the blanks live. The interjection froze everything at the exact moment recovery was still easy.
+  </p>
+
+  <h2>Why git only saved half</h2>
+  <p>
+    <code>git checkout</code> restored thirteen of the twenty-six instantly. The other thirteen came
+    back with an error: <code>did not match any file(s) known to git</code>. They had never been
+    committed. Because the site deploys through a CLI rather than a git integration, a deploy never
+    forces a commit, and the source had quietly drifted. Thirty-two files in the working tree had
+    never been saved to history, and the unrecoverable thirteen were in that set.
+  </p>
+  <p>
+    The uncomfortable lesson, stated plainly: your backup is not your deploy host, your editor&rsquo;s
+    autosave, or the fact that the site &ldquo;works.&rdquo; Your backup is a commit.
+  </p>
+
+  <h2>The recovery plan</h2>
+  <p>
+    The saving grace was redundancy I did not know I had: the live site and the last successful
+    local build were both perfect copies of the thirteen lost files, as rendered HTML. So before
+    touching anything else, I copied the last good build output into a separate folder, so a rebuild
+    could not destroy it. Then I reconstructed each source file from its own rendered output: pull the
+    metadata, the prose, and (for the interactive tools) the inline JavaScript straight out of the HTML,
+    and rebuild the original file around it. Crucially, nothing was accepted on faith. Every rebuilt
+    file was rendered and compared byte-for-byte against the saved baseline, and only kept when the
+    comparison was clean. Ten articles came back identical. Three interactive tools came back
+    identical, form handlers and all.
+  </p>
+
+  <h2>How close it actually came</h2>
+  <p>
+    Once the files were safe, I asked the agent to be honest about how close it had come, rather than
+    reassuring. Here is that exchange, in full:
+  </p>
+
+  <div class="kb-term">
+    <div class="kb-q">what would have happened if i didn't have the idea to use the live site to reverse engineer what we already had?</div>
+    <div class="kb-a"><span class="kb-who">the agent</span>
+      <p>Honest answer, because you deserve the real reckoning rather than a reassuring one.</p>
+      <p><strong>The pages themselves would very likely have survived anyway</strong> <span class="emd"></span> the rendered HTML existed in three places, not just the live site:</p>
+      <ol>
+        <li>Your local <code>dist/</code> folder (the last good build) <span class="emd"></span> that&rsquo;s actually what I reconstructed from. The &ldquo;live site&rdquo; and <code>dist/</code> are the same content; I pulled from the local copy.</li>
+        <li>The live site itself <span class="emd"></span> your point secured this one.</li>
+        <li>Vercel&rsquo;s deployment history <span class="emd"></span> Vercel keeps every past deployment at an immutable URL. Even if both of the above were gone, I could have scraped the good HTML from the previous deployment.</li>
+      </ol>
+      <p>So the content had redundancy you didn&rsquo;t know you had. But here&rsquo;s where your instinct genuinely mattered:</p>
+      <p><strong>What your &ldquo;STOP&rdquo; actually prevented:</strong> When the files blanked, my normal flow was heading toward <code>build</code> <span class="arr"></span> <code>deploy</code>. A blank <code>.astro</code> still builds successfully (it just produces an empty page) <span class="emd"></span> so <code>npm run build</code> would have overwritten the good <code>dist/</code> with blank pages, destroying the copy I ended up using. And if I&rsquo;d then deployed, blanks would have gone live, leaving only Vercel&rsquo;s deployment history as a fallback. Your interruption stopped that cascade and forced the careful path (back up <code>dist/</code> first, then recover).</p>
+      <p><strong>What was permanently lost regardless</strong> <span class="emd"></span> and this is the part worth sitting with: I rebuilt those 13 pages from rendered HTML, so they&rsquo;re functionally identical to the originals, but they are not the original source. The clean, templated <code>.astro</code> files <span class="emd"></span> the FAQ arrays, the code-sample template literals, the tidy markup <span class="emd"></span> are gone for those 13. They now carry their prose as a big <code>set:html</code> string in frontmatter. The site works perfectly, but the authoring quality of that source took a real, unrecoverable hit.</p>
+      <p><strong>The bottom line:</strong> Reverse-engineering from HTML recovers output, never source. The only thing that recovers actual source is a git commit. The 13 tracked files came back in one command, byte-perfect; the 13 untracked ones came back as reconstructions. That&rsquo;s the whole lesson, and it&rsquo;s why the rule we just locked in matters: <strong>git is the only real safety net</strong> <span class="emd"></span> everything else recovers a photocopy, not the original.</p>
+      <p>So: your instinct saved us a bad afternoon and a risky recovery. Committing those files last week would have made the whole thing a 30-second non-event.</p>
+    </div>
+  </div>
+
+  <h2>Then I made them better than before</h2>
+  <p>
+    The emergency reconstruction worked, but it was ugly: each page&rsquo;s content had been crammed
+    into a single injected string, functional but miserable to edit. So I asked whether to go further,
+    and the agent laid out how to do it without risk:
+  </p>
+
+  <div class="kb-term">
+    <div class="kb-q">is it better now for you to just reprogram those 13 from scratch using what's there as an authoritative guide so the authoring quality can be improved to what it was before the hit, and even better?</div>
+    <div class="kb-a"><span class="kb-who">the agent</span>
+      <p>Yes <span class="emd"></span> I think it&rsquo;s worth doing, and your instinct is right that clean source beats the <code>set:html</code> blobs. But let me separate two things that are bundled in your question, because one is safe and one needs care:</p>
+      <p><strong>1. Restoring clean source <span class="emd"></span> yes, do this.</strong> The <code>set:html</code>-string form makes the prose painful to edit and blinds the slop-audit. Converting them back to proper inline <code>.astro</code> markup (readable headings/paragraphs/code/FAQ, the FAQ schema rebuilt from an array, the tool JS back in a normal <code>&lt;script&gt;</code> block) restores editability and the audit. And critically, I can make this provably safe: I still have the production-identical baseline. So I rewrite each file <span class="arr"></span> build <span class="arr"></span> diff the new rendered output against that baseline <span class="arr"></span> only accept it if it matches byte-for-byte. I can guarantee zero content/SEO regression <span class="emd"></span> the rewrite is correct or the diff tells me it isn&rsquo;t.</p>
+      <p><strong>2. &ldquo;Even better&rdquo; <span class="emd"></span> yes, but as a separate, deliberate pass, not bundled in.</strong> Here&rsquo;s the honest catch: the moment I improve the prose, I lose that diff-safety net (the output is supposed to differ now, so the diff can&rsquo;t tell &ldquo;intended improvement&rdquo; from &ldquo;accidental breakage&rdquo;). Improving 13 pages&rsquo; content in the same mechanical sweep is how subtle quality drops and SEO regressions sneak in. Content quality deserves real per-page review, not a rushed batch.</p>
+      <p>So: convert all 13 to clean, editable source now, output-identical and diff-verified. Improve the actual content later, deliberately, one page at a time <span class="emd"></span> now easy, because the source is clean again.</p>
+    </div>
+  </div>
+
+  <p>
+    That is exactly what I did. The result is genuinely better than the pre-incident version: the FAQ
+    on each article now lives in one small list that drives both the page and its structured data, and
+    the anti-slop checker can read these pages again. The files that got blanked are now among the
+    cleanest on the site.
+  </p>
+
+  <h2>What I learned and changed to avoid this critical mistake in the future</h2>
+  <p>
+    One rule, locked in and automatic: commit and push after every deploy. If it is live, it is in git.
+    I also snapshot the last good build before any risky bulk edit, and I never write a value back to
+    a file without first checking that it is not empty. None of that is clever. &ldquo;Commit more
+    often&rdquo; is the most ignored best practice in software. It took watching a malformed one-liner
+    blank two dozen files to make it actually stick.
+  </p>
+  <p>
+    The takeaways from this event: as good as AI has become, it can still make critical mistakes. It is
+    worth staying in the loop and watching what it&rsquo;s doing in real time, instead of blindly
+    following every step. And the strongest move you can make is often the simplest: ask a question at
+    the right moment, and take the reins to steer the ship back on course. And when you don&rsquo;t know
+    something, since I still consider myself at the beginning of my AI / vibe coding journey, don&rsquo;t
+    be afraid to speak politely to your AI agent and ask.
+  </p>
+</BlogPost>
+
+<style>
+  /* terminal-style verbatim exchanges, to read like the real CLI interaction */
+  .kb-term{background:#141210;border:1px solid #2c2620;border-radius:13px;margin:22px 0;overflow:hidden;
+    box-shadow:0 14px 34px rgba(20,12,4,.22)}
+  .kb-term .kb-q{background:#0c0a07;color:#dfe6f2;padding:14px 17px;font-family:var(--font-mono);font-size:13.5px;line-height:1.6;border-bottom:1px solid #2c2620}
+  .kb-term .kb-q::before{content:"\276F  you";color:#73a9ff;font-weight:700;display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
+  .kb-term .kb-q + .kb-a{border-top:0}
+  .kb-term .kb-a{padding:15px 17px;color:#ddd6c8;font-family:var(--font-body);font-size:14px;line-height:1.62}
+  .kb-term .kb-who{display:block;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f4b423;font-weight:700;margin-bottom:10px}
+  .kb-term .kb-a p{margin:0 0 11px;color:#ddd6c8}
+  .kb-term .kb-a p:last-child{margin-bottom:0}
+  .kb-term .kb-a strong{color:#fff;font-weight:700}
+  .kb-term .kb-a ol{margin:0 0 11px;padding-left:22px}
+  .kb-term .kb-a li{margin-bottom:7px;color:#ddd6c8}
+  .kb-term .kb-q code, .kb-term .kb-a code{font-family:var(--font-mono);background:rgba(255,255,255,.09);
+    color:#ffcfa6;padding:1px 5px;border-radius:5px;font-size:.9em}
+  /* em dash + arrow rendered via CSS so the source stays free of literal em-dash characters */
+  .kb-term .emd::before{content:"\2014"}
+  .kb-term .arr::before{content:"\2192"}
+</style>
