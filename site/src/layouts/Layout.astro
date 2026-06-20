@@ -8,6 +8,7 @@ const {
   sidebar = path !== '/',          // sidebar on every page except the homepage
   crumb = null,                    // optional deep trail: [{label, href?}, …] (last item = current page, no href)
   crumbLabel = null,               // optional label override for the auto two-level crumb
+  noindex = false,                 // temporary/experimental pages: keep out of search + sitemap intent
 } = Astro.props;
 
 const canonical = new URL(path, Astro.site).href;
@@ -40,6 +41,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{title}</title>
 <meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
 <link rel="canonical" href={canonical} />
 <link rel="alternate" type="application/rss+xml" title="KB Cafe" href="/feed.xml" />
 <!-- favicon = the KB cup mark (generated from logo.png via scripts/gen-favicon.cjs) -->

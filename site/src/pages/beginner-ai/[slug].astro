@@ -1,0 +1,74 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { BG_GUIDES, bgTopicLabel } from '../../data/beginnerGuides.js';
+
+export function getStaticPaths() {
+  return BG_GUIDES.map((g) => ({ params: { slug: g.slug }, props: { g } }));
+}
+const { g } = Astro.props;
+const more = BG_GUIDES.filter((x) => x.slug !== g.slug && x.topic === g.topic).slice(0, 3);
+const fallback = BG_GUIDES.filter((x) => x.slug !== g.slug).slice(0, 3);
+const related = more.length ? more : fallback;
+---
+<Layout
+  title={`${g.title} | Beginner AI | KB Cafe`}
+  description={g.excerpt}
+  path={`/beginner-ai/${g.slug}`}
+  sidebar={false}
+  noindex={true}
+>
+  <article class="ba">
+    <nav class="ba-crumb"><a href="/beginner-ai">Beginner AI</a> / <a href={`/beginner-ai/guides?topic=${g.topic}`}>{bgTopicLabel(g.topic)}</a></nav>
+    <div class="ba-tags"><span class="ba-tag ba-tag-topic">{bgTopicLabel(g.topic)}</span><span class="ba-tag ba-tag-lvl">{g.level}</span><span class="ba-min">&#128337; {g.minutes} min read</span></div>
+    <h1>{g.title}</h1>
+    <p class="ba-lede">{g.excerpt}</p>
+    <div class="ba-body" set:html={g.body} />
+
+    <aside class="ba-more">
+      <h2>Keep going</h2>
+      <div class="ba-more-grid">
+        {related.map((r) => (
+          <a class="ba-card" href={`/beginner-ai/${r.slug}`}>
+            <span class="ba-card-topic">{bgTopicLabel(r.topic)}</span>
+            <span class="ba-card-t">{r.title}</span>
+            <span class="ba-card-go">Read &rarr;</span>
+          </a>
+        ))}
+      </div>
+      <a class="ba-all" href="/beginner-ai/guides">&larr; All beginner guides</a>
+    </aside>
+  </article>
+</Layout>
+
+<style>
+  .ba{max-width:680px;margin:0 auto;padding:30px 0 40px;--bz-soft:#574b3f;--bz-mute:#8a7e6e;--bz-line:rgba(30,24,19,.12)}
+  .ba-crumb{font-family:var(--font-mono);font-size:12px;color:var(--bz-mute);margin-bottom:16px}
+  .ba-crumb a{color:var(--bz-mute);text-decoration:none}.ba-crumb a:hover{color:#3478f6}
+  .ba-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .ba-tag{font-family:var(--font-mono);font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:6px}
+  .ba-tag-topic{background:#eaf1ff;color:#2a63cf}
+  .ba-tag-lvl{background:#dcf3ee;color:#0c7a5f}
+  .ba-min{font-family:var(--font-mono);font-size:11.5px;color:var(--bz-mute)}
+  .ba h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.08;font-size:clamp(30px,4.6vw,44px)}
+  .ba-lede{font-size:19px;line-height:1.5;color:var(--bz-soft);margin-top:16px;font-weight:500}
+  .ba-body{margin-top:14px}
+  .ba-body :global(h2){font-family:var(--font-display);font-weight:800;font-size:23px;letter-spacing:-.01em;margin:30px 0 12px}
+  .ba-body :global(p){font-size:17px;line-height:1.68;color:#2e2620;margin:0 0 16px}
+  .ba-body :global(ul),.ba-body :global(ol){margin:0 0 18px;padding-left:24px}
+  .ba-body :global(li){font-size:17px;line-height:1.6;color:#2e2620;margin-bottom:9px}
+  .ba-body :global(strong){color:#1E1813}
+  .ba-body :global(a){color:#2a63cf;font-weight:600;text-decoration:none}
+  .ba-body :global(a:hover){text-decoration:underline}
+  .ba-body :global(em){color:var(--bz-soft)}
+  .ba-more{margin-top:40px;border-top:1px solid var(--bz-line);padding-top:24px}
+  .ba-more h2{font-family:var(--font-display);font-weight:800;font-size:18px;margin-bottom:14px}
+  .ba-more-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .ba-card{display:flex;flex-direction:column;gap:7px;background:#fff;border:1.3px solid var(--bz-line);border-radius:14px;padding:14px;text-decoration:none;color:#1E1813;transition:transform .14s,border-color .14s}
+  .ba-card:hover{transform:translateY(-3px);border-color:#9fc0f7}
+  .ba-card-topic{font-family:var(--font-mono);font-size:10px;font-weight:700;color:#2a63cf}
+  .ba-card-t{font-family:var(--font-display);font-weight:700;font-size:14px;line-height:1.25;flex:1}
+  .ba-card-go{font-family:var(--font-mono);font-size:11px;font-weight:700;color:#3478f6}
+  .ba-all{display:inline-block;margin-top:20px;font-family:var(--font-mono);font-size:12.5px;color:var(--bz-soft);text-decoration:none}
+  .ba-all:hover{color:#3478f6}
+  @media(max-width:600px){.ba-more-grid{grid-template-columns:1fr}}
+</style>

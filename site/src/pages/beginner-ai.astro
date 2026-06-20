@@ -1,0 +1,134 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { BG_TOPICS, BG_GUIDES, BG_TOOLS, bgTopicLabel } from '../data/beginnerGuides.js';
+const featured = BG_GUIDES.slice(0, 4);
+---
+<Layout
+  title="New to AI? Start here, a beginner's guide | KB Cafe"
+  description="Plain-language guides, hand-picked tools, and step-by-step help built for complete beginners. No jargon, no overwhelm, just a clear path to confident AI use."
+  path="/beginner-ai"
+  sidebar={false}
+  noindex={true}
+>
+  <div class="bz">
+    <!-- HERO -->
+    <section class="bz-hero">
+      <span class="bz-pill"><span class="bz-dot"></span> New to AI? You are in the right place.</span>
+      <h1>Learn AI from scratch,<br><span class="bz-grad">one clear step at a time.</span></h1>
+      <p class="bz-lede">A friendly knowledge base, hand-picked tools, and plain-language guides built for complete beginners. No jargon, no overwhelm, just a clear path to confident AI use.</p>
+      <div class="bz-cta">
+        <a class="bz-btn bz-btn-pri" href="/beginner-ai/guides">Browse all guides &rarr;</a>
+        <a class="bz-btn bz-btn-gho" href="/beginner-ai/what-is-ai">Start with the basics</a>
+      </div>
+      <div class="bz-proof"><span>&#9989; Beginner-safe</span><span>&#128338; 5&ndash;8 min reads</span><span>&#10024; Plain language</span></div>
+    </section>
+
+    <!-- TOPICS -->
+    <section class="bz-sec">
+      <div class="bz-eye">Browse by topic</div>
+      <h2 class="bz-h2">Find your starting point</h2>
+      <p class="bz-sub">Six areas cover everything you need to go from curious to confident with AI.</p>
+      <div class="bz-topics">
+        {BG_TOPICS.map((t) => (
+          <a class="bz-topic" href={`/beginner-ai/guides?topic=${t.id}`}>
+            <span class="bz-tic">{t.icon}</span>
+            <span class="bz-tn">{t.label}</span>
+            <span class="bz-td">{t.blurb}</span>
+            <span class="bz-go">Explore &rarr;</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- FEATURED GUIDES -->
+    <section class="bz-sec">
+      <div class="bz-row"><div><div class="bz-eye">Start here</div><h2 class="bz-h2">Featured beginner guides</h2></div><a class="bz-all" href="/beginner-ai/guides">View all &rarr;</a></div>
+      <p class="bz-sub">Hand-picked articles that answer the questions every beginner asks first.</p>
+      <div class="bz-guides">
+        {featured.map((g) => (
+          <a class="bz-guide" href={`/beginner-ai/${g.slug}`}>
+            <div class="bz-tags"><span class="bz-tag bz-tag-topic">{bgTopicLabel(g.topic)}</span><span class="bz-tag bz-tag-lvl">{g.level}</span></div>
+            <h3>{g.title}</h3>
+            <p>{g.excerpt}</p>
+            <span class="bz-min">&#128337; {g.minutes} min read</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="bz-sec">
+      <div class="bz-eye">Toolbox</div>
+      <h2 class="bz-h2">Popular tools for beginners</h2>
+      <p class="bz-sub">The AI assistants you have heard about, explained plainly. Most have a free version, so you can start today.</p>
+      <div class="bz-tools">
+        {BG_TOOLS.map((tool) => (
+          <div class="bz-tool">
+            <div class="bz-tool-h"><span class="bz-tool-n" set:html={tool.name} /><span class="bz-price">{tool.price}</span></div>
+            <p class="bz-tool-d" set:html={tool.ds} />
+            <span class="bz-tool-cat">{tool.cat}</span>
+          </div>
+        ))}
+      </div>
+      <p class="bz-note">No star ratings here on purpose: we do not invent numbers. These are honest, plain descriptions to help you pick a first tool.</p>
+    </section>
+
+    <p class="bz-foot">This is an experimental beginner section. It is not yet linked from the main site while we shape it.</p>
+  </div>
+</Layout>
+
+<style>
+  .bz{max-width:1080px;margin:0 auto;padding:8px 0 50px;--bz-ink:#1E1813;--bz-soft:#574b3f;--bz-mute:#8a7e6e;--bz-line:rgba(30,24,19,.12)}
+  .bz-hero{text-align:center;padding:46px 16px 30px;background:radial-gradient(120% 90% at 80% -10%,rgba(244,180,35,.12),transparent 55%),radial-gradient(90% 70% at 10% 5%,rgba(238,75,43,.06),transparent 55%);border-radius:22px}
+  .bz-pill{display:inline-flex;align-items:center;gap:8px;border:1.2px solid var(--bz-line);background:rgba(255,255,255,.7);border-radius:999px;padding:7px 15px;font-size:13px;font-weight:600;color:var(--bz-soft)}
+  .bz-dot{width:7px;height:7px;border-radius:50%;background:#0f9f82}
+  .bz-hero h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.035em;line-height:1.04;font-size:clamp(34px,5.6vw,60px);margin:20px 0 0}
+  .bz-grad{background:linear-gradient(100deg,#3478f6,#0f9f82);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .bz-lede{max-width:620px;margin:20px auto 0;font-size:17.5px;line-height:1.55;color:var(--bz-soft)}
+  .bz-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+  .bz-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:700;font-size:15px;border-radius:13px;padding:13px 22px;text-decoration:none;cursor:pointer}
+  .bz-btn-pri{background:#3478f6;color:#fff;box-shadow:0 12px 26px rgba(52,120,246,.26)}
+  .bz-btn-pri:hover{background:#2a63cf}
+  .bz-btn-gho{background:#fff;color:var(--bz-ink);border:1.4px solid var(--bz-line)}
+  .bz-btn-gho:hover{border-color:var(--bz-ink)}
+  .bz-proof{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:24px;font-size:13.5px;color:var(--bz-mute)}
+
+  .bz-sec{margin-top:48px}
+  .bz-eye{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#3478f6;margin-bottom:9px}
+  .bz-h2{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;font-size:clamp(24px,3.4vw,32px)}
+  .bz-sub{font-size:15.5px;color:var(--bz-soft);margin-top:7px;max-width:600px}
+  .bz-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+  .bz-all{font-family:var(--font-display);font-weight:700;font-size:14px;color:#3478f6;text-decoration:none;white-space:nowrap}
+
+  .bz-topics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+  .bz-topic{display:flex;flex-direction:column;gap:8px;background:#fff;border:1.4px solid var(--bz-line);border-radius:18px;padding:22px 20px;text-decoration:none;color:var(--bz-ink);transition:transform .15s,box-shadow .15s,border-color .15s}
+  .bz-topic:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(40,30,12,.09);border-color:#cdb9f0}
+  .bz-tic{font-size:30px;line-height:1}
+  .bz-tn{font-family:var(--font-display);font-weight:800;font-size:18px;margin-top:4px}
+  .bz-td{font-size:13.5px;color:var(--bz-soft);line-height:1.5;flex:1}
+  .bz-go{font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:#3478f6;margin-top:4px}
+
+  .bz-guides{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:20px}
+  .bz-guide{display:flex;flex-direction:column;gap:10px;background:#fff;border:1.4px solid var(--bz-line);border-radius:16px;padding:18px;text-decoration:none;color:var(--bz-ink);transition:transform .15s,box-shadow .15s,border-color .15s}
+  .bz-guide:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(40,30,12,.09);border-color:#9fc0f7}
+  .bz-tags{display:flex;gap:6px;flex-wrap:wrap}
+  .bz-tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.03em;padding:3px 8px;border-radius:6px}
+  .bz-tag-topic{background:#eaf1ff;color:#2a63cf}
+  .bz-tag-lvl{background:#dcf3ee;color:#0c7a5f}
+  .bz-guide h3{font-family:var(--font-display);font-weight:800;font-size:15.5px;line-height:1.2}
+  .bz-guide p{font-size:13px;color:var(--bz-soft);line-height:1.45;flex:1}
+  .bz-min{font-family:var(--font-mono);font-size:11.5px;color:var(--bz-mute)}
+
+  .bz-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:20px}
+  .bz-tool{background:#fff;border:1.4px solid var(--bz-line);border-radius:16px;padding:18px}
+  .bz-tool-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .bz-tool-n{font-family:var(--font-display);font-weight:800;font-size:16px}
+  .bz-price{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:var(--bz-mute);white-space:nowrap}
+  .bz-tool-d{font-size:13px;color:var(--bz-soft);line-height:1.5;margin:9px 0 12px}
+  .bz-tool-cat{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:#2a63cf;background:#eaf1ff;border-radius:6px;padding:4px 9px}
+  .bz-note{margin-top:16px;font-size:12.5px;color:var(--bz-mute);font-style:italic}
+  .bz-foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--bz-line);font-family:var(--font-mono);font-size:12px;color:var(--bz-mute);text-align:center}
+
+  @media(max-width:860px){.bz-topics,.bz-tools{grid-template-columns:1fr 1fr}.bz-guides{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.bz-topics,.bz-tools,.bz-guides{grid-template-columns:1fr}}
+</style>
