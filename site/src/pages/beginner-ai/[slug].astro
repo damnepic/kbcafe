@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Share from '../../components/Share.astro';
 import { BG_GUIDES, BG_LEVELUP, bgTopicLabel } from '../../data/beginnerGuides.js';
 
 export function getStaticPaths() {
@@ -23,6 +24,8 @@ const levelUp = BG_LEVELUP[g.slug];
     <h1>{g.title}</h1>
     <p class="ba-lede">{g.excerpt}</p>
     <div class="ba-body" set:html={g.body} />
+
+    <Share path={`/beginner-ai/${g.slug}`} title={g.title} variant="subtle" lead="general" />
 
     {levelUp && (
       <a class="ba-levelup" href={levelUp.href}>
