@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Share from '../components/Share.astro';
 import { BG_TOPICS, BG_GUIDES, BG_TOOLS, bgTopicLabel } from '../data/beginnerGuides.js';
 const featured = BG_GUIDES.slice(0, 4);
-const ARROW = `<svg viewBox="0 0 100 72" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14C40 2 78 8 84 50"/><path d="M70 44 86 54 92 36"/></svg>`;
+const ARROW = `<svg viewBox="0 0 76 52" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8C2 32 18 45 48 36"/><path d="M35 41 49 36 43 23"/></svg>`;
 ---
 <Layout
   title="New to AI? Start here, a beginner's guide | KB Cafe"
@@ -78,7 +78,7 @@ const ARROW = `<svg viewBox="0 0 100 72" fill="none" stroke="currentColor" strok
       <h2 class="bz-share-h">Share with friends, family, or anyone you know that wants a beginner introduction to learning about AI!</h2>
       <div class="bz-share-row">
         <span class="bz-share-arrow" set:html={ARROW} />
-        <Share path="/beginner-ai" title="A beginner's guide to AI" variant="subtle" />
+        <Share path="/beginner-ai" title="A beginner's guide to AI" variant="subtle" lead="general" />
       </div>
     </section>
 
@@ -144,12 +144,10 @@ const ARROW = `<svg viewBox="0 0 100 72" fill="none" stroke="currentColor" strok
   .bz-share{margin-top:52px;text-align:center}
   .bz-share-h{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;font-size:clamp(20px,2.8vw,27px);line-height:1.22;max-width:700px;margin:0 auto;color:var(--bz-ink)}
   .bz-share-row{display:inline-flex;align-items:center;gap:12px;margin-top:14px}
-  .bz-share-arrow{color:#3478f6;display:inline-flex;width:62px;flex:0 0 auto;transform:translateY(-4px)}
+  .bz-share-arrow{color:#3478f6;display:inline-flex;width:56px;flex:0 0 auto;transform:translateY(6px)}
   .bz-share-arrow svg{width:100%;height:auto;display:block}
-  .bz-share :global(.share){margin:0}
+  .bz-share :global(.share){margin:0;justify-content:center}
   .bz-share :global(.share-label){display:none}
-  .bz-share :global(.share.subtle .sh){width:40px;height:40px;border-radius:11px;background:var(--cream)}
-  .bz-share :global(.share.subtle .sh svg){width:18px;height:18px}
   /* graduation bridge: coral (the warm main site) closes the beginner hub */
   .bz-levelup{display:block;margin-top:46px;text-decoration:none;border-radius:20px;padding:26px 28px;color:#fff;
     background:radial-gradient(circle at 90% 16%,rgba(255,255,255,.18),transparent 44%),linear-gradient(135deg,#ff6a3d,#df421e);

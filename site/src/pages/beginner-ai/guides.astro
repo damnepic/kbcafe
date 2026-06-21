@@ -1,17 +1,20 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { BG_TOPICS, BG_LEVELS, BG_GUIDES, bgTopicLabel } from '../../data/beginnerGuides.js';
+// Difficulty filter + article count are parked until there are non-beginner guides or >~10 articles.
+// Flip these to true to bring them back (all the markup + JS are still in place).
+const SHOW_DIFFICULTY = false;
+const SHOW_COUNT = false;
 ---
 <Layout
   title="Every AI guide for beginners, organized | KB Cafe"
-  description="Filter beginner AI guides by topic or difficulty. Each article is written in plain language, with practical examples you can try immediately."
+  description="Browse beginner AI guides by topic. Each article is written in plain language, with practical examples you can try immediately."
   path="/beginner-ai/guides"
   sidebar={false}
 >
   <div class="bg">
     <a class="bg-back" href="/beginner-ai">&larr; Beginner AI</a>
     <h1>Every guide, organized and ready.</h1>
-    <p class="bg-lede">Filter by topic or difficulty. Each article is written in plain language, with practical examples you can try immediately.</p>
 
     <div class="bg-filter">
       <div class="bg-fl">Filter by topic</div>
@@ -20,15 +23,17 @@ import { BG_TOPICS, BG_LEVELS, BG_GUIDES, bgTopicLabel } from '../../data/beginn
         {BG_TOPICS.map((t) => <button class="bg-pill" data-topic={t.id}>{t.label}</button>)}
       </div>
     </div>
-    <div class="bg-filter">
-      <div class="bg-fl">Difficulty</div>
-      <div class="bg-pills" id="levels">
-        <button class="bg-pill on" data-level="all">All levels</button>
-        {BG_LEVELS.map((l) => <button class="bg-pill" data-level={l}>{l}</button>)}
+    {SHOW_DIFFICULTY && (
+      <div class="bg-filter">
+        <div class="bg-fl">Difficulty</div>
+        <div class="bg-pills" id="levels">
+          <button class="bg-pill on" data-level="all">All levels</button>
+          {BG_LEVELS.map((l) => <button class="bg-pill" data-level={l}>{l}</button>)}
+        </div>
       </div>
-    </div>
+    )}
 
-    <p class="bg-count" id="count">Showing {BG_GUIDES.length} articles</p>
+    {SHOW_COUNT && <p class="bg-count" id="count">Showing {BG_GUIDES.length} articles</p>}
 
     <div class="bg-grid" id="grid">
       {BG_GUIDES.map((g) => (
@@ -53,11 +58,12 @@ import { BG_TOPICS, BG_LEVELS, BG_GUIDES, bgTopicLabel } from '../../data/beginn
         var ok = (topic === 'all' || c.dataset.topic === topic) && (level === 'all' || c.dataset.level === level);
         c.hidden = !ok; if (ok) n++;
       });
-      countEl.textContent = 'Showing ' + n + ' article' + (n === 1 ? '' : 's');
+      if (countEl) countEl.textContent = 'Showing ' + n + ' article' + (n === 1 ? '' : 's');
       none.hidden = n > 0;
     }
     function wire(groupId, setFn) {
-      document.getElementById(groupId).addEventListener('click', function (e) {
+      var g = document.getElementById(groupId); if (!g) return;
+      g.addEventListener('click', function (e) {
         var b = e.target.closest('.bg-pill'); if (!b) return;
         this.querySelectorAll('.bg-pill').forEach(function (p) { p.classList.remove('on'); });
         b.classList.add('on'); setFn(b); apply();

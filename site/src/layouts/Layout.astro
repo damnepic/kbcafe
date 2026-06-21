@@ -30,6 +30,11 @@ const activeNavHref = (() => {
 })();
 const navActive = (href) => href === '/' ? path === '/' : href === activeNavHref;
 
+// Search "Go" button color, themed by page area (homepage + sidebar pages = orange; beginner = blue; blog = black)
+let nsGoBg = 'var(--coral)';
+if (path.startsWith('/beginner-ai')) nsGoBg = '#3478f6';
+else if (path.startsWith('/blog')) nsGoBg = 'var(--ink)';
+
 // Breadcrumbs: every page except home. Wrappers pass `crumb`; standalone pages auto-derive "KB Cafe / Page".
 const SECTION_LABELS = {
   ai: 'AI Explained', map: 'Knowledge Map', reference: 'Knowledge Base', learn: 'Learn',
@@ -139,6 +144,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
         <form class="ns-form" id="ns-form" action="/search" method="get" role="search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
           <input id="ns-input" name="q" type="text" placeholder="Search tools, references &amp; AI…" autocomplete="off" />
+          <button class="ns-go" type="submit" style={`background:${nsGoBg}`}>Go</button>
         </form>
       </div>
     </div>
@@ -172,12 +178,12 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
       <a href="/blog">Blog</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
-      <a href="https://github.com/damnepic/kbcafe" target="_blank" rel="noopener noreferrer">Contact</a>
     </nav>
     <div class="foot-social">
       <a href="https://github.com/damnepic/kbcafe" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 8.84 21.5c.5.08.66-.22.66-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.1-1.47-1.1-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.9-1.29 2.74-1.02 2.74-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.16.57.67.48A10 10 0 0 0 12 2Z"/></svg></a>
       <span class="soon" aria-label="X, coming soon" title="Coming soon"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.3 8.3L23 22h-6.6l-5.2-6.8L5.3 22H2l7.8-8.9L1.7 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.2 3.8H5.3L17.7 20Z"/></svg></span>
       <a href="/feeds" aria-label="Feeds" title="Feeds"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="19" r="2.2"/><path d="M3 11a10 10 0 0 1 10 10h-3A7 7 0 0 0 3 14v-3Zm0-6a16 16 0 0 1 16 16h-3A13 13 0 0 0 3 8V5Z"/></svg></a>
+      <a href="/contact" aria-label="Contact" title="Contact"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3 7 9 6 9-6"/></svg></a>
     </div>
     <div class="foot-copy">&copy; 1999&ndash;2026 KB Cafe &middot; part of the family with <a href="https://yank.info" target="_blank" rel="noopener noreferrer">yank.info</a></div>
   </footer>
@@ -273,7 +279,9 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   .nav-search.mac .ns-key{display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:var(--ink-soft);border:1px solid var(--line);border-radius:5px;padding:1px 5px;background:var(--paper-2)}
   .ns-form{display:none;align-items:center;gap:8px;border:1.2px solid var(--ink);border-radius:11px;padding:7px 12px;background:var(--cream)}
   .ns-form svg{width:16px;height:16px;color:var(--ink-soft);flex:0 0 auto}
-  .ns-form input{border:0;outline:0;background:transparent;font-family:var(--font-body);font-size:14px;color:var(--ink);width:230px;max-width:46vw}
+  .ns-form input{border:0;outline:0;background:transparent;font-family:var(--font-body);font-size:14px;color:var(--ink);width:200px;max-width:42vw}
+  .ns-go{flex:0 0 auto;border:0;border-radius:8px;padding:6px 14px;color:#fff;font-family:var(--font-display);font-weight:800;font-size:13px;letter-spacing:.01em;cursor:pointer;transition:filter .14s,transform .14s}
+  .ns-go:hover{filter:brightness(.92);transform:translateY(-1px)}
   .nav-search.open .ns-toggle{display:none}
   .nav-search.open .ns-form{display:flex}
   .nav-new{display:inline-flex;align-items:center;margin-left:6px;padding:2px 8px;border-radius:999px;

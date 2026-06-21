@@ -1,16 +1,20 @@
 ---
-// Reusable share row. variant="prominent" (tools) or "subtle" (articles).
-const { path, title, variant = 'subtle' } = Astro.props;
+// Reusable share row.
+//   variant="prominent" (tools, boxed) or "subtle" (articles).
+//   lead="general"  -> reorder to email, copy-link, facebook, then the rest, and emphasize those three.
+//                      (Facebook leads because its 40+ audience is a strong fit for beginner AI content.)
+const { path, title, variant = 'subtle', lead = null } = Astro.props;
 const shareUrl = new URL(path, Astro.site).href;
 const u = encodeURIComponent(shareUrl);
 const ttl = encodeURIComponent(title);
 const txt = encodeURIComponent(`${title}: a free, client-side tool on KB Cafe`);
 const txtA = encodeURIComponent(`${title}, on KB Cafe`);
 const t = variant === 'prominent' ? txt : txtA;
-const share = {
+const href = {
   x: `https://x.com/intent/tweet?text=${t}&url=${u}`,
   reddit: `https://www.reddit.com/submit?url=${u}&title=${ttl}`,
   linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${u}`,
   hn: `https://news.ycombinator.com/submitlink?u=${u}&t=${ttl}`,
   email: `mailto:?subject=${ttl}&body=${t}%20${u}`,
 };
@@ -19,25 +23,39 @@ const ICONS = {
   reddit: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.1a2.1 2.1 0 0 0-3.6-1.5 10.3 10.3 0 0 0-5.3-1.7l.9-4.1 2.9.6a1.5 1.5 0 1 0 .2-1l-3.3-.7a.5.5 0 0 0-.6.4l-1 4.8a10.4 10.4 0 0 0-5.4 1.7 2.1 2.1 0 1 0-2.3 3.4 4 4 0 0 0 0 .6c0 3.1 3.6 5.6 8 5.6s8-2.5 8-5.6a4 4 0 0 0 0-.6 2.1 2.1 0 0 0 1.4-2Zm-13 1.4a1.4 1.4 0 1 1 1.4 1.4 1.4 1.4 0 0 1-1.4-1.4Zm7.8 3.6a5.2 5.2 0 0 1-3.8 1.2 5.2 5.2 0 0 1-3.8-1.2.5.5 0 0 1 .7-.7 4.3 4.3 0 0 0 3.1.9 4.3 4.3 0 0 0 3.1-.9.5.5 0 1 1 .7.7Zm-.3-2.2a1.4 1.4 0 1 1 1.4-1.4 1.4 1.4 0 0 1-1.4 1.4Z"/></svg>`,
   hn: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3Zm9.3 10.6L8.6 7h1.9l2.3 4.3L15.1 7H17l-3.7 6.6V18h-1V13.6Z"/></svg>`,
   linkedin: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.94 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM3.3 8.4h3.3V21H3.3V8.4Zm5.5 0H12v1.7h.05a3.5 3.5 0 0 1 3.15-1.7c3.4 0 4 2.2 4 5.1V21h-3.3v-5.6c0-1.3 0-3-1.85-3s-2.1 1.4-2.1 2.9V21H8.8V8.4Z"/></svg>`,
+  facebook: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z"/></svg>`,
   email: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3 7 9 6 9-6"/></svg>`,
   discord: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.3 5.3A16 16 0 0 0 15.4 4l-.25.5a12 12 0 0 1 3.4 1.1 11 11 0 0 0-9.1 0A12 12 0 0 1 12.9 4.5L12.6 4a16 16 0 0 0-3.9 1.3C5.2 8.7 4.6 12 4.8 15.2a16 16 0 0 0 4.8 2.4l.6-1a10 10 0 0 1-1.6-.8l.4-.3a8.4 8.4 0 0 0 7.2 0l.4.3a10 10 0 0 1-1.6.8l.6 1a16 16 0 0 0 4.8-2.4c.3-3.7-.6-7-2.3-9.9ZM9.7 13.5c-.8 0-1.4-.7-1.4-1.6s.6-1.6 1.4-1.6 1.4.7 1.4 1.6-.6 1.6-1.4 1.6Zm4.6 0c-.8 0-1.4-.7-1.4-1.6s.6-1.6 1.4-1.6 1.4.7 1.4 1.6-.6 1.6-1.4 1.6Z"/></svg>`,
   link: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15 15 9M10.5 6.5l1-1a4 4 0 0 1 6 6l-1 1M13.5 17.5l-1 1a4 4 0 0 1-6-6l1-1"/></svg>`,
 };
+const BTN = {
+  x:        { kind: 'link', href: href.x,        label: 'Share on X',           icon: ICONS.x,        blank: true },
+  reddit:   { kind: 'link', href: href.reddit,   label: 'Share on Reddit',      icon: ICONS.reddit,   blank: true },
+  hn:       { kind: 'link', href: href.hn,       label: 'Share on Hacker News', icon: ICONS.hn,       blank: true },
+  linkedin: { kind: 'link', href: href.linkedin, label: 'Share on LinkedIn',    icon: ICONS.linkedin, blank: true },
+  facebook: { kind: 'link', href: href.facebook, label: 'Share on Facebook',    icon: ICONS.facebook, blank: true },
+  email:    { kind: 'link', href: href.email,    label: 'Share by email',       icon: ICONS.email },
+  discord:  { kind: 'copy', discord: true,       label: 'Copy link for Discord', icon: ICONS.discord },
+  link:     { kind: 'copy',                      label: 'Copy link',            icon: ICONS.link },
+};
+const ORDER = lead === 'general'
+  ? ['email', 'link', 'facebook', 'x', 'reddit', 'linkedin', 'hn']
+  : ['x', 'reddit', 'hn', 'linkedin', 'facebook', 'email', 'discord', 'link'];
+const leadSet = lead === 'general' ? new Set(['email', 'link', 'facebook']) : new Set();
+const items = ORDER.map((k) => ({ key: k, ...BTN[k] }));
 ---
-<aside class={`share ${variant}`} data-share>
+<aside class={`share ${variant}${lead ? ' has-lead' : ''}`} data-share>
   {variant === 'prominent' ? (
     <div class="share-copy"><strong>Find this tool helpful?</strong><span><b>Share</b> it with a friend, it&rsquo;s free and runs in the browser. No data <b>ever</b> stored. 100% <b>private</b>.</span></div>
   ) : (
     <span class="share-label">Share</span>
   )}
   <div class="share-btns">
-    <a class="sh" href={share.x} target="_blank" rel="noopener noreferrer" aria-label="Share on X" title="Share on X" set:html={ICONS.x} />
-    <a class="sh" href={share.reddit} target="_blank" rel="noopener noreferrer" aria-label="Share on Reddit" title="Share on Reddit" set:html={ICONS.reddit} />
-    <a class="sh" href={share.hn} target="_blank" rel="noopener noreferrer" aria-label="Share on Hacker News" title="Share on Hacker News" set:html={ICONS.hn} />
-    <a class="sh" href={share.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" title="Share on LinkedIn" set:html={ICONS.linkedin} />
-    <a class="sh" href={share.email} aria-label="Share by email" title="Share by email" set:html={ICONS.email} />
-    <button class="sh js-copylink" data-discord type="button" aria-label="Copy link for Discord" title="Copy link (paste into Discord)" set:html={ICONS.discord} />
-    <button class="sh js-copylink" type="button" aria-label="Copy link" title="Copy link" set:html={ICONS.link} />
+    {items.map((b) => b.kind === 'copy' ? (
+      <button class={`sh js-copylink${leadSet.has(b.key) ? ' is-lead' : ''}`} type="button" data-discord={b.discord ? '' : undefined} aria-label={b.label} title={b.label} set:html={b.icon} />
+    ) : (
+      <a class={`sh${leadSet.has(b.key) ? ' is-lead' : ''}`} href={b.href} target={b.blank ? '_blank' : undefined} rel={b.blank ? 'noopener noreferrer' : undefined} aria-label={b.label} title={b.label} set:html={b.icon} />
+    ))}
     <span class="share-done" hidden>Link copied</span>
   </div>
 </aside>
@@ -57,6 +75,12 @@ const ICONS = {
   .share.subtle .sh{width:34px;height:34px;border-radius:9px;background:transparent}
   .sh svg{width:18px;height:18px}.share.subtle .sh svg{width:16px;height:16px}
   .sh:hover{color:var(--coral);border-color:var(--coral);transform:translateY(-2px)}
+  /* lead emphasis: the primary share methods get filled + a touch larger */
+  .share.has-lead.subtle .sh{width:38px;height:38px}
+  .sh.is-lead{background:var(--coral);border-color:var(--coral);color:#fff}
+  .share.has-lead.subtle .sh.is-lead{width:44px;height:44px;border-radius:11px}
+  .share.has-lead.subtle .sh.is-lead svg{width:19px;height:19px}
+  .sh.is-lead:hover{background:var(--coral-deep);border-color:var(--coral-deep);color:#fff}
   .share-done{font-family:var(--font-mono);font-size:12px;font-weight:700;color:#2f7d32}
   @media(max-width:560px){.share.prominent{flex-direction:column;align-items:flex-start}}
 </style>
