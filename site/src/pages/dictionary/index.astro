@@ -7,6 +7,17 @@ const gloss = (e) => { const p = plain(e.answer).replace(/^An?\s+|^The\s+/i, '')
 const built = KIND_ORDER.filter((k) => byKind(k).length > 0);
 const soon = KIND_ORDER.filter((k) => byKind(k).length === 0);
 
+// A-Z list view: every term sorted alphabetically, grouped by first letter
+const allTerms = DICT.slice().sort((a, b) => a.term.localeCompare(b.term, 'en', { sensitivity: 'base' }));
+const azGroups = [];
+allTerms.forEach((e) => {
+  const c0 = e.term.charAt(0).toUpperCase();
+  const letter = (c0 >= 'A' && c0 <= 'Z') ? c0 : '#';
+  let g = azGroups[azGroups.length - 1];
+  if (!g || g.letter !== letter) { g = { letter, items: [] }; azGroups.push(g); }
+  g.items.push(e);
+});
+
 const schema = {
   '@context': 'https://schema.org', '@type': 'DefinedTermSet',
   name: 'Plain-English Tech Dictionary', url: 'https://kbcafe.com/dictionary',
@@ -19,7 +30,7 @@ const schema = {
   description="AI, coding, startup, and internet terms explained for beginners, in one sentence, with an example and a next step. No jargon, no gatekeeping."
   path="/dictionary"
 >
-  <section class="dh">
+  <section class="dh" data-view="cats">
     <div class="eyebrow">&#10022; Plain-English Tech Dictionary</div>
     <h1>The words that get you <span class="mk">unstuck.</span></h1>
     <p class="lede">
@@ -27,9 +38,21 @@ const schema = {
       and where to go next. Hit a word you don&rsquo;t know in a lesson? Look it up, then get back to it.
     </p>
 
-    <div class="dh-search">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="dq" type="text" autocomplete="off" placeholder="Search a term: token, dns, agent, http&hellip;" />
+    <div class="dh-toolbar">
+      <div class="dh-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="dq" type="text" autocomplete="off" placeholder="Search a term: token, dns, agent, http&hellip;" />
+      </div>
+      <div class="dh-view" id="dh-view" role="group" aria-label="View style">
+        <button class="dh-vbtn on" type="button" data-view="cats" aria-label="Grouped by category">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6"/></svg>
+          <span>Categories</span>
+        </button>
+        <button class="dh-vbtn" type="button" data-view="az" aria-label="Alphabetical list">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h2M4 12h2M4 17h2M10 7h10M10 12h10M10 17h10"/></svg>
+          <span>A&ndash;Z list</span>
+        </button>
+      </div>
     </div>
     <p class="dh-empty" id="dh-empty" hidden>No match yet. Try a shorter word, or <a href="/search">search the whole site &rarr;</a></p>
 
@@ -79,55 +102,91 @@ const schema = {
         </p>
       </div>
     )}
+
+    <div class="dh-az" id="dh-az">
+      <div class="dh-az-jump">
+        {azGroups.map((g) => <a href={`#az-${g.letter}`}>{g.letter}</a>)}
+      </div>
+      {azGroups.map((g) => (
+        <div class="dh-az-sec" id={`az-${g.letter}`}>
+          <div class="dh-az-h">{g.letter}</div>
+          <div class="dh-az-list">
+            {g.items.map((e) => (
+              <a class="dh-az-term" href={`/dictionary/${e.slug}`} data-name={`${e.term.toLowerCase()} ${e.slug}`} style={`--accent:${KIND_META[e.kind].color}`}>
+                <span class="dh-az-dot" style={`background:${KIND_META[e.kind].color}`}></span>
+                <span class="dh-az-t">{e.term}</span>
+                <span class="dh-az-g">{gloss(e)}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   </section>
 
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   <script is:inline>
     (function () {
+      var dh = document.querySelector('.dh');
       var q = document.getElementById('dq'), empty = document.getElementById('dh-empty');
-      if (!q) return;
+      if (!q || !dh) return;
       var terms = Array.prototype.slice.call(document.querySelectorAll('.dh-cat .dh-term'));
       var cats = Array.prototype.slice.call(document.querySelectorAll('.dh-cat'));
       var pop = document.querySelector('.dh-pop-wrap');
       var popGrid = document.querySelector('.dh-pop-grid');
       var popSub = document.querySelector('.dh-pop-sub');
       var fpills = Array.prototype.slice.call(document.querySelectorAll('.dh-fpill'));
-      function setActivePill(f) { fpills.forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-filter') === f); }); }
+      var vbtns = Array.prototype.slice.call(document.querySelectorAll('.dh-vbtn'));
+      var azTerms = Array.prototype.slice.call(document.querySelectorAll('.dh-az-term'));
+      var azSecs = Array.prototype.slice.call(document.querySelectorAll('.dh-az-sec'));
+      var view = 'cats', cat = 'all';
+      function setActivePill(f) { cat = f; fpills.forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-filter') === f); }); }
 
-      // category filter pills (a click clears any search and shows just that category)
-      function filterCat(f) {
-        q.value = ''; empty.hidden = true; setActivePill(f);
-        terms.forEach(function (t) { t.style.display = ''; });
-        if (f === 'all') {
-          if (popGrid) popGrid.style.display = ''; if (popSub) popSub.style.display = '';
-          cats.forEach(function (c) { c.style.display = ''; });
-        } else {
-          if (popGrid) popGrid.style.display = 'none'; if (popSub) popSub.style.display = 'none';
-          cats.forEach(function (c) { c.style.display = (c.getAttribute('data-cat') === f) ? '' : 'none'; });
-        }
-      }
-      fpills.forEach(function (p) { p.addEventListener('click', function () { filterCat(p.getAttribute('data-filter')); }); });
-
-      // search (overrides the category filter)
-      q.addEventListener('input', function () {
-        var v = q.value.trim().toLowerCase(); var any = false;
-        setActivePill('all');
+      function applyCats(v) {
         if (!v) {
-          if (pop) pop.style.display = ''; if (popGrid) popGrid.style.display = ''; if (popSub) popSub.style.display = '';
-          terms.forEach(function (t) { t.style.display = ''; });
-          cats.forEach(function (c) { c.style.display = ''; });
-          empty.hidden = true; return;
+          if (pop) pop.style.display = '';
+          if (cat === 'all') {
+            if (popGrid) popGrid.style.display = ''; if (popSub) popSub.style.display = '';
+            terms.forEach(function (t) { t.style.display = ''; });
+            cats.forEach(function (c) { c.style.display = ''; });
+          } else {
+            if (popGrid) popGrid.style.display = 'none'; if (popSub) popSub.style.display = 'none';
+            terms.forEach(function (t) { t.style.display = ''; });
+            cats.forEach(function (c) { c.style.display = (c.getAttribute('data-cat') === cat) ? '' : 'none'; });
+          }
+          return true;
         }
         if (pop) pop.style.display = 'none';
-        terms.forEach(function (t) {
-          var hit = t.getAttribute('data-name').indexOf(v) > -1;
-          t.style.display = hit ? '' : 'none'; if (hit) any = true;
-        });
-        cats.forEach(function (c) {
-          c.style.display = c.querySelectorAll('.dh-term:not([style*="none"])').length ? '' : 'none';
-        });
-        empty.hidden = any;
-      });
+        if (popGrid) popGrid.style.display = 'none'; if (popSub) popSub.style.display = 'none';
+        var any = false;
+        terms.forEach(function (t) { var hit = t.getAttribute('data-name').indexOf(v) > -1; t.style.display = hit ? '' : 'none'; if (hit) any = true; });
+        cats.forEach(function (c) { c.style.display = c.querySelectorAll('.dh-term:not([style*="none"])').length ? '' : 'none'; });
+        return any;
+      }
+      function applyAz(v) {
+        var any = false;
+        azTerms.forEach(function (t) { var hit = !v || t.getAttribute('data-name').indexOf(v) > -1; t.style.display = hit ? '' : 'none'; if (hit) any = true; });
+        azSecs.forEach(function (s) { s.style.display = s.querySelectorAll('.dh-az-term:not([style*="none"])').length ? '' : 'none'; });
+        return any;
+      }
+      function apply() {
+        var v = q.value.trim().toLowerCase();
+        var any = view === 'az' ? applyAz(v) : applyCats(v);
+        empty.hidden = !v || any;
+      }
+      function setView(v) {
+        view = v; dh.setAttribute('data-view', v);
+        vbtns.forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-view') === v); });
+        try { localStorage.setItem('kb-dict-view', v); } catch (e) {}
+        apply();
+      }
+
+      fpills.forEach(function (p) { p.addEventListener('click', function () { q.value = ''; setActivePill(p.getAttribute('data-filter')); apply(); }); });
+      vbtns.forEach(function (b) { b.addEventListener('click', function () { setView(b.getAttribute('data-view')); }); });
+      q.addEventListener('input', function () { if (q.value.trim()) setActivePill('all'); apply(); });
+
+      try { var sv = localStorage.getItem('kb-dict-view'); if (sv === 'az' || sv === 'cats') setView(sv); } catch (e) {}
+      apply();
     })();
   </script>
 </Layout>
@@ -138,8 +197,32 @@ const schema = {
   .dh h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(36px,6vw,58px)}
   .dh .mk{color:var(--coral)}
   .lede{margin-top:18px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:600px}
-  .dh-search{margin-top:24px;display:flex;align-items:center;gap:11px;border:1.6px solid var(--ink);border-radius:14px;padding:13px 17px;background:var(--cream);max-width:500px;color:var(--ink-soft)}
-  .dh-search input{flex:1;border:0;outline:0;background:transparent;font-family:var(--font-body);font-size:15px;color:var(--ink)}
+  .dh-toolbar{margin-top:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .dh-search{display:flex;align-items:center;gap:11px;border:1.6px solid var(--ink);border-radius:14px;padding:13px 17px;background:var(--cream);flex:1;min-width:230px;max-width:500px;color:var(--ink-soft)}
+  .dh-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-family:var(--font-body);font-size:15px;color:var(--ink)}
+  /* view toggle: Categories <-> A-Z list */
+  .dh-view{display:inline-flex;background:var(--cream);border:1.4px solid var(--line);border-radius:12px;padding:4px;gap:3px;flex:0 0 auto}
+  .dh-vbtn{display:inline-flex;align-items:center;gap:6px;border:0;background:none;cursor:pointer;border-radius:9px;padding:9px 13px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--ink-soft);transition:all .14s}
+  .dh-vbtn:hover{color:var(--ink)}
+  .dh-vbtn.on{background:var(--ink);color:var(--cream)}
+  .dh-vbtn svg{flex:0 0 auto}
+  /* view switching */
+  .dh[data-view="cats"] .dh-az{display:none}
+  .dh[data-view="az"] .dh-pop-wrap,.dh[data-view="az"] .dh-cat,.dh[data-view="az"] .dh-soon{display:none}
+  /* A-Z list view */
+  .dh-az{margin-top:28px}
+  .dh-az-jump{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:24px}
+  .dh-az-jump a{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink-soft);text-decoration:none;width:28px;height:28px;display:grid;place-items:center;border-radius:7px;border:1px solid var(--line);transition:all .12s}
+  .dh-az-jump a:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .dh-az-sec{margin-bottom:18px;scroll-margin-top:84px}
+  .dh-az-h{font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--coral);margin:0 0 8px;border-bottom:2px solid var(--line);padding-bottom:5px}
+  .dh-az-list{display:grid;grid-template-columns:1fr 1fr;gap:2px 24px}
+  .dh-az-term{display:flex;align-items:baseline;gap:9px;padding:8px 10px;border-radius:9px;text-decoration:none;color:var(--ink)}
+  .dh-az-term:hover{background:color-mix(in srgb, var(--accent) 9%, transparent)}
+  .dh-az-dot{width:8px;height:8px;border-radius:2px;flex:0 0 auto;align-self:center}
+  .dh-az-t{font-family:var(--font-display);font-weight:700;font-size:14.5px;flex:0 0 auto}
+  .dh-az-g{font-size:12.5px;color:var(--ink-soft);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  @media(max-width:640px){.dh-az-list{grid-template-columns:1fr}}
   .dh-empty{margin-top:12px;font-size:14px;color:var(--ink-soft)}
   .dh-empty a{color:var(--coral);font-weight:600;text-decoration:none}
   .dh-pop-wrap{margin-top:30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
