@@ -253,6 +253,23 @@ export const BG_GUIDES = [
   },
 ];
 
+// Graduation bridges: each beginner guide "levels up" into a matching destination on the main
+// (warm) site. Kept honest, not forced: image topics, which the main site doesn't cover, point to
+// the broadly-useful dictionary rather than a contrived tool.
+export const BG_LEVELUP = {
+  'what-is-ai':                 { href: '/ai',               label: 'See how AI actually works' },
+  'first-ai-prompt':            { href: '/prompt-builder',   label: 'Build a pro-level prompt' },
+  'first-ai-image':             { href: '/dictionary',       label: 'Browse the plain-English AI dictionary' },
+  'everyday-ai-tasks':          { href: '/tools',            label: 'Try the free browser tools' },
+  'ai-privacy':                 { href: '/tools',            label: 'Tools that run in your browser, nothing uploaded' },
+  'writing-with-ai':            { href: '/prompt-optimizer', label: 'Sharpen any prompt with the Prompt Optimizer' },
+  'ai-hallucinations':          { href: '/what-is-rag',      label: 'How RAG keeps AI honest' },
+  'ai-glossary':                { href: '/dictionary',       label: 'The full 75-term plain-English dictionary' },
+  'ai-image-styles':            { href: '/dictionary',       label: 'Browse the plain-English AI dictionary' },
+  'ai-ethics':                  { href: '/ai',               label: 'Go deeper in AI Explained' },
+  'chatgpt-vs-claude-vs-gemini':{ href: '/ai',               label: 'See how these models actually work' },
+};
+
 export const bgGuide = (slug) => BG_GUIDES.find((g) => g.slug === slug);
 export const bgTopic = (id) => BG_TOPICS.find((t) => t.id === id);
 export const bgTopicLabel = (id) => (bgTopic(id) ? bgTopic(id).label : id);

@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { BG_GUIDES, bgTopicLabel } from '../../data/beginnerGuides.js';
+import { BG_GUIDES, BG_LEVELUP, bgTopicLabel } from '../../data/beginnerGuides.js';
 
 export function getStaticPaths() {
   return BG_GUIDES.map((g) => ({ params: { slug: g.slug }, props: { g } }));
@@ -9,13 +9,13 @@ const { g } = Astro.props;
 const more = BG_GUIDES.filter((x) => x.slug !== g.slug && x.topic === g.topic).slice(0, 3);
 const fallback = BG_GUIDES.filter((x) => x.slug !== g.slug).slice(0, 3);
 const related = more.length ? more : fallback;
+const levelUp = BG_LEVELUP[g.slug];
 ---
 <Layout
   title={`${g.title} | Beginner AI | KB Cafe`}
   description={g.excerpt}
   path={`/beginner-ai/${g.slug}`}
   sidebar={false}
-  noindex={true}
 >
   <article class="ba">
     <nav class="ba-crumb"><a href="/beginner-ai">Beginner AI</a> / <a href={`/beginner-ai/guides?topic=${g.topic}`}>{bgTopicLabel(g.topic)}</a></nav>
@@ -23,6 +23,14 @@ const related = more.length ? more : fallback;
     <h1>{g.title}</h1>
     <p class="ba-lede">{g.excerpt}</p>
     <div class="ba-body" set:html={g.body} />
+
+    {levelUp && (
+      <a class="ba-levelup" href={levelUp.href}>
+        <span class="ba-lu-eye">Ready to level up?</span>
+        <span class="ba-lu-t">{levelUp.label} <span aria-hidden="true">&rarr;</span></span>
+        <span class="ba-lu-d">Step up from the beginner basics into the full KB Cafe.</span>
+      </a>
+    )}
 
     <aside class="ba-more">
       <h2>Keep going</h2>
@@ -60,6 +68,14 @@ const related = more.length ? more : fallback;
   .ba-body :global(a){color:#2a63cf;font-weight:600;text-decoration:none}
   .ba-body :global(a:hover){text-decoration:underline}
   .ba-body :global(em){color:var(--bz-soft)}
+  /* graduation bridge: coral (the warm main site) against the blue beginner zone = "level up" */
+  .ba-levelup{display:block;margin-top:32px;text-decoration:none;border-radius:16px;padding:20px 22px;color:#fff;
+    background:radial-gradient(circle at 88% 18%,rgba(255,255,255,.18),transparent 46%),linear-gradient(135deg,#ff6a3d,#df421e);
+    box-shadow:0 14px 32px rgba(238,75,43,.22);transition:transform .15s,box-shadow .15s}
+  .ba-levelup:hover{transform:translateY(-3px);box-shadow:0 20px 42px rgba(238,75,43,.3)}
+  .ba-lu-eye{display:block;font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.85)}
+  .ba-lu-t{display:block;font-family:var(--font-display);font-weight:800;font-size:20px;line-height:1.15;margin-top:5px}
+  .ba-lu-d{display:block;font-size:13.5px;color:rgba(255,255,255,.82);margin-top:5px}
   .ba-more{margin-top:40px;border-top:1px solid var(--bz-line);padding-top:24px}
   .ba-more h2{font-family:var(--font-display);font-weight:800;font-size:18px;margin-bottom:14px}
   .ba-more-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}

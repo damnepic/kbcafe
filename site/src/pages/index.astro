@@ -182,6 +182,7 @@ const UI_ICONS = {
         <span class="db-feat-dv"></span>
         <div class="db-feat"><span class="db-feat-ic" set:html={UI_ICONS.rocket} /><div class="db-feat-t"><b>Next Step</b><small>Keep learning</small></div></div>
       </div>
+      <a class="db-beginner" href="/beginner-ai">Brand new to AI? Start with the beginner guides <span aria-hidden="true">&rarr;</span></a>
     </div>
     <div class="db-right">
       <div class="db-grid">
@@ -383,6 +384,8 @@ const UI_ICONS = {
   .db-feat-t b{display:block;font-family:var(--font-display);font-weight:700;font-size:11.5px;color:#fff;line-height:1.15;white-space:nowrap}
   .db-feat-t small{font-size:9.5px;color:rgba(255,255,255,.55);white-space:nowrap}
   .db-feat-dv{flex:0 0 auto;width:1px;height:24px;background:rgba(255,255,255,.14)}
+  .db-beginner{display:inline-block;margin-top:18px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--gold);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .14s}
+  .db-beginner:hover{border-color:rgba(244,180,35,.6)}
   /* right card grid */
   .db-right{display:flex;flex-direction:column;gap:10px}
   .db-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:minmax(84px,1fr);gap:10px}
