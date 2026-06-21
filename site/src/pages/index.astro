@@ -325,6 +325,9 @@ const dictCount = DICT.length;
   }
   /* the inline prompt output is built with innerHTML; scoped CSS can't reach JS-created nodes, so style its labels globally */
   body.home .ld-out .k{ color:#F4B423; font-weight:700; }
+  /* same gotcha: the newsletter "launching soon" message is innerHTML-built, so it ignored the scoped .nl-done rule
+     and inherited near-black --ink on the dark form. Style it globally (gold reads on the dark-brown pill). */
+  body.home .nl-done{ color:#F4B423 !important; }
 </style>
 
 <style>
