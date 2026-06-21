@@ -46,3 +46,4 @@ Thumbs.db
 
 # local recovery backups (do not commit)
 recovery_dist_*/
+backups/
