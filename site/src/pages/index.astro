@@ -87,6 +87,30 @@ const dictTerms = DICT_SLUGS.map(findTerm).filter(Boolean);
 const dictCount = DICT.length;
 // card display only: capitalize each word's first letter (keeps API/RAG/MCP intact; "Vibe coding"->"Vibe Coding")
 const titleCard = (s) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+// ── Lucide icons (ISC license, from lucide.dev) for the dictionary band ──
+const _svg = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const DICT_ICONS = {
+  'vibe-coding': _svg('<path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>'),
+  'deploy': _svg('<path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/>'),
+  'api': _svg('<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/>'),
+  'token': _svg('<path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/>'),
+  'rag': _svg('<path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/><path d="M18 18a4 4 0 0 0 2-7.464"/><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/><path d="M6 18a4 4 0 0 1-2-7.464"/><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/>'),
+  'mcp': _svg('<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>'),
+  'localhost': _svg('<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>'),
+  'hallucination': _svg('<path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/>'),
+  'webhook': _svg('<path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2"/><path d="m6 17 3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06"/><path d="m12 6 3.13 5.73C15.66 12.7 16.9 13 18 13a4 4 0 0 1 0 8"/>'),
+  'stack-trace': _svg('<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/>'),
+  'database': _svg('<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>'),
+  'git': _svg('<path d="M15 6a9 9 0 0 0-9 9V3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>'),
+};
+const UI_ICONS = {
+  book: _svg('<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>'),
+  zap: _svg('<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>'),
+  check: _svg('<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>'),
+  rocket: _svg('<path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/>'),
+  sparkles: _svg('<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>'),
+};
 ---
 <Layout
   title="KB Cafe, the interactive AI knowledge base"
@@ -168,14 +192,36 @@ const titleCard = (s) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.sli
   <!-- DICTIONARY band (the vocabulary layer) -->
   <section class="dict-band">
     <div class="db-l">
-      <div class="db-eye">✦ New here?</div>
-      <h2>Stuck on a term? Look it up.</h2>
-      <p>The Plain-English Tech Dictionary: {dictCount} AI, coding, and vibe-coding terms explained in one sentence, with an example and a next step.</p>
-      <a class="db-btn" href="/dictionary">Browse all {dictCount} terms →</a>
+      <span class="db-eye"><span class="db-eye-spark">✦</span> New here?</span>
+      <h2 class="db-h">Stuck on a term?<br><span class="db-h-grad">Look it up.</span></h2>
+      <p class="db-desc">The Plain-English Tech Dictionary: {dictCount} AI, coding, and vibe-coding terms explained in one sentence, with an example and a next step.</p>
+      <a class="db-btn" href="/dictionary"><span class="db-btn-ic" set:html={UI_ICONS.book} /> Browse all {dictCount} terms <span class="db-btn-ar" aria-hidden="true">→</span></a>
+      <div class="db-feats">
+        <div class="db-feat"><span class="db-feat-ic" set:html={UI_ICONS.zap} /><div class="db-feat-t"><b>Plain English</b><small>No jargon</small></div></div>
+        <span class="db-feat-dv"></span>
+        <div class="db-feat"><span class="db-feat-ic" set:html={UI_ICONS.check} /><div class="db-feat-t"><b>One Sentence</b><small>Quick clarity</small></div></div>
+        <span class="db-feat-dv"></span>
+        <div class="db-feat"><span class="db-feat-ic" set:html={UI_ICONS.rocket} /><div class="db-feat-t"><b>Next Step</b><small>Keep learning</small></div></div>
+      </div>
     </div>
-    <div class="db-terms">
+    <div class="db-grid">
       {dictTerms.map(t => (
-        <a class={`db-term${t.slug === 'vibe-coding' ? ' feat' : ''}`} href={`/dictionary/${t.slug}`}>{titleCard(t.term)}</a>
+        t.slug === 'vibe-coding' ? (
+          <a class="db-card db-feat-card" href={`/dictionary/${t.slug}`}>
+            <span class="db-fc-spark" set:html={UI_ICONS.sparkles} />
+            <span class="db-fc-ic" set:html={DICT_ICONS[t.slug]} />
+            <span class="db-fc-nm">{titleCard(t.term)}</span>
+            <span class="db-fc-ar" aria-hidden="true">→</span>
+          </a>
+        ) : (
+          <a class="db-card" href={`/dictionary/${t.slug}`}>
+            <span class="db-card-top">
+              <span class="db-card-ic" set:html={DICT_ICONS[t.slug]} />
+              <span class="db-card-nm">{titleCard(t.term)}</span>
+            </span>
+            <span class="db-card-ar" aria-hidden="true">→</span>
+          </a>
+        )
       ))}
     </div>
   </section>
@@ -381,20 +427,45 @@ const titleCard = (s) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.sli
   .triage-sec .o-grid{margin-top:22px}
 
   /* ===== REDESIGN: dictionary band ===== */
-  .dict-band{max-width:1120px;margin:46px auto 0;background:linear-gradient(140deg,#2a211a,#342920);border-radius:22px;padding:34px 32px;color:#fff;display:grid;grid-template-columns:1fr 1.1fr;gap:30px;align-items:center}
-  .db-eye{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
-  .db-l h2{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:-.02em;margin:10px 0 0;line-height:1.08;color:#fff}
-  .db-l p{color:rgba(255,255,255,.74);font-size:15px;line-height:1.55;margin:12px 0 0;max-width:380px}
-  .db-btn{display:inline-flex;margin-top:18px;background:#fff;color:var(--ink);font-family:var(--font-display);font-weight:800;font-size:14px;border-radius:11px;padding:11px 18px;text-decoration:none}
-  .db-btn:hover{background:var(--cream)}
-  .db-terms{display:flex;flex-wrap:wrap;gap:10px}
-  .db-term{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;flex-shrink:0;font-family:var(--font-mono);font-size:13px;font-weight:600;color:#f6efe2;background:rgba(255,255,255,.08);border:1.3px solid rgba(255,255,255,.26);border-radius:10px;padding:9px 13px;text-decoration:none;transition:transform .14s,background .14s,border-color .14s}
-  .db-term::after{content:"\2192";color:var(--gold);transition:transform .14s}
-  .db-term:hover{transform:translateY(-2px);background:rgba(255,255,255,.16);border-color:rgba(244,180,35,.7)}
-  .db-term:hover::after{transform:translateX(3px)}
-  .db-term.feat{background:var(--coral);border-color:var(--coral);color:#fff;white-space:normal;text-align:center}
-  .db-term.feat::after{color:#fff}
-  .db-term.feat:hover{background:var(--coral-deep);border-color:var(--coral-deep)}
+  .dict-band{max-width:1120px;margin:46px auto 0;background:linear-gradient(140deg,#2a211a,#342920);border-radius:22px;padding:36px;color:#fff;display:grid;grid-template-columns:0.82fr 1.18fr;gap:34px;align-items:center}
+  /* left panel */
+  .db-eye{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(244,180,35,.4);border-radius:999px;padding:6px 13px}
+  .db-h{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,3.3vw,42px);letter-spacing:-.03em;line-height:1.02;margin:18px 0 0;color:#fff}
+  .db-h-grad{background:linear-gradient(100deg,#ff8a5c,#ee4b2b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .db-desc{color:rgba(255,255,255,.72);font-size:15px;line-height:1.55;margin:16px 0 0;max-width:400px}
+  .db-btn{display:inline-flex;align-items:center;gap:9px;margin-top:22px;background:#fff;color:var(--ink);font-family:var(--font-display);font-weight:800;font-size:14.5px;border-radius:13px;padding:13px 20px;text-decoration:none;box-shadow:0 0 0 3px rgba(238,75,43,.18),0 12px 28px rgba(238,75,43,.2);transition:transform .15s,box-shadow .15s}
+  .db-btn:hover{transform:translateY(-2px);box-shadow:0 0 0 3px rgba(238,75,43,.26),0 16px 34px rgba(238,75,43,.26)}
+  .db-btn-ic{display:grid;place-items:center;color:var(--coral)}
+  .db-btn-ic svg{width:18px;height:18px}
+  .db-btn-ar{transition:transform .15s}
+  .db-btn:hover .db-btn-ar{transform:translateX(3px)}
+  .db-feats{display:flex;align-items:center;gap:16px;margin-top:26px;flex-wrap:wrap}
+  .db-feat{display:flex;align-items:center;gap:9px}
+  .db-feat-ic{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(238,75,43,.16);color:var(--coral)}
+  .db-feat-ic svg{width:16px;height:16px}
+  .db-feat-t b{display:block;font-family:var(--font-display);font-weight:700;font-size:13px;color:#fff;line-height:1.15}
+  .db-feat-t small{font-size:11px;color:rgba(255,255,255,.55)}
+  .db-feat-dv{width:1px;height:28px;background:rgba(255,255,255,.14)}
+  /* right card grid */
+  .db-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:minmax(84px,1fr);gap:10px}
+  .db-card{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:8px;padding:12px 13px;border-radius:13px;text-decoration:none;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);transition:transform .15s,border-color .15s,background .15s}
+  .db-card:hover{transform:translateY(-2px);border-color:rgba(238,75,43,.6);background:rgba(238,75,43,.09)}
+  .db-card-top{display:flex;flex-direction:column;gap:8px;min-width:0}
+  .db-card-ic{width:22px;height:22px;color:var(--coral);display:grid;place-items:center}
+  .db-card-ic svg{width:22px;height:22px}
+  .db-card-nm{font-family:var(--font-display);font-weight:700;font-size:13px;color:#f3ecdf;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .db-card-ar{color:var(--gold);opacity:.55;font-size:15px;line-height:1;transition:transform .15s,opacity .15s}
+  .db-card:hover .db-card-ar{opacity:1;transform:translateX(3px)}
+  .db-card:nth-last-child(3),.db-card:nth-last-child(2){grid-column:span 2}
+  /* featured card */
+  .db-feat-card{grid-column:1;grid-row:1 / span 2;justify-content:flex-start;padding:17px;border-color:transparent;background:radial-gradient(120% 90% at 85% 4%,rgba(255,255,255,.22),transparent 55%),linear-gradient(155deg,#ff6a3d,#df421e)}
+  .db-feat-card:hover{transform:translateY(-3px);border-color:transparent;background:radial-gradient(120% 90% at 85% 4%,rgba(255,255,255,.28),transparent 55%),linear-gradient(155deg,#ff774c,#d63e1f)}
+  .db-fc-spark{position:absolute;top:13px;right:13px;color:rgba(255,255,255,.9);display:grid;place-items:center}
+  .db-fc-spark svg{width:17px;height:17px}
+  .db-fc-ic{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;color:#fff}
+  .db-fc-ic svg{width:23px;height:23px}
+  .db-fc-nm{margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:20px;line-height:1.05;letter-spacing:-.02em;color:#fff}
+  .db-fc-ar{margin-top:8px;color:#fff;font-size:17px;font-weight:700;line-height:1}
 
   /* ===== REDESIGN: featured tools as the orange "Learn by doing" trio ===== */
   .feat.hot{border-color:transparent;color:#fff;
@@ -410,7 +481,9 @@ const titleCard = (s) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.sli
   .crow{border-color:var(--line)}
   .tr-ic.b1,.tr-ic.b2,.tr-ic.b3,.tr-ic.b4{color:var(--ink-soft)}
 
-  @media(max-width:880px){.ld-grid{grid-template-columns:1fr}.dict-band{grid-template-columns:1fr}}
+  @media(max-width:880px){.ld-grid{grid-template-columns:1fr}.dict-band{grid-template-columns:1fr}
+    .db-grid{grid-template-columns:repeat(2,1fr)}.db-feat-card{grid-column:1 / 3;grid-row:auto}
+    .db-card:nth-last-child(3),.db-card:nth-last-child(2){grid-column:auto}}
 
   /* HERO (outcome-first, centered intro) */
   .hero-o{margin:40px 0 0;text-align:center}
