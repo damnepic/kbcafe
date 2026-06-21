@@ -85,6 +85,8 @@ const FEATURED = [
 const DICT_SLUGS = ['vibe-coding','deploy','api','token','rag','mcp','localhost','hallucination','webhook','stack-trace','database','git'];
 const dictTerms = DICT_SLUGS.map(findTerm).filter(Boolean);
 const dictCount = DICT.length;
+// card display only: capitalize each word's first letter (keeps API/RAG/MCP intact; "Vibe coding"->"Vibe Coding")
+const titleCard = (s) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 ---
 <Layout
   title="KB Cafe, the interactive AI knowledge base"
@@ -167,7 +169,7 @@ const dictCount = DICT.length;
     </div>
     <div class="db-terms">
       {dictTerms.map(t => (
-        <a class={`db-term${t.slug === 'vibe-coding' ? ' feat' : ''}`} href={`/dictionary/${t.slug}`}>{t.term}</a>
+        <a class={`db-term${t.slug === 'vibe-coding' ? ' feat' : ''}`} href={`/dictionary/${t.slug}`}>{titleCard(t.term)}</a>
       ))}
     </div>
   </section>
@@ -384,7 +386,7 @@ const dictCount = DICT.length;
   .db-term::after{content:"\2192";color:var(--gold);transition:transform .14s}
   .db-term:hover{transform:translateY(-2px);background:rgba(255,255,255,.16);border-color:rgba(244,180,35,.7)}
   .db-term:hover::after{transform:translateX(3px)}
-  .db-term.feat{background:var(--coral);border-color:var(--coral);color:#fff}
+  .db-term.feat{background:var(--coral);border-color:var(--coral);color:#fff;white-space:normal;text-align:center}
   .db-term.feat::after{color:#fff}
   .db-term.feat:hover{background:var(--coral-deep);border-color:var(--coral-deep)}
 
