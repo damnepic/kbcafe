@@ -183,16 +183,29 @@ const UI_ICONS = {
         <div class="db-feat"><span class="db-feat-ic" set:html={UI_ICONS.rocket} /><div class="db-feat-t"><b>Next Step</b><small>Keep learning</small></div></div>
       </div>
     </div>
-    <div class="db-grid">
-      {dictTerms.map(t => (
-        t.slug === 'vibe-coding' ? (
-          <a class="db-card db-feat-card" href={`/dictionary/${t.slug}`}>
-            <span class="db-fc-spark" set:html={UI_ICONS.sparkles} />
-            <span class="db-fc-ic" set:html={DICT_ICONS[t.slug]} />
-            <span class="db-fc-nm">{titleCard(t.term)}</span>
-            <span class="db-fc-ar" aria-hidden="true">→</span>
-          </a>
-        ) : (
+    <div class="db-right">
+      <div class="db-grid">
+        {dictTerms.slice(0, 9).map(t => (
+          t.slug === 'vibe-coding' ? (
+            <a class="db-card db-feat-card" href={`/dictionary/${t.slug}`}>
+              <span class="db-fc-spark" set:html={UI_ICONS.sparkles} />
+              <span class="db-fc-ic" set:html={DICT_ICONS[t.slug]} />
+              <span class="db-fc-nm">{titleCard(t.term)}</span>
+              <span class="db-fc-ar" aria-hidden="true">→</span>
+            </a>
+          ) : (
+            <a class="db-card" href={`/dictionary/${t.slug}`}>
+              <span class="db-card-top">
+                <span class="db-card-ic" set:html={DICT_ICONS[t.slug]} />
+                <span class="db-card-nm">{titleCard(t.term)}</span>
+              </span>
+              <span class="db-card-ar" aria-hidden="true">→</span>
+            </a>
+          )
+        ))}
+      </div>
+      <div class="db-grid-bottom">
+        {dictTerms.slice(9).map(t => (
           <a class="db-card" href={`/dictionary/${t.slug}`}>
             <span class="db-card-top">
               <span class="db-card-ic" set:html={DICT_ICONS[t.slug]} />
@@ -200,8 +213,8 @@ const UI_ICONS = {
             </span>
             <span class="db-card-ar" aria-hidden="true">→</span>
           </a>
-        )
-      ))}
+        ))}
+      </div>
     </div>
   </section>
 
@@ -363,15 +376,17 @@ const UI_ICONS = {
   .db-btn-ic svg{width:18px;height:18px}
   .db-btn-ar{transition:transform .15s}
   .db-btn:hover .db-btn-ar{transform:translateX(3px)}
-  .db-feats{display:flex;align-items:center;gap:16px;margin-top:26px;flex-wrap:wrap}
-  .db-feat{display:flex;align-items:center;gap:9px}
-  .db-feat-ic{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(238,75,43,.16);color:var(--coral)}
-  .db-feat-ic svg{width:16px;height:16px}
-  .db-feat-t b{display:block;font-family:var(--font-display);font-weight:700;font-size:13px;color:#fff;line-height:1.15}
-  .db-feat-t small{font-size:11px;color:rgba(255,255,255,.55)}
-  .db-feat-dv{width:1px;height:28px;background:rgba(255,255,255,.14)}
+  .db-feats{display:flex;align-items:center;gap:11px;margin-top:24px;flex-wrap:nowrap}
+  .db-feat{display:flex;align-items:center;gap:7px}
+  .db-feat-ic{flex:0 0 auto;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:rgba(238,75,43,.16);color:var(--coral)}
+  .db-feat-ic svg{width:14px;height:14px}
+  .db-feat-t b{display:block;font-family:var(--font-display);font-weight:700;font-size:11.5px;color:#fff;line-height:1.15;white-space:nowrap}
+  .db-feat-t small{font-size:9.5px;color:rgba(255,255,255,.55);white-space:nowrap}
+  .db-feat-dv{flex:0 0 auto;width:1px;height:24px;background:rgba(255,255,255,.14)}
   /* right card grid */
+  .db-right{display:flex;flex-direction:column;gap:10px}
   .db-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:minmax(84px,1fr);gap:10px}
+  .db-grid-bottom{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(84px,1fr);gap:10px}
   .db-card{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:8px;padding:12px 13px;border-radius:13px;text-decoration:none;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);transition:transform .15s,border-color .15s,background .15s}
   .db-card:hover{transform:translateY(-2px);border-color:rgba(238,75,43,.6);background:rgba(238,75,43,.09)}
   .db-card-top{display:flex;flex-direction:column;gap:8px;min-width:0}
@@ -380,7 +395,6 @@ const UI_ICONS = {
   .db-card-nm{font-family:var(--font-display);font-weight:700;font-size:13px;color:#f3ecdf;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .db-card-ar{color:var(--gold);opacity:.55;font-size:15px;line-height:1;transition:transform .15s,opacity .15s}
   .db-card:hover .db-card-ar{opacity:1;transform:translateX(3px)}
-  .db-card:nth-last-child(3),.db-card:nth-last-child(2){grid-column:span 2}
   /* featured card */
   .db-feat-card{grid-column:1;grid-row:1 / span 2;justify-content:flex-start;padding:17px;border-color:transparent;background:radial-gradient(120% 90% at 85% 4%,rgba(255,255,255,.22),transparent 55%),linear-gradient(155deg,#ff6a3d,#df421e)}
   .db-feat-card:hover{transform:translateY(-3px);border-color:transparent;background:radial-gradient(120% 90% at 85% 4%,rgba(255,255,255,.28),transparent 55%),linear-gradient(155deg,#ff774c,#d63e1f)}
@@ -407,7 +421,7 @@ const UI_ICONS = {
 
   @media(max-width:880px){.dict-band{grid-template-columns:1fr}
     .db-grid{grid-template-columns:repeat(2,1fr)}.db-feat-card{grid-column:1 / 3;grid-row:auto}
-    .db-card:nth-last-child(3),.db-card:nth-last-child(2){grid-column:auto}}
+    .db-feats{flex-wrap:wrap;gap:14px}}
 
   /* HERO (outcome-first, centered intro) */
   .hero-o{margin:40px 0 0;text-align:center}
