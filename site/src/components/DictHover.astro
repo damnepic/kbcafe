@@ -10,7 +10,6 @@ const MAP = Object.fromEntries(DICT.map((t) => [t.slug, { t: t.term, d: plain(t.
 <div id="kb-tip" class="kb-tip" hidden role="tooltip">
   <span class="kb-tip-t"></span>
   <span class="kb-tip-d"></span>
-  <span class="kb-tip-go">Click to learn more &rarr;</span>
 </div>
 
 <script define:vars={{ MAP }}>
@@ -69,5 +68,4 @@ const MAP = Object.fromEntries(DICT.map((t) => [t.slug, { t: t.term, d: plain(t.
     box-shadow:0 14px 34px rgba(20,12,4,.3);font-family:var(--font-body);pointer-events:none}
   .kb-tip-t{font-family:var(--font-display);font-weight:800;font-size:13.5px;color:#fff}
   .kb-tip-d{font-size:12.5px;line-height:1.45;color:#d7cfc0}
-  .kb-tip-go{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:var(--gold);letter-spacing:.03em}
 </style>
