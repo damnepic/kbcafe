@@ -1,5 +1,8 @@
 ---
 import Sidebar from '../components/Sidebar.astro';
+import { TOOLS } from '../data/tools.js';
+import { AI } from '../data/ai.js';
+import { REFERENCE } from '../data/reference.js';
 const {
   title = 'KB Cafe, a developer’s knowledge base',
   description = 'Fast, clean developer tools and quick references, freshly brewed. Everything runs in your browser: nothing uploaded, nothing tracked.',
@@ -13,8 +16,19 @@ const {
 
 const canonical = new URL(path, Astro.site).href;
 
-// nav active state: home is exact; others match the section (e.g. /learn + /learn-*)
-const navActive = (href) => href === '/' ? path === '/' : (path === href || path.startsWith(href));
+// nav active state: map every inner page to its parent nav item. Tools / references / AI explainers
+// live at top-level slugs (e.g. /prompt-simulator, not /tools/prompt-simulator), so a URL-prefix match
+// misses them; we match by data membership instead so the section stays underlined on inner pages.
+const TOOL_PATHS = new Set(TOOLS.filter(t => t.href).map(t => t.href));
+const KB_PATHS = new Set([...AI, ...REFERENCE].filter(x => x.href).map(x => x.href));
+const activeNavHref = (() => {
+  if (path === '/') return '/';
+  if (path === '/tools' || path.startsWith('/tools') || TOOL_PATHS.has(path)) return '/tools';
+  if (path.startsWith('/learn') || path === '/skill-tree' || path.startsWith('/ai-patterns')) return '/learn';
+  if (path === '/reference' || path.startsWith('/reference') || path === '/ai' || path.startsWith('/dictionary') || KB_PATHS.has(path)) return '/reference';
+  return null;
+})();
+const navActive = (href) => href === '/' ? path === '/' : href === activeNavHref;
 
 // Breadcrumbs: every page except home. Wrappers pass `crumb`; standalone pages auto-derive "KB Cafe / Page".
 const SECTION_LABELS = {
