@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { TOOLS } from '../data/tools.js';
+import { AI_SUB, AI_SUB_META, AI_SUB_ORDER } from '../data/toolMeta.js';
 import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
 import { DICT, findTerm } from '../data/dictionary.js';
@@ -49,6 +50,19 @@ const toolCount = TOOLS.filter(t => t.href).length;
 // honest, data-derived counts for the social-proof strip
 const refCount = REFERENCE.length + AI.length; // evergreen references + AI explainers
 const aiCount = TOOLS.filter(t => t.href && t.cat === 'ai').length; // AI tools
+
+// ── AI toolkit: the 27 AI tools grouped into the same 4 clusters as the /tools page ──
+const CLUSTER_ICON = {
+  prompting: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12Z"/><path d="M9 11h6M9 14h4"/></svg>`,
+  models: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14a4 4 0 0 0 4-4"/><circle cx="12" cy="14" r="8"/><path d="M12 14 9 9"/><path d="M12 6V3M4.5 7.5 3 6M19.5 7.5 21 6"/></svg>`,
+  agents: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6.5" r="2.4"/><circle cx="18" cy="17.5" r="2.4"/><path d="M8.2 11l7.6-3.5M8.2 13l7.6 3.5"/></svg>`,
+  build: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="M12 12l8-4.5M12 12v9M12 12 4 7.5"/></svg>`,
+};
+const aiToolsAll = TOOLS.filter(t => t.href && t.cat === 'ai');
+const aiClusters = AI_SUB_ORDER.map(sub => ({
+  sub, label: AI_SUB_META[sub].label, icon: CLUSTER_ICON[sub],
+  items: aiToolsAll.filter(t => AI_SUB[t.href] === sub),
+}));
 const explainerCount = AI.filter(a => a.type === 'explainer').length; // concept explainers
 
 // goal-first workflows: bundle tools by what you're trying to do (vs browsing 34 tools)
@@ -235,6 +249,27 @@ const UI_ICONS = {
           <h3>{f.name}</h3>
           <p>{f.desc}</p>
           <span class="feat-go">Try it <span aria-hidden="true">→</span></span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- AI TOOLKIT — mirrors the /tools page clustering -->
+  <section class="home-sec aitk">
+    <div class="sec-head">
+      <div class="sec-title">
+        <span class="kicker kicker-ai">The AI toolkit</span>
+        <p class="sec-sub">{aiCount} tools, grouped by what you need, the same way as on the tools page.</p>
+      </div>
+      <a class="sec-link" href="/tools?cat=ai">View all AI tools →</a>
+    </div>
+    <div class="aitk-grid">
+      {aiClusters.map(c => (
+        <a class="aitk-card" href={`/tools?cat=ai:${c.sub}`}>
+          <div class="aitk-top"><span class="aitk-ic" set:html={c.icon} /><span class="aitk-n">{c.items.length} tools</span></div>
+          <h3 class="aitk-label">{c.label}</h3>
+          <ul class="aitk-list">{c.items.slice(0, 3).map(t => <li>{t.nm}</li>)}</ul>
+          <span class="aitk-go">Open {c.label} <span aria-hidden="true">→</span></span>
         </a>
       ))}
     </div>
@@ -653,6 +688,23 @@ const UI_ICONS = {
   .feat h3{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.02em;margin:0 0 7px;line-height:1.15}
   .feat p{font-size:14px;color:var(--ink-soft);line-height:1.5;margin:0 0 16px}
   .feat-go{margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--coral);display:inline-flex;align-items:center;gap:6px}
+
+  /* AI TOOLKIT — 4 cluster cards mirroring /tools (responsive 4 -> 2 -> 1) */
+  .aitk{margin-top:36px}
+  .aitk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .aitk-card{display:flex;flex-direction:column;background:var(--cream);border:1.2px solid var(--line);border-top:3px solid #7657ff;border-radius:16px;padding:16px;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s}
+  .aitk-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(40,24,12,.09);border-color:#7657ff}
+  .aitk-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .aitk-ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#7657ff;color:#fff}
+  .aitk-ic svg{width:19px;height:19px}
+  .aitk-n{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:#6a4cf0;background:rgba(118,87,255,.12);border-radius:999px;padding:3px 9px}
+  .aitk-label{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.02em;margin:0 0 10px;line-height:1.15}
+  .aitk-list{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:6px}
+  .aitk-list li{font-size:12.5px;color:var(--ink-soft);line-height:1.3;position:relative;padding-left:14px}
+  .aitk-list li::before{content:"";position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;background:#7657ff;opacity:.55}
+  .aitk-go{margin-top:auto;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#6a4cf0;display:inline-flex;align-items:center;gap:5px}
+  @media(max-width:860px){.aitk-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.aitk-grid{grid-template-columns:1fr}}
 
   /* COMPACT lists (AI Explained + Popular Tools) */
   .compact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
