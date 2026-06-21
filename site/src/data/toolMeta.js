@@ -17,12 +17,12 @@ const I = {
 // genuine matching term exists (intuitive, not spammy). Surfaced under each heading on /tools.
 export const CAT_META = {
   ai:       { label: 'AI',          bg: '#7657ff', icon: I.brackets, desc: ['Everything for building with ', { t: 'large language models', s: 'llm' }, ': ', { t: 'prompts', s: 'prompt' }, ', ', { t: 'tokens', s: 'token' }, ', ', { t: 'agents', s: 'agent' }, ', cost, and context.'] },
-  json:     { label: 'JSON',        bg: '#ee4b2b', icon: I.braces,   desc: ['Generate types and convert JSON, the data format behind most ', { t: 'APIs', s: 'api' }, ' and ', { t: 'schemas', s: 'schema' }, '.'] },
-  encoding: { label: 'Encoding',    bg: '#e0911a', icon: I.hash,     desc: ['Encode, decode, and inspect Base64 and JWTs, the tokens behind ', { t: 'authentication', s: 'authentication' }, '.'] },
+  json:     { label: 'JSON',        bg: '#ee4b2b', icon: I.braces,   desc: ['Generate types and convert ', { t: 'JSON', s: 'json' }, ', the data format behind most ', { t: 'APIs', s: 'api' }, ' and ', { t: 'schemas', s: 'schema' }, '.'] },
+  encoding: { label: 'Encoding',    bg: '#e0911a', icon: I.hash,     desc: ['Encode, decode, and inspect ', { t: 'Base64', s: 'base64' }, ' and JWTs, the tokens behind ', { t: 'authentication', s: 'authentication' }, '.'] },
   convert:  { label: 'Converters',  bg: '#3478f6', icon: I.table,    desc: ['Convert between data formats like CSV, YAML, and JSON, and turn cURL commands into code.'] },
   text:     { label: 'Text',        bg: '#8a63ff', icon: I.doc,      desc: ['Format and clean up text and code, from messy SQL to naming conventions.'] },
-  time:     { label: 'Time & Cron', bg: '#0f9f82', icon: I.clock,    desc: ['Build and read cron schedules for recurring jobs, in plain English.'] },
-  feeds:    { label: 'Feeds',       bg: '#f4842a', icon: I.rss,      desc: ['Validate, preview, and convert RSS and Atom feeds, the open web’s syndication format.'] },
+  time:     { label: 'Time & Cron', bg: '#0f9f82', icon: I.clock,    desc: ['Build and read ', { t: 'cron', s: 'cron' }, ' schedules for recurring jobs, in plain English.'] },
+  feeds:    { label: 'Feeds',       bg: '#f4842a', icon: I.rss,      desc: ['Validate, preview, and convert ', { t: 'RSS', s: 'rss' }, ' and Atom feeds, the open web’s syndication format.'] },
   email:    { label: 'Email',       bg: '#d63e1f', icon: I.mail,     desc: ['Check a ', { t: 'domain', s: 'domain' }, '’s email deliverability: SPF, DKIM, and DMARC.'] },
   network:  { label: 'Network',     bg: '#3478f6', icon: I.globe,    desc: ['Look up ', { t: 'DNS', s: 'dns' }, ' records and WHOIS data for any ', { t: 'domain', s: 'domain' }, '.'] },
 };
