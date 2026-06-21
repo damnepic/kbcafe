@@ -362,8 +362,8 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     /* phone: hide inline nav, center the brand; sidebar burger floats left, menu burger floats right */
     .nav-links{display:none}
     .site-nav{justify-content:center}
-    .sb-burger{position:absolute;left:0;top:50%;transform:translateY(-50%);margin:0;z-index:2}
-    .nav-burger{display:grid;position:absolute;right:0;top:50%;transform:translateY(-50%);margin:0;z-index:3}
+    .nav-burger{display:grid;position:absolute;left:16px;top:50%;transform:translateY(-50%);margin:0;z-index:3}
+    .sb-burger{position:absolute;right:16px;top:50%;transform:translateY(-50%);margin:0;z-index:2}
     /* open: the header nav becomes a full-width dropdown panel */
     .site-nav.menu-open .nav-links{display:flex;flex-direction:column;align-items:stretch;gap:2px;
       position:absolute;top:100%;left:0;right:0;z-index:60;background:var(--header);
