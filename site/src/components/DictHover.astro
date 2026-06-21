@@ -7,7 +7,7 @@ import { DICT } from '../data/dictionary.js';
 const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&ldquo;|&rdquo;/g, '"').replace(/&rsquo;|&lsquo;/g, "'").replace(/&amp;/g, '&').replace(/&[a-z]+;/g, '').replace(/\s+/g, ' ').trim();
 const MAP = Object.fromEntries(DICT.map((t) => [t.slug, { t: t.term, d: plain(t.answer) }]));
 ---
-<div id="kb-tip" class="kb-tip" hidden role="tooltip">
+<div id="kb-tip" class="kb-tip" role="tooltip" style="display:none">
   <span class="kb-tip-t"></span>
   <span class="kb-tip-d"></span>
 </div>
@@ -32,9 +32,9 @@ const MAP = Object.fromEntries(DICT.map((t) => [t.slug, { t: t.term, d: plain(t.
       var s = slugOf(a), e = s && MAP[s];
       if (!e) return;
       tEl.textContent = e.t; dEl.textContent = e.d;
-      tip.hidden = false; place(a);
+      tip.style.display = 'flex'; place(a);
     }
-    function hide() { clearTimeout(showTimer); showTimer = null; tip.hidden = true; }
+    function hide() { clearTimeout(showTimer); showTimer = null; tip.style.display = 'none'; }
     document.addEventListener('mouseover', function (e) {
       var a = e.target.closest && e.target.closest('a.kb-term[href*="/dictionary/"]');
       if (!a || a === hoverTerm) return;

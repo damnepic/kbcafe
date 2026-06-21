@@ -35,8 +35,15 @@ const schema = {
 
     <div class="dh-pop-wrap">
       <div class="dh-cat-h"><span class="dh-dot" style="background:var(--coral)"></span>Start here</div>
+      <div class="dh-filter">
+        <span class="dh-filter-l">or filter by</span>
+        <button class="dh-fpill on" type="button" data-filter="all">All</button>
+        {built.map((k) => (
+          <button class="dh-fpill" type="button" data-filter={k}><span class="dh-fdot" style={`background:${KIND_META[k].color}`}></span>{KIND_META[k].label} terms</button>
+        ))}
+      </div>
       <p class="dh-pop-sub">The words beginners get stuck on first. New to one? It is a 2-minute read.</p>
-      <div class="dh-grid">
+      <div class="dh-grid dh-pop-grid">
         {POPULAR.map(findTerm).filter(Boolean).map((e) => (
           <a class="dh-term dh-pop" href={`/dictionary/${e.slug}`} style={`--accent:${KIND_META[e.kind].color}`}>
             <span class="dh-t">{e.term}</span>
@@ -82,18 +89,44 @@ const schema = {
       var terms = Array.prototype.slice.call(document.querySelectorAll('.dh-cat .dh-term'));
       var cats = Array.prototype.slice.call(document.querySelectorAll('.dh-cat'));
       var pop = document.querySelector('.dh-pop-wrap');
+      var popGrid = document.querySelector('.dh-pop-grid');
+      var popSub = document.querySelector('.dh-pop-sub');
+      var fpills = Array.prototype.slice.call(document.querySelectorAll('.dh-fpill'));
+      function setActivePill(f) { fpills.forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-filter') === f); }); }
+
+      // category filter pills (a click clears any search and shows just that category)
+      function filterCat(f) {
+        q.value = ''; empty.hidden = true; setActivePill(f);
+        terms.forEach(function (t) { t.style.display = ''; });
+        if (f === 'all') {
+          if (popGrid) popGrid.style.display = ''; if (popSub) popSub.style.display = '';
+          cats.forEach(function (c) { c.style.display = ''; });
+        } else {
+          if (popGrid) popGrid.style.display = 'none'; if (popSub) popSub.style.display = 'none';
+          cats.forEach(function (c) { c.style.display = (c.getAttribute('data-cat') === f) ? '' : 'none'; });
+        }
+      }
+      fpills.forEach(function (p) { p.addEventListener('click', function () { filterCat(p.getAttribute('data-filter')); }); });
+
+      // search (overrides the category filter)
       q.addEventListener('input', function () {
         var v = q.value.trim().toLowerCase(); var any = false;
+        setActivePill('all');
+        if (!v) {
+          if (pop) pop.style.display = ''; if (popGrid) popGrid.style.display = ''; if (popSub) popSub.style.display = '';
+          terms.forEach(function (t) { t.style.display = ''; });
+          cats.forEach(function (c) { c.style.display = ''; });
+          empty.hidden = true; return;
+        }
+        if (pop) pop.style.display = 'none';
         terms.forEach(function (t) {
-          var hit = !v || t.getAttribute('data-name').indexOf(v) > -1;
+          var hit = t.getAttribute('data-name').indexOf(v) > -1;
           t.style.display = hit ? '' : 'none'; if (hit) any = true;
         });
         cats.forEach(function (c) {
-          var visible = c.querySelectorAll('.dh-term:not([style*="none"])').length;
-          c.style.display = visible ? '' : 'none';
+          c.style.display = c.querySelectorAll('.dh-term:not([style*="none"])').length ? '' : 'none';
         });
-        if (pop) pop.style.display = v ? 'none' : '';
-        empty.hidden = any || !v;
+        empty.hidden = any;
       });
     })();
   </script>
@@ -111,6 +144,12 @@ const schema = {
   .dh-empty a{color:var(--coral);font-weight:600;text-decoration:none}
   .dh-pop-wrap{margin-top:30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
   .dh-pop-sub{font-size:13.5px;color:var(--ink-soft);margin:2px 0 13px}
+  .dh-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 14px}
+  .dh-filter-l{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--ink-soft);margin-right:2px}
+  .dh-fpill{display:inline-flex;align-items:center;gap:7px;border:1.3px solid var(--line);background:var(--cream);color:var(--ink-soft);border-radius:999px;padding:6px 13px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;transition:border-color .14s,color .14s,background .14s}
+  .dh-fpill:hover{border-color:var(--ink);color:var(--ink)}
+  .dh-fpill.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .dh-fdot{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
   .dh-pop{border-color:rgba(238,75,43,.28)}
   .dh-cat{margin-top:30px}
   .dh-cat-h{font-family:var(--font-display);font-weight:800;font-size:18px;display:flex;align-items:center;gap:9px;margin-bottom:13px}
