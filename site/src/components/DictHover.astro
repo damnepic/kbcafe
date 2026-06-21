@@ -1,8 +1,8 @@
 ---
 // Hover-preview for dictionary term links. Include <DictHover /> on any page that has
-// .kb-term links (learning paths, explainers). Hovering/focusing a term shows its one-line
-// definition in a shared tooltip; clicking still opens the full entry. Single source: the
-// definition map is generated from the dictionary data, so it never drifts.
+// .kb-term links (learning paths, explainers). Resting on a term for 1.5s shows its one-line
+// definition; it vanishes the instant you leave the word (or click elsewhere). Clicking the
+// underlined term still opens the full entry. The map is generated from the dictionary data.
 import { DICT } from '../data/dictionary.js';
 const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&ldquo;|&rdquo;/g, '"').replace(/&rsquo;|&lsquo;/g, "'").replace(/&amp;/g, '&').replace(/&[a-z]+;/g, '').replace(/\s+/g, ' ').trim();
 const MAP = Object.fromEntries(DICT.map((t) => [t.slug, { t: t.term, d: plain(t.answer) }]));
@@ -18,16 +18,9 @@ const MAP = Object.fromEntries(DICT.map((t) => [t.slug, { t: t.term, d: plain(t.
     var tip = document.getElementById('kb-tip');
     if (!tip) return;
     var tEl = tip.querySelector('.kb-tip-t'), dEl = tip.querySelector('.kb-tip-d');
-    var cur = null, curHref = null, lastMove = 0, suppressUntil = 0, hideTimer = null;
-    document.addEventListener('mousemove', function () { lastMove = Date.now(); }, { passive: true });
+    var hoverTerm = null, showTimer = null, suppressUntil = 0;
     function slugOf(a) { var m = (a.getAttribute('href') || '').match(/\/dictionary\/([^\/?#]+)/); return m ? m[1] : null; }
-    function show(a) {
-      var s = slugOf(a), e = s && MAP[s];
-      if (!e) return;
-      clearTimeout(hideTimer);
-      tEl.textContent = e.t; dEl.textContent = e.d;
-      curHref = a.getAttribute('href'); cur = a;
-      tip.hidden = false;
+    function place(a) {
       var r = a.getBoundingClientRect(), tr = tip.getBoundingClientRect();
       var top = r.top - tr.height - 9;
       if (top < 8) top = r.bottom + 9;                    // flip below if no room above
@@ -36,42 +29,45 @@ const MAP = Object.fromEntries(DICT.map((t) => [t.slug, { t: t.term, d: plain(t.
       tip.style.top = (top + window.scrollY) + 'px';
       tip.style.left = (left + window.scrollX) + 'px';
     }
-    function hide() { clearTimeout(hideTimer); tip.hidden = true; cur = null; curHref = null; }
-    function hideSoon() { clearTimeout(hideTimer); hideTimer = setTimeout(hide, 160); }
+    function show(a) {
+      var s = slugOf(a), e = s && MAP[s];
+      if (!e) return;
+      tEl.textContent = e.t; dEl.textContent = e.d;
+      tip.hidden = false; place(a);
+    }
+    function hide() { clearTimeout(showTimer); showTimer = null; tip.hidden = true; }
     document.addEventListener('mouseover', function (e) {
       var a = e.target.closest && e.target.closest('a.kb-term[href*="/dictionary/"]');
-      // intentional hover only: the pointer must have just moved (a term scrolling under a
-      // stationary cursor fires mouseover with no mousemove) and not be mid/just-post scroll.
-      if (a && a !== cur && Date.now() - lastMove < 120 && Date.now() >= suppressUntil) show(a);
+      if (!a || a === hoverTerm) return;
+      hoverTerm = a; clearTimeout(showTimer);
+      if (Date.now() < suppressUntil) return;
+      showTimer = setTimeout(function () { if (hoverTerm === a) show(a); }, 1500);   // appears only after 1.5s of hover
     });
     document.addEventListener('mouseout', function (e) {
       var a = e.target.closest && e.target.closest('a.kb-term');
       if (!a) return;
       var to = e.relatedTarget;
-      if (to && to.closest && (to.closest('a.kb-term') || to.closest('#kb-tip'))) return;
-      hideSoon();   // delay so the cursor can travel onto the now-clickable tooltip
+      if (to && to.closest && to.closest('a.kb-term') === a) return;   // still inside the same term
+      hoverTerm = null; hide();                                        // left the word: vanish instantly
     });
-    // keep the tooltip up while the pointer is on it, and let a click open the full entry
-    tip.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
-    tip.addEventListener('mouseleave', hide);
-    tip.addEventListener('click', function () { if (curHref) window.location.href = curHref; });
     document.addEventListener('focusin', function (e) {
       var a = e.target.closest && e.target.closest('a.kb-term[href*="/dictionary/"]');
-      if (a) show(a);
+      if (a) { hoverTerm = a; show(a); }     // keyboard focus shows it right away (accessibility)
     });
-    document.addEventListener('focusout', hide);
-    window.addEventListener('scroll', function () { hide(); suppressUntil = Date.now() + 200; }, { passive: true });
+    document.addEventListener('focusout', function () { hoverTerm = null; hide(); });
+    // safeguard: a click/tap anywhere that is not a term dismisses it (the term's own click still navigates)
+    document.addEventListener('mousedown', function (e) {
+      if (!(e.target.closest && e.target.closest('a.kb-term'))) { hoverTerm = null; hide(); }
+    });
+    window.addEventListener('scroll', function () { hoverTerm = null; hide(); suppressUntil = Date.now() + 400; }, { passive: true });
   })();
 </script>
 
 <style is:global>
   .kb-tip{position:absolute;z-index:200;max-width:280px;display:flex;flex-direction:column;gap:5px;
     background:#15120e;color:#e9e2d4;border-radius:11px;padding:11px 13px;
-    box-shadow:0 14px 34px rgba(20,12,4,.3);font-family:var(--font-body);cursor:pointer;
-    border:1px solid transparent;transition:border-color .14s,background .14s}
-  .kb-tip:hover{background:#1c1813;border-color:rgba(244,180,35,.45)}
+    box-shadow:0 14px 34px rgba(20,12,4,.3);font-family:var(--font-body);pointer-events:none}
   .kb-tip-t{font-family:var(--font-display);font-weight:800;font-size:13.5px;color:#fff}
   .kb-tip-d{font-size:12.5px;line-height:1.45;color:#d7cfc0}
   .kb-tip-go{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:var(--gold);letter-spacing:.03em}
-  .kb-tip:hover .kb-tip-go{color:#ffd25e}
 </style>
