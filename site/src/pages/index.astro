@@ -175,6 +175,7 @@ const UI_ICONS = {
       <h2 class="db-h">Stuck on a term?<br><span class="db-h-grad">Look it up.</span></h2>
       <p class="db-desc">The Plain-English Tech Dictionary: {dictCount} AI, coding, and vibe-coding terms explained in one sentence, with an example and a next step.</p>
       <a class="db-btn" href="/dictionary"><span class="db-btn-ic" set:html={UI_ICONS.book} /> Browse all {dictCount} terms <span class="db-btn-ar" aria-hidden="true">→</span></a>
+      <a class="db-beginner" href="/beginner-ai">Brand new to AI? Start with the beginner guides <span aria-hidden="true">→</span></a>
       <div class="db-feats">
         <div class="db-feat"><span class="db-feat-ic" set:html={UI_ICONS.zap} /><div class="db-feat-t"><b>Plain English</b><small>No jargon</small></div></div>
         <span class="db-feat-dv"></span>
@@ -182,7 +183,6 @@ const UI_ICONS = {
         <span class="db-feat-dv"></span>
         <div class="db-feat"><span class="db-feat-ic" set:html={UI_ICONS.rocket} /><div class="db-feat-t"><b>Next Step</b><small>Keep learning</small></div></div>
       </div>
-      <a class="db-beginner" href="/beginner-ai">Brand new to AI? Start with the beginner guides <span aria-hidden="true">&rarr;</span></a>
     </div>
     <div class="db-right">
       <div class="db-grid">
@@ -365,26 +365,27 @@ const UI_ICONS = {
   .triage-sec .o-grid{margin-top:22px}
 
   /* ===== REDESIGN: dictionary band ===== */
-  .dict-band{max-width:1120px;margin:46px auto 0;background:linear-gradient(140deg,#2a211a,#342920);border-radius:22px;padding:36px;color:#fff;display:grid;grid-template-columns:0.82fr 1.18fr;gap:34px;align-items:center}
-  /* left panel */
+  .dict-band{max-width:1120px;margin:46px auto 0;background:linear-gradient(140deg,#2a211a,#342920);border-radius:22px;padding:36px;color:#fff;display:grid;grid-template-columns:0.82fr 1.18fr;gap:34px;align-items:stretch}
+  /* left panel: top-aligned content, feature row pinned to the bottom so it lines up with the card grid's bottom row */
+  .db-l{display:flex;flex-direction:column;align-items:flex-start}
   .db-eye{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(244,180,35,.4);border-radius:999px;padding:6px 13px}
-  .db-h{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,3.3vw,42px);letter-spacing:-.03em;line-height:1.02;margin:18px 0 0;color:#fff}
+  .db-h{align-self:stretch;font-family:var(--font-display);font-weight:800;font-size:clamp(30px,3.3vw,42px);letter-spacing:-.03em;line-height:1.02;margin:14px 0 0;color:#fff}
   .db-h-grad{background:linear-gradient(100deg,#ff8a5c,#ee4b2b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-  .db-desc{color:rgba(255,255,255,.72);font-size:15px;line-height:1.55;margin:16px 0 0;max-width:400px}
+  .db-desc{align-self:stretch;color:rgba(255,255,255,.72);font-size:15px;line-height:1.55;margin:13px 0 0;max-width:400px}
   .db-btn{display:inline-flex;align-items:center;gap:9px;margin-top:22px;background:#fff;color:var(--ink);font-family:var(--font-display);font-weight:800;font-size:14.5px;border-radius:13px;padding:13px 20px;text-decoration:none;box-shadow:0 0 0 3px rgba(238,75,43,.18),0 12px 28px rgba(238,75,43,.2);transition:transform .15s,box-shadow .15s}
   .db-btn:hover{transform:translateY(-2px);box-shadow:0 0 0 3px rgba(238,75,43,.26),0 16px 34px rgba(238,75,43,.26)}
   .db-btn-ic{display:grid;place-items:center;color:var(--coral)}
   .db-btn-ic svg{width:18px;height:18px}
   .db-btn-ar{transition:transform .15s}
   .db-btn:hover .db-btn-ar{transform:translateX(3px)}
-  .db-feats{display:flex;align-items:center;gap:11px;margin-top:24px;flex-wrap:nowrap}
+  .db-feats{display:flex;align-items:center;gap:11px;margin-top:auto;flex-wrap:nowrap}
   .db-feat{display:flex;align-items:center;gap:7px}
   .db-feat-ic{flex:0 0 auto;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:rgba(238,75,43,.16);color:var(--coral)}
   .db-feat-ic svg{width:14px;height:14px}
   .db-feat-t b{display:block;font-family:var(--font-display);font-weight:700;font-size:11.5px;color:#fff;line-height:1.15;white-space:nowrap}
   .db-feat-t small{font-size:9.5px;color:rgba(255,255,255,.55);white-space:nowrap}
   .db-feat-dv{flex:0 0 auto;width:1px;height:24px;background:rgba(255,255,255,.14)}
-  .db-beginner{display:inline-block;margin-top:18px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--gold);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .14s}
+  .db-beginner{display:inline-block;margin-top:14px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--gold);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .14s}
   .db-beginner:hover{border-color:rgba(244,180,35,.6)}
   /* right card grid */
   .db-right{display:flex;flex-direction:column;gap:10px}
@@ -424,7 +425,7 @@ const UI_ICONS = {
 
   @media(max-width:880px){.dict-band{grid-template-columns:1fr}
     .db-grid{grid-template-columns:repeat(2,1fr)}.db-feat-card{grid-column:1 / 3;grid-row:auto}
-    .db-feats{flex-wrap:wrap;gap:14px}}
+    .db-feats{flex-wrap:wrap;gap:14px;margin-top:24px}}
 
   /* HERO (outcome-first, centered intro) */
   .hero-o{margin:40px 0 0;text-align:center}
