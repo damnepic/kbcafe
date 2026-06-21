@@ -16,7 +16,16 @@ import { REFERENCE } from '../data/reference.js';
       <a href="/#menu">tools</a>.
     </p>
 
-    <div style="display:flex;align-items:center;gap:14px;margin:2px 0 24px;padding:16px 20px;border:1.4px solid var(--line);border-radius:16px;background:var(--cream)"><span style="font-size:25px;line-height:1;flex:0 0 auto">&#128214;</span><span style="flex:1;font-size:14.5px;line-height:1.5;color:var(--ink-soft)"><b style="color:var(--ink)">New to these terms?</b> Start with the <a href="/dictionary" style="color:var(--coral);font-weight:800;text-decoration:none">Plain-English Tech Dictionary</a> for quick, beginner definitions of the words in these guides.</span><span style="display:flex;flex-direction:column;gap:7px;flex:0 0 auto;align-items:flex-end"><a href="/dictionary" style="font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--coral);white-space:nowrap;text-decoration:none">Open &rarr;</a><a href="/beginner-ai" style="font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:#3478f6;white-space:nowrap;text-decoration:none">or check our Beginner&rsquo;s Guide &rarr;</a></span></div>
+    <div class="ref-pills">
+      <a class="ref-pill" href="/dictionary">
+        <span class="ref-pill-ic">&#128214;</span>
+        <span class="ref-pill-b"><b>New to a term?</b><small>The Plain-English Tech Dictionary defines every word in these guides, in one sentence.</small><span class="ref-pill-go">Open the dictionary &rarr;</span></span>
+      </a>
+      <a class="ref-pill ref-pill-blue" href="/beginner-ai">
+        <span class="ref-pill-ic">&#10024;</span>
+        <span class="ref-pill-b"><b>New to AI entirely?</b><small>Our Beginner&rsquo;s Guide starts from zero, no jargon, just plain language.</small><span class="ref-pill-go">Start learning &rarr;</span></span>
+      </a>
+    </div>
 
     <div class="grid">
       {REFERENCE.map(r => (
@@ -43,6 +52,18 @@ import { REFERENCE } from '../data/reference.js';
 </Layout>
 
 <style>
+  /* "new here?" pills: dictionary (coral) + Beginner's Guide (blue), side by side, stacking on mobile */
+  .ref-pills{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:2px 0 24px}
+  .ref-pill{display:flex;gap:13px;align-items:flex-start;padding:16px 18px;border:1.4px solid var(--line);border-radius:16px;background:var(--cream);text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s}
+  .ref-pill:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(40,30,12,.08);border-color:var(--coral)}
+  .ref-pill-ic{font-size:24px;line-height:1.1;flex:0 0 auto}
+  .ref-pill-b{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .ref-pill-b b{font-family:var(--font-display);font-weight:800;font-size:15.5px;color:var(--ink)}
+  .ref-pill-b small{font-size:13px;color:var(--ink-soft);line-height:1.45}
+  .ref-pill-go{font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--coral);margin-top:5px}
+  .ref-pill-blue:hover{border-color:#3478f6}
+  .ref-pill-blue .ref-pill-go{color:#3478f6}
+  @media(max-width:680px){.ref-pills{grid-template-columns:1fr}}
   .ref-hub{padding:40px 0 20px;max-width:860px}
   .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:18px}
   h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(38px,6vw,64px)}
