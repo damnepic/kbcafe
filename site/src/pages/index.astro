@@ -171,11 +171,10 @@ const UI_ICONS = {
   <!-- DICTIONARY band (the vocabulary layer) -->
   <section class="dict-band">
     <div class="db-l">
-      <span class="db-eye"><span class="db-eye-spark">✦</span> New here?</span>
+      <a class="db-eye" href="/beginner-ai"><span class="db-eye-spark">✦</span> New here?</a>
       <h2 class="db-h">Stuck on a term?<br><span class="db-h-grad">Look it up.</span></h2>
       <p class="db-desc">The Plain-English Tech Dictionary: {dictCount} AI, coding, and vibe-coding terms explained in one sentence, with an example and a next step.</p>
       <a class="db-btn" href="/dictionary"><span class="db-btn-ic" set:html={UI_ICONS.book} /> Browse all {dictCount} terms <span class="db-btn-ar" aria-hidden="true">→</span></a>
-      <a class="db-beginner" href="/beginner-ai">Brand new to AI? Start with the beginner guides <span aria-hidden="true">→</span></a>
       <div class="db-feats">
         <div class="db-feat"><span class="db-feat-ic" set:html={UI_ICONS.zap} /><div class="db-feat-t"><b>Plain English</b><small>No jargon</small></div></div>
         <span class="db-feat-dv"></span>
@@ -216,6 +215,7 @@ const UI_ICONS = {
           </a>
         ))}
       </div>
+      <a class="db-beginner" href="/beginner-ai">Brand new to AI? Start with the beginner guides <span aria-hidden="true">→</span></a>
     </div>
   </section>
 
@@ -368,7 +368,8 @@ const UI_ICONS = {
   .dict-band{max-width:1120px;margin:46px auto 0;background:linear-gradient(140deg,#2a211a,#342920);border-radius:22px;padding:36px;color:#fff;display:grid;grid-template-columns:0.82fr 1.18fr;gap:34px;align-items:stretch}
   /* left panel: top-aligned content, feature row pinned to the bottom so it lines up with the card grid's bottom row */
   .db-l{display:flex;flex-direction:column;align-items:flex-start}
-  .db-eye{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(244,180,35,.4);border-radius:999px;padding:6px 13px}
+  .db-eye{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(244,180,35,.4);border-radius:999px;padding:6px 13px;text-decoration:none;transition:border-color .14s,background .14s}
+  .db-eye:hover{border-color:var(--gold);background:rgba(244,180,35,.1)}
   .db-h{align-self:stretch;font-family:var(--font-display);font-weight:800;font-size:clamp(30px,3.3vw,42px);letter-spacing:-.03em;line-height:1.02;margin:14px 0 0;color:#fff}
   .db-h-grad{background:linear-gradient(100deg,#ff8a5c,#ee4b2b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
   .db-desc{align-self:stretch;color:rgba(255,255,255,.72);font-size:15px;line-height:1.55;margin:13px 0 0;max-width:400px}
@@ -385,7 +386,7 @@ const UI_ICONS = {
   .db-feat-t b{display:block;font-family:var(--font-display);font-weight:700;font-size:11.5px;color:#fff;line-height:1.15;white-space:nowrap}
   .db-feat-t small{font-size:9.5px;color:rgba(255,255,255,.55);white-space:nowrap}
   .db-feat-dv{flex:0 0 auto;width:1px;height:24px;background:rgba(255,255,255,.14)}
-  .db-beginner{display:inline-block;margin-top:14px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--gold);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .14s}
+  .db-beginner{align-self:flex-start;margin-top:2px;font-family:var(--font-mono);font-size:13.75px;font-weight:700;color:var(--gold);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .14s}
   .db-beginner:hover{border-color:rgba(244,180,35,.6)}
   /* right card grid */
   .db-right{display:flex;flex-direction:column;gap:10px}
