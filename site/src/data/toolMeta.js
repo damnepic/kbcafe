@@ -27,5 +27,25 @@ export const CAT_META = {
 // display order for grouped views
 export const CAT_ORDER = ['ai', 'json', 'encoding', 'convert', 'text', 'time', 'feeds', 'email', 'network'];
 
+// AI is 27 tools, so it gets sub-clusters (used by the /tools "smart rail" + grouped view)
+export const AI_SUB_META = {
+  prompting: { label: 'Prompting' },
+  models:    { label: 'Models & cost' },
+  agents:    { label: 'Agents & MCP' },
+  build:     { label: 'Build & ship' },
+};
+export const AI_SUB_ORDER = ['prompting', 'models', 'agents', 'build'];
+export const AI_SUB = {
+  '/prompt-optimizer': 'prompting', '/prompt-builder': 'prompting', '/prompt-linter': 'prompting',
+  '/prompt-diff': 'prompting', '/prompt-simulator': 'prompting', '/prompt-x-ray': 'prompting', '/good-vs-bad-prompts': 'prompting',
+  '/token-counter': 'models', '/context-window-visualizer': 'models', '/context-budget-analyzer': 'models',
+  '/llm-vram-calculator': 'models', '/llm-cost-calculator': 'models', '/ai-profit-calculator': 'models',
+  '/mcp-config-generator': 'agents', '/mcp-inspector': 'agents', '/ai-pattern-explorer': 'agents',
+  '/ai-pattern-builder': 'agents', '/agent-memory-simulator': 'agents', '/tool-call-visualizer': 'agents',
+  '/structured-output-builder': 'build', '/rag-chunking-visualizer': 'build', '/embedding-explorer': 'build',
+  '/ai-stack-explainer': 'build', '/ai-architecture-generator': 'build', '/claim-checker': 'build',
+  '/scope-sorter': 'build', '/launch-rubric': 'build',
+};
+
 // tools that get a "New" badge
 export const NEW_TOOLS = ['/mcp-inspector', '/ai-profit-calculator', '/prompt-optimizer', '/whois-lookup', '/dns-lookup', '/email-deliverability-checker', '/token-counter', '/context-budget-analyzer', '/rag-chunking-visualizer', '/mcp-config-generator', '/prompt-linter', '/prompt-diff', '/llm-vram-calculator', '/llm-cost-calculator', '/agent-memory-simulator', '/ai-pattern-builder', '/ai-stack-explainer', '/tool-call-visualizer', '/prompt-x-ray', '/embedding-explorer', '/claim-checker', '/scope-sorter', '/launch-rubric', '/ai-architecture-generator', '/prompt-simulator', '/prompt-builder', '/good-vs-bad-prompts'];
