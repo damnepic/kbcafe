@@ -69,6 +69,8 @@ const items = ORDER.map((k) => ({ key: k, ...BTN[k] }));
   .share-copy span{font-size:13px;color:var(--ink-soft)}
   .share-copy span b{font-weight:800;color:var(--ink)}
   .share-label{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  /* in lead mode the label is sized to sit at the same height as the (larger) share buttons */
+  .share.has-lead .share-label{font-size:20px;line-height:1;height:44px;display:inline-flex;align-items:center}
   .share-btns{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .sh{display:grid;place-items:center;border:1.5px solid var(--line);border-radius:11px;background:var(--paper);color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:transform .12s,border-color .12s,color .12s,background .12s}
   .share.prominent .sh{width:42px;height:42px}
