@@ -68,6 +68,7 @@ const isNew = (t) => NEW_TOOLS.includes(t.href);
           {groups.map(g => g.cat === 'ai' ? (
             <section class="cat-sec" data-cat="ai">
               <div class="cat-head"><span class="cat-ic" style={`background:${g.meta.bg}`} set:html={g.meta.icon} /><h2>AI</h2><span class="cat-n">{g.items.length}</span></div>
+              <p class="cat-desc">{g.meta.desc.map(seg => typeof seg === 'string' ? seg : (<a class="cd-link" href={`/dictionary/${seg.s}`}>{seg.t}</a>))}</p>
               {AI_SUB_ORDER.map(sub => (
                 <div class="ai-sub" data-sub={sub}>
                   <div class="ai-sub-h"><span class="ai-sub-dot" style={`background:${g.meta.bg}`}></span>{AI_SUB_META[sub].label}<span class="ai-sub-n">{aiSub(sub).length}</span></div>
@@ -85,6 +86,7 @@ const isNew = (t) => NEW_TOOLS.includes(t.href);
           ) : (
             <section class="cat-sec" data-cat={g.cat}>
               <div class="cat-head"><span class="cat-ic" style={`background:${g.meta.bg}`} set:html={g.meta.icon} /><h2>{g.meta.label}</h2><span class="cat-n">{g.items.length}</span></div>
+              <p class="cat-desc">{g.meta.desc.map(seg => typeof seg === 'string' ? seg : (<a class="cd-link" href={`/dictionary/${seg.s}`}>{seg.t}</a>))}</p>
               <div class="cat-grid">
                 {g.items.map(t => (
                   <a class="t-card" href={t.href} data-cat={g.cat} data-q={qOf(t)}>
@@ -238,6 +240,10 @@ const isNew = (t) => NEW_TOOLS.includes(t.href);
   .cat-ic svg{width:18px;height:18px}
   .cat-head h2{font-family:var(--font-display);font-weight:800;font-size:21px;letter-spacing:-.02em;margin:0}
   .cat-n{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);background:var(--paper-2);border-radius:999px;padding:3px 10px}
+  /* one-line category definition + contextual dictionary interlinks */
+  .cat-desc{margin:-4px 0 16px;font-size:13.5px;line-height:1.5;color:var(--ink-soft);max-width:660px}
+  .cat-desc .cd-link{color:var(--coral);text-decoration:none;border-bottom:1px solid rgba(238,75,43,.32)}
+  .cat-desc .cd-link:hover{border-bottom-color:var(--coral)}
   .ai-sub{margin-bottom:22px}
   .ai-sub:last-child{margin-bottom:0}
   .ai-sub-h{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px}

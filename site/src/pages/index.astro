@@ -254,7 +254,7 @@ const UI_ICONS = {
     </div>
   </section>
 
-  <!-- AI TOOLKIT — mirrors the /tools page clustering -->
+  <!-- AI TOOLKIT: mirrors the /tools page clustering -->
   <section class="home-sec aitk">
     <div class="sec-head">
       <div class="sec-title">
@@ -265,12 +265,12 @@ const UI_ICONS = {
     </div>
     <div class="aitk-grid">
       {aiClusters.map(c => (
-        <a class="aitk-card" href={`/tools?cat=ai:${c.sub}`}>
+        <div class="aitk-card">
           <div class="aitk-top"><span class="aitk-ic" set:html={c.icon} /><span class="aitk-n">{c.items.length} tools</span></div>
           <h3 class="aitk-label">{c.label}</h3>
-          <ul class="aitk-list">{c.items.slice(0, 3).map(t => <li>{t.nm}</li>)}</ul>
-          <span class="aitk-go">Open {c.label} <span aria-hidden="true">→</span></span>
-        </a>
+          <ul class="aitk-list">{c.items.slice(0, 3).map(t => <li><a href={t.href}>{t.nm}</a></li>)}</ul>
+          <a class="aitk-go" href={`/tools?cat=ai:${c.sub}`}>See all {c.items.length} <span aria-hidden="true">→</span></a>
+        </div>
       ))}
     </div>
   </section>
@@ -689,20 +689,22 @@ const UI_ICONS = {
   .feat p{font-size:14px;color:var(--ink-soft);line-height:1.5;margin:0 0 16px}
   .feat-go{margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--coral);display:inline-flex;align-items:center;gap:6px}
 
-  /* AI TOOLKIT — 4 cluster cards mirroring /tools (responsive 4 -> 2 -> 1) */
+  /* AI TOOLKIT: 4 cluster cards mirroring /tools (responsive 4 -> 2 -> 1) */
   .aitk{margin-top:36px}
   .aitk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-  .aitk-card{display:flex;flex-direction:column;background:var(--cream);border:1.2px solid var(--line);border-top:3px solid #7657ff;border-radius:16px;padding:16px;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s}
-  .aitk-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(40,24,12,.09);border-color:#7657ff}
+  .aitk-card{display:flex;flex-direction:column;background:var(--cream);border:1.2px solid var(--line);border-top:3px solid #7657ff;border-radius:16px;padding:16px;box-shadow:0 6px 18px rgba(40,24,12,.04)}
   .aitk-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
   .aitk-ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#7657ff;color:#fff}
   .aitk-ic svg{width:19px;height:19px}
   .aitk-n{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:#6a4cf0;background:rgba(118,87,255,.12);border-radius:999px;padding:3px 9px}
   .aitk-label{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:-.02em;margin:0 0 10px;line-height:1.15}
-  .aitk-list{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:6px}
-  .aitk-list li{font-size:12.5px;color:var(--ink-soft);line-height:1.3;position:relative;padding-left:14px}
-  .aitk-list li::before{content:"";position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;background:#7657ff;opacity:.55}
-  .aitk-go{margin-top:auto;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#6a4cf0;display:inline-flex;align-items:center;gap:5px}
+  .aitk-list{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:7px}
+  .aitk-list li{position:relative;padding-left:14px}
+  .aitk-list li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#7657ff;opacity:.55}
+  .aitk-list li a{font-size:12.5px;color:var(--ink-soft);line-height:1.3;text-decoration:none;transition:color .12s}
+  .aitk-list li a:hover{color:#6a4cf0}
+  .aitk-go{margin-top:auto;font-family:var(--font-mono);font-size:12px;font-weight:700;color:#6a4cf0;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+  .aitk-go:hover{color:#7657ff;text-decoration:underline}
   @media(max-width:860px){.aitk-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:520px){.aitk-grid{grid-template-columns:1fr}}
 
