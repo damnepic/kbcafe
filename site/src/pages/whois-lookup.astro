@@ -132,3 +132,38 @@ Two honest limits: registrant <strong>personal contact data is redacted</strong>
   })();
   </script>
 </ToolPage>
+
+<!-- styles restored 2026-06-21 (lost in the 06-20 dist recovery). is:global because the results are innerHTML-built. -->
+<style is:global>
+  .wl{max-width:680px}
+  .wl-form{margin:0}
+  .wl-inputs{display:flex;gap:10px;align-items:stretch;margin-bottom:14px}
+  .wl-domain{flex:1;min-width:0;height:52px;border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:0 18px;font-family:var(--font-body);font-size:16px;color:var(--ink);outline:0;transition:border-color .15s,box-shadow .15s}
+  .wl-domain:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(238,75,43,.1)}
+  .wl-domain::placeholder{color:#a99e90}
+  .wl-go.btn{flex:0 0 auto;height:52px;display:inline-flex;align-items:center;justify-content:center;border-radius:14px;padding:0 26px;font-size:15px}
+  .wl-samples{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .wl-samples-lbl{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+
+  .wl-results{margin-top:24px}
+  .wl-card{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);overflow:hidden}
+  .wl-for{font-family:var(--font-mono);font-weight:700;font-size:15px;color:var(--ink);padding:14px 18px;border-bottom:1px solid var(--line);background:var(--paper-2)}
+  .wl-card .wl-row{display:flex;gap:16px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--line)}
+  .wl-card .wl-row:last-child{border-bottom:0}
+  .wl-row-block{flex-direction:column;gap:9px;align-items:stretch}
+  .wl-k{font-family:var(--font-mono);font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);flex:0 0 130px}
+  .wl-v{font-size:14.5px;color:var(--ink);min-width:0;word-break:break-word}
+  .wl-flag{display:inline-flex;align-items:center;margin-left:8px;padding:2px 9px;border-radius:999px;font-family:var(--font-mono);font-size:11px;font-weight:700}
+  .wl-flag.ok{background:#dcf3ee;color:#0c7a5f}
+  .wl-flag.warn{background:#fff0d6;color:#a86a12}
+  .wl-flag.bad{background:#ffe0da;color:var(--coral-deep)}
+  .wl-status{display:flex;flex-wrap:wrap;gap:7px}
+  .wl-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:var(--paper-2);border:1px solid var(--line);font-family:var(--font-mono);font-size:12px;color:var(--ink)}
+  .wl-chip em{font-style:normal;color:var(--ink-soft);font-size:11.5px}
+  .wl-ns{display:flex;flex-wrap:wrap;gap:8px}
+  .wl-ns code{font-family:var(--font-mono);font-size:12.5px;background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--ink)}
+  .wl-note{margin:14px 2px 0;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
+  .wl-loading,.wl-empty,.wl-err{padding:16px 18px;border:1.5px solid var(--line);border-radius:14px;background:var(--cream);font-size:14.5px;color:var(--ink-soft)}
+  .wl-err{border-color:rgba(238,75,43,.3)}
+  @media(max-width:520px){.wl-inputs{flex-wrap:wrap}.wl-domain{flex:1 1 100%}.wl-go.btn{flex:1 1 100%}.wl-card .wl-row{flex-direction:column;gap:5px}.wl-k{flex-basis:auto}}
+</style>

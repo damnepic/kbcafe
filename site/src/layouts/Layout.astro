@@ -148,6 +148,9 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
         </form>
       </div>
     </div>
+    <button class="nav-burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="nb-bars" d="M4 7h16M4 12h16M4 17h16"/><path class="nb-x" d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
 </nav>
 
 <div class={sidebar ? "wrap wrap-sb" : "wrap"}>
@@ -205,6 +208,18 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     document.addEventListener('keydown', function (e) {
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); open(); }
     });
+  })();
+
+  // Mobile menu: hamburger toggles the header nav into a dropdown panel.
+  (function () {
+    var nav = document.querySelector('.site-nav'), burger = document.getElementById('nav-burger');
+    if (!nav || !burger) return;
+    function setOpen(o) { nav.classList.toggle('menu-open', o); burger.setAttribute('aria-expanded', o ? 'true' : 'false'); }
+    burger.addEventListener('click', function (e) { e.stopPropagation(); setOpen(!nav.classList.contains('menu-open')); });
+    Array.prototype.forEach.call(nav.querySelectorAll('.nav-links a'), function (a) { a.addEventListener('click', function () { setOpen(false); }); });
+    document.addEventListener('click', function (e) { if (nav.classList.contains('menu-open') && !nav.contains(e.target)) setOpen(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+    window.addEventListener('resize', function () { if (window.innerWidth > 520) setOpen(false); });
   })();
 </script>
 </body>
@@ -266,6 +281,12 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   .nav-links a:hover{color:var(--ink)}
   .nav-links a.on{color:var(--ink);font-weight:700}
   .nav-links a.on::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:2.5px;border-radius:2px;background:var(--coral)}
+  /* mobile menu hamburger (reveals the header nav on phones) */
+  .nav-burger{display:none;place-items:center;width:38px;height:38px;border-radius:10px;border:1.2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+  .nav-burger svg{width:22px;height:22px}
+  .nav-burger .nb-x{display:none}
+  .site-nav.menu-open .nav-burger .nb-bars{display:none}
+  .site-nav.menu-open .nav-burger .nb-x{display:block}
   /* search: magnifier by default; ⌘K box on Mac; expands to an inline bar */
   .nav-search{position:relative;display:flex;align-items:center}
   .ns-toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;background:none;border:0;color:var(--ink-soft);padding:6px;border-radius:10px;transition:color .15s,border-color .15s}
@@ -338,9 +359,21 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
 
   @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
   @media(max-width:520px){
-    /* phone: hide inline nav, center the brand; burger floats left out of flow so the logo is truly centered */
+    /* phone: hide inline nav, center the brand; sidebar burger floats left, menu burger floats right */
     .nav-links{display:none}
     .site-nav{justify-content:center}
     .sb-burger{position:absolute;left:0;top:50%;transform:translateY(-50%);margin:0;z-index:2}
+    .nav-burger{display:grid;position:absolute;right:0;top:50%;transform:translateY(-50%);margin:0;z-index:3}
+    /* open: the header nav becomes a full-width dropdown panel */
+    .site-nav.menu-open .nav-links{display:flex;flex-direction:column;align-items:stretch;gap:2px;
+      position:absolute;top:100%;left:0;right:0;z-index:60;background:var(--header);
+      border-bottom:1px solid var(--line);padding:8px 16px 16px;box-shadow:0 16px 34px rgba(20,16,12,.16);animation:rise .18s ease}
+    .site-nav.menu-open .nav-links a{padding:13px 12px;font-size:16px;font-weight:600;border-radius:10px;color:var(--ink)}
+    .site-nav.menu-open .nav-links a.on{background:rgba(238,75,43,.08)}
+    .site-nav.menu-open .nav-links a.on::after{display:none}
+    .site-nav.menu-open .nav-search{display:block;margin-top:8px}
+    .site-nav.menu-open .nav-search .ns-toggle{display:none}
+    .site-nav.menu-open .nav-search .ns-form{display:flex;width:100%}
+    .site-nav.menu-open .nav-search .ns-form input{width:100%;max-width:none;flex:1}
   }
 </style>
