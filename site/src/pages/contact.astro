@@ -27,6 +27,8 @@ import Layout from '../layouts/Layout.astro';
     (function () {
       var f = document.getElementById('ctForm'), st = document.getElementById('ctStatus');
       if (!f) return;
+      // assembled at runtime so the literal address never sits in the page source for scrapers
+      var ADDR = 'combo' + 'ventures' + String.fromCharCode(64) + 'gmail' + '.' + 'com';
       function show(cls, msg) { st.hidden = false; st.className = 'ct-status' + (cls ? ' ' + cls : ''); st.textContent = msg; }
       f.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -36,8 +38,8 @@ import Layout from '../layouts/Layout.astro';
         var lines = [d.message.trim(), '', '--'];
         if (d.name) lines.push(d.name);
         if (d.email) lines.push(d.email);
-        window.location.href = 'mailto:comboventures@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
-        show('ok', 'Opening your email app to send. If nothing happens, email us directly at comboventures@gmail.com.');
+        window.location.href = 'mailto:' + ADDR + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+        show('ok', 'Opening your email app to send. If nothing happens, email us directly at ' + ADDR + '.');
       });
     })();
   </script>
