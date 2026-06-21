@@ -1,6 +1,9 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "beginner-guide-to-ai", title: "New to AI? We Built a Beginner's Guide That Starts From Zero",
+    date: "2026-06-21", tag: "News",
+    excerpt: "A complete, no-jargon guide to AI for people with zero background, plus an easy way to share it with anyone who wants to learn the simplest way possible." },
   { slug: "ai-agent-blanked-26-files", title: "How an AI Agent Blanked 26 Files, and the One Question That Saved Me",
     date: "2026-06-20", tag: "Build in Public",
     excerpt: "A postmortem: an AI coding agent null-wrote 26 of my source files. Why git only saved half, how I rebuilt the rest from build output and verified every byte, and the rule I locked in." },

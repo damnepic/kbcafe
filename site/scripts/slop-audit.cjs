@@ -106,6 +106,7 @@ const targets = [
   ["ai-business.astro", "article"],
   ["case-studies/kbcafe.astro", "article"],
   ["blog/ai-agent-blanked-26-files.astro", "article"],
+  ["blog/beginner-guide-to-ai.astro", "article"],
   ["blog/building-the-prompt-optimizer.astro", "article"],
   ["blog/introducing-ai-business.astro", "article"],
   ["blog/the-return-of-kb-cafe.astro", "article"],
