@@ -221,6 +221,24 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
     window.addEventListener('resize', function () { if (window.innerWidth > 520) setOpen(false); });
   })();
+
+  // Knowledge-map rail: arriving from /map (?from=map) docks the live map on the right so you keep your place (desktop).
+  (function () {
+    if (location.pathname === '/map') return;
+    try { if (new URLSearchParams(location.search).get('from') !== 'map') return; } catch (e) { return; }
+    if (window.self !== window.top) return;       // never nest a rail inside the embedded map
+    if (window.innerWidth <= 900) return;          // desktop only; phones get the full-width article
+    var nav = document.querySelector('.site-nav'); var navH = nav ? nav.offsetHeight : 64;
+    var panel = document.createElement('aside'); panel.className = 'kb-maprail-panel';
+    panel.style.top = navH + 'px'; panel.style.height = 'calc(100vh - ' + navH + 'px)';
+    panel.innerHTML = '<div class="kb-maprail-bar"><span>☕ Knowledge map</span><button class="kb-maprail-close" type="button" aria-label="Close map">✕</button></div><iframe class="kb-maprail-frame" src="/map" title="Knowledge map"></iframe>';
+    document.body.appendChild(panel);
+    document.body.classList.add('kb-maprail');
+    panel.querySelector('.kb-maprail-close').addEventListener('click', function () {
+      panel.remove(); document.body.classList.remove('kb-maprail');
+      try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    });
+  })();
 </script>
 </body>
 </html>
@@ -251,6 +269,14 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   /* sidebar pages go full-width so the sidebar's left edge meets the far-left logo (34px gutter) */
   .wrap-sb{max-width:none;padding:0 34px}
   .wrap-sb > footer{max-width:1120px;margin-inline:auto}
+  /* knowledge-map rail: a persistent /map iframe docked right when you arrive from /map (?from=map), desktop only */
+  .kb-maprail-panel{position:fixed;right:0;z-index:40;width:min(46vw,720px);background:var(--paper);border-left:1.5px solid var(--line);box-shadow:-10px 0 30px rgba(40,24,12,.07);display:flex;flex-direction:column}
+  .kb-maprail-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--header);font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-soft)}
+  .kb-maprail-close{border:0;background:none;cursor:pointer;font-size:15px;color:var(--ink-soft);padding:2px 5px;border-radius:6px}
+  .kb-maprail-close:hover{color:var(--coral);background:var(--cream)}
+  .kb-maprail-frame{flex:1;border:0;width:100%}
+  body.kb-maprail .wrap{max-width:none;margin-left:0;margin-right:min(46vw,720px)}
+  @media(max-width:900px){.kb-maprail-panel{display:none}body.kb-maprail .wrap{margin-right:0}}
   a{color:inherit}
 
   /* nav (cream header band, full-bleed over the off-white body) */

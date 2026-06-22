@@ -289,10 +289,11 @@ nodes.forEach(n => {
       document.getElementById('km-m-desc').textContent = info.ds || '';
       const rel = document.getElementById('km-m-related');
       rel.innerHTML = info.related.length
-        ? '<span class="km-rel-lbl">' + (info.type === 'concept' ? 'Try it with' : 'Explains') + '</span>' + info.related.map(r => '<a class="km-rel-chip" href="' + r.href + '">' + r.label + '</a>').join('')
+        ? '<span class="km-rel-lbl">' + (info.type === 'concept' ? 'Try it with' : 'Explains') + '</span>' + info.related.map(r => '<a class="km-rel-chip" target="_top" href="' + r.href + '?from=map">' + r.label + '</a>').join('')
         : '';
       const cta = document.getElementById('km-m-cta');
-      cta.href = info.href; cta.textContent = (info.type === 'concept' ? 'Read the full guide →' : 'Open the tool →'); cta.style.background = ph.color;
+      // ?from=map keeps the map docked on the destination; target=_top so it works whether the map is standalone or embedded in the rail
+      cta.href = info.href + '?from=map'; cta.setAttribute('target', '_top'); cta.textContent = (info.type === 'concept' ? 'Read the full guide →' : 'Open the tool →'); cta.style.background = ph.color;
       modal.querySelector('.km-modal-card').style.borderTopColor = ph.color;
       modal.hidden = false;
     }
