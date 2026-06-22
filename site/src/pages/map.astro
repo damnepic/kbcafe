@@ -5,7 +5,6 @@ import { TOOLS } from '../data/tools.js';
 import { TOOL_GRAPH } from '../data/toolGraph.js';
 import { LEARNING_PATHS } from '../data/learningPaths.js';
 
-// short label for a concept ("What is a context window?" -> "Context window")
 const shortConcept = (nm) => {
   let s = nm.replace(/^What (is|are) (an?\s|the\s)?/i, '').replace(/\?$/, '').trim();
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -15,67 +14,117 @@ const concepts = AI.filter(a => a.type === 'explainer');
 const conceptIds = new Set(concepts.map(c => c.href));
 const aiTools = TOOLS.filter(t => t.href && t.cat === 'ai');
 
+// ── phases: one ordered, colored grouping that drives BOTH the constellation (cluster color)
+//    and the timeline (left-to-right evolution). Each concept maps to a phase. ──
+const PHASES = [
+  { key: 0, label: 'Foundations',  color: '#7657ff', blurb: 'How a model reads, remembers, and structures what you give it.' },
+  { key: 1, label: 'Retrieval',    color: '#3478f6', blurb: 'Giving a model your own data to answer from, by meaning.' },
+  { key: 2, label: 'Tools & agents', color: '#ee4b2b', blurb: 'Letting a model call functions, use tools, and act on a goal.' },
+  { key: 3, label: 'Automation',   color: '#0f9f82', blurb: 'Wiring it all into workflows that run themselves.' },
+];
+const PHASE = {
+  '/what-is-a-context-window': 0, '/what-are-embeddings': 0, '/what-are-structured-outputs': 0,
+  '/what-is-a-vector-database': 1, '/what-is-rag': 1,
+  '/what-is-tool-calling': 2, '/what-is-mcp': 2, '/what-is-agent-memory': 2,
+  '/what-is-workflow-automation': 3, '/ai-agents-vs-workflows-vs-rpa': 3, '/webhooks-vs-polling': 3, '/what-is-ai-orchestration': 3,
+};
+const phaseOf = (href) => (PHASE[href] != null ? PHASE[href] : 0);
+
+// tools that teach a concept (for the cards + which phase a tool belongs to)
+const toolsForConcept = (href) => Object.keys(TOOL_GRAPH).filter(h => (TOOL_GRAPH[h].learn || []).includes(href));
+const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
+// a tool's phase = the phase of the first concept it teaches (fallback 0)
+const toolPhase = (href) => { const g = TOOL_GRAPH[href]; const c = g && (g.learn || [])[0]; return c != null ? phaseOf(c) : 0; };
+
+// graph nodes + edges (for the constellation), each tagged with its phase
 const nodes = [
-  ...concepts.map(c => ({ id: c.href, label: shortConcept(c.nm), type: 'concept' })),
-  ...aiTools.map(t => ({ id: t.href, label: t.nm, type: 'tool' })),
+  ...concepts.map(c => ({ id: c.href, label: shortConcept(c.nm), type: 'concept', ph: phaseOf(c.href) })),
+  ...aiTools.map(t => ({ id: t.href, label: t.nm, type: 'tool', ph: toolPhase(t.href) })),
 ];
 const idSet = new Set(nodes.map(n => n.id));
-
-// edges: concept->concept (from rel next/prereq), concept<->tool (tool teaches concept)
 const edgeSet = new Set();
 const edges = [];
 const addEdge = (a, b, kind) => {
   if (!idSet.has(a) || !idSet.has(b) || a === b) return;
-  const key = [a, b].sort().join('|');
-  if (edgeSet.has(key)) return; edgeSet.add(key); edges.push({ s: a, t: b, kind });
+  const key = [a, b].sort().join('|'); if (edgeSet.has(key)) return; edgeSet.add(key); edges.push({ s: a, t: b, kind });
 };
-concepts.forEach(c => {
-  const r = c.rel || {};
-  [...(r.next || []), ...(r.prereq || []), ...(r.related || [])].forEach(o => { if (conceptIds.has(o)) addEdge(c.href, o, 'cc'); });
-});
+concepts.forEach(c => { const r = c.rel || {}; [...(r.next || []), ...(r.prereq || []), ...(r.related || [])].forEach(o => { if (conceptIds.has(o)) addEdge(c.href, o, 'cc'); }); });
 Object.entries(TOOL_GRAPH).forEach(([tool, g]) => (g.learn || []).forEach(c => addEdge(tool, c, 'ct')));
 
-// crawlable groupings
-const conceptList = concepts.map(c => ({ href: c.href, label: shortConcept(c.nm),
-  tools: Object.keys(TOOL_GRAPH).filter(h => (TOOL_GRAPH[h].learn || []).includes(c.href)),
+// cards + timeline groupings (concept-centric, grouped by phase, in phase order)
+const byPhase = PHASES.map(ph => ({
+  ...ph,
+  items: concepts.filter(c => phaseOf(c.href) === ph.key).map(c => ({ href: c.href, label: shortConcept(c.nm), tools: toolsForConcept(c.href) })),
 }));
-const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
+const conceptCount = concepts.length, toolCount = aiTools.length;
 ---
 <Layout
   title="AI Knowledge Map, how every concept and tool connects | KB Cafe"
-  description="An interactive map of KB Cafe's AI knowledge base: concepts, the tools that demonstrate them, and the learning paths that tie them together. Drag, zoom, and explore."
+  description="An interactive map of KB Cafe's AI knowledge base: concepts, the tools that demonstrate them, and the learning paths that tie them together. Browse as cards, a constellation, or a timeline."
   path="/map"
 >
-  <section class="km">
+  <section class="km" data-view="cards">
     <header class="km-head">
       <div class="eyebrow">☕ Knowledge map</div>
       <h1>The whole <span class="mk">graph.</span></h1>
       <p class="lede">Every AI concept, the tools that demonstrate it, and how they connect. The same idea as a Wikipedia category map, for how modern AI actually works.</p>
+      <div class="km-toolbar">
+        <span class="km-count">{conceptCount} concepts · {toolCount} tools</span>
+        <div class="km-views" id="km-views" role="group" aria-label="View style">
+          <button class="km-vbtn on" data-view="cards" type="button">▦ Cards</button>
+          <button class="km-vbtn" data-view="constellation" type="button">✦ Constellation</button>
+          <button class="km-vbtn" data-view="timeline" type="button">▸ Timeline</button>
+        </div>
+      </div>
     </header>
 
-    <div class="km-legend">
-      <span class="lg"><span class="dot c"></span>Concept (read)</span>
-      <span class="lg"><span class="dot t"></span>Tool (try)</span>
-      <span class="km-hint">drag · scroll to zoom · click a node</span>
+    <!-- CARDS (default · crawlable · mobile-friendly) -->
+    <div class="km-cards" id="km-cards">
+      {byPhase.map(ph => (
+        <div class="kmc-phase">
+          <div class="kmc-phase-h"><span class="kmc-dot" style={`background:${ph.color}`}></span>{ph.label}<span class="kmc-blurb">{ph.blurb}</span></div>
+          <div class="kmc-grid">
+            {ph.items.map(c => (
+              <div class="kmc-card" style={`--ac:${ph.color}`}>
+                <a class="kmc-nm" href={c.href}>{c.label}</a>
+                <div class="kmc-tools">
+                  {c.tools.length ? c.tools.map(h => <a class="kmc-tool" href={h}>{toolLabel[h] || h}</a>) : <span class="kmc-none">explainer</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      <div class="kmc-paths">
+        <div class="kmc-paths-h">Learning paths</div>
+        <div class="kmc-paths-row">{LEARNING_PATHS.map(p => <a class="kmc-path" href={p.route}>{p.title} <span aria-hidden="true">→</span></a>)}</div>
+      </div>
     </div>
-    <div class="km-stage"><svg id="graph" role="img" aria-label="Knowledge graph of AI concepts and tools"></svg></div>
 
-    <!-- crawlable / no-JS index -->
-    <div class="km-index">
-      <h2>Concepts &amp; their tools</h2>
-      <div class="km-cols">
-        {conceptList.map(c => (
-          <div class="km-c">
-            <a class="km-c-nm" href={c.href}>{c.label}</a>
-            <div class="km-c-tools">
-              {c.tools.length ? c.tools.map(h => <a href={h}>{toolLabel[h] || h}</a>) : <span class="km-none">explainer</span>}
+    <!-- CONSTELLATION (visual; SVG built in JS) -->
+    <div class="km-constellation" id="km-constellation">
+      <div class="km-legend">
+        {PHASES.map(ph => <span class="lg"><span class="lg-dot" style={`background:${ph.color}`}></span>{ph.label}</span>)}
+        <span class="km-hint">drag · scroll to zoom · tap a star</span>
+      </div>
+      <div class="km-stage"><svg id="graph" role="img" aria-label="Constellation of AI concepts and tools"></svg></div>
+    </div>
+
+    <!-- TIMELINE (evolution by phase) -->
+    <div class="km-timeline" id="km-timeline">
+      <div class="kmt-track">
+        {byPhase.map((ph, i) => (
+          <div class="kmt-phase" style={`--ac:${ph.color}`}>
+            <div class="kmt-node"><span class="kmt-step">{i + 1}</span></div>
+            <div class="kmt-body">
+              <div class="kmt-h">{ph.label}</div>
+              <p class="kmt-blurb">{ph.blurb}</p>
+              <div class="kmt-items">
+                {ph.items.map(c => <a class="kmt-item" href={c.href}>{c.label}</a>)}
+              </div>
             </div>
           </div>
         ))}
-      </div>
-      <h2 style="margin-top:30px">Learning paths</h2>
-      <div class="km-paths">
-        {LEARNING_PATHS.map(p => <a class="km-path" href={p.route}>{p.title} <span aria-hidden="true">→</span></a>)}
       </div>
     </div>
   </section>
@@ -89,136 +138,161 @@ const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 42 3 82 5 122 6 C 156 7 182 5 198 4 L 198 17 C 164 19 128 18 92 17 C 54 16 28 18 2 20 Z' fill='%23c0905a' fill-opacity='0.55'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:center bottom;background-size:100% .2em}
   .lede{margin-top:18px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:640px}
-  .km-legend{display:flex;align-items:center;gap:18px;margin:24px 0 10px;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);flex-wrap:wrap}
-  .lg{display:flex;align-items:center;gap:7px}
-  .dot{width:12px;height:12px;border-radius:50%}.dot.c{background:#7657ff}.dot.t{background:#ee4b2b}
-  .km-hint{margin-left:auto;opacity:.7}
-  .km-stage{border:1.5px solid var(--line);border-radius:18px;background:
-    radial-gradient(circle at 30% 20%,rgba(118,87,255,.06),transparent 40%),
-    radial-gradient(circle at 80% 80%,rgba(238,75,43,.05),transparent 40%),var(--paper-2);
-    overflow:hidden;touch-action:none}
-  #graph{display:block;width:100%;height:660px;cursor:grab}
-  /* graph internals are created in JS, so these must be GLOBAL (scoped CSS won't reach them) */
-  :global(#graph.grabbing){cursor:grabbing}
-  :global(#graph .edge){stroke:rgba(30,24,19,.16);stroke-width:1.3}
-  :global(#graph .edge.ct){stroke:rgba(238,75,43,.22)}
-  :global(#graph .node circle){cursor:pointer;transition:opacity .12s}
-  :global(#graph .node.concept circle){fill:#7657ff}
-  :global(#graph .node.tool circle){fill:#ee4b2b}
-  /* labels get a paper-coloured halo so they stay legible over edges/nodes */
-  :global(#graph .node text){font-family:var(--font-mono);font-size:11px;fill:var(--ink);pointer-events:none;paint-order:stroke;stroke:#FEFDFB;stroke-width:3.5px;stroke-linejoin:round}
-  :global(#graph .node.concept text){font-weight:700;font-size:11.5px}
-  /* tool labels only appear on hover/highlight to cut clutter; concepts always labelled */
-  :global(#graph .node.tool text){opacity:0;transition:opacity .12s}
-  :global(#graph .node.tool:hover text){opacity:1}
-  :global(#graph .node.tool.hi text){opacity:1}
-  :global(#graph.dim .node:not(.hi) circle){opacity:.2}
-  :global(#graph.dim .node:not(.hi) text){opacity:.1}
-  :global(#graph.dim .edge:not(.hi)){opacity:.07}
 
-  .km-index{margin-top:36px;border-top:1px solid var(--line);padding-top:26px}
-  .km-index h2{font-family:var(--font-display);font-weight:800;font-size:22px;margin:0 0 16px}
-  .km-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
-  .km-c{border-bottom:1px solid var(--line);padding-bottom:11px}
-  .km-c-nm{font-family:var(--font-display);font-weight:800;font-size:15.5px;color:var(--ink);text-decoration:none;display:inline-block;margin-bottom:5px}
-  .km-c-nm:hover{color:var(--coral)}
-  .km-c-tools{display:flex;flex-wrap:wrap;gap:6px 12px}
-  .km-c-tools a{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);text-decoration:none;border-bottom:1.5px solid var(--coral)}
-  .km-c-tools a:hover{color:var(--coral)}
-  .km-none{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);opacity:.6}
-  .km-paths{display:flex;flex-wrap:wrap;gap:10px}
-  .km-path{font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);text-decoration:none;border:1.5px solid var(--line);border-radius:999px;padding:9px 16px}
-  .km-path:hover{border-color:var(--ink);color:var(--coral)}
-  /* the interactive graph is unreadable + un-zoomable on phones; show the readable index instead */
-  @media(max-width:760px){.km-stage,.km-legend{display:none}.km-index{border-top:0;padding-top:0;margin-top:8px}}
-  @media(max-width:600px){.km-cols{grid-template-columns:1fr}.km-hint{display:none}}
+  .km-toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:24px 0 8px}
+  .km-count{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+  .km-views{display:inline-flex;background:var(--cream);border:1.4px solid var(--line);border-radius:12px;padding:4px;gap:3px;margin-left:auto}
+  .km-vbtn{border:0;background:none;cursor:pointer;border-radius:9px;padding:9px 13px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--ink-soft);transition:all .14s}
+  .km-vbtn:hover{color:var(--ink)}
+  .km-vbtn.on{background:var(--ink);color:var(--cream)}
+
+  /* view switching */
+  .km[data-view="cards"] .km-constellation,.km[data-view="cards"] .km-timeline{display:none}
+  .km[data-view="constellation"] .km-cards,.km[data-view="constellation"] .km-timeline{display:none}
+  .km[data-view="timeline"] .km-cards,.km[data-view="timeline"] .km-constellation{display:none}
+
+  /* ── CARDS ── */
+  .km-cards{margin-top:18px}
+  .kmc-phase{margin-bottom:30px}
+  .kmc-phase-h{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:19px;margin-bottom:14px;flex-wrap:wrap}
+  .kmc-dot{width:12px;height:12px;border-radius:4px;flex:0 0 auto}
+  .kmc-blurb{font-family:var(--font-body);font-weight:400;font-size:13px;color:var(--ink-soft)}
+  .kmc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .kmc-card{background:var(--cream);border:1.3px solid var(--line);border-top:3px solid var(--ac);border-radius:14px;padding:15px 16px;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .kmc-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(40,24,12,.09);border-color:color-mix(in srgb,var(--ac) 40%,var(--line))}
+  .kmc-nm{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink);text-decoration:none;display:inline-block;margin-bottom:9px}
+  .kmc-nm:hover{color:var(--ac)}
+  .kmc-tools{display:flex;flex-wrap:wrap;gap:6px}
+  .kmc-tool{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);text-decoration:none;background:var(--paper-2);border:1px solid var(--line);border-radius:7px;padding:3px 8px;transition:all .12s}
+  .kmc-tool:hover{color:#fff;background:var(--ac);border-color:var(--ac)}
+  .kmc-none{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);opacity:.6}
+  .kmc-paths{margin-top:8px;border-top:1px solid var(--line);padding-top:22px}
+  .kmc-paths-h{font-family:var(--font-display);font-weight:800;font-size:19px;margin-bottom:14px}
+  .kmc-paths-row{display:flex;flex-wrap:wrap;gap:10px}
+  .kmc-path{font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);text-decoration:none;border:1.5px solid var(--line);border-radius:999px;padding:9px 16px}
+  .kmc-path:hover{border-color:var(--ink);color:var(--coral)}
+
+  /* ── CONSTELLATION ── */
+  .km-constellation{margin-top:18px}
+  .km-legend{display:flex;align-items:center;gap:16px;margin-bottom:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);flex-wrap:wrap}
+  .lg{display:flex;align-items:center;gap:6px}.lg-dot{width:11px;height:11px;border-radius:50%}
+  .km-hint{margin-left:auto;opacity:.7}
+  .km-stage{border:1.5px solid #2a2740;border-radius:18px;background:radial-gradient(circle at 30% 18%,#221d35,#15131c 60%);overflow:hidden;touch-action:none}
+  #graph{display:block;width:100%;height:620px;cursor:grab}
+  :global(#graph.grabbing){cursor:grabbing}
+  :global(#graph .edge){stroke:rgba(150,140,210,.22);stroke-width:1.1}
+  :global(#graph .edge.ct){stroke:rgba(150,140,210,.13)}
+  :global(#graph .node circle){cursor:pointer}
+  :global(#graph .glow){opacity:.5}
+  :global(#graph .node text){font-family:var(--font-mono);fill:#e9e4f7;pointer-events:none;paint-order:stroke;stroke:#15131c;stroke-width:3px;stroke-linejoin:round}
+  :global(#graph .node.concept text){font-size:11.5px;font-weight:700}
+  :global(#graph .node.tool text){font-size:9.5px;fill:#b9b1d6}
+  :global(#graph.dim .node:not(.hi) circle){opacity:.25}
+  :global(#graph.dim .node:not(.hi) text){opacity:.12}
+  :global(#graph.dim .node:not(.hi) .glow){opacity:.05}
+  :global(#graph.dim .edge:not(.hi)){opacity:.05}
+
+  /* ── TIMELINE ── */
+  .km-timeline{margin-top:22px}
+  .kmt-track{position:relative;padding-left:6px}
+  .kmt-track::before{content:"";position:absolute;left:21px;top:8px;bottom:8px;width:2px;background:linear-gradient(#7657ff,#3478f6,#ee4b2b,#0f9f82)}
+  .kmt-phase{position:relative;display:flex;gap:20px;padding:0 0 28px 0}
+  .kmt-node{flex:0 0 auto;z-index:1}
+  .kmt-step{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--ac);color:#fff;font-family:var(--font-mono);font-weight:800;font-size:14px;box-shadow:0 0 0 5px var(--paper)}
+  .kmt-body{flex:1;min-width:0;padding-top:2px}
+  .kmt-h{font-family:var(--font-display);font-weight:800;font-size:20px;color:var(--ink)}
+  .kmt-blurb{font-size:13.5px;color:var(--ink-soft);margin:3px 0 11px;line-height:1.45}
+  .kmt-items{display:flex;flex-wrap:wrap;gap:8px}
+  .kmt-item{font-family:var(--font-display);font-weight:700;font-size:13.5px;color:var(--ink);text-decoration:none;background:var(--cream);border:1.3px solid var(--line);border-left:3px solid var(--ac);border-radius:10px;padding:8px 13px;transition:transform .13s,border-color .13s}
+  .kmt-item:hover{transform:translateX(2px);border-color:var(--ac)}
+
+  @media(max-width:760px){
+    .km-views{margin-left:0}
+    .kmc-grid{grid-template-columns:1fr}
+    .km-hint{display:none}
+    /* constellation graph is desktop-leaning; keep it usable but Cards is the default + readable view */
+    #graph{height:460px}
+  }
 </style>
 
-<script is:inline define:vars={{ nodes, edges }}>
-  const svg = document.getElementById('graph');
-  const W = 1100, H = 660;
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  const SVGNS = 'http://www.w3.org/2000/svg';
-
-  // deterministic seed positions on a circle (no Math.random for stable layout)
-  const N = nodes.length;
-  nodes.forEach((n, i) => {
-    const a = (i / N) * Math.PI * 2;
-    n.x = W / 2 + Math.cos(a) * 230; n.y = H / 2 + Math.sin(a) * 190; n.vx = 0; n.vy = 0;
-  });
-  const idx = Object.fromEntries(nodes.map((n, i) => [n.id, i]));
-  const E = edges.map(e => ({ s: idx[e.s], t: idx[e.t], kind: e.kind })).filter(e => e.s != null && e.t != null);
-  const deg = nodes.map(() => 0); E.forEach(e => { deg[e.s]++; deg[e.t]++; });
-
-  // force simulation
-  const REP = 11000, SPRING = 0.014, LEN = 150, GRAV = 0.011, DAMP = 0.85;
-  for (let it = 0; it < 440; it++) {
-    for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
-      let dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
-      let d2 = dx * dx + dy * dy || 0.01; const d = Math.sqrt(d2);
-      const f = REP / d2; const fx = (dx / d) * f, fy = (dy / d) * f;
-      nodes[i].vx += fx; nodes[i].vy += fy; nodes[j].vx -= fx; nodes[j].vy -= fy;
+<script is:inline define:vars={{ nodes, edges, PHASES }}>
+  (function () {
+    const km = document.querySelector('.km');
+    const views = document.getElementById('km-views');
+    function setView(v) {
+      km.setAttribute('data-view', v);
+      views.querySelectorAll('.km-vbtn').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+      try { localStorage.setItem('kb-map-view', v); } catch (e) {}
+      if (v === 'constellation') buildGraph();
     }
-    E.forEach(e => {
-      const a = nodes[e.s], b = nodes[e.t];
-      let dx = b.x - a.x, dy = b.y - a.y; const d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-      const f = (d - LEN) * SPRING; const fx = (dx / d) * f, fy = (dy / d) * f;
-      a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
-    });
-    nodes.forEach(n => {
-      n.vx += (W / 2 - n.x) * GRAV; n.vy += (H / 2 - n.y) * GRAV;
-      n.vx *= DAMP; n.vy *= DAMP; n.x += n.vx; n.y += n.vy;
-    });
-  }
-  // fit to viewbox
-  const pad = 90;
-  const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
-  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  const sx = (W - pad * 2) / (maxX - minX || 1), sy = (H - pad * 2) / (maxY - minY || 1); const s = Math.min(sx, sy);
-  nodes.forEach(n => { n.x = pad + (n.x - minX) * s; n.y = pad + (n.y - minY) * s; });
+    views.addEventListener('click', (e) => { const b = e.target.closest('.km-vbtn'); if (b) setView(b.dataset.view); });
 
-  // render
-  const gZoom = document.createElementNS(SVGNS, 'g');
-  const gEdges = document.createElementNS(SVGNS, 'g');
-  const gNodes = document.createElementNS(SVGNS, 'g');
-  gZoom.appendChild(gEdges); gZoom.appendChild(gNodes); svg.appendChild(gZoom);
-  const adj = nodes.map(() => new Set());
-  E.forEach((e, k) => {
-    const line = document.createElementNS(SVGNS, 'line');
-    line.setAttribute('x1', nodes[e.s].x); line.setAttribute('y1', nodes[e.s].y);
-    line.setAttribute('x2', nodes[e.t].x); line.setAttribute('y2', nodes[e.t].y);
-    line.setAttribute('class', 'edge ' + e.kind); line.dataset.s = e.s; line.dataset.t = e.t;
-    gEdges.appendChild(line); adj[e.s].add(e.t); adj[e.t].add(e.s);
-  });
-  nodes.forEach((n, i) => {
-    const g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'node ' + n.type); g.dataset.i = i;
-    const a = document.createElementNS(SVGNS, 'a'); a.setAttribute('href', n.id);
-    const c = document.createElementNS(SVGNS, 'circle');
-    c.setAttribute('cx', n.x); c.setAttribute('cy', n.y);
-    c.setAttribute('r', n.type === 'concept' ? 11 + Math.min(deg[i], 5) : 7);
-    const t = document.createElementNS(SVGNS, 'text');
-    t.setAttribute('x', n.x); t.setAttribute('y', n.y - (n.type === 'concept' ? 18 : 13));
-    t.setAttribute('text-anchor', 'middle'); t.textContent = n.label;
-    a.appendChild(c); g.appendChild(a); g.appendChild(t); gNodes.appendChild(g);
-    g.addEventListener('mouseenter', () => highlight(i));
-    g.addEventListener('mouseleave', clearHi);
-  });
+    // ── constellation (force sim, built once, dark star-map render) ──
+    let built = false;
+    const COLOR = PHASES.reduce((m, p) => (m[p.key] = p.color, m), {});
+    function buildGraph() {
+      if (built) return; built = true;
+      const svg = document.getElementById('graph'); if (!svg) return;
+      const W = 1100, H = 620, SVGNS = 'http://www.w3.org/2000/svg';
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      const N = nodes.length;
+      nodes.forEach((n, i) => { const a = (i / N) * Math.PI * 2; n.x = W / 2 + Math.cos(a) * 230; n.y = H / 2 + Math.sin(a) * 180; n.vx = 0; n.vy = 0; });
+      const idx = Object.fromEntries(nodes.map((n, i) => [n.id, i]));
+      const E = edges.map(e => ({ s: idx[e.s], t: idx[e.t], kind: e.kind })).filter(e => e.s != null && e.t != null);
+      const deg = nodes.map(() => 0); E.forEach(e => { deg[e.s]++; deg[e.t]++; });
+      const REP = 11000, SPRING = 0.014, LEN = 150, GRAV = 0.011, DAMP = 0.85;
+      for (let it = 0; it < 440; it++) {
+        for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+          let dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y; let d2 = dx * dx + dy * dy || 0.01; const d = Math.sqrt(d2);
+          const f = REP / d2; const fx = (dx / d) * f, fy = (dy / d) * f; nodes[i].vx += fx; nodes[i].vy += fy; nodes[j].vx -= fx; nodes[j].vy -= fy;
+        }
+        E.forEach(e => { const a = nodes[e.s], b = nodes[e.t]; let dx = b.x - a.x, dy = b.y - a.y; const d = Math.sqrt(dx * dx + dy * dy) || 0.01; const f = (d - LEN) * SPRING; const fx = (dx / d) * f, fy = (dy / d) * f; a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy; });
+        nodes.forEach(n => { n.vx += (W / 2 - n.x) * GRAV; n.vy += (H / 2 - n.y) * GRAV; n.vx *= DAMP; n.vy *= DAMP; n.x += n.vx; n.y += n.vy; });
+      }
+      const pad = 80, xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+      const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+      const s = Math.min((W - pad * 2) / (maxX - minX || 1), (H - pad * 2) / (maxY - minY || 1));
+      nodes.forEach(n => { n.x = pad + (n.x - minX) * s; n.y = pad + (n.y - minY) * s; });
 
-  function highlight(i) {
-    svg.classList.add('dim');
-    gNodes.querySelectorAll('.node').forEach(el => { const j = +el.dataset.i; el.classList.toggle('hi', j === i || adj[i].has(j)); });
-    gEdges.querySelectorAll('.edge').forEach(el => { el.classList.toggle('hi', +el.dataset.s === i || +el.dataset.t === i); });
-  }
-  function clearHi() { svg.classList.remove('dim'); gNodes.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); gEdges.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); }
+      const gZoom = document.createElementNS(SVGNS, 'g'), gEdges = document.createElementNS(SVGNS, 'g'), gNodes = document.createElementNS(SVGNS, 'g');
+      gZoom.appendChild(gEdges); gZoom.appendChild(gNodes); svg.appendChild(gZoom);
+      const adj = nodes.map(() => new Set());
+      E.forEach(e => {
+        const ln = document.createElementNS(SVGNS, 'line');
+        ln.setAttribute('x1', nodes[e.s].x); ln.setAttribute('y1', nodes[e.s].y); ln.setAttribute('x2', nodes[e.t].x); ln.setAttribute('y2', nodes[e.t].y);
+        ln.setAttribute('class', 'edge ' + e.kind); ln.dataset.s = e.s; ln.dataset.t = e.t; gEdges.appendChild(ln); adj[e.s].add(e.t); adj[e.t].add(e.s);
+      });
+      nodes.forEach((n, i) => {
+        const g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'node ' + n.type); g.dataset.i = i;
+        const a = document.createElementNS(SVGNS, 'a'); a.setAttribute('href', n.id);
+        const col = COLOR[n.ph] || '#7657ff';
+        const r = n.type === 'concept' ? 10 + Math.min(deg[i], 5) : 5.5;
+        const glow = document.createElementNS(SVGNS, 'circle');
+        glow.setAttribute('cx', n.x); glow.setAttribute('cy', n.y); glow.setAttribute('r', r * 2.4); glow.setAttribute('fill', col); glow.setAttribute('class', 'glow');
+        const c = document.createElementNS(SVGNS, 'circle');
+        c.setAttribute('cx', n.x); c.setAttribute('cy', n.y); c.setAttribute('r', r); c.setAttribute('fill', col);
+        const t = document.createElementNS(SVGNS, 'text');
+        t.setAttribute('x', n.x); t.setAttribute('y', n.y - r - 6); t.setAttribute('text-anchor', 'middle'); t.textContent = n.label;
+        a.appendChild(glow); a.appendChild(c); g.appendChild(a); g.appendChild(t); gNodes.appendChild(g);
+        g.addEventListener('mouseenter', () => highlight(i)); g.addEventListener('mouseleave', clearHi);
+      });
+      function highlight(i) { svg.classList.add('dim'); gNodes.querySelectorAll('.node').forEach(el => { const j = +el.dataset.i; el.classList.toggle('hi', j === i || adj[i].has(j)); }); gEdges.querySelectorAll('.edge').forEach(el => el.classList.toggle('hi', +el.dataset.s === i || +el.dataset.t === i)); }
+      function clearHi() { svg.classList.remove('dim'); gNodes.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); gEdges.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); }
 
-  // pan + zoom
-  let tx = 0, ty = 0, scale = 1, dragging = false, sx0 = 0, sy0 = 0, moved = false;
-  const apply = () => gZoom.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
-  svg.addEventListener('wheel', (e) => { e.preventDefault(); const f = e.deltaY < 0 ? 1.1 : 0.9; scale = Math.max(0.5, Math.min(3, scale * f)); apply(); }, { passive: false });
-  svg.addEventListener('pointerdown', (e) => { dragging = true; moved = false; sx0 = e.clientX; sy0 = e.clientY; svg.classList.add('grabbing'); });
-  svg.addEventListener('pointermove', (e) => { if (!dragging) return; const dx = e.clientX - sx0, dy = e.clientY - sy0; if (Math.abs(dx) + Math.abs(dy) > 3) moved = true; tx += dx; ty += dy; sx0 = e.clientX; sy0 = e.clientY; apply(); });
-  const end = () => { dragging = false; svg.classList.remove('grabbing'); };
-  svg.addEventListener('pointerup', end); svg.addEventListener('pointerleave', end);
-  // prevent click-navigation after a drag
-  gNodes.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
+      let tx = 0, ty = 0, scale = 1, dragging = false, sx0 = 0, sy0 = 0, moved = false;
+      const apply = () => gZoom.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
+      svg.addEventListener('wheel', (e) => { e.preventDefault(); const f = e.deltaY < 0 ? 1.1 : 0.9; scale = Math.max(0.5, Math.min(3, scale * f)); apply(); }, { passive: false });
+      svg.addEventListener('pointerdown', (e) => { dragging = true; moved = false; sx0 = e.clientX; sy0 = e.clientY; svg.classList.add('grabbing'); });
+      svg.addEventListener('pointermove', (e) => { if (!dragging) return; const dx = e.clientX - sx0, dy = e.clientY - sy0; if (Math.abs(dx) + Math.abs(dy) > 3) moved = true; tx += dx; ty += dy; sx0 = e.clientX; sy0 = e.clientY; apply(); });
+      const end = () => { dragging = false; svg.classList.remove('grabbing'); };
+      svg.addEventListener('pointerup', end); svg.addEventListener('pointerleave', end);
+      gNodes.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
+    }
+
+    // default view: Constellation on desktop (the showcase), Cards on mobile + for crawlers (markup default = cards)
+    let initial = null;
+    try { const s = localStorage.getItem('kb-map-view'); if (s === 'cards' || s === 'constellation' || s === 'timeline') initial = s; } catch (e) {}
+    if (!initial) initial = window.innerWidth > 760 ? 'constellation' : 'cards';
+    setView(initial);
+  })();
 </script>
