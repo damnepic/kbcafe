@@ -56,6 +56,11 @@ const schema = {
     </div>
     <p class="dh-empty" id="dh-empty" hidden>No match yet. Try a shorter word, or <a href="/search">search the whole site &rarr;</a></p>
 
+    <div class="dict-tip">
+      <span class="dict-tip-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span>
+      <p><strong>Tip:</strong> Use <a href="/blog/the-study-window">study mode</a> to keep this dictionary open in a window on the right while you interactively learn and build with AI on the left. Look up any term the moment it trips you up, without ever losing your place.</p>
+    </div>
+
     <div class="dh-pop-wrap">
       <div class="dh-cat-h"><span class="dh-dot" style="background:var(--coral)"></span>Start here</div>
       <div class="dh-filter">
@@ -198,6 +203,15 @@ const schema = {
   .dh .mk{color:var(--coral)}
   .lede{margin-top:18px;font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:600px}
   .dh-toolbar{margin-top:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  /* study-mode tip: desktop-only (study mode is desktop-only) */
+  .dict-tip{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:13px 16px;background:var(--paper);border:1.5px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;max-width:760px}
+  .dict-tip-ic{flex:0 0 auto;color:var(--gold);display:flex;margin-top:1px}
+  .dict-tip-ic svg{width:20px;height:20px}
+  .dict-tip p{margin:0;font-size:14.5px;line-height:1.55;color:var(--ink-soft)}
+  .dict-tip strong{color:var(--ink)}
+  .dict-tip a{color:var(--coral);font-weight:700;text-decoration:none}
+  .dict-tip a:hover{text-decoration:underline}
+  @media(max-width:900px){.dict-tip{display:none}}
   .dh-search{display:flex;align-items:center;gap:11px;border:1.6px solid var(--ink);border-radius:14px;padding:13px 17px;background:var(--cream);flex:1;min-width:230px;max-width:500px;color:var(--ink-soft)}
   .dh-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-family:var(--font-body);font-size:15px;color:var(--ink)}
   /* view toggle: Categories <-> A-Z list */
