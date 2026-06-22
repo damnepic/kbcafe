@@ -253,6 +253,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
       var titleEl = panel.querySelector('.kb-maprail-title');
       frame.addEventListener('load', function () {
         try { var t = frame.contentDocument && frame.contentDocument.title; if (t) titleEl.textContent = (t.replace(/\s*[|·:-]\s*KB Cafe.*$/i, '').trim() || t); } catch (e) {}
+        persist();   // track the page the window is showing (incl. navigation inside it) so it survives a left-side reload
       });
       // drag the left grip to resize both panes; remember the width
       var grip = panel.querySelector('.kb-maprail-grip');
@@ -271,16 +272,26 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
       syncNav();
     }
 
+    // remember the window state (open + the page it is showing) so it survives a left-side reload; SEO-safe (sessionStorage only)
+    function persist() {
+      var fr = document.querySelector('.kb-maprail-frame'); if (!fr) return;
+      var u; try { u = fr.contentWindow.location.pathname + fr.contentWindow.location.search; } catch (e) { u = fr.getAttribute('src'); }
+      try { sessionStorage.setItem('kb-study-open', '1'); if (u) sessionStorage.setItem('kb-study-url', u); } catch (e) {}
+    }
+    function clearPersist() { try { sessionStorage.removeItem('kb-study-open'); sessionStorage.removeItem('kb-study-url'); } catch (e) {} }
+
     function openStudy(url) {
       if (!desktop()) { location.href = url; return; }   // no split on phones; just navigate there
       var panel = document.querySelector('.kb-maprail-panel');
       if (panel) { panel.querySelector('.kb-maprail-frame').src = url; }
       else { build(url); }
+      try { sessionStorage.setItem('kb-study-open', '1'); sessionStorage.setItem('kb-study-url', url); } catch (e) {}
       syncNav();
     }
     function closeStudy() {
       var panel = document.querySelector('.kb-maprail-panel'); if (panel) panel.remove();
       document.body.classList.remove('kb-maprail'); document.body.style.removeProperty('--maprail-w');
+      clearPersist();
       syncNav();
     }
     window.openStudyWindow = openStudy;
@@ -290,8 +301,18 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     var navBtn = document.getElementById('nav-study');
     if (navBtn) navBtn.addEventListener('click', function () { isOpen() ? closeStudy() : openStudy(location.pathname + location.search); });
 
-    // (4) auto-open when you arrive from /map (?from=map), then strip the param so it never lingers
+    // (0) RESTORE: a normal link click reloads the whole document, which would drop the right pane. If the window was
+    // open on the previous page, re-dock it at the same page, so clicking a left-side link reloads only the left and
+    // the right comes back where it was. Pure client JS + sessionStorage, no URL changes, indexed pages unaffected.
+    var restored = false;
     if (location.pathname !== '/map' && window.self === window.top && desktop()) {
+      var wasOpen = false, savedUrl = null;
+      try { wasOpen = sessionStorage.getItem('kb-study-open') === '1'; savedUrl = sessionStorage.getItem('kb-study-url'); } catch (e) {}
+      if (wasOpen) { openStudy(savedUrl || '/map'); restored = true; }
+    }
+
+    // (4) auto-open when you arrive from /map (?from=map), then strip the param so it never lingers
+    if (!restored && location.pathname !== '/map' && window.self === window.top && desktop()) {
       var fromMap = false; try { fromMap = new URLSearchParams(location.search).get('from') === 'map'; } catch (e) {}
       if (fromMap) { openStudy('/map'); try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} }
     }
