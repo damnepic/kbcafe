@@ -581,7 +581,12 @@ const UI_ICONS = {
   .trust b{font-family:var(--font-display);font-weight:800;font-size:13px;display:block;line-height:1.12;color:var(--ink)}
   .trust small{font-size:11px;color:var(--ink-soft)}
   .tr-dv{width:1px;height:26px;background:rgba(30,24,19,.14);flex:0 0 auto}
-  @media(max-width:760px){.trust{gap:14px 18px}.tr-dv{display:none}}
+  @media(max-width:760px){
+    .trust{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px;max-width:440px;justify-items:start;padding:16px 18px}
+    .tr-dv{display:none}
+    .tr-item{justify-content:flex-start}
+  }
+  @media(max-width:430px){.trust{grid-template-columns:1fr;max-width:280px}}
 
   /* SECTIONS */
   .home-sec,.results{max-width:1120px;margin:0 auto 52px}

@@ -236,7 +236,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     --font-mono:"JetBrains Mono",ui-monospace,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;overflow-x:clip}
   /* offset anchor jumps so headings clear the sticky header */
   :where(h2,h3)[id]{scroll-margin-top:96px}
   /* dictionary inline term links (global so they also style set:html content) */
@@ -244,7 +244,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   .kb-term:hover{background:rgba(238,75,43,.09);border-bottom-style:solid}
   .lpp-primer-h{font-weight:700;color:var(--ink)}
   body{font-family:var(--font-body);background:var(--bg);color:var(--ink);
-    -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+    -webkit-font-smoothing:antialiased;overflow-x:clip;position:relative}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
   .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 28px}

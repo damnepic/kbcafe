@@ -222,7 +222,11 @@ const schema = {
   .dh-az-dot{width:8px;height:8px;border-radius:2px;flex:0 0 auto;align-self:center}
   .dh-az-t{font-family:var(--font-display);font-weight:700;font-size:14.5px;flex:0 0 auto}
   .dh-az-g{font-size:12.5px;color:var(--ink-soft);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  @media(max-width:640px){.dh-az-list{grid-template-columns:1fr}}
+  @media(max-width:640px){
+    .dh-az-list{grid-template-columns:1fr}
+    .dh-az-term{flex-wrap:wrap}
+    .dh-az-g{white-space:normal;overflow:visible;text-overflow:clip;flex:1 1 100%;min-width:0;padding-left:17px;margin-top:1px;overflow-wrap:anywhere}
+  }
   .dh-empty{margin-top:12px;font-size:14px;color:var(--ink-soft)}
   .dh-empty a{color:var(--coral);font-weight:600;text-decoration:none}
   .dh-pop-wrap{margin-top:30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
