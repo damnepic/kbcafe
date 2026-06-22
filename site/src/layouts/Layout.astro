@@ -247,7 +247,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     // reflect whatever page the window is showing (same-origin) so it reads as a real window, not just "the map"
     var frame = panel.querySelector('.kb-maprail-frame'), titleEl = panel.querySelector('.kb-maprail-title');
     frame.addEventListener('load', function () {
-      try { var t = frame.contentDocument && frame.contentDocument.title; if (t) titleEl.textContent = (t.replace(/\s*[|·–—-]\s*KB Cafe.*$/i, '').trim() || t); } catch (e) {}
+      try { var t = frame.contentDocument && frame.contentDocument.title; if (t) titleEl.textContent = (t.replace(/\s*[|·:-]\s*KB Cafe.*$/i, '').trim() || t); } catch (e) {}
     });
 
     // drag the left grip to resize both panes; remember the width
