@@ -136,6 +136,10 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
       <a href="/reference" class={navActive('/reference') ? 'on' : ''}>Knowledge Base</a>
       <a href="/tools" class={navActive('/tools') ? 'on' : ''}>Tools</a>
       <a href="/learn" class={navActive('/learn') ? 'on' : ''}>Learn</a>
+      <button class="nav-study" id="nav-study" type="button" aria-pressed="false" aria-label="Open a study window: read two pages side by side" title="Study window: open a second page beside this one">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/><path d="m10 15-3-3 3-3"/></svg>
+        <span>Study</span>
+      </button>
       <div class="nav-search" id="navsearch">
         <button class="ns-toggle" id="ns-toggle" type="button" aria-label="Search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -222,52 +226,114 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     window.addEventListener('resize', function () { if (window.innerWidth > 520) setOpen(false); });
   })();
 
-  // "Study window": arriving from /map (?from=map) docks an independent second viewport on the right so you can read or
-  // use two pages side by side. It is its own little browser (own nav), resizable via the left grip, dismissable.
-  // Desktop only and entirely JS-injected, so crawled/indexed pages are unaffected (SEO-clean, see canonical).
+  // Study window: an independent, resizable second viewport docked on the right so you can read or use two pages at
+  // once. Opens from (1) the nav "Study" toggle, (2) the "Open beside" button by a page title, (3) hovering an
+  // in-content link, and (4) arriving from /map (?from=map). Desktop only, entirely JS-injected, so crawled/indexed
+  // pages are byte-identical and unaffected (SEO-clean, see the query-stripped canonical).
   (function () {
-    if (location.pathname === '/map') return;
-    try { if (new URLSearchParams(location.search).get('from') !== 'map') return; } catch (e) { return; }
-    if (window.self !== window.top) return;       // never nest a window inside the embedded one
-    if (window.innerWidth <= 900) return;          // desktop only; phones get the full-width article
+    function desktop() { return window.innerWidth > 900; }
     function clampW(x) { return Math.max(340, Math.min(Math.round(window.innerWidth * 0.72), x)); }
-    var saved = parseInt(localStorage.getItem('kb-maprail-w') || '', 10);
-    var startW = clampW((saved && saved > 0) ? saved : Math.round(Math.min(660, window.innerWidth * 0.46)));
-    document.body.style.setProperty('--maprail-w', startW + 'px');
-    var nav = document.querySelector('.site-nav'); var navH = nav ? nav.offsetHeight : 64;
-    var panel = document.createElement('aside'); panel.className = 'kb-maprail-panel';
-    panel.style.top = navH + 'px'; panel.style.height = 'calc(100vh - ' + navH + 'px)';
-    panel.innerHTML = '<span class="kb-maprail-grip" title="Drag to resize"></span>'
-      + '<div class="kb-maprail-bar"><span class="kb-maprail-title">☕ Knowledge map</span><button class="kb-maprail-close" type="button" aria-label="Close the second window">✕</button></div>'
-      + '<iframe class="kb-maprail-frame" src="/map" title="Study window" loading="lazy"></iframe>';
-    document.body.appendChild(panel);
-    document.body.classList.add('kb-maprail');
-    try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}   // strip ?from=map so it never lingers / gets shared / looks like a real URL
+    function isOpen() { return !!document.querySelector('.kb-maprail-panel'); }
+    function syncNav() { var b = document.getElementById('nav-study'); if (b) { b.classList.toggle('on', isOpen()); b.setAttribute('aria-pressed', isOpen() ? 'true' : 'false'); } }
 
-    // reflect whatever page the window is showing (same-origin) so it reads as a real window, not just "the map"
-    var frame = panel.querySelector('.kb-maprail-frame'), titleEl = panel.querySelector('.kb-maprail-title');
-    frame.addEventListener('load', function () {
-      try { var t = frame.contentDocument && frame.contentDocument.title; if (t) titleEl.textContent = (t.replace(/\s*[|·:-]\s*KB Cafe.*$/i, '').trim() || t); } catch (e) {}
-    });
+    function build(url) {
+      var saved = parseInt(localStorage.getItem('kb-maprail-w') || '', 10);
+      var startW = clampW((saved && saved > 0) ? saved : Math.round(Math.min(660, window.innerWidth * 0.46)));
+      document.body.style.setProperty('--maprail-w', startW + 'px');
+      var nav = document.querySelector('.site-nav'); var navH = nav ? nav.offsetHeight : 64;
+      var panel = document.createElement('aside'); panel.className = 'kb-maprail-panel';
+      panel.style.top = navH + 'px'; panel.style.height = 'calc(100vh - ' + navH + 'px)';
+      panel.innerHTML = '<span class="kb-maprail-grip" title="Drag to resize"></span>'
+        + '<div class="kb-maprail-bar"><span class="kb-maprail-title">Study window</span><button class="kb-maprail-close" type="button" aria-label="Close the second window">✕</button></div>'
+        + '<iframe class="kb-maprail-frame" title="Study window" loading="lazy"></iframe>';
+      document.body.appendChild(panel);
+      document.body.classList.add('kb-maprail');
+      var frame = panel.querySelector('.kb-maprail-frame'); frame.src = url;
+      // reflect whatever page the window is showing (same-origin) so the bar reads as a real window
+      var titleEl = panel.querySelector('.kb-maprail-title');
+      frame.addEventListener('load', function () {
+        try { var t = frame.contentDocument && frame.contentDocument.title; if (t) titleEl.textContent = (t.replace(/\s*[|·:-]\s*KB Cafe.*$/i, '').trim() || t); } catch (e) {}
+      });
+      // drag the left grip to resize both panes; remember the width
+      var grip = panel.querySelector('.kb-maprail-grip');
+      grip.addEventListener('pointerdown', function (e) {
+        e.preventDefault(); try { grip.setPointerCapture(e.pointerId); } catch (_) {} document.body.classList.add('kb-maprail-drag');
+        function mv(ev) { document.body.style.setProperty('--maprail-w', clampW(window.innerWidth - ev.clientX) + 'px'); }
+        function up() {
+          document.body.classList.remove('kb-maprail-drag');
+          grip.removeEventListener('pointermove', mv); grip.removeEventListener('pointerup', up);
+          var cur = parseInt(document.body.style.getPropertyValue('--maprail-w'), 10);
+          if (cur) { try { localStorage.setItem('kb-maprail-w', cur); } catch (_) {} }
+        }
+        grip.addEventListener('pointermove', mv); grip.addEventListener('pointerup', up);
+      });
+      panel.querySelector('.kb-maprail-close').addEventListener('click', closeStudy);
+      syncNav();
+    }
 
-    // drag the left grip to resize both panes; remember the width
-    var grip = panel.querySelector('.kb-maprail-grip');
-    grip.addEventListener('pointerdown', function (e) {
-      e.preventDefault(); try { grip.setPointerCapture(e.pointerId); } catch (_) {} document.body.classList.add('kb-maprail-drag');
-      function mv(ev) { document.body.style.setProperty('--maprail-w', clampW(window.innerWidth - ev.clientX) + 'px'); }
-      function up() {
-        document.body.classList.remove('kb-maprail-drag');
-        grip.removeEventListener('pointermove', mv); grip.removeEventListener('pointerup', up);
-        var cur = parseInt(document.body.style.getPropertyValue('--maprail-w'), 10);
-        if (cur) { try { localStorage.setItem('kb-maprail-w', cur); } catch (_) {} }
+    function openStudy(url) {
+      if (!desktop()) { location.href = url; return; }   // no split on phones; just navigate there
+      var panel = document.querySelector('.kb-maprail-panel');
+      if (panel) { panel.querySelector('.kb-maprail-frame').src = url; }
+      else { build(url); }
+      syncNav();
+    }
+    function closeStudy() {
+      var panel = document.querySelector('.kb-maprail-panel'); if (panel) panel.remove();
+      document.body.classList.remove('kb-maprail'); document.body.style.removeProperty('--maprail-w');
+      syncNav();
+    }
+    window.openStudyWindow = openStudy;
+    window.closeStudyWindow = closeStudy;
+
+    // (1) nav "Study" toggle: open the current page beside, or close if already open
+    var navBtn = document.getElementById('nav-study');
+    if (navBtn) navBtn.addEventListener('click', function () { isOpen() ? closeStudy() : openStudy(location.pathname + location.search); });
+
+    // (4) auto-open when you arrive from /map (?from=map), then strip the param so it never lingers
+    if (location.pathname !== '/map' && window.self === window.top && desktop()) {
+      var fromMap = false; try { fromMap = new URLSearchParams(location.search).get('from') === 'map'; } catch (e) {}
+      if (fromMap) { openStudy('/map'); try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} }
+    }
+
+    // (2) "Open beside" button trailing the page title (content pages only)
+    if (window.self === window.top && location.pathname !== '/map') {
+      var h1 = document.querySelector('.layout-main h1, .tool-head h1, .ref-article h1');
+      if (h1 && !document.getElementById('study-beside')) {
+        var ob = document.createElement('button'); ob.id = 'study-beside'; ob.className = 'study-beside'; ob.type = 'button';
+        ob.title = 'Open this page in a second window beside the one you are reading';
+        ob.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/><path d="m10 15-3-3 3-3"/></svg><span>Open beside</span>';
+        ob.addEventListener('click', function () { openStudy(location.pathname + location.search); });
+        h1.appendChild(ob);
       }
-      grip.addEventListener('pointermove', mv); grip.addEventListener('pointerup', up);
-    });
+    }
 
-    panel.querySelector('.kb-maprail-close').addEventListener('click', function () {
-      panel.remove(); document.body.classList.remove('kb-maprail'); document.body.style.removeProperty('--maprail-w');
-      try { history.replaceState(null, '', location.pathname); } catch (e) {}
-    });
+    // (3) hover an in-content link to send it to the study window without leaving your place
+    if (window.self === window.top) {
+      var peek = null, peekHref = null, hideT = null;
+      function ensurePeek() {
+        if (peek) return peek;
+        peek = document.createElement('button'); peek.className = 'kb-linkpeek'; peek.type = 'button';
+        peek.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/></svg>Open in window';
+        peek.addEventListener('click', function () { if (peekHref) openStudy(peekHref); hidePeek(); });
+        peek.addEventListener('mouseenter', function () { if (hideT) { clearTimeout(hideT); hideT = null; } });
+        peek.addEventListener('mouseleave', schedHide);
+        document.body.appendChild(peek); return peek;
+      }
+      function showPeek(a) {
+        var p = ensurePeek(), r = a.getBoundingClientRect(); peekHref = a.getAttribute('href');
+        p.style.top = (window.scrollY + r.top - 38) + 'px'; p.style.left = (window.scrollX + r.left) + 'px'; p.classList.add('show');
+      }
+      function hidePeek() { if (peek) peek.classList.remove('show'); }
+      function schedHide() { if (hideT) clearTimeout(hideT); hideT = setTimeout(hidePeek, 280); }
+      document.addEventListener('mouseover', function (e) {
+        var a = e.target.closest && e.target.closest('.prose a[href^="/"]');
+        if (a && desktop()) { if (hideT) { clearTimeout(hideT); hideT = null; } showPeek(a); }
+      });
+      document.addEventListener('mouseout', function (e) {
+        if (e.target.closest && e.target.closest('.prose a[href^="/"]')) schedHide();
+      });
+    }
   })();
 </script>
 </body>
@@ -313,6 +379,19 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
   body.kb-maprail-drag{cursor:col-resize;user-select:none}
   body.kb-maprail-drag .kb-maprail-frame{pointer-events:none}  /* let the drag glide over the iframe instead of being swallowed by it */
   @media(max-width:900px){.kb-maprail-panel{display:none}body.kb-maprail .wrap{margin-right:0}}
+  /* study-window triggers: nav toggle (1), "Open beside" by the title (2), in-content link peek (3) */
+  .nav-study{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--ink-soft);background:none;border:1.5px solid var(--line);border-radius:9px;padding:5px 10px;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+  .nav-study svg{width:15px;height:15px}
+  .nav-study:hover{color:var(--coral);border-color:var(--coral)}
+  .nav-study.on{color:#fff;background:var(--coral);border-color:var(--coral)}
+  .study-beside{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;margin-left:14px;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.02em;line-height:1;color:var(--coral);background:#fff;border:1.5px solid var(--coral);border-radius:9px;padding:6px 10px;cursor:pointer;white-space:nowrap;transition:transform .12s,box-shadow .12s}
+  .study-beside svg{width:14px;height:14px}
+  .study-beside:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(238,75,43,.22)}
+  .kb-linkpeek{position:absolute;z-index:60;display:none;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:8px;padding:6px 9px;cursor:pointer;box-shadow:0 6px 16px rgba(30,24,19,.25);white-space:nowrap}
+  .kb-linkpeek svg{width:13px;height:13px}
+  .kb-linkpeek.show{display:inline-flex}
+  .kb-linkpeek:hover{background:var(--coral)}
+  @media(max-width:900px){.nav-study,.study-beside,.kb-linkpeek{display:none !important}}
   a{color:inherit}
 
   /* nav (cream header band, full-bleed over the off-white body) */
