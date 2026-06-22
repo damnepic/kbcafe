@@ -218,9 +218,9 @@ nodes.forEach(n => {
   :global(#graph .hit){fill:transparent;cursor:grab}
   :global(#graph .core){stroke:rgba(255,255,255,.18);stroke-width:1.2}
   :global(#graph .node text){font-family:var(--font-mono);fill:#f4f1fc;pointer-events:none;paint-order:stroke;stroke:#120f1c;stroke-width:3.5px;stroke-linejoin:round}
-  :global(#graph .node.concept text){font-size:25px;font-weight:700}
+  :global(#graph .node.concept text){font-size:25px;font-weight:700;pointer-events:auto;cursor:pointer}
   :global(#graph .node.tool text){font-size:18px;fill:#d2cbe9;opacity:0;transition:opacity .15s}
-  :global(#graph .node.tool.hi text),:global(#graph .node.tool:hover text){opacity:1}
+  :global(#graph .node.tool.hi text),:global(#graph .node.tool:hover text){opacity:1;pointer-events:auto;cursor:pointer}
   :global(#graph.dim .node:not(.hi) .core){opacity:.32}
   :global(#graph.dim .node:not(.hi) .glow){opacity:.05}
   :global(#graph.dim .node:not(.hi) text){opacity:.1}
@@ -278,6 +278,16 @@ nodes.forEach(n => {
     }
     views.addEventListener('click', (e) => { const b = e.target.closest('.km-vbtn'); if (b) setView(b.dataset.view); });
 
+    // every guide/tool link in the map (Cards, Timeline, the modal) opens the destination with the map docked
+    // (?from=map on navigation, targeting the top window so it works standalone AND inside the rail iframe).
+    // Constellation stars are skipped here, they open the in-place modal instead.
+    km.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="/"]'); if (!a || a.closest('.node')) return;
+      e.preventDefault();
+      const href = a.getAttribute('href'); const url = href + (href.indexOf('?') < 0 ? '?' : '&') + 'from=map';
+      try { (window.top || window).location.href = url; } catch (_) { window.location.href = url; }
+    });
+
     // node detail modal (opens on tap instead of navigating away)
     const modal = document.getElementById('km-modal');
     function openModal(href) {
@@ -289,11 +299,10 @@ nodes.forEach(n => {
       document.getElementById('km-m-desc').textContent = info.ds || '';
       const rel = document.getElementById('km-m-related');
       rel.innerHTML = info.related.length
-        ? '<span class="km-rel-lbl">' + (info.type === 'concept' ? 'Try it with' : 'Explains') + '</span>' + info.related.map(r => '<a class="km-rel-chip" target="_top" href="' + r.href + '?from=map">' + r.label + '</a>').join('')
+        ? '<span class="km-rel-lbl">' + (info.type === 'concept' ? 'Try it with' : 'Explains') + '</span>' + info.related.map(r => '<a class="km-rel-chip" href="' + r.href + '">' + r.label + '</a>').join('')
         : '';
       const cta = document.getElementById('km-m-cta');
-      // ?from=map keeps the map docked on the destination; target=_top so it works whether the map is standalone or embedded in the rail
-      cta.href = info.href + '?from=map'; cta.setAttribute('target', '_top'); cta.textContent = (info.type === 'concept' ? 'Read the full guide →' : 'Open the tool →'); cta.style.background = ph.color;
+      cta.href = info.href; cta.textContent = (info.type === 'concept' ? 'Read the full guide →' : 'Open the tool →'); cta.style.background = ph.color;
       modal.querySelector('.km-modal-card').style.borderTopColor = ph.color;
       modal.hidden = false;
     }
