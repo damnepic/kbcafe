@@ -14,8 +14,6 @@ const concepts = AI.filter(a => a.type === 'explainer');
 const conceptIds = new Set(concepts.map(c => c.href));
 const aiTools = TOOLS.filter(t => t.href && t.cat === 'ai');
 
-// ── phases: one ordered, colored grouping that drives BOTH the constellation (cluster color)
-//    and the timeline (left-to-right evolution). Each concept maps to a phase. ──
 const PHASES = [
   { key: 0, label: 'Foundations',  color: '#7657ff', blurb: 'How a model reads, remembers, and structures what you give it.' },
   { key: 1, label: 'Retrieval',    color: '#3478f6', blurb: 'Giving a model your own data to answer from, by meaning.' },
@@ -29,14 +27,10 @@ const PHASE = {
   '/what-is-workflow-automation': 3, '/ai-agents-vs-workflows-vs-rpa': 3, '/webhooks-vs-polling': 3, '/what-is-ai-orchestration': 3,
 };
 const phaseOf = (href) => (PHASE[href] != null ? PHASE[href] : 0);
-
-// tools that teach a concept (for the cards + which phase a tool belongs to)
 const toolsForConcept = (href) => Object.keys(TOOL_GRAPH).filter(h => (TOOL_GRAPH[h].learn || []).includes(href));
 const toolLabel = Object.fromEntries(aiTools.map(t => [t.href, t.nm]));
-// a tool's phase = the phase of the first concept it teaches (fallback 0)
 const toolPhase = (href) => { const g = TOOL_GRAPH[href]; const c = g && (g.learn || [])[0]; return c != null ? phaseOf(c) : 0; };
 
-// graph nodes + edges (for the constellation), each tagged with its phase
 const nodes = [
   ...concepts.map(c => ({ id: c.href, label: shortConcept(c.nm), type: 'concept', ph: phaseOf(c.href) })),
   ...aiTools.map(t => ({ id: t.href, label: t.nm, type: 'tool', ph: toolPhase(t.href) })),
@@ -51,7 +45,6 @@ const addEdge = (a, b, kind) => {
 concepts.forEach(c => { const r = c.rel || {}; [...(r.next || []), ...(r.prereq || []), ...(r.related || [])].forEach(o => { if (conceptIds.has(o)) addEdge(c.href, o, 'cc'); }); });
 Object.entries(TOOL_GRAPH).forEach(([tool, g]) => (g.learn || []).forEach(c => addEdge(tool, c, 'ct')));
 
-// cards + timeline groupings (concept-centric, grouped by phase, in phase order)
 const byPhase = PHASES.map(ph => ({
   ...ph,
   items: concepts.filter(c => phaseOf(c.href) === ph.key).map(c => ({ href: c.href, label: shortConcept(c.nm), tools: toolsForConcept(c.href) })),
@@ -62,6 +55,7 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
   title="AI Knowledge Map, how every concept and tool connects | KB Cafe"
   description="An interactive map of KB Cafe's AI knowledge base: concepts, the tools that demonstrate them, and the learning paths that tie them together. Browse as cards, a constellation, or a timeline."
   path="/map"
+  sidebar={false}
 >
   <section class="km" data-view="cards">
     <header class="km-head">
@@ -78,7 +72,6 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
       </div>
     </header>
 
-    <!-- CARDS (default · crawlable · mobile-friendly) -->
     <div class="km-cards" id="km-cards">
       {byPhase.map(ph => (
         <div class="kmc-phase">
@@ -101,17 +94,18 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
       </div>
     </div>
 
-    <!-- CONSTELLATION (visual; SVG built in JS) -->
     <div class="km-constellation" id="km-constellation">
       <div class="km-legend">
         {PHASES.map(ph => <span class="lg"><span class="lg-dot" style={`background:${ph.color}`}></span>{ph.label}</span>)}
-        <span class="km-hint">drag a star to pull it out · drag the space to pan · scroll to zoom</span>
-        <button class="km-reset" id="km-reset" type="button">↺ Reset layout</button>
+        <span class="km-hint">tap a star to open · drag it to pull it out · hold to pan · scroll to zoom</span>
+        <div class="km-actions">
+          <button class="km-btn" id="km-reset" type="button">↺ Reset</button>
+          <button class="km-btn" id="km-fs" type="button">⛶ Full screen</button>
+        </div>
       </div>
-      <div class="km-stage"><svg id="graph" role="img" aria-label="Constellation of AI concepts and tools"></svg></div>
+      <div class="km-stage" id="km-stage"><svg id="graph" role="img" aria-label="Constellation of AI concepts and tools"></svg></div>
     </div>
 
-    <!-- TIMELINE (evolution by phase) -->
     <div class="km-timeline" id="km-timeline">
       <div class="kmt-track">
         {byPhase.map((ph, i) => (
@@ -147,7 +141,6 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
   .km-vbtn:hover{color:var(--ink)}
   .km-vbtn.on{background:var(--ink);color:var(--cream)}
 
-  /* view switching */
   .km[data-view="cards"] .km-constellation,.km[data-view="cards"] .km-timeline{display:none}
   .km[data-view="constellation"] .km-cards,.km[data-view="constellation"] .km-timeline{display:none}
   .km[data-view="timeline"] .km-cards,.km[data-view="timeline"] .km-constellation{display:none}
@@ -177,23 +170,30 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
   .km-constellation{margin-top:18px}
   .km-legend{display:flex;align-items:center;gap:16px;margin-bottom:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);flex-wrap:wrap}
   .lg{display:flex;align-items:center;gap:6px}.lg-dot{width:11px;height:11px;border-radius:50%}
-  .km-hint{margin-left:auto;opacity:.7}
-  .km-stage{border:1.5px solid #2a2740;border-radius:18px;background:radial-gradient(circle at 30% 18%,#221d35,#15131c 60%);overflow:hidden;touch-action:none;
-    position:relative;left:50%;transform:translateX(-50%);width:min(94vw,1340px)}
-  #graph{display:block;width:100%;height:780px;cursor:grab;touch-action:none}
-  .km-reset{margin-left:10px;font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-soft);background:var(--cream);border:1.3px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;transition:all .14s}
-  .km-reset:hover{border-color:var(--ink);color:var(--ink)}
+  .km-hint{opacity:.72}
+  .km-actions{display:flex;gap:8px;margin-left:auto}
+  .km-btn{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-soft);background:var(--cream);border:1.3px solid var(--line);border-radius:8px;padding:7px 13px;cursor:pointer;transition:all .14s}
+  .km-btn:hover{border-color:var(--ink);color:var(--ink)}
+  /* full-bleed-to-the-right-and-left of the (now sidebar-less) page so the map uses the real estate */
+  .km-stage{border:1.5px solid #2a2740;border-radius:20px;overflow:hidden;touch-action:none;
+    background:radial-gradient(120% 90% at 28% 12%,#251f3a 0%,#191428 42%,#120f1c 100%);
+    position:relative;left:50%;transform:translateX(-50%);width:min(94vw,1400px)}
+  #graph{display:block;width:100%;height:800px;cursor:grab;touch-action:none}
   :global(#graph.grabbing){cursor:grabbing}
-  :global(#graph .edge){stroke:rgba(150,140,210,.22);stroke-width:1.1}
-  :global(#graph .edge.ct){stroke:rgba(150,140,210,.13)}
-  :global(#graph .node circle){cursor:pointer}
-  :global(#graph .glow){opacity:.5}
-  :global(#graph .node text){font-family:var(--font-mono);fill:#f0ecfb;pointer-events:none;paint-order:stroke;stroke:#15131c;stroke-width:5px;stroke-linejoin:round}
-  :global(#graph .node.concept text){font-size:26px;font-weight:700}
-  :global(#graph .node.tool text){font-size:19px;fill:#c8c1e2}
-  :global(#graph.dim .node:not(.hi) circle){opacity:.25}
-  :global(#graph.dim .node:not(.hi) text){opacity:.12}
+  .km-stage:fullscreen{width:100vw;height:100vh;left:0;transform:none;border-radius:0;border:0}
+  .km-stage:fullscreen #graph{height:100vh}
+  :global(#graph .edge){stroke:rgba(168,158,228,.20);stroke-width:1.2}
+  :global(#graph .edge.ct){stroke:rgba(168,158,228,.10)}
+  :global(#graph .glow){pointer-events:none}
+  :global(#graph .hit){fill:transparent;cursor:grab}
+  :global(#graph .core){stroke:rgba(255,255,255,.18);stroke-width:1.2}
+  :global(#graph .node text){font-family:var(--font-mono);fill:#f4f1fc;pointer-events:none;paint-order:stroke;stroke:#120f1c;stroke-width:3.5px;stroke-linejoin:round}
+  :global(#graph .node.concept text){font-size:25px;font-weight:700}
+  :global(#graph .node.tool text){font-size:18px;fill:#d2cbe9;opacity:0;transition:opacity .15s}
+  :global(#graph .node.tool.hi text),:global(#graph .node.tool:hover text){opacity:1}
+  :global(#graph.dim .node:not(.hi) .core){opacity:.32}
   :global(#graph.dim .node:not(.hi) .glow){opacity:.05}
+  :global(#graph.dim .node:not(.hi) text){opacity:.1}
   :global(#graph.dim .edge:not(.hi)){opacity:.05}
 
   /* ── TIMELINE ── */
@@ -214,7 +214,7 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
     .km-views{margin-left:0}
     .kmc-grid{grid-template-columns:1fr}
     .km-hint{display:none}
-    /* constellation graph is desktop-leaning; keep it usable but Cards is the default + readable view */
+    .km-actions{margin-left:0}
     #graph{height:560px}
   }
 </style>
@@ -231,21 +231,28 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
     }
     views.addEventListener('click', (e) => { const b = e.target.closest('.km-vbtn'); if (b) setView(b.dataset.view); });
 
-    // ── constellation (force sim, built once, dark star-map render) ──
     let built = false;
     const COLOR = PHASES.reduce((m, p) => (m[p.key] = p.color, m), {});
     function buildGraph() {
       if (built) return; built = true;
       const svg = document.getElementById('graph'); if (!svg) return;
-      const W = 1480, H = 840, SVGNS = 'http://www.w3.org/2000/svg';
+      const W = 1480, H = 840, NS = 'http://www.w3.org/2000/svg';
+      const cN = (t) => document.createElementNS(NS, t);
+      const circ = (cx, cy, r, fill, cls) => { const c = cN('circle'); c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r); c.setAttribute('fill', fill); if (cls) c.setAttribute('class', cls); return c; };
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+      // soft blur-glow filter (the premium star look)
+      const defs = cN('defs'); const filt = cN('filter');
+      filt.setAttribute('id', 'kglow'); filt.setAttribute('x', '-120%'); filt.setAttribute('y', '-120%'); filt.setAttribute('width', '340%'); filt.setAttribute('height', '340%');
+      const blur = cN('feGaussianBlur'); blur.setAttribute('stdDeviation', '9'); filt.appendChild(blur); defs.appendChild(filt); svg.appendChild(defs);
+
       const N = nodes.length;
       nodes.forEach((n, i) => { const a = (i / N) * Math.PI * 2; n.x = W / 2 + Math.cos(a) * 320; n.y = H / 2 + Math.sin(a) * 250; n.vx = 0; n.vy = 0; });
       const idx = Object.fromEntries(nodes.map((n, i) => [n.id, i]));
       const E = edges.map(e => ({ s: idx[e.s], t: idx[e.t], kind: e.kind })).filter(e => e.s != null && e.t != null);
       const deg = nodes.map(() => 0); E.forEach(e => { deg[e.s]++; deg[e.t]++; });
-      const REP = 17000, SPRING = 0.013, LEN = 200, GRAV = 0.01, DAMP = 0.85;
-      for (let it = 0; it < 460; it++) {
+      const REP = 20000, SPRING = 0.012, LEN = 235, GRAV = 0.009, DAMP = 0.85;
+      for (let it = 0; it < 480; it++) {
         for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
           let dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y; let d2 = dx * dx + dy * dy || 0.01; const d = Math.sqrt(d2);
           const f = REP / d2; const fx = (dx / d) * f, fy = (dy / d) * f; nodes[i].vx += fx; nodes[i].vy += fy; nodes[j].vx -= fx; nodes[j].vy -= fy;
@@ -253,68 +260,74 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
         E.forEach(e => { const a = nodes[e.s], b = nodes[e.t]; let dx = b.x - a.x, dy = b.y - a.y; const d = Math.sqrt(dx * dx + dy * dy) || 0.01; const f = (d - LEN) * SPRING; const fx = (dx / d) * f, fy = (dy / d) * f; a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy; });
         nodes.forEach(n => { n.vx += (W / 2 - n.x) * GRAV; n.vy += (H / 2 - n.y) * GRAV; n.vx *= DAMP; n.vy *= DAMP; n.x += n.vx; n.y += n.vy; });
       }
-      const pad = 100, xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+      const pad = 110, xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
       const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-      const s = Math.min((W - pad * 2) / (maxX - minX || 1), (H - pad * 2) / (maxY - minY || 1));
-      nodes.forEach(n => { n.x = pad + (n.x - minX) * s; n.y = pad + (n.y - minY) * s; });
-      const orig = nodes.map(n => ({ x: n.x, y: n.y }));   // remembered for the snap-back button
+      const sc = Math.min((W - pad * 2) / (maxX - minX || 1), (H - pad * 2) / (maxY - minY || 1));
+      nodes.forEach(n => { n.x = pad + (n.x - minX) * sc; n.y = pad + (n.y - minY) * sc; });
+      const orig = nodes.map(n => ({ x: n.x, y: n.y }));
 
-      const gZoom = document.createElementNS(SVGNS, 'g'), gEdges = document.createElementNS(SVGNS, 'g'), gNodes = document.createElementNS(SVGNS, 'g');
+      const gZoom = cN('g'), gEdges = cN('g'), gNodes = cN('g');
       gZoom.appendChild(gEdges); gZoom.appendChild(gNodes); svg.appendChild(gZoom);
       const adj = nodes.map(() => new Set());
       const edgesByNode = nodes.map(() => []);
       E.forEach(e => {
-        const ln = document.createElementNS(SVGNS, 'line');
+        const ln = cN('line');
         ln.setAttribute('x1', nodes[e.s].x); ln.setAttribute('y1', nodes[e.s].y); ln.setAttribute('x2', nodes[e.t].x); ln.setAttribute('y2', nodes[e.t].y);
         ln.setAttribute('class', 'edge ' + e.kind); ln.dataset.s = e.s; ln.dataset.t = e.t; gEdges.appendChild(ln);
         adj[e.s].add(e.t); adj[e.t].add(e.s);
         edgesByNode[e.s].push({ el: ln, end: 1 }); edgesByNode[e.t].push({ el: ln, end: 2 });
       });
       nodes.forEach((n, i) => {
-        const g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'node ' + n.type); g.dataset.i = i;
-        const a = document.createElementNS(SVGNS, 'a'); a.setAttribute('href', n.id);
+        const g = cN('g'); g.setAttribute('class', 'node ' + n.type); g.dataset.i = i;
+        const a = cN('a'); a.setAttribute('href', n.id);
+        const inner = cN('g'); inner.setAttribute('transform', `translate(${n.x} ${n.y})`);
         const col = COLOR[n.ph] || '#7657ff';
-        const r = n.type === 'concept' ? 16 + Math.min(deg[i], 6) * 1.6 : 9;
+        const r = n.type === 'concept' ? 15 + Math.min(deg[i], 6) * 1.5 : 8.5;
         n._r = r;
-        const glow = document.createElementNS(SVGNS, 'circle');
-        glow.setAttribute('cx', n.x); glow.setAttribute('cy', n.y); glow.setAttribute('r', r * 2.4); glow.setAttribute('fill', col); glow.setAttribute('class', 'glow');
-        const c = document.createElementNS(SVGNS, 'circle');
-        c.setAttribute('cx', n.x); c.setAttribute('cy', n.y); c.setAttribute('r', r); c.setAttribute('fill', col);
-        const t = document.createElementNS(SVGNS, 'text');
-        t.setAttribute('x', n.x); t.setAttribute('y', n.y - r - 9); t.setAttribute('text-anchor', 'middle'); t.textContent = n.label;
-        a.appendChild(glow); a.appendChild(c); g.appendChild(a); g.appendChild(t); gNodes.appendChild(g);
-        n._glow = glow; n._core = c; n._text = t;
+        const glow = circ(0, 0, r * 2.6, col, 'glow'); glow.setAttribute('filter', 'url(#kglow)'); glow.setAttribute('opacity', '.55');
+        const core = circ(0, 0, r, col, 'core');
+        const hl = circ(-r * 0.34, -r * 0.34, r * 0.42, '#ffffff'); hl.setAttribute('opacity', '.30'); hl.setAttribute('class', 'hl');
+        const hit = circ(0, 0, Math.max(r + 11, 21), 'transparent', 'hit');
+        const t = cN('text'); t.setAttribute('x', 0); t.setAttribute('y', -r - 10); t.setAttribute('text-anchor', 'middle'); t.textContent = n.label;
+        inner.appendChild(glow); inner.appendChild(core); inner.appendChild(hl); inner.appendChild(hit); inner.appendChild(t);
+        a.appendChild(inner); g.appendChild(a); gNodes.appendChild(g);
+        n._inner = inner;
         g.addEventListener('mouseenter', () => highlight(i)); g.addEventListener('mouseleave', clearHi);
       });
       function moveNode(i, x, y) {
-        const n = nodes[i]; n.x = x; n.y = y;
-        n._glow.setAttribute('cx', x); n._glow.setAttribute('cy', y);
-        n._core.setAttribute('cx', x); n._core.setAttribute('cy', y);
-        n._text.setAttribute('x', x); n._text.setAttribute('y', y - n._r - 9);
+        const n = nodes[i]; n.x = x; n.y = y; n._inner.setAttribute('transform', `translate(${x} ${y})`);
         edgesByNode[i].forEach(o => { if (o.end === 1) { o.el.setAttribute('x1', x); o.el.setAttribute('y1', y); } else { o.el.setAttribute('x2', x); o.el.setAttribute('y2', y); } });
       }
       function highlight(i) { svg.classList.add('dim'); gNodes.querySelectorAll('.node').forEach(el => { const j = +el.dataset.i; el.classList.toggle('hi', j === i || adj[i].has(j)); }); gEdges.querySelectorAll('.edge').forEach(el => el.classList.toggle('hi', +el.dataset.s === i || +el.dataset.t === i)); }
       function clearHi() { svg.classList.remove('dim'); gNodes.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); gEdges.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); }
 
-      // pan (drag empty space) · drag a star (pull a concept out) · wheel zoom
-      let tx = 0, ty = 0, scale = 1, mode = null, dragI = -1, sx0 = 0, sy0 = 0, moved = false;
+      // interaction: drag empty space = pan · quick-drag a star = move it · HOLD a star = pan the whole map · wheel = zoom
+      let tx = 0, ty = 0, scale = 1, mode = null, dragI = -1, sx0 = 0, sy0 = 0, moved = false, longT = null;
       const apply = () => gZoom.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
-      svg.addEventListener('wheel', (e) => { e.preventDefault(); const f = e.deltaY < 0 ? 1.1 : 0.9; scale = Math.max(0.4, Math.min(4, scale * f)); apply(); }, { passive: false });
-      svg.addEventListener('pointerdown', (e) => { const g = e.target.closest('.node'); mode = g ? 'node' : 'pan'; dragI = g ? +g.dataset.i : -1; sx0 = e.clientX; sy0 = e.clientY; moved = false; svg.classList.add('grabbing'); try { svg.setPointerCapture(e.pointerId); } catch (_) {} });
+      const clearLong = () => { if (longT) { clearTimeout(longT); longT = null; } };
+      svg.addEventListener('wheel', (e) => { e.preventDefault(); const f = e.deltaY < 0 ? 1.1 : 0.9; scale = Math.max(0.35, Math.min(4.5, scale * f)); apply(); }, { passive: false });
+      svg.addEventListener('pointerdown', (e) => {
+        const g = e.target.closest('.node'); sx0 = e.clientX; sy0 = e.clientY; moved = false; svg.classList.add('grabbing');
+        try { svg.setPointerCapture(e.pointerId); } catch (_) {}
+        if (!g) { mode = 'pan'; dragI = -1; }
+        else { mode = null; dragI = +g.dataset.i; clearLong(); longT = setTimeout(() => { mode = 'pan'; moved = true; }, 340); }   // long-press on a star -> pan the map
+      });
       svg.addEventListener('pointermove', (e) => {
-        if (!mode) return; const dx = e.clientX - sx0, dy = e.clientY - sy0; if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+        const dx = e.clientX - sx0, dy = e.clientY - sy0; const far = Math.abs(dx) + Math.abs(dy) > 4;
+        if (mode === null) { if (far) { mode = 'node'; clearLong(); } else return; }
+        if (far) moved = true;
         if (mode === 'pan') { tx += dx; ty += dy; apply(); }
         else { const rect = svg.getBoundingClientRect(); const ppu = (rect.width / W) * scale || 1; moveNode(dragI, nodes[dragI].x + dx / ppu, nodes[dragI].y + dy / ppu); }
         sx0 = e.clientX; sy0 = e.clientY;
       });
-      const end = () => { mode = null; dragI = -1; svg.classList.remove('grabbing'); };
+      const end = () => { clearLong(); mode = null; dragI = -1; svg.classList.remove('grabbing'); };
       svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
       gNodes.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
 
-      // snap-back: glide every node to its original layout position + reset pan/zoom
+      // snap-back: glide every node home + reset pan/zoom
       const resetBtn = document.getElementById('km-reset');
       if (resetBtn) resetBtn.addEventListener('click', () => {
-        const start = nodes.map(n => ({ x: n.x, y: n.y })); let t0 = null; const dur = 520;
+        const start = nodes.map(n => ({ x: n.x, y: n.y })); let t0 = null; const dur = 540;
         tx = 0; ty = 0; scale = 1; apply();
         function stepF(ts) {
           if (t0 == null) t0 = ts;
@@ -324,9 +337,15 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
         }
         requestAnimationFrame(stepF);
       });
+      // fullscreen
+      const fsBtn = document.getElementById('km-fs'), stage = document.getElementById('km-stage');
+      if (fsBtn && stage) fsBtn.addEventListener('click', () => {
+        if (document.fullscreenElement) { document.exitFullscreen && document.exitFullscreen(); }
+        else if (stage.requestFullscreen) { stage.requestFullscreen(); }
+      });
     }
 
-    // default view: Constellation on desktop (the showcase), Cards on mobile + for crawlers (markup default = cards)
+    // default: Constellation on desktop (the showcase), Cards on mobile + for crawlers (markup default = cards)
     let initial = null;
     try { const s = localStorage.getItem('kb-map-view'); if (s === 'cards' || s === 'constellation' || s === 'timeline') initial = s; } catch (e) {}
     if (!initial) initial = window.innerWidth > 760 ? 'constellation' : 'cards';
