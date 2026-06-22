@@ -231,9 +231,10 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
     var nav = document.querySelector('.site-nav'); var navH = nav ? nav.offsetHeight : 64;
     var panel = document.createElement('aside'); panel.className = 'kb-maprail-panel';
     panel.style.top = navH + 'px'; panel.style.height = 'calc(100vh - ' + navH + 'px)';
-    panel.innerHTML = '<div class="kb-maprail-bar"><span>☕ Knowledge map</span><button class="kb-maprail-close" type="button" aria-label="Close map">✕</button></div><iframe class="kb-maprail-frame" src="/map" title="Knowledge map"></iframe>';
+    panel.innerHTML = '<div class="kb-maprail-bar"><span>☕ Knowledge map</span><button class="kb-maprail-close" type="button" aria-label="Close map">✕</button></div><iframe class="kb-maprail-frame" src="/map" title="Knowledge map" loading="lazy"></iframe>';
     document.body.appendChild(panel);
     document.body.classList.add('kb-maprail');
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}   // strip ?from=map immediately so the param never lingers, gets shared, or is seen as a real URL
     panel.querySelector('.kb-maprail-close').addEventListener('click', function () {
       panel.remove(); document.body.classList.remove('kb-maprail');
       try { history.replaceState(null, '', location.pathname); } catch (e) {}
