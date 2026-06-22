@@ -298,7 +298,7 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
 
     // (2) "Open beside" button trailing the page title (content pages only)
     if (window.self === window.top && location.pathname !== '/map') {
-      var h1 = document.querySelector('.layout-main h1, .tool-head h1, .ref-article h1');
+      var h1 = document.querySelector('.layout-main h1, .tool-head h1, .ref-article h1, .ba h1');
       if (h1 && !document.getElementById('study-beside')) {
         var ob = document.createElement('button'); ob.id = 'study-beside'; ob.className = 'study-beside'; ob.type = 'button';
         ob.title = 'Open this page in a second window beside the one you are reading';
@@ -327,11 +327,11 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
       function hidePeek() { if (peek) peek.classList.remove('show'); }
       function schedHide() { if (hideT) clearTimeout(hideT); hideT = setTimeout(hidePeek, 280); }
       document.addEventListener('mouseover', function (e) {
-        var a = e.target.closest && e.target.closest('.prose a[href^="/"]');
+        var a = e.target.closest && e.target.closest('.prose a[href^="/"], .ba-body a[href^="/"]');
         if (a && desktop()) { if (hideT) { clearTimeout(hideT); hideT = null; } showPeek(a); }
       });
       document.addEventListener('mouseout', function (e) {
-        if (e.target.closest && e.target.closest('.prose a[href^="/"]')) schedHide();
+        if (e.target.closest && e.target.closest('.prose a[href^="/"], .ba-body a[href^="/"]')) schedHide();
       });
     }
   })();
