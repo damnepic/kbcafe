@@ -582,11 +582,17 @@ const UI_ICONS = {
   .trust small{font-size:11px;color:var(--ink-soft)}
   .tr-dv{width:1px;height:26px;background:rgba(30,24,19,.14);flex:0 0 auto}
   @media(max-width:760px){
-    .trust{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px;max-width:440px;justify-items:start;padding:16px 18px}
+    .trust{display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;padding:18px;justify-items:start}
     .tr-dv{display:none}
-    .tr-item{justify-content:flex-start}
+    .tr-item{justify-content:flex-start;gap:13px}
+    .tr-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+    .tr-ic svg{width:21px;height:21px}
+    .tr-ic.b1{background:rgba(52,120,246,.12)}
+    .tr-ic.b2{background:rgba(238,75,43,.12)}
+    .tr-ic.b3{background:rgba(224,145,26,.14)}
+    .tr-ic.b4{background:rgba(15,159,130,.12)}
   }
-  @media(max-width:430px){.trust{grid-template-columns:1fr;max-width:280px}}
+  @media(max-width:430px){.trust{grid-template-columns:1fr}}
 
   /* SECTIONS */
   .home-sec,.results{max-width:1120px;margin:0 auto 52px}
