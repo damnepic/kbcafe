@@ -50,6 +50,23 @@ const byPhase = PHASES.map(ph => ({
   items: concepts.filter(c => phaseOf(c.href) === ph.key).map(c => ({ href: c.href, label: shortConcept(c.nm), tools: toolsForConcept(c.href) })),
 }));
 const conceptCount = concepts.length, toolCount = aiTools.length;
+
+// per-node detail for the click modal: description + related links
+const aiByHref = Object.fromEntries(AI.map(a => [a.href, a]));
+const toolByHref = Object.fromEntries(TOOLS.map(t => [t.href, t]));
+const conceptLabel = (href) => { const a = aiByHref[href]; return a ? shortConcept(a.nm) : href; };
+const INFO = {};
+nodes.forEach(n => {
+  let ds = '', related = [];
+  if (n.type === 'concept') {
+    ds = (aiByHref[n.id] || {}).ds || '';
+    related = toolsForConcept(n.id).map(h => ({ href: h, label: toolLabel[h] || h }));
+  } else {
+    ds = (toolByHref[n.id] || {}).ds || '';
+    related = (((TOOL_GRAPH[n.id] || {}).learn) || []).filter(h => conceptIds.has(h)).map(h => ({ href: h, label: conceptLabel(h) }));
+  }
+  INFO[n.id] = { label: n.label, ds, type: n.type, ph: n.ph, href: n.id, related };
+});
 ---
 <Layout
   title="AI Knowledge Map, how every concept and tool connects | KB Cafe"
@@ -103,7 +120,20 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
           <button class="km-btn" id="km-fs" type="button">⛶ Full screen</button>
         </div>
       </div>
-      <div class="km-stage" id="km-stage"><svg id="graph" role="img" aria-label="Constellation of AI concepts and tools"></svg></div>
+      <div class="km-stage" id="km-stage">
+        <svg id="graph" role="img" aria-label="Constellation of AI concepts and tools"></svg>
+        <div class="km-modal" id="km-modal" hidden>
+          <div class="km-modal-bg" data-close></div>
+          <div class="km-modal-card" role="dialog" aria-modal="true" aria-labelledby="km-m-title">
+            <button class="km-modal-x" data-close type="button" aria-label="Close">✕</button>
+            <div class="km-modal-type" id="km-m-type"></div>
+            <h2 class="km-modal-title" id="km-m-title"></h2>
+            <p class="km-modal-desc" id="km-m-desc"></p>
+            <div class="km-modal-related" id="km-m-related"></div>
+            <a class="km-modal-cta" id="km-m-cta" href="#"></a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="km-timeline" id="km-timeline">
@@ -195,6 +225,23 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
   :global(#graph.dim .node:not(.hi) .glow){opacity:.05}
   :global(#graph.dim .node:not(.hi) text){opacity:.1}
   :global(#graph.dim .edge:not(.hi)){opacity:.05}
+  /* node detail modal (scoped to the stage so it works in fullscreen too) */
+  .km-modal{position:absolute;inset:0;z-index:6;display:grid;place-items:center;padding:20px}
+  .km-modal[hidden]{display:none}
+  .km-modal-bg{position:absolute;inset:0;background:rgba(8,6,16,.6)}
+  .km-modal-card{position:relative;max-width:430px;width:100%;background:var(--cream);border:1.5px solid var(--line);border-top:3px solid var(--coral);border-radius:18px;padding:24px 24px 22px;box-shadow:0 30px 70px rgba(0,0,0,.45);animation:kmrise .18s ease}
+  @keyframes kmrise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .km-modal-x{position:absolute;top:13px;right:14px;border:0;background:none;cursor:pointer;font-size:17px;color:var(--ink-soft);line-height:1;padding:4px}
+  .km-modal-x:hover{color:var(--ink)}
+  .km-modal-type{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+  .km-modal-title{font-family:var(--font-display);font-weight:800;font-size:23px;letter-spacing:-.02em;margin:5px 0 10px;color:var(--ink);line-height:1.15;padding-right:20px}
+  .km-modal-desc{font-size:14.5px;line-height:1.55;color:var(--ink-soft);margin:0}
+  .km-modal-related{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:16px}
+  .km-rel-lbl{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);width:100%;margin-bottom:-1px}
+  .km-rel-chip{font-family:var(--font-mono);font-size:11.5px;color:var(--ink);text-decoration:none;background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:5px 10px;transition:all .12s}
+  .km-rel-chip:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .km-modal-cta{display:inline-flex;align-items:center;gap:6px;margin-top:18px;color:#fff;text-decoration:none;font-family:var(--font-display);font-weight:800;font-size:14px;border-radius:11px;padding:11px 18px;transition:filter .14s}
+  .km-modal-cta:hover{filter:brightness(.93)}
 
   /* ── TIMELINE ── */
   .km-timeline{margin-top:22px}
@@ -219,7 +266,7 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
   }
 </style>
 
-<script is:inline define:vars={{ nodes, edges, PHASES }}>
+<script is:inline define:vars={{ nodes, edges, PHASES, INFO }}>
   (function () {
     const km = document.querySelector('.km');
     const views = document.getElementById('km-views');
@@ -230,6 +277,28 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
       if (v === 'constellation') buildGraph();
     }
     views.addEventListener('click', (e) => { const b = e.target.closest('.km-vbtn'); if (b) setView(b.dataset.view); });
+
+    // node detail modal (opens on tap instead of navigating away)
+    const modal = document.getElementById('km-modal');
+    function openModal(href) {
+      const info = INFO[href]; if (!info || !modal) return;
+      const ph = PHASES[info.ph] || PHASES[0];
+      const typeEl = document.getElementById('km-m-type');
+      typeEl.textContent = (info.type === 'concept' ? 'Concept' : 'Tool') + ' · ' + ph.label; typeEl.style.color = ph.color;
+      document.getElementById('km-m-title').textContent = info.label;
+      document.getElementById('km-m-desc').textContent = info.ds || '';
+      const rel = document.getElementById('km-m-related');
+      rel.innerHTML = info.related.length
+        ? '<span class="km-rel-lbl">' + (info.type === 'concept' ? 'Try it with' : 'Explains') + '</span>' + info.related.map(r => '<a class="km-rel-chip" href="' + r.href + '">' + r.label + '</a>').join('')
+        : '';
+      const cta = document.getElementById('km-m-cta');
+      cta.href = info.href; cta.textContent = (info.type === 'concept' ? 'Read the full guide →' : 'Open the tool →'); cta.style.background = ph.color;
+      modal.querySelector('.km-modal-card').style.borderTopColor = ph.color;
+      modal.hidden = false;
+    }
+    function closeModal() { if (modal) modal.hidden = true; }
+    if (modal) modal.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
     let built = false;
     const COLOR = PHASES.reduce((m, p) => (m[p.key] = p.color, m), {});
@@ -322,7 +391,11 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
       });
       const end = () => { clearLong(); mode = null; dragI = -1; svg.classList.remove('grabbing'); };
       svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
-      gNodes.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
+      gNodes.addEventListener('click', (e) => {
+        e.preventDefault();              // never navigate away; the modal explains it in place
+        if (moved) return;               // that was a drag, not a tap
+        const g = e.target.closest('.node'); if (g) openModal(nodes[+g.dataset.i].id);
+      }, true);
 
       // snap-back: glide every node home + reset pan/zoom
       const resetBtn = document.getElementById('km-reset');
