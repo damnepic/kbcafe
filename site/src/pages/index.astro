@@ -335,7 +335,7 @@ const UI_ICONS = {
   <div class="cta">
     <div class="nl-card">
       <span class="nl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4Z"/><path d="M16 11h2.4a2.4 2.4 0 0 1 0 4.8H16"/><path d="M8 3.2c-.8 1-.8 1.9 0 2.9M12 3.2c-.8 1-.8 1.9 0 2.9"/></svg></span>
-      <div class="nl-text"><h3>Crème de la crème <span class="nl-cup" aria-hidden="true">☕</span></h3><p>Only the best tools, tips, and real life examples for building websites and apps. No B.S. guru crap or spam.</p></div>
+      <div class="nl-text"><h3>Crème de la crème</h3><p>Only the best tools, tips, and real life examples for building websites and apps. No B.S. guru crap or spam.</p></div>
       <form class="nl-form" id="nlform" onsubmit="return false" title="Coming soon">
         <input id="nlemail" type="text" readonly placeholder="you@example.com" />
         <button type="submit">Subscribe</button>
@@ -655,9 +655,10 @@ const UI_ICONS = {
   .cta .nl-card h3{color:var(--ink)}
   .cta .nl-card p{color:var(--ink-soft)}
   .nl-card .nl-ic{background:var(--ink);border-color:var(--ink);color:var(--gold)}
-  .nl-card .nl-form{background:linear-gradient(135deg,#2c1d12,#3a2616);border:1px solid rgba(30,24,19,.28);transition:opacity .15s}
+  .nl-card .nl-form{background:var(--cream);border:1.5px solid var(--ink);transition:opacity .15s}
   .nl-card .nl-form:hover{opacity:.55;cursor:not-allowed}
-  .nl-card .nl-form input{cursor:not-allowed}
+  .nl-card .nl-form input{cursor:not-allowed;color:var(--ink)}
+  .nl-card .nl-form input::placeholder{color:var(--ink-soft)}
   .nl-card .nl-done{color:var(--ink-soft)}
   .nl-card h3{display:flex;align-items:center;gap:8px}
   .nl-cup{font-size:16px}
