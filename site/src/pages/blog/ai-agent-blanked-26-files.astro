@@ -30,7 +30,7 @@ import BlogPost from '../../layouts/BlogPost.astro';
     agent came back with the scope of what it had just done:
   </p>
 
-  <div class="kb-term">
+  <div class="qa-box">
     <div class="kb-a"><span class="kb-who">the agent</span>
       <p>I caused a destructive error <span class="emd"></span> a botched PowerShell replace null-wrote 26 files; 13 were restored from <code>git</code>, but 13 untracked files are blanked. The good news: the last successful build&rsquo;s <code>dist/*.html</code> still has their full rendered content, so they&rsquo;re recoverable.</p>
     </div>
@@ -39,7 +39,7 @@ import BlogPost from '../../layouts/BlogPost.astro';
   <h2>The question that saved me</h2>
   <p>Before the agent could take its (catastrophic) next step, since I was watching the session, I was able to <strong>stop</strong> auto mode and cut in:</p>
 
-  <div class="kb-term">
+  <div class="qa-box">
     <div class="kb-q">wait. STOP. if you didn't deploy live yet, what's live currently hasn't been overwritten by your destructive error correct?</div>
   </div>
 
@@ -83,7 +83,7 @@ import BlogPost from '../../layouts/BlogPost.astro';
     reassuring. Here is that exchange, in full:
   </p>
 
-  <div class="kb-term">
+  <div class="qa-box">
     <div class="kb-q">what would have happened if i didn't have the idea to use the live site to reverse engineer what we already had?</div>
     <div class="kb-a"><span class="kb-who">the agent</span>
       <p>Honest answer, because you deserve the real reckoning rather than a reassuring one.</p>
@@ -108,7 +108,7 @@ import BlogPost from '../../layouts/BlogPost.astro';
     and the agent laid out how to do it without risk:
   </p>
 
-  <div class="kb-term">
+  <div class="qa-box">
     <div class="kb-q">is it better now for you to just reprogram those 13 from scratch using what's there as an authoritative guide so the authoring quality can be improved to what it was before the hit, and even better?</div>
     <div class="kb-a"><span class="kb-who">the agent</span>
       <p>Yes <span class="emd"></span> I think it&rsquo;s worth doing, and your instinct is right that clean source beats the <code>set:html</code> blobs. But let me separate two things that are bundled in your question, because one is safe and one needs care:</p>
@@ -145,21 +145,21 @@ import BlogPost from '../../layouts/BlogPost.astro';
 
 <style>
   /* terminal-style verbatim exchanges, to read like the real CLI interaction */
-  .kb-term{background:#141210;border:1px solid #2c2620;border-radius:13px;margin:22px 0;overflow:hidden;
+  .qa-box{background:#141210;border:1px solid #2c2620;border-radius:13px;margin:22px 0;overflow:hidden;
     box-shadow:0 14px 34px rgba(20,12,4,.22)}
-  .kb-term .kb-q{background:#0c0a07;color:#dfe6f2;padding:14px 17px;font-family:var(--font-mono);font-size:13.5px;line-height:1.6;border-bottom:1px solid #2c2620}
-  .kb-term .kb-q::before{content:"\276F  you";color:#73a9ff;font-weight:700;display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
-  .kb-term .kb-q + .kb-a{border-top:0}
-  .kb-term .kb-a{padding:15px 17px;color:#ddd6c8;font-family:var(--font-body);font-size:14px;line-height:1.62}
-  .kb-term .kb-who{display:block;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f4b423;font-weight:700;margin-bottom:10px}
-  .kb-term .kb-a p{margin:0 0 11px;color:#ddd6c8}
-  .kb-term .kb-a p:last-child{margin-bottom:0}
-  .kb-term .kb-a strong{color:#fff;font-weight:700}
-  .kb-term .kb-a ol{margin:0 0 11px;padding-left:22px}
-  .kb-term .kb-a li{margin-bottom:7px;color:#ddd6c8}
-  .kb-term .kb-q code, .kb-term .kb-a code{font-family:var(--font-mono);background:rgba(255,255,255,.09);
+  .qa-box .kb-q{background:#0c0a07;color:#dfe6f2;padding:14px 17px;font-family:var(--font-mono);font-size:13.5px;line-height:1.6;border-bottom:1px solid #2c2620}
+  .qa-box .kb-q::before{content:"\276F  you";color:#73a9ff;font-weight:700;display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
+  .qa-box .kb-q + .kb-a{border-top:0}
+  .qa-box .kb-a{padding:15px 17px;color:#ddd6c8;font-family:var(--font-body);font-size:14px;line-height:1.62}
+  .qa-box .kb-who{display:block;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f4b423;font-weight:700;margin-bottom:10px}
+  .qa-box .kb-a p{margin:0 0 11px;color:#ddd6c8}
+  .qa-box .kb-a p:last-child{margin-bottom:0}
+  .qa-box .kb-a strong{color:#fff;font-weight:700}
+  .qa-box .kb-a ol{margin:0 0 11px;padding-left:22px}
+  .qa-box .kb-a li{margin-bottom:7px;color:#ddd6c8}
+  .qa-box .kb-q code, .qa-box .kb-a code{font-family:var(--font-mono);background:rgba(255,255,255,.09);
     color:#ffcfa6;padding:1px 5px;border-radius:5px;font-size:.9em}
   /* em dash + arrow rendered via CSS so the source stays free of literal em-dash characters */
-  .kb-term .emd::before{content:"\2014"}
-  .kb-term .arr::before{content:"\2192"}
+  .qa-box .emd::before{content:"\2014"}
+  .qa-box .arr::before{content:"\2192"}
 </style>
