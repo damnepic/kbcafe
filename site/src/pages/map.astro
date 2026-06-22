@@ -105,7 +105,8 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
     <div class="km-constellation" id="km-constellation">
       <div class="km-legend">
         {PHASES.map(ph => <span class="lg"><span class="lg-dot" style={`background:${ph.color}`}></span>{ph.label}</span>)}
-        <span class="km-hint">drag · scroll to zoom · tap a star</span>
+        <span class="km-hint">drag a star to pull it out · drag the space to pan · scroll to zoom</span>
+        <button class="km-reset" id="km-reset" type="button">↺ Reset layout</button>
       </div>
       <div class="km-stage"><svg id="graph" role="img" aria-label="Constellation of AI concepts and tools"></svg></div>
     </div>
@@ -177,16 +178,19 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
   .km-legend{display:flex;align-items:center;gap:16px;margin-bottom:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);flex-wrap:wrap}
   .lg{display:flex;align-items:center;gap:6px}.lg-dot{width:11px;height:11px;border-radius:50%}
   .km-hint{margin-left:auto;opacity:.7}
-  .km-stage{border:1.5px solid #2a2740;border-radius:18px;background:radial-gradient(circle at 30% 18%,#221d35,#15131c 60%);overflow:hidden;touch-action:none}
-  #graph{display:block;width:100%;height:620px;cursor:grab}
+  .km-stage{border:1.5px solid #2a2740;border-radius:18px;background:radial-gradient(circle at 30% 18%,#221d35,#15131c 60%);overflow:hidden;touch-action:none;
+    position:relative;left:50%;transform:translateX(-50%);width:min(94vw,1340px)}
+  #graph{display:block;width:100%;height:780px;cursor:grab;touch-action:none}
+  .km-reset{margin-left:10px;font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--ink-soft);background:var(--cream);border:1.3px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;transition:all .14s}
+  .km-reset:hover{border-color:var(--ink);color:var(--ink)}
   :global(#graph.grabbing){cursor:grabbing}
   :global(#graph .edge){stroke:rgba(150,140,210,.22);stroke-width:1.1}
   :global(#graph .edge.ct){stroke:rgba(150,140,210,.13)}
   :global(#graph .node circle){cursor:pointer}
   :global(#graph .glow){opacity:.5}
-  :global(#graph .node text){font-family:var(--font-mono);fill:#e9e4f7;pointer-events:none;paint-order:stroke;stroke:#15131c;stroke-width:3px;stroke-linejoin:round}
-  :global(#graph .node.concept text){font-size:11.5px;font-weight:700}
-  :global(#graph .node.tool text){font-size:9.5px;fill:#b9b1d6}
+  :global(#graph .node text){font-family:var(--font-mono);fill:#f0ecfb;pointer-events:none;paint-order:stroke;stroke:#15131c;stroke-width:5px;stroke-linejoin:round}
+  :global(#graph .node.concept text){font-size:26px;font-weight:700}
+  :global(#graph .node.tool text){font-size:19px;fill:#c8c1e2}
   :global(#graph.dim .node:not(.hi) circle){opacity:.25}
   :global(#graph.dim .node:not(.hi) text){opacity:.12}
   :global(#graph.dim .node:not(.hi) .glow){opacity:.05}
@@ -211,7 +215,7 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
     .kmc-grid{grid-template-columns:1fr}
     .km-hint{display:none}
     /* constellation graph is desktop-leaning; keep it usable but Cards is the default + readable view */
-    #graph{height:460px}
+    #graph{height:560px}
   }
 </style>
 
@@ -233,15 +237,15 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
     function buildGraph() {
       if (built) return; built = true;
       const svg = document.getElementById('graph'); if (!svg) return;
-      const W = 1100, H = 620, SVGNS = 'http://www.w3.org/2000/svg';
+      const W = 1480, H = 840, SVGNS = 'http://www.w3.org/2000/svg';
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
       const N = nodes.length;
-      nodes.forEach((n, i) => { const a = (i / N) * Math.PI * 2; n.x = W / 2 + Math.cos(a) * 230; n.y = H / 2 + Math.sin(a) * 180; n.vx = 0; n.vy = 0; });
+      nodes.forEach((n, i) => { const a = (i / N) * Math.PI * 2; n.x = W / 2 + Math.cos(a) * 320; n.y = H / 2 + Math.sin(a) * 250; n.vx = 0; n.vy = 0; });
       const idx = Object.fromEntries(nodes.map((n, i) => [n.id, i]));
       const E = edges.map(e => ({ s: idx[e.s], t: idx[e.t], kind: e.kind })).filter(e => e.s != null && e.t != null);
       const deg = nodes.map(() => 0); E.forEach(e => { deg[e.s]++; deg[e.t]++; });
-      const REP = 11000, SPRING = 0.014, LEN = 150, GRAV = 0.011, DAMP = 0.85;
-      for (let it = 0; it < 440; it++) {
+      const REP = 17000, SPRING = 0.013, LEN = 200, GRAV = 0.01, DAMP = 0.85;
+      for (let it = 0; it < 460; it++) {
         for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
           let dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y; let d2 = dx * dx + dy * dy || 0.01; const d = Math.sqrt(d2);
           const f = REP / d2; const fx = (dx / d) * f, fy = (dy / d) * f; nodes[i].vx += fx; nodes[i].vy += fy; nodes[j].vx -= fx; nodes[j].vy -= fy;
@@ -249,44 +253,77 @@ const conceptCount = concepts.length, toolCount = aiTools.length;
         E.forEach(e => { const a = nodes[e.s], b = nodes[e.t]; let dx = b.x - a.x, dy = b.y - a.y; const d = Math.sqrt(dx * dx + dy * dy) || 0.01; const f = (d - LEN) * SPRING; const fx = (dx / d) * f, fy = (dy / d) * f; a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy; });
         nodes.forEach(n => { n.vx += (W / 2 - n.x) * GRAV; n.vy += (H / 2 - n.y) * GRAV; n.vx *= DAMP; n.vy *= DAMP; n.x += n.vx; n.y += n.vy; });
       }
-      const pad = 80, xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+      const pad = 100, xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
       const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
       const s = Math.min((W - pad * 2) / (maxX - minX || 1), (H - pad * 2) / (maxY - minY || 1));
       nodes.forEach(n => { n.x = pad + (n.x - minX) * s; n.y = pad + (n.y - minY) * s; });
+      const orig = nodes.map(n => ({ x: n.x, y: n.y }));   // remembered for the snap-back button
 
       const gZoom = document.createElementNS(SVGNS, 'g'), gEdges = document.createElementNS(SVGNS, 'g'), gNodes = document.createElementNS(SVGNS, 'g');
       gZoom.appendChild(gEdges); gZoom.appendChild(gNodes); svg.appendChild(gZoom);
       const adj = nodes.map(() => new Set());
+      const edgesByNode = nodes.map(() => []);
       E.forEach(e => {
         const ln = document.createElementNS(SVGNS, 'line');
         ln.setAttribute('x1', nodes[e.s].x); ln.setAttribute('y1', nodes[e.s].y); ln.setAttribute('x2', nodes[e.t].x); ln.setAttribute('y2', nodes[e.t].y);
-        ln.setAttribute('class', 'edge ' + e.kind); ln.dataset.s = e.s; ln.dataset.t = e.t; gEdges.appendChild(ln); adj[e.s].add(e.t); adj[e.t].add(e.s);
+        ln.setAttribute('class', 'edge ' + e.kind); ln.dataset.s = e.s; ln.dataset.t = e.t; gEdges.appendChild(ln);
+        adj[e.s].add(e.t); adj[e.t].add(e.s);
+        edgesByNode[e.s].push({ el: ln, end: 1 }); edgesByNode[e.t].push({ el: ln, end: 2 });
       });
       nodes.forEach((n, i) => {
         const g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'node ' + n.type); g.dataset.i = i;
         const a = document.createElementNS(SVGNS, 'a'); a.setAttribute('href', n.id);
         const col = COLOR[n.ph] || '#7657ff';
-        const r = n.type === 'concept' ? 10 + Math.min(deg[i], 5) : 5.5;
+        const r = n.type === 'concept' ? 16 + Math.min(deg[i], 6) * 1.6 : 9;
+        n._r = r;
         const glow = document.createElementNS(SVGNS, 'circle');
         glow.setAttribute('cx', n.x); glow.setAttribute('cy', n.y); glow.setAttribute('r', r * 2.4); glow.setAttribute('fill', col); glow.setAttribute('class', 'glow');
         const c = document.createElementNS(SVGNS, 'circle');
         c.setAttribute('cx', n.x); c.setAttribute('cy', n.y); c.setAttribute('r', r); c.setAttribute('fill', col);
         const t = document.createElementNS(SVGNS, 'text');
-        t.setAttribute('x', n.x); t.setAttribute('y', n.y - r - 6); t.setAttribute('text-anchor', 'middle'); t.textContent = n.label;
+        t.setAttribute('x', n.x); t.setAttribute('y', n.y - r - 9); t.setAttribute('text-anchor', 'middle'); t.textContent = n.label;
         a.appendChild(glow); a.appendChild(c); g.appendChild(a); g.appendChild(t); gNodes.appendChild(g);
+        n._glow = glow; n._core = c; n._text = t;
         g.addEventListener('mouseenter', () => highlight(i)); g.addEventListener('mouseleave', clearHi);
       });
+      function moveNode(i, x, y) {
+        const n = nodes[i]; n.x = x; n.y = y;
+        n._glow.setAttribute('cx', x); n._glow.setAttribute('cy', y);
+        n._core.setAttribute('cx', x); n._core.setAttribute('cy', y);
+        n._text.setAttribute('x', x); n._text.setAttribute('y', y - n._r - 9);
+        edgesByNode[i].forEach(o => { if (o.end === 1) { o.el.setAttribute('x1', x); o.el.setAttribute('y1', y); } else { o.el.setAttribute('x2', x); o.el.setAttribute('y2', y); } });
+      }
       function highlight(i) { svg.classList.add('dim'); gNodes.querySelectorAll('.node').forEach(el => { const j = +el.dataset.i; el.classList.toggle('hi', j === i || adj[i].has(j)); }); gEdges.querySelectorAll('.edge').forEach(el => el.classList.toggle('hi', +el.dataset.s === i || +el.dataset.t === i)); }
       function clearHi() { svg.classList.remove('dim'); gNodes.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); gEdges.querySelectorAll('.hi').forEach(e => e.classList.remove('hi')); }
 
-      let tx = 0, ty = 0, scale = 1, dragging = false, sx0 = 0, sy0 = 0, moved = false;
+      // pan (drag empty space) · drag a star (pull a concept out) · wheel zoom
+      let tx = 0, ty = 0, scale = 1, mode = null, dragI = -1, sx0 = 0, sy0 = 0, moved = false;
       const apply = () => gZoom.setAttribute('transform', `translate(${tx} ${ty}) scale(${scale})`);
-      svg.addEventListener('wheel', (e) => { e.preventDefault(); const f = e.deltaY < 0 ? 1.1 : 0.9; scale = Math.max(0.5, Math.min(3, scale * f)); apply(); }, { passive: false });
-      svg.addEventListener('pointerdown', (e) => { dragging = true; moved = false; sx0 = e.clientX; sy0 = e.clientY; svg.classList.add('grabbing'); });
-      svg.addEventListener('pointermove', (e) => { if (!dragging) return; const dx = e.clientX - sx0, dy = e.clientY - sy0; if (Math.abs(dx) + Math.abs(dy) > 3) moved = true; tx += dx; ty += dy; sx0 = e.clientX; sy0 = e.clientY; apply(); });
-      const end = () => { dragging = false; svg.classList.remove('grabbing'); };
-      svg.addEventListener('pointerup', end); svg.addEventListener('pointerleave', end);
+      svg.addEventListener('wheel', (e) => { e.preventDefault(); const f = e.deltaY < 0 ? 1.1 : 0.9; scale = Math.max(0.4, Math.min(4, scale * f)); apply(); }, { passive: false });
+      svg.addEventListener('pointerdown', (e) => { const g = e.target.closest('.node'); mode = g ? 'node' : 'pan'; dragI = g ? +g.dataset.i : -1; sx0 = e.clientX; sy0 = e.clientY; moved = false; svg.classList.add('grabbing'); try { svg.setPointerCapture(e.pointerId); } catch (_) {} });
+      svg.addEventListener('pointermove', (e) => {
+        if (!mode) return; const dx = e.clientX - sx0, dy = e.clientY - sy0; if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+        if (mode === 'pan') { tx += dx; ty += dy; apply(); }
+        else { const rect = svg.getBoundingClientRect(); const ppu = (rect.width / W) * scale || 1; moveNode(dragI, nodes[dragI].x + dx / ppu, nodes[dragI].y + dy / ppu); }
+        sx0 = e.clientX; sy0 = e.clientY;
+      });
+      const end = () => { mode = null; dragI = -1; svg.classList.remove('grabbing'); };
+      svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
       gNodes.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
+
+      // snap-back: glide every node to its original layout position + reset pan/zoom
+      const resetBtn = document.getElementById('km-reset');
+      if (resetBtn) resetBtn.addEventListener('click', () => {
+        const start = nodes.map(n => ({ x: n.x, y: n.y })); let t0 = null; const dur = 520;
+        tx = 0; ty = 0; scale = 1; apply();
+        function stepF(ts) {
+          if (t0 == null) t0 = ts;
+          const k = Math.min(1, (ts - t0) / dur), ez = 1 - Math.pow(1 - k, 3);
+          for (let i = 0; i < N; i++) moveNode(i, start[i].x + (orig[i].x - start[i].x) * ez, start[i].y + (orig[i].y - start[i].y) * ez);
+          if (k < 1) requestAnimationFrame(stepF);
+        }
+        requestAnimationFrame(stepF);
+      });
     }
 
     // default view: Constellation on desktop (the showcase), Cards on mobile + for crawlers (markup default = cards)
