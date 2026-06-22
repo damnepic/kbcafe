@@ -1,6 +1,9 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "the-study-window", title: "Meet the Study Window: Read Two Pages at Once",
+    date: "2026-06-22", tag: "Build in Public",
+    excerpt: "A resizable second window that docks on the right so you can keep the knowledge map, a reference, or a tool open beside whatever you are reading. How it works, how to open it, and when it earns its keep." },
   { slug: "beginner-guide-to-ai", title: "New to AI? We Built a Beginner's Guide That Starts From Zero",
     date: "2026-06-21", tag: "News",
     excerpt: "A complete, no-jargon guide to AI for people with zero background, plus an easy way to share it with anyone who wants to learn the simplest way possible." },

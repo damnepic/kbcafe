@@ -1,0 +1,113 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="Meet the Study Window: Read Two Pages at Once"
+  description="KB Cafe now has a Study Window, a resizable second viewport that docks on the right so you can keep the knowledge map, a reference, or a tool open beside whatever you are reading. Here is how it works, how to open it, and when it earns its keep."
+  slug="the-study-window"
+  tag="Build in Public"
+  date="2026-06-22"
+>
+  <p>
+    Reading docs is rarely a single-page job. You read about <a href="/what-is-rag">RAG</a>, and halfway through you
+    want the definition of a <a href="/what-is-a-context-window">context window</a> open beside it. You start a
+    tutorial, and you want the tool it describes running next to the steps. The web&rsquo;s usual answer is a second
+    browser tab and a lot of alt-tabbing, which means you keep losing your place.
+  </p>
+  <p>
+    So we built a better answer into the site. Meet the <strong>Study Window</strong>: a real, resizable second
+    viewport that docks on the right edge of the page, so you can read or use two KB Cafe pages at the same time
+    without leaving the one you are on.
+  </p>
+
+  <figure>
+    <img src="/blog/study-hero.jpg" alt="The What is RAG article on the left, with the KB Cafe knowledge map docked as a second window on the right" loading="lazy" width="1840" height="1124" />
+    <figcaption>Reading about RAG on the left, with the knowledge map parked in the Study Window on the right.</figcaption>
+  </figure>
+
+  <h2>Where it came from</h2>
+  <p>
+    The feature started life as a smaller idea. Our <a href="/map">knowledge map</a> is a great way to jump into a
+    concept, but clicking a star used to send you to the full guide and the map vanished. You had to hit Back to get
+    it again. That felt backwards: the map is exactly the thing you want to keep around <em>while</em> you read.
+  </p>
+  <p>
+    So we made the map stay. Open a guide from the map and the map rides along, docked on the right. Once that
+    existed, the obvious question was: why only the map? The right side of a wide screen is mostly empty space.
+    Anything on the site could live there. The map rail grew up into a general Study Window.
+  </p>
+
+  <h2>Three ways to open it</h2>
+  <p>There is no menu to dig through. Three entry points cover the natural moments you would want a second page:</p>
+  <ul>
+    <li><strong>The <em>Study</em> button in the top nav.</strong> Always there, beside search. One click opens the
+      current page in the window; click again to close. This is the &ldquo;split what I&rsquo;m looking at&rdquo;
+      button.</li>
+    <li><strong>&ldquo;Open beside&rdquo; next to a page title.</strong> On any guide or tool, a small button sits
+      right by the heading. It pins that page into the window so you can wander off on the left while it stays put.</li>
+    <li><strong>Hovering an in-content link.</strong> The real superpower, below.</li>
+  </ul>
+
+  <figure>
+    <img src="/blog/study-entry.jpg" alt="The KB Cafe top bar showing the Study toggle button beside search, and an Open beside button next to the page title" loading="lazy" width="1840" height="409" />
+    <figcaption>Two of the entry points: the <em>Study</em> toggle in the nav, and <em>Open beside</em> by the title.</figcaption>
+  </figure>
+
+  <h2>Send any link into the window</h2>
+  <p>
+    This is the one that changes how studying feels. Hover any link inside an article and a small
+    <strong>Open in window</strong> chip appears. Click it, and that linked page loads into the Study Window while
+    you stay exactly where you are. No tab switch, no scroll position lost.
+  </p>
+
+  <figure class="tight">
+    <img src="/blog/study-peek.png" alt="An Open in window chip floating above a context window link inside an article" loading="lazy" width="940" height="264" />
+    <figcaption>Hover a link, get an <em>Open in window</em> chip. The reference opens on the right, you keep your place on the left.</figcaption>
+  </figure>
+
+  <h2>When it earns its keep</h2>
+  <p>A second window is only useful for the right jobs. The ones we keep reaching for:</p>
+  <ul>
+    <li><strong>Keep the map open while you read.</strong> The original use case. Explore concepts on the
+      <a href="/map">knowledge map</a> on the right while the current guide stays on the left.</li>
+    <li><strong>Compare two ideas side by side.</strong> Read <a href="/what-is-a-context-window">context windows</a>
+      and <a href="/what-is-rag">RAG</a> together and the relationship clicks faster than reading them one after the
+      other.</li>
+    <li><strong>Follow the explainer while you use the tool.</strong> Keep a tool&rsquo;s write-up open beside the
+      tool itself, so the &ldquo;why&rdquo; sits next to the &ldquo;do.&rdquo;</li>
+    <li><strong>Hold a reference open during an exercise.</strong> Pin a cheat sheet or definition on the right and
+      work through the steps on the left without flipping back and forth.</li>
+  </ul>
+
+  <figure>
+    <img src="/blog/study-twoup.jpg" alt="The context window guide on the left and the RAG guide loaded in the Study Window on the right" loading="lazy" width="1840" height="1124" />
+    <figcaption>Two related guides open at once. Drag the divider in the middle to give either side more room.</figcaption>
+  </figure>
+
+  <h2>The details that make it feel right</h2>
+  <ul>
+    <li><strong>It is a real window, not a preview.</strong> The Study Window is the actual page, with its own
+      navigation. You can browse inside it independently of the main page.</li>
+    <li><strong>Drag to resize.</strong> Grab the divider and size the two panes to your screen. Useful on smaller
+      laptops where one fixed width would cut content off. Your chosen width is remembered for next time.</li>
+    <li><strong>It tells you what it is showing.</strong> The little bar at the top of the window updates to the page
+      currently inside it, so it never reads as a mystery panel.</li>
+    <li><strong>Close it any time.</strong> One button returns the page to full width.</li>
+    <li><strong>Desktop only, on purpose.</strong> Splitting a phone screen in half helps no one, so on small screens
+      links just open normally. The window is a big-screen luxury.</li>
+  </ul>
+
+  <h2>Built clean, on purpose</h2>
+  <p>
+    One thing we cared about while building this: it had to be invisible to search engines and add zero weight to the
+    pages people actually land on. So the whole Study Window is layered on with JavaScript and never touches the page
+    a crawler sees. The canonical URL stays clean, the indexed article is byte-for-byte what it was before, and the
+    second window simply does not exist until you ask for it. A nice feature should not cost you any SEO, and this one
+    does not.
+  </p>
+
+  <p>
+    Want to try it? Open the <a href="/map">knowledge map</a> and click into any concept, or hit the
+    <em>Study</em> button up top on any guide. Then drag the divider and make the screen yours.
+  </p>
+</BlogPost>
