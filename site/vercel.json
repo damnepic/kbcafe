@@ -9,6 +9,8 @@
     { "source": "/feed", "destination": "/feed.xml" }
   ],
   "redirects": [
+    { "source": "/", "has": [{ "type": "host", "value": "www.kbcafe.com" }], "destination": "https://kbcafe.com/", "permanent": true },
+    { "source": "/", "has": [{ "type": "host", "value": "kbcafe.vercel.app" }], "destination": "https://kbcafe.com/", "permanent": true },
     { "source": "/:path*", "has": [{ "type": "host", "value": "www.kbcafe.com" }], "destination": "https://kbcafe.com/:path*", "permanent": true },
     { "source": "/:path*", "has": [{ "type": "host", "value": "kbcafe.vercel.app" }], "destination": "https://kbcafe.com/:path*", "permanent": true },
 
