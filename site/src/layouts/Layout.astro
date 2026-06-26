@@ -322,7 +322,8 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
       var h1 = document.querySelector('.layout-main h1, .tool-head h1, .ref-article h1, .ba h1');
       if (h1 && !document.getElementById('study-beside')) {
         var ob = document.createElement('button'); ob.id = 'study-beside'; ob.className = 'study-beside'; ob.type = 'button';
-        ob.title = 'Open this page in a second window beside the one you are reading';
+        ob.title = 'Use this if you want to multi-task or learn with an additional window beside this one, to speed up and enhance your learning experience.';
+        ob.setAttribute('aria-label', 'Open this page in a second window. Use it to multi-task or learn with an additional window beside this one, to speed up and enhance your learning experience.');
         ob.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/><path d="m10 15-3-3 3-3"/></svg><span>Open beside</span>';
         ob.addEventListener('click', function () { openStudy(location.pathname + location.search); });
         h1.appendChild(ob);
