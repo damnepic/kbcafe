@@ -1,6 +1,9 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "hands-on-coding-with-ai", title: "Learn to Code With AI, Hands-On",
+    date: "2026-06-26", tag: "News",
+    excerpt: "New: a Coding with AI track with an interactive prompt builder and a spot-the-hallucination exercise, an MCP servers lesson with a match-the-server quiz, and a CSS starter with a live editor. Built to be used, not just read." },
   { slug: "the-study-window", title: "Meet the Study Window: Read Two Pages at Once",
     date: "2026-06-22", tag: "Build in Public",
     excerpt: "A resizable second window that docks on the right so you can keep the knowledge map, a reference, or a tool open beside whatever you are reading. How it works, how to open it, and when it earns its keep." },

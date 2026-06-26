@@ -1,0 +1,81 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="Learn to Code With AI, Hands-On"
+  description="New on KB Cafe: a Coding with AI track built around an interactive prompt builder and a spot-the-hallucination exercise, a lesson on MCP servers with a match-the-server quiz, and a CSS starter guide with a live editor. Built to be used, not just read."
+  slug="hands-on-coding-with-ai"
+  tag="News"
+  date="2026-06-26"
+>
+  <p>
+    There is a big gap between reading about coding with AI and actually doing it well. Most writing on the subject is
+    either breathless hype or a wall of tips you nod along to and forget. KB Cafe&rsquo;s whole bet is the opposite:
+    learn by doing. So the latest batch of content is not a pile of articles, it is a set of tools and exercises you can
+    practice in, with the explanation wrapped around them. Here is what is new.
+  </p>
+
+  <h2>A Coding with AI track</h2>
+  <p>
+    The centerpiece is a practical method for writing real code with AI, distilled into a guide and a tool that work
+    together. <a href="/how-to-write-code-with-ai">How to write code with AI</a> covers the habits that separate people
+    who get great code from people who get frustrated: set the right expectations, work around a model&rsquo;s training
+    cutoff, manage its context, plan before you dictate, and test everything. No hype, just the method.
+  </p>
+  <p>
+    The part you will actually keep open is the <a href="/ai-coding-prompt-builder">AI Coding Prompt Builder</a>. Pick
+    <em>plan</em> or <em>build</em> mode, describe the task, and toggle the things that matter, an exact function
+    signature, type hints, tests, error handling, a preference for stable libraries, and a slot to paste fresh docs for a
+    library the model is too old to know. It assembles a precise, copy-paste prompt live in your browser. A vague request
+    gets vague code; this is what a careful brief looks like.
+  </p>
+
+  <figure>
+    <img src="/blog/new-coding-prompt-builder.jpg" alt="The AI Coding Prompt Builder with an example loaded: build mode, a function signature, and toggles for type hints, tests, and stable libraries" loading="lazy" width="1840" height="1294" />
+    <figcaption>The AI Coding Prompt Builder assembles a precise prompt from a few deliberate choices.</figcaption>
+  </figure>
+
+  <p>
+    Reading about hallucinations is one thing; catching one is another, so the guide includes a
+    <strong>spot-the-hallucination</strong> exercise: a snippet of plausible-looking code with one invented function,
+    and you have to find it. There are also four new dictionary terms the topic kept needing,
+    <a href="/dictionary/training-cutoff">training cutoff</a>, <a href="/dictionary/system-prompt">system prompt</a>,
+    <a href="/dictionary/coding-agent">coding agent</a>, and <a href="/dictionary/sandbox">sandbox</a>, and the whole
+    thing is sequenced into a free, self-paced <a href="/learn-ai-coding">Coding with AI</a> path.
+  </p>
+
+  <h2>MCP, end to end</h2>
+  <p>
+    Once a model can write code, the next question is how to connect it to your actual tools and data. That is what the
+    Model Context Protocol is for, and KB Cafe now covers it from the idea to the appliance. <a href="/what-is-mcp">What
+    is MCP</a> explains the protocol; the new lesson, <a href="/what-are-mcp-servers">What are MCP servers</a>, is about
+    the servers you actually plug in, files, databases, GitHub, the live web, browsers, grounded in real examples from
+    the community <a href="https://github.com/punkpeye/awesome-mcp-servers">awesome-mcp-servers</a> list.
+  </p>
+  <p>
+    It comes with a <strong>match-the-task-to-the-server</strong> exercise: given a job like &ldquo;let the AI query your
+    Postgres database,&rdquo; you pick the right server and find out why. When you are ready to connect one for real, the
+    <a href="/mcp-config-generator">MCP Config Generator</a> builds the config block.
+  </p>
+
+  <figure>
+    <img src="/blog/new-mcp-exercise.jpg" alt="The match-the-task-to-the-server exercise on the MCP servers lesson, showing a correct answer revealed for a filesystem task" loading="lazy" width="1840" height="1294" />
+    <figcaption>The MCP servers lesson: match a task to the right server, then see why it fits.</figcaption>
+  </figure>
+
+  <h2>And a CSS starter</h2>
+  <p>
+    Not everything new is about AI. <a href="/how-to-start-css">How to start CSS</a> is a short, opinionated path from
+    blank page to something you can style: what CSS is, the three ways to add it, selectors, the box model, and a habit
+    for sane sizing. It has a <strong>live editor</strong>, type CSS on the left and watch a card update on the right,
+    and when you want to go deeper it points you at the tutorials over at <a href="https://csscreme.com/tutorials">CSS
+    Cr&egrave;me</a>.
+  </p>
+
+  <h2>Where to start</h2>
+  <p>
+    If you build with AI, open the <a href="/ai-coding-prompt-builder">prompt builder</a> and run a real task through it.
+    If you are newer, walk the <a href="/learn-ai-coding">Coding with AI</a> path from the top. Either way, the point is
+    the same one KB Cafe keeps coming back to: you learn this stuff by using it, so we built things to use.
+  </p>
+</BlogPost>
