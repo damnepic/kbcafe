@@ -18,6 +18,7 @@ export const TOOLS = [
   { cat:"ai",       ctl:"AI",          nm:"prompt simulator",  ds:"See what a vague prompt forces AI to guess.",      color:"c-coral", href:"/prompt-simulator" },
   { cat:"ai",       ctl:"AI",          nm:"prompt builder",    ds:"Answer 6 questions, get a clear prompt.",          color:"c-gold",  href:"/prompt-builder" },
   { cat:"ai",       ctl:"AI",          nm:"prompt optimizer",  ds:"Score, fix & restructure any prompt, all-in-one.", color:"c-coral", href:"/prompt-optimizer" },
+  { cat:"ai",       ctl:"AI",          nm:"ai coding prompt builder", ds:"Plan-or-build mode: signature, types, tests, stable libs, fresh docs.", color:"c-gold", href:"/ai-coding-prompt-builder" },
   { cat:"ai",       ctl:"AI",          nm:"good vs bad prompts", ds:"Before/after prompt rewrites, with the why.",    color:"c-cream", href:"/good-vs-bad-prompts" },
   { cat:"ai",       ctl:"AI",          nm:"llm vram calculator", ds:"Estimate VRAM to run a model locally.",          color:"c-coral", href:"/llm-vram-calculator" },
   { cat:"ai",       ctl:"AI",          nm:"llm cost calculator", ds:"Estimate API cost from token usage.",            color:"c-cream", href:"/llm-cost-calculator" },

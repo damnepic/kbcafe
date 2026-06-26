@@ -40,7 +40,7 @@ export const AI_SUB_META = {
 export const AI_SUB_ORDER = ['prompting', 'models', 'agents', 'build'];
 export const AI_SUB = {
   '/prompt-optimizer': 'prompting', '/prompt-builder': 'prompting', '/prompt-linter': 'prompting',
-  '/prompt-diff': 'prompting', '/prompt-simulator': 'prompting', '/prompt-x-ray': 'prompting', '/good-vs-bad-prompts': 'prompting',
+  '/prompt-diff': 'prompting', '/prompt-simulator': 'prompting', '/prompt-x-ray': 'prompting', '/good-vs-bad-prompts': 'prompting', '/ai-coding-prompt-builder': 'prompting',
   '/token-counter': 'models', '/context-window-visualizer': 'models', '/context-budget-analyzer': 'models',
   '/llm-vram-calculator': 'models', '/llm-cost-calculator': 'models', '/ai-profit-calculator': 'models',
   '/mcp-config-generator': 'agents', '/mcp-inspector': 'agents', '/ai-pattern-explorer': 'agents',
@@ -51,4 +51,4 @@ export const AI_SUB = {
 };
 
 // tools that get a "New" badge
-export const NEW_TOOLS = ['/mcp-inspector', '/ai-profit-calculator', '/prompt-optimizer', '/whois-lookup', '/dns-lookup', '/email-deliverability-checker', '/token-counter', '/context-budget-analyzer', '/rag-chunking-visualizer', '/mcp-config-generator', '/prompt-linter', '/prompt-diff', '/llm-vram-calculator', '/llm-cost-calculator', '/agent-memory-simulator', '/ai-pattern-builder', '/ai-stack-explainer', '/tool-call-visualizer', '/prompt-x-ray', '/embedding-explorer', '/claim-checker', '/scope-sorter', '/launch-rubric', '/ai-architecture-generator', '/prompt-simulator', '/prompt-builder', '/good-vs-bad-prompts'];
+export const NEW_TOOLS = ['/ai-coding-prompt-builder', '/mcp-inspector', '/ai-profit-calculator', '/prompt-optimizer', '/whois-lookup', '/dns-lookup', '/email-deliverability-checker', '/token-counter', '/context-budget-analyzer', '/rag-chunking-visualizer', '/mcp-config-generator', '/prompt-linter', '/prompt-diff', '/llm-vram-calculator', '/llm-cost-calculator', '/agent-memory-simulator', '/ai-pattern-builder', '/ai-stack-explainer', '/tool-call-visualizer', '/prompt-x-ray', '/embedding-explorer', '/claim-checker', '/scope-sorter', '/launch-rubric', '/ai-architecture-generator', '/prompt-simulator', '/prompt-builder', '/good-vs-bad-prompts'];
