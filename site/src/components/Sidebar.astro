@@ -3,13 +3,17 @@
 // mobile = slide-in drawer. No tracking. `path` highlights the current page.
 import { TOOLS } from '../data/tools.js';
 import { LEARNING_PATHS } from '../data/learningPaths.js';
+import { AI } from '../data/ai.js';
+import { REFERENCE } from '../data/reference.js';
 const { path = '' } = Astro.props;
 const aiTools = TOOLS.filter(t => t.href && t.cat === 'ai');
+const explainers = AI.filter(a => a.type === 'explainer');
 
 const I = {
   build: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="M12 12l8-4.5M12 12v9M12 12 4 7.5"/></svg>`,
   chat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12Z"/><path d="M9 11h6M9 14h4"/></svg>`,
   book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 6S9 4 4 4v13c5 0 8 2 8 2s3-2 8-2V4c-5 0-8 2-8 2Z"/><path d="M12 6v15"/></svg>`,
+  doc: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>`,
   tool: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.2 5.2L3 18l3 3 6.5-6.5a4 4 0 0 0 5.2-5.2l-2.6 2.6-2.3-2.3 2.6-2.6Z"/></svg>`,
   cap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2 9l10 5 10-5-10-5Z"/><path d="M6 11v5c0 1.1 2.7 2.5 6 2.5s6-1.4 6-2.5v-5"/></svg>`,
   search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>`,
@@ -52,6 +56,14 @@ const active = (h) => h === path;
     ))}
   </nav>
 
+  <div class="sb-sec" data-sec="explained">
+    <button class="sb-toggle" type="button" aria-expanded="false"><span class="sb-ic" set:html={I.book} /><span class="sb-lbl">AI Explained</span><span class="sb-chev" set:html={I.chevron} /></button>
+    <div class="sb-list">
+      {explainers.map(a => <a class={`sb-link${active(a.href) ? ' on' : ''}`} href={a.href}>{a.nm}</a>)}
+      <a class="sb-all" href="/ai">All AI Explained →</a>
+    </div>
+  </div>
+
   <div class="sb-sec" data-sec="tools">
     <button class="sb-toggle" type="button" aria-expanded="false"><span class="sb-ic" set:html={I.tool} /><span class="sb-lbl">Use a tool</span><span class="sb-chev" set:html={I.chevron} /></button>
     <div class="sb-list">
@@ -61,11 +73,19 @@ const active = (h) => h === path;
   </div>
 
   <div class="sb-sec" data-sec="lessons">
-    <button class="sb-toggle" type="button" aria-expanded="false"><span class="sb-ic" set:html={I.cap} /><span class="sb-lbl">Lessons</span><span class="sb-chev" set:html={I.chevron} /></button>
+    <button class="sb-toggle" type="button" aria-expanded="false"><span class="sb-ic" set:html={I.cap} /><span class="sb-lbl">Learning paths</span><span class="sb-chev" set:html={I.chevron} /></button>
     <div class="sb-list">
       {LEARNING_PATHS.map(p => <a class={`sb-link${active(p.route) ? ' on' : ''}`} href={p.route}>{p.title}</a>)}
       <a class={`sb-link${active('/skill-tree') ? ' on' : ''}`} href="/skill-tree">Skill Tree</a>
       <a class="sb-all" href="/learn">All learning paths →</a>
+    </div>
+  </div>
+
+  <div class="sb-sec" data-sec="refs">
+    <button class="sb-toggle" type="button" aria-expanded="false"><span class="sb-ic" set:html={I.doc} /><span class="sb-lbl">References</span><span class="sb-chev" set:html={I.chevron} /></button>
+    <div class="sb-list">
+      {REFERENCE.map(r => <a class={`sb-link${active(r.href) ? ' on' : ''}`} href={r.href}>{r.nm}</a>)}
+      <a class="sb-all" href="/reference">All references →</a>
     </div>
   </div>
 
@@ -158,7 +178,9 @@ const active = (h) => h === path;
     // expandable sections, remembered
     sb.querySelectorAll('.sb-sec').forEach(sec => {
       const key = 'kb-sb-' + sec.dataset.sec;
-      if (ls.get(key) === '1') sec.classList.add('open');
+      const saved = ls.get(key);
+      // AI Explained opens by default so the lessons are right there to flip through; other sections stay tucked
+      if (saved === '1' || (saved !== '0' && sec.dataset.sec === 'explained')) sec.classList.add('open');
       const btn = sec.querySelector('.sb-toggle');
       btn.setAttribute('aria-expanded', sec.classList.contains('open'));
       btn.addEventListener('click', () => {
