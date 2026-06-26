@@ -39,6 +39,14 @@ export const AI = [
     ds: "Define fields once; generate the schema for OpenAI, Anthropic, Gemini, and plain JSON Schema.",
     rel: { related: ["/what-are-structured-outputs", "/what-is-tool-calling"] } },
 
+  // ── Coding with AI ──
+  { nm: "How to write code with AI", href: "/how-to-write-code-with-ai", type: "explainer", tag: "Guide",
+    ds: "A practical, no-hype method: set expectations, work around the training cutoff, manage context, plan then dictate, test everything, and know when to take over.",
+    rel: { related: ["/what-is-a-context-window", "/what-is-tool-calling"], next: ["/ai-coding-prompt-builder"] } },
+  { nm: "AI Coding Prompt Builder", href: "/ai-coding-prompt-builder", type: "tool", tag: "Tool",
+    ds: "Assemble a precise coding prompt: pick plan-or-build mode, then toggle signature, types, tests, stable libraries, and fresh docs. Copy-paste ready.",
+    rel: { related: ["/how-to-write-code-with-ai", "/context-window-visualizer"] } },
+
   // ── Automation explainers (fundamentals, AI-connected) ──
   { nm: "What is workflow automation?", href: "/what-is-workflow-automation", type: "explainer", tag: "Automation",
     ds: "The trigger-to-action model behind every automation, no-code tools like Zapier and n8n, and where AI fits.",

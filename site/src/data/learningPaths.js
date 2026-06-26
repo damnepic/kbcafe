@@ -28,6 +28,13 @@ export const LEARNING_PATHS = [
     intro: '<span class="lpp-primer-h">New to the lingo?</span> Automation wires apps together: a <a class="kb-term" href="/dictionary/webhook">webhook</a> fires the instant something happens, an <a class="kb-term" href="/dictionary/api">API</a> lets the steps talk to each other, and an <a class="kb-term" href="/dictionary/agent">agent</a> can decide what to do next. Hover any underlined word for a quick definition, or click to learn more.',
     steps: ['/what-is-workflow-automation', '/automation-blueprints', '/cron-generator', '/webhooks-vs-polling', '/ai-agents-vs-workflows-vs-rpa', '/what-is-tool-calling', '/tool-call-visualizer', '/what-is-ai-orchestration', '/ai-architecture-generator'],
   },
+  {
+    id: 'coding', title: 'Coding with AI', shortTitle: 'Coding with AI', tag: 'Craft',
+    route: '/learn-ai-coding', minutes: 35, outcome: 'I want to write real code with AI instead of fighting it',
+    blurb: 'The method behind getting great code out of AI: the right mental model, the training cutoff, managing context, planning then dictating, and the prompt that ties it together. Build a real coding prompt as you go.',
+    intro: '<span class="lpp-primer-h">New to the lingo?</span> A model can <a class="kb-term" href="/dictionary/hallucination">hallucinate</a> code that does not exist, and it knows nothing past its <a class="kb-term" href="/dictionary/training-cutoff">training cutoff</a>. You steer it with a clear <a class="kb-term" href="/dictionary/system-prompt">system prompt</a> inside its <a class="kb-term" href="/dictionary/context-window">context window</a>, and a <a class="kb-term" href="/dictionary/coding-agent">coding agent</a> can run and fix its own code. Hover any underlined word for a quick definition, or click to learn more.',
+    steps: ['/how-to-write-code-with-ai', '/ai-coding-prompt-builder', '/what-is-a-context-window', '/context-window-visualizer', '/what-is-tool-calling'],
+  },
 ];
 
 // reverse helper: which paths include a given href

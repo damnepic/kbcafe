@@ -79,4 +79,8 @@ export const REFERENCE = [
   { nm: "Cron explained", href: "/cron-explained",
     ds: "Crontab's five fields, ranges and steps, named shortcuts, the day-of-month vs day-of-week OR gotcha, and why jobs fail.", tag: "Shell",
     rel: ["/cron-generator", "/shell-scripting-explained", "/http-explained"] },
+  // Front-end
+  { nm: "How to start CSS", href: "/how-to-start-css",
+    ds: "What CSS is, the three ways to add it, selectors, the box model, sane sizing, and a live editor to try it in.", tag: "Front-end",
+    rel: ["/http-explained", "/what-is-json", "/what-is-rss"] },
 ];

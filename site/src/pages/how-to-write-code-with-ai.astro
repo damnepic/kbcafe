@@ -1,0 +1,156 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="How to write code with AI, a practical method | KB Cafe"
+  description="A practical, no-hype method for writing real code with AI: set the right expectations, work around the training cutoff, manage context, plan then dictate, test everything, and know when to take over. With a hands-on prompt builder and a spot-the-hallucination exercise."
+  path="/how-to-write-code-with-ai"
+  eyebrow="AI Explained · Guide"
+  h1="How to write code with AI"
+  tagline="The people who get great code out of AI are not using a secret model. They have a method. Here is the practical version, with two hands-on exercises built in."
+>
+  <h2>Start with the right mental model</h2>
+  <p>
+    A coding model is not a genie and not a search engine. The frame that works, borrowed from people who use it daily,
+    is an over-confident assistant who types extremely fast, has read most of the internet, and has almost no judgement
+    about whether its own answer is correct. It will hand you working code and broken code with the same easy confidence.
+    Your job is not to trust it. It is to direct it and check it.
+  </p>
+  <p>
+    Because a model predicts likely text rather than knowing facts, it sometimes
+    <a class="kb-term" href="/dictionary/hallucination">hallucinates</a>: it invents a library, a function, or an option
+    that sounds plausible and simply does not exist. That is not a reason to give up on it. It is a known failure mode you
+    design around, the same way you work around any tool&rsquo;s limits. The rest of this guide is how.
+  </p>
+
+  <h2>Mind the training cutoff</h2>
+  <p>
+    Every model has a <a class="kb-term" href="/dictionary/training-cutoff">training cutoff</a>, the date its knowledge
+    stops. Ask about a library version released after that date and it will answer anyway, often inventing methods that
+    fit the older version it remembers. Two habits fix most of this. First, prefer stable, popular libraries: the model
+    has seen thousands of correct examples, so it guesses far less. Second, for anything newer than the model, paste a
+    few lines of the current documentation straight into your prompt. You are not expected to memorize cutoff dates; you
+    just need to recognize the symptom (confident code using an API that does not exist) and reach for fresh docs.
+  </p>
+
+  <div class="sth" id="sth">
+    <div class="sth-head">Hands-on: spot the hallucination</div>
+    <p class="sth-sub">A model was asked to total an API response. Which line is invented?</p>
+    <pre class="sth-code">import requests
+
+resp = requests.get(api_url)
+items = resp.json()
+total = requests.sum_results(items)</pre>
+    <div class="sth-opts" id="sth-opts">
+      <button type="button" data-k="a">resp = requests.get(api_url)</button>
+      <button type="button" data-k="b">items = resp.json()</button>
+      <button type="button" data-k="c">total = requests.sum_results(items)</button>
+    </div>
+    <p class="sth-reveal" id="sth-reveal" hidden></p>
+  </div>
+
+  <h2>Context is the whole game</h2>
+  <p>
+    Most of the skill in working with a model comes down to managing its
+    <a class="kb-term" href="/dictionary/context-window">context window</a>, the text it can see at once. A model knows
+    only what is in front of it: the current conversation, plus anything you paste in. Start a fresh chat and it
+    remembers nothing. Use that on purpose. Seed a new conversation by dumping the relevant code or a working example,
+    then ask for the change. The <a class="kb-term" href="/dictionary/system-prompt">system prompt</a> is your standing
+    brief at the top of every reply, the place for rules like &ldquo;cite file paths&rdquo; and &ldquo;never invent
+    APIs.&rdquo; If you want to see exactly what fills the window, the
+    <a href="/context-window-visualizer">Context Window Visualizer</a> lays it out.
+  </p>
+
+  <h2>Plan first, then dictate</h2>
+  <p>
+    Real work has two phases, and the model is good at both if you switch modes deliberately. In the planning phase it is
+    a fast research assistant: ask &ldquo;what are my options for X, with the tradeoffs and a tiny runnable example of
+    each.&rdquo; Once you have chosen an approach, stop asking and start telling. Give the exact function signature, the
+    types, the error handling, and the constraints. Writing that brief in English, with a few small gaps for the model to
+    fill, is genuinely faster than writing the code yourself, and what comes back needs far less repair. The
+    <a href="/ai-coding-prompt-builder">AI Coding Prompt Builder</a> assembles both kinds of prompt for you.
+  </p>
+
+  <h2>You have to test what it writes</h2>
+  <p>
+    This is the one step you cannot hand to the machine. Reading code is not the same as watching it run. Ask the model
+    to write the tests alongside the code, then actually run them, and run the thing yourself on a real input. A model
+    will happily produce code that looks right and fails on the first edge case. Manual checking was always part of the
+    job; with AI in the loop it is the part that keeps you out of trouble.
+  </p>
+
+  <h2>Treat it as a conversation</h2>
+  <p>
+    The first answer is a draft, not a verdict. The fastest path to good code is a short back-and-forth: &ldquo;break
+    that repetitive block into a function,&rdquo; &ldquo;use string methods instead of a regex here,&rdquo; or simply
+    pasting the error message back with &ldquo;this failed, here is the trace.&rdquo; The model never tires of revising,
+    so nudge it toward what you actually wanted instead of accepting the first thing it typed.
+  </p>
+
+  <h2>Let tools run the code</h2>
+  <p>
+    The biggest jump in usefulness comes from tools that can run code in a
+    <a class="kb-term" href="/dictionary/sandbox">sandbox</a> and read the result, closing the loop: write, run, see the
+    error, fix, repeat. A <a class="kb-term" href="/dictionary/coding-agent">coding agent</a> like Claude Code, Cursor,
+    or Aider does this across your real files: it edits, runs the tests, reads the failure, and tries again. That is
+    powerful and worth using. It does not remove your two jobs, which are still to direct it clearly and to test the
+    result.
+  </p>
+
+  <h2>Vibe-code to learn, then tighten up</h2>
+  <p>
+    <a class="kb-term" href="/dictionary/vibe-coding">Vibe coding</a>, accepting changes without reading every line, is a
+    fantastic way to learn what a model can and cannot do, and perfect for throwaway weekend projects. It is a poor fit
+    for code you will have to maintain or that touches anything important. Use the loose mode to explore and build
+    intuition; switch to the precise, tested mode the moment the code needs to last.
+  </p>
+
+  <h2>Know when to take over</h2>
+  <p>
+    Sometimes it is simply faster to write the line yourself than to explain it. The model amplifies your expertise; it
+    does not replace it. The more clearly you understand the problem, the better you can brief the model and the faster
+    you catch its mistakes, which is why experienced developers often get the most out of these tools. Treat AI as a way
+    to ship things you would not otherwise have had time for, not as a reason to stop learning how the code works.
+  </p>
+
+  <h2>Put it into practice</h2>
+  <ul>
+    <li><a href="/ai-coding-prompt-builder">AI Coding Prompt Builder</a>, assemble a precise plan-or-build prompt.</li>
+    <li><a href="/context-window-visualizer">Context Window Visualizer</a>, see what is filling the model&rsquo;s memory.</li>
+    <li><a href="/learn-ai-coding">Coding with AI</a>, the full path from mental model to shipping.</li>
+  </ul>
+</AiPage>
+
+<style is:global>
+  .sth{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin:22px 0}
+  .sth-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .sth-sub{font-size:14.5px;color:var(--ink);margin:8px 0 10px}
+  .sth-code{margin:0 0 12px;background:var(--ink);color:#eee4d3;font-family:var(--font-mono);font-size:13px;line-height:1.6;padding:13px 15px;border-radius:11px;white-space:pre-wrap}
+  .sth-opts{display:flex;flex-direction:column;gap:8px}
+  .sth-opts button{text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:9px 12px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .sth-opts button:hover{border-color:var(--coral)}
+  .sth-opts button.right{border-color:#0f9f82;background:rgba(15,159,130,.1)}
+  .sth-opts button.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .sth-reveal{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:11px 13px}
+  .sth-reveal code{font-family:var(--font-mono);font-size:.92em;background:rgba(30,24,19,.08);padding:1px 5px;border-radius:5px}
+</style>
+
+<script is:inline>
+  (function () {
+    var opts = document.getElementById('sth-opts'), reveal = document.getElementById('sth-reveal');
+    if (!opts) return;
+    opts.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      Array.prototype.forEach.call(opts.children, function (c) { c.classList.remove('right', 'wrong'); });
+      var ok = b.dataset.k === 'c';
+      b.classList.add(ok ? 'right' : 'wrong');
+      opts.querySelector('[data-k=c]').classList.add('right');
+      reveal.innerHTML = (ok ? '<strong>Right.</strong> ' : '<strong>Not quite, it is the last line.</strong> ')
+        + '<code>requests</code> is an HTTP library, it has no <code>sum_results()</code>. The model invented a '
+        + 'plausible-sounding helper because the surrounding code made one seem likely. The real fix is to total the '
+        + 'list yourself. This is exactly what a <a class="kb-term" href="/dictionary/training-cutoff">stale or guessed</a> '
+        + 'API looks like: confident, reasonable, and not real. Always run the code.';
+      reveal.hidden = false;
+    });
+  })();
+</script>

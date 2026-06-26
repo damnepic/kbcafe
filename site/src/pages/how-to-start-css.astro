@@ -1,0 +1,155 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+const FAQ = [
+  { q: "Do I need to learn HTML before CSS?", a: "A little. CSS styles HTML, so you need enough HTML to make a few elements (a heading, a paragraph, a button) before there is anything to style. An hour of HTML basics is plenty to start." },
+  { q: "Should I use inline styles or a stylesheet?", a: "Use an external stylesheet for almost everything. Inline styles (a style attribute on one element) are fine for a quick test, but they do not scale and they are hard to change. One .css file keeps all your styling in one place." },
+  { q: "What is the box model?", a: "Every element is a box with four layers from the inside out: the content, then padding (space inside the border), then the border, then margin (space outside it). Most layout confusion is really box-model confusion, so learn it early." },
+  { q: "Why does my layout break on a phone?", a: "Usually a fixed width. A width: 600px element cannot shrink, so it overflows a 360px screen. Prefer max-width, which lets the element shrink when it has to, and design for the small screen first." },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+// literal CSS braces would be parsed as Astro expressions in markup, so the code samples live here as strings
+const EXAMPLE_RULE = `p {
+  color: #333;
+  font-size: 18px;
+}`;
+const STARTER_CSS = `.card {
+  background: #fff;
+  border: 1px solid #e5ded0;
+  border-radius: 14px;
+  padding: 20px;
+  max-width: 280px;
+  font-family: system-ui, sans-serif;
+}
+.card h3 { margin: 0 0 6px; color: #1e1813; }
+.card p  { margin: 0 0 14px; color: #574b3f; }
+.card button {
+  background: #ee4b2b;
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}`;
+---
+<ReferencePage
+  title="How to start CSS, a beginner's guide | KB Cafe"
+  description="A short, practical guide to starting CSS: what it is, the three ways to add it, selectors, the box model, sane sizing, and a mobile-first habit. With a live editor you can type in, and where to go next."
+  path="/how-to-start-css"
+  eyebrow="Knowledge Base · Front-end"
+  h1="How to start CSS"
+  tagline="CSS is the language that decides how a web page looks. Here is the short path from blank page to something you can actually style, with a live editor to try it in."
+>
+  <nav class="toc" aria-label="On this page">
+    <span class="toc-h">On this page</span>
+    <a href="#what">What CSS is</a>
+    <a href="#add">Three ways to add it</a>
+    <a href="#select">Selectors</a>
+    <a href="#box">The box model</a>
+    <a href="#try">Try it live</a>
+    <a href="#sizing">Sane sizing</a>
+    <a href="#next">Where to go next</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <h2 id="what">What CSS is</h2>
+  <p>
+    <strong>CSS</strong> (Cascading Style Sheets) is a set of rules that decide how your HTML looks: colors, fonts,
+    spacing, and layout. HTML provides the content and structure; CSS provides the appearance. A rule has two parts, a
+    <em>selector</em> that picks which elements to style, and a block of <em>declarations</em> that set properties:
+  </p>
+  <pre class="code">{EXAMPLE_RULE}</pre>
+  <p>That reads: &ldquo;for every paragraph, set the text color and the font size.&rdquo; That is the whole shape of CSS, repeated. The &ldquo;cascading&rdquo; part means that when several rules touch the same element, the more specific and later one wins.</p>
+
+  <h2 id="add">Three ways to add CSS</h2>
+  <p>There are three places CSS can live, and you will mostly want the third:</p>
+  <ul>
+    <li><strong>Inline</strong>, a <code>style</code> attribute on one element: <code>&lt;p style="color:red"&gt;</code>. Quick for a test, but it does not scale and is hard to maintain.</li>
+    <li><strong>Internal</strong>, a <code>&lt;style&gt;</code> block in the page&rsquo;s <code>&lt;head&gt;</code>. Fine for a single page or a quick demo.</li>
+    <li><strong>External</strong>, a separate <code>styles.css</code> file linked with <code>&lt;link rel="stylesheet" href="styles.css"&gt;</code>. This is the real answer: all your styling in one place, shared across every page, easy to change.</li>
+  </ul>
+
+  <h2 id="select">Selectors: how you target things</h2>
+  <p>Three selectors cover almost everything when you start:</p>
+  <ul>
+    <li><strong>Element</strong>: <code>p</code>, <code>h1</code>, <code>button</code>, styles every element of that type.</li>
+    <li><strong>Class</strong>: <code>.card</code>, styles any element with <code>class="card"</code>. This is the workhorse; you will use classes constantly.</li>
+    <li><strong>ID</strong>: <code>#header</code>, styles the one element with <code>id="header"</code>. Use sparingly; classes are more flexible.</li>
+  </ul>
+  <p>A reliable habit from day one: open your browser&rsquo;s <strong>DevTools</strong> (right-click any element, choose Inspect). It shows you every rule affecting that element and lets you edit values live. It is the fastest way to learn what a property actually does, and to debug why something is not styled the way you expect.</p>
+
+  <h2 id="box">The box model</h2>
+  <p>
+    Every element is a box with four layers, from the inside out: <strong>content</strong>, then <strong>padding</strong>
+    (space inside the box, around the content), then the <strong>border</strong>, then <strong>margin</strong> (space
+    outside the box, pushing other elements away). Most early layout confusion is really box-model confusion, so it is
+    worth getting straight first. One line saves a lot of pain: <code>box-sizing: border-box</code> makes an element&rsquo;s
+    width include its padding and border, which is almost always what you expect.
+  </p>
+
+  <div class="csd" id="csd">
+    <h2 id="try" style="margin-top:0">Try it live</h2>
+    <p class="csd-sub">Edit the CSS on the left and watch the card on the right update. Nothing here can break the page; it runs in its own frame.</p>
+    <div class="csd-grid">
+      <textarea id="csd-css" spellcheck="false">{STARTER_CSS}</textarea>
+      <iframe id="csd-prev" title="Live CSS preview" class="csd-prev"></iframe>
+    </div>
+  </div>
+
+  <h2 id="sizing">Sane sizing and a mobile-first habit</h2>
+  <p>
+    Two opinions that save beginners from the most common headaches. First, prefer <code>max-width</code> over a fixed
+    <code>width</code>. A fixed width cannot shrink, so it overflows small screens; <code>max-width</code> caps the size on
+    big screens but lets the element shrink when it must. Second, design for the small screen first, then add styles for
+    wider screens with a media query. Starting narrow and growing is far easier than starting wide and cramming.
+  </p>
+  <p>
+    For units, three carry you a long way at the start: <code>px</code> for fixed sizes, <code>%</code> for sizes relative
+    to the parent, and <code>rem</code> for font sizes that respect the user&rsquo;s settings. You can add <code>em</code>,
+    <code>vw</code>, and <code>vh</code> later, once the first three feel natural.
+  </p>
+
+  <h2 id="next">Where to go next</h2>
+  <p>
+    The fastest way to improve is to copy a design you like and rebuild it, leaning on DevTools to see how it was done.
+    For step-by-step CSS tutorials, real technique breakdowns, and a gallery of designs to learn from, our sister site
+    <strong>CSS Cr&egrave;me</strong> is built for exactly this stage:
+  </p>
+  <p class="csd-cta">
+    <a href="https://csscreme.com/tutorials">Browse the CSS Cr&egrave;me tutorials &rarr;</a>
+  </p>
+  <p>
+    From here, the next properties worth learning are <strong>Flexbox</strong> and <strong>Grid</strong> for layout, and
+    <strong>transitions</strong> for simple animation. Build small things, inspect often, and keep your styles in one
+    external file.
+  </p>
+
+  <h2 id="faq">FAQ</h2>
+  {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+</ReferencePage>
+
+<style is:global>
+  .csd{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:18px 20px;margin:26px 0}
+  .csd-sub{font-size:14px;color:var(--ink-soft);margin:6px 0 14px}
+  .csd-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
+  .csd textarea{width:100%;min-height:300px;border:1.5px solid var(--line);border-radius:11px;background:var(--ink);color:#eee4d3;font-family:var(--font-mono);font-size:12.5px;line-height:1.55;padding:13px;resize:vertical}
+  .csd textarea:focus{outline:0;border-color:var(--coral)}
+  .csd-prev{width:100%;min-height:300px;border:1.5px solid var(--line);border-radius:11px;background:#fbf4e9}
+  .csd-cta{margin:14px 0}
+  .csd-cta a{display:inline-block;background:var(--ink);color:#fff;font-family:var(--font-display);font-weight:800;font-size:15px;text-decoration:none;padding:11px 20px;border-radius:11px}
+  .csd-cta a:hover{background:var(--coral)}
+  @media(max-width:620px){.csd-grid{grid-template-columns:1fr}.csd textarea,.csd-prev{min-height:220px}}
+</style>
+
+<script is:inline>
+  (function () {
+    var css = document.getElementById('csd-css'), prev = document.getElementById('csd-prev');
+    if (!css || !prev) return;
+    var HTML = '<div class="card"><h3>Fresh card</h3><p>Edit the CSS and this updates live.</p><button>Get started</button></div>';
+    function render() {
+      prev.srcdoc = '<!doctype html><meta charset="utf-8"><style>body{margin:0;padding:18px;display:grid;place-items:center;min-height:100vh;box-sizing:border-box}*{box-sizing:border-box}' + css.value + '</style>' + HTML;
+    }
+    css.addEventListener('input', render);
+    render();
+  })();
+</script>

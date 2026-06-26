@@ -812,6 +812,51 @@ export const DICT = [
     next: { label: 'Read any feed: Feed Preview', href: '/feed-preview', desc: 'Paste a feed URL and see it as a clean list.' },
     related: ['webhook', 'url'],
   },
+
+  // ═══════════════════════ Wave 4: coding with AI (from the "how to write code with AI" guide) ═══════════════════════
+  {
+    slug: 'training-cutoff', term: 'Training cutoff', kind: 'ai',
+    answer: 'A model&rsquo;s <strong>training cutoff</strong> is the date its training data stops, so it knows nothing that happened after it.',
+    analogy: 'Like a textbook printed on a certain date: sharp on everything up to then, blank on anything newer.',
+    example: 'Ask a model with an early-2024 cutoff about a library released in 2025 and it will guess, often inventing functions that do not exist.',
+    why: 'It explains a lot of confident-but-wrong coding answers: the model is recalling an older version of the world. Knowing the cutoff tells you when to paste in fresh docs.',
+    where: ['ChatGPT', 'Claude', 'Cursor', 'model release notes'],
+    next: { label: 'How to write code with AI', href: '/how-to-write-code-with-ai', desc: 'Work around stale knowledge: prefer stable libraries, and paste recent docs into the prompt.' },
+    related: ['hallucination', 'llm', 'model'],
+  },
+  {
+    slug: 'system-prompt', term: 'System prompt', kind: 'ai',
+    answer: 'A <strong>system prompt</strong> is a standing instruction set at the start of a chat that tells the model how to behave, before you ask anything.',
+    analogy: 'Like the brief you hand someone on day one: tone, rules, and what to do, sitting in the background the whole time.',
+    example: '&ldquo;You are a terse coding assistant. Always cite file paths and never invent APIs.&rdquo; Every later answer is shaped by it.',
+    why: 'It is the most reliable lever for steering an AI. Role, format, and guardrails live here, separate from your actual question.',
+    where: ['ChatGPT custom instructions', 'Claude', 'OpenAI API', 'Cursor rules'],
+    whereOurs: { label: 'KB Cafe · Context Window Visualizer', href: '/context-window-visualizer' },
+    ladder: { label: 'It lives in the context window', href: '/what-is-a-context-window' },
+    next: { label: 'How to write code with AI', href: '/how-to-write-code-with-ai', desc: 'Where the system prompt fits when you brief a model to write code.' },
+    related: ['prompt', 'context-window', 'temperature'],
+  },
+  {
+    slug: 'coding-agent', term: 'Coding agent', kind: 'ai',
+    answer: 'A <strong>coding agent</strong> is an AI tool that does not just suggest code but reads your files, makes changes, runs commands, and fixes its own errors in a loop.',
+    analogy: 'Less like autocomplete, more like a junior developer at the keyboard: give it a task and it works through the steps, checking as it goes.',
+    example: 'Tools like Claude Code, Cursor&rsquo;s agent, and Aider can edit several files, run the tests, read the failure, and try again until it passes.',
+    why: 'It is the shift from &ldquo;AI that talks&rdquo; to &ldquo;AI that acts&rdquo; in your codebase. Powerful, but you still have to read and test what it does.',
+    where: ['Claude Code', 'Cursor', 'Aider', 'Windsurf'],
+    ladder: { label: 'How agents act: tool calling', href: '/what-is-tool-calling' },
+    next: { label: 'How to write code with AI', href: '/how-to-write-code-with-ai', desc: 'How to direct a coding agent well, and when to take over.' },
+    related: ['agent', 'tool-calling', 'vibe-coding'],
+  },
+  {
+    slug: 'sandbox', term: 'Sandbox', kind: 'coding',
+    answer: 'A <strong>sandbox</strong> is an isolated, locked-down space where code can run without touching your files, your network, or the rest of your system.',
+    analogy: 'Like a child&rsquo;s sandbox: build and knock things down freely, and nothing escapes the box.',
+    example: 'When ChatGPT runs Python or Claude renders a web app, it executes in a sandbox, so a bad script cannot harm your machine.',
+    why: 'It is what makes &ldquo;let the AI run its own code&rdquo; safe. Tools that run code in a loop are powerful, but only inside a sandbox.',
+    where: ['ChatGPT Code Interpreter', 'Claude Artifacts', 'CodeSandbox', 'Docker'],
+    next: { label: 'How to write code with AI', href: '/how-to-write-code-with-ai', desc: 'Why tools that run code close the loop: write, run, see the error, fix.' },
+    related: ['environment-variable', 'deploy', 'cli'],
+  },
 ];
 
 export const findTerm = (slug) => DICT.find((t) => t.slug === slug);

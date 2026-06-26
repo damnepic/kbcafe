@@ -1,0 +1,201 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+---
+<ToolPage
+  title="AI Coding Prompt Builder, write prompts that get real code | KB Cafe"
+  description="Build a strong coding prompt for ChatGPT, Claude, or Cursor. Pick plan-or-build mode, describe the task, and toggle the things that matter, signature, types, tests, error handling, stable libraries, fresh docs. Assembles a copy-paste prompt live, in your browser."
+  path="/ai-coding-prompt-builder"
+  eyebrow="AI Explained · Tool"
+  h1="AI Coding Prompt Builder"
+  tagline="A vague request gets vague code. This assembles a precise, copy-paste prompt the way an experienced developer would brief one, live in your browser. Nothing is uploaded."
+>
+  <div class="cpb">
+    <div class="cpb-modes" id="cpb-modes" role="tablist" aria-label="Prompt mode">
+      <button class="cpb-mode on" data-mode="build" type="button">Build it</button>
+      <button class="cpb-mode" data-mode="plan" type="button">Plan / explore</button>
+    </div>
+    <p class="cpb-modehint" id="cpb-modehint"></p>
+
+    <label class="cpb-field">
+      <span class="cpb-lbl">What do you want?</span>
+      <textarea id="cpb-task" rows="2" placeholder="e.g. Given a CSV file path, return the rows as a list of dictionaries, skipping blank lines."></textarea>
+    </label>
+
+    <label class="cpb-field">
+      <span class="cpb-lbl">Language or stack</span>
+      <input id="cpb-stack" type="text" placeholder="e.g. Python 3.12, or React + TypeScript" />
+    </label>
+
+    <div class="cpb-build" id="cpb-build">
+      <label class="cpb-field">
+        <span class="cpb-lbl">Exact signature <span class="cpb-opt">optional, but powerful</span></span>
+        <textarea id="cpb-sig" rows="2" placeholder="e.g. def read_csv(path: str) -> list[dict]:"></textarea>
+      </label>
+
+      <fieldset class="cpb-toggles">
+        <legend class="cpb-lbl">Insist on</legend>
+        <label class="cpb-chk"><input type="checkbox" id="cpb-typed" checked /> <span>Full type hints</span></label>
+        <label class="cpb-chk"><input type="checkbox" id="cpb-err" checked /> <span>Error handling + edge cases</span></label>
+        <label class="cpb-chk"><input type="checkbox" id="cpb-boring" checked /> <span>Stable, popular libraries</span></label>
+        <label class="cpb-chk"><input type="checkbox" id="cpb-tests" /> <span>Write tests</span></label>
+        <input id="cpb-framework" class="cpb-sub" type="text" placeholder="test framework, e.g. pytest" hidden />
+      </fieldset>
+
+      <label class="cpb-field">
+        <span class="cpb-lbl">Constraints <span class="cpb-opt">one per line, optional</span></span>
+        <textarea id="cpb-constraints" rows="2" placeholder="e.g. No external dependencies&#10;Must handle files over 1GB without loading it all into memory"></textarea>
+      </label>
+
+      <label class="cpb-field">
+        <span class="cpb-lbl">Paste docs for a new library <span class="cpb-opt">optional, beats a stale training cutoff</span></span>
+        <textarea id="cpb-docs" rows="2" placeholder="Paste a few lines from the library's current README or docs if it's newer than the model."></textarea>
+      </label>
+    </div>
+
+    <div class="cpb-out-wrap">
+      <div class="cpb-out-head">
+        <span class="cpb-lbl">Your prompt</span>
+        <div class="cpb-actions">
+          <button id="cpb-example" class="cpb-btn ghost" type="button">Load example</button>
+          <button id="cpb-copy" class="cpb-btn" type="button">Copy</button>
+        </div>
+      </div>
+      <pre id="cpb-out" class="cpb-out" aria-live="polite"></pre>
+    </div>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>Why a built prompt beats a one-liner</h2>
+    <p>
+      The biggest difference between people who get great code out of AI and people who get frustrated is rarely the
+      model. It is the prompt. A model is a fast, confident, slightly over-eager assistant: give it a vague task and it
+      fills the gaps with guesses. Give it a precise brief and it fills the gaps with exactly what you asked for. Writing
+      that brief in English, with a few deliberate gaps, is faster than writing the code yourself, and the code that
+      comes back needs far less fixing.
+    </p>
+    <p>This tool assembles the brief for you. Two modes, matching the two phases of real work:</p>
+    <ul>
+      <li><strong>Plan / explore</strong> asks for a few options with tradeoffs and tiny runnable examples. Use it before
+        you have committed to an approach, when the model is at its best as a research assistant.</li>
+      <li><strong>Build it</strong> switches to instruction mode: a precise spec with a signature, types, tests, and
+        constraints. Once you know what you want, be specific and a little bossy.</li>
+    </ul>
+    <p>
+      Each toggle maps to a habit that pays off. An exact <strong>signature</strong> removes ambiguity about inputs and
+      outputs. <strong>Type hints</strong> and explicit <strong>error handling</strong> are the parts people skip and
+      regret. Asking for <strong>tests</strong> gives you something to run, which is the one step you should never
+      outsource. Preferring <strong>stable, popular libraries</strong> keeps the model on ground it has seen thousands of
+      times. And pasting <strong>fresh docs</strong> works around a model&rsquo;s
+      <a class="kb-term" href="/dictionary/training-cutoff">training cutoff</a>, the date its knowledge stops, which is
+      the hidden cause of a lot of confident, wrong answers.
+    </p>
+    <p>
+      The full method, with the reasoning behind each habit, is in the guide:
+      <a href="/how-to-write-code-with-ai">How to write code with AI</a>. When you are ready to run the prompt, paste it
+      into ChatGPT, <a class="kb-term" href="/dictionary/coding-agent">Claude Code, Cursor, or any coding agent</a>, then
+      read and test what comes back.
+    </p>
+  </Fragment>
+</ToolPage>
+
+<style is:global>
+  .cpb{max-width:780px;margin:0 auto}
+  .cpb-modes{display:inline-flex;gap:4px;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:6px}
+  .cpb-mode{border:0;background:none;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink-soft);padding:7px 16px;border-radius:9px;cursor:pointer;transition:background .15s,color .15s}
+  .cpb-mode.on{background:var(--coral);color:#fff}
+  .cpb-modehint{font-size:13.5px;color:var(--ink-soft);margin:0 0 16px;min-height:1.3em}
+  .cpb-field{display:block;margin-bottom:14px}
+  .cpb-lbl{display:block;font-family:var(--font-display);font-weight:700;font-size:13.5px;color:var(--ink);margin-bottom:6px}
+  .cpb-opt{font-family:var(--font-body);font-weight:500;font-size:12px;color:var(--ink-soft)}
+  .cpb textarea,.cpb input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:11px;background:var(--cream);padding:11px 13px;font-family:var(--font-mono);font-size:13.5px;color:var(--ink);resize:vertical;line-height:1.5}
+  .cpb textarea:focus,.cpb input[type=text]:focus{outline:0;border-color:var(--coral)}
+  .cpb-toggles{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+  .cpb-toggles legend{padding:0 6px}
+  .cpb-chk{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink);cursor:pointer}
+  .cpb-chk input{width:16px;height:16px;accent-color:var(--coral)}
+  .cpb-sub{flex:1 1 100%;max-width:240px}
+  .cpb-out-wrap{margin-top:22px;border:1.5px solid var(--ink);border-radius:14px;overflow:hidden;background:var(--ink)}
+  .cpb-out-head{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:var(--ink)}
+  .cpb-out-head .cpb-lbl{color:#fff;margin:0}
+  .cpb-actions{display:flex;gap:8px}
+  .cpb-btn{border:0;border-radius:8px;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:12.5px;padding:6px 13px;cursor:pointer}
+  .cpb-btn.ghost{background:rgba(255,255,255,.14);color:#fff}
+  .cpb-btn:hover{filter:brightness(1.05)}
+  .cpb-out{margin:0;padding:15px;background:var(--ink);color:#eee4d3;font-family:var(--font-mono);font-size:13px;line-height:1.62;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow:auto}
+</style>
+
+<script is:inline>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var mode = 'build';
+    var modesEl = $('cpb-modes'), hintEl = $('cpb-modehint'), buildEl = $('cpb-build');
+    var task = $('cpb-task'), stack = $('cpb-stack'), sig = $('cpb-sig');
+    var typed = $('cpb-typed'), err = $('cpb-err'), boring = $('cpb-boring'), tests = $('cpb-tests'), framework = $('cpb-framework');
+    var constraints = $('cpb-constraints'), docs = $('cpb-docs'), out = $('cpb-out');
+    var HINTS = {
+      build: 'Instruction mode: you know what you want, so be specific and a little bossy.',
+      plan: 'Research mode: you are still deciding, so ask for options and tradeoffs first.'
+    };
+
+    function render() {
+      var t = task.value.trim(), s = stack.value.trim(), L = [];
+      if (mode === 'plan') {
+        L.push("I'm choosing an approach for this task:");
+        L.push(t || "(describe what you want to build)");
+        if (s) L.push("\nLanguage / stack: " + s);
+        L.push("\nGive me 2 or 3 solid options. For each one:");
+        L.push("- a one-line summary and when you'd pick it");
+        L.push("- the main tradeoffs (how mature it is, complexity, performance)");
+        L.push("- a minimal working example I can actually run");
+        L.push("\nPrefer well-established, widely-used libraries with plenty of examples. If any option is newer than your training data, tell me instead of guessing.");
+      } else {
+        L.push("Write " + (s || "code") + " for this task:");
+        L.push(t || "(describe exactly what the code should do)");
+        if (sig.value.trim()) { L.push("\nUse exactly this signature:"); L.push(sig.value.trim()); }
+        var reqs = [];
+        if (typed.checked) reqs.push("Use full type hints / typed signatures.");
+        if (err.checked) reqs.push("Handle errors and edge cases explicitly: bad input, empty input, and failures. Don't fail silently.");
+        if (boring.checked) reqs.push("Use stable, popular libraries with lots of examples. Avoid anything obscure or brand-new.");
+        constraints.value.split("\n").forEach(function (c) { if (c.trim()) reqs.push(c.trim()); });
+        if (reqs.length) { L.push("\nRequirements:"); reqs.forEach(function (r) { L.push("- " + r); }); }
+        if (tests.checked) L.push("\nThen write tests with " + (framework.value.trim() || "a standard test framework") + " covering the happy path and the edge cases above.");
+        if (docs.value.trim()) { L.push("\nUse this documentation for the library (it may be newer than your training data):"); L.push(docs.value.trim()); }
+        L.push("\nWrite code you'd be comfortable maintaining: clear names, a short comment where it helps, no clever tricks. Show me the complete file(s).");
+      }
+      out.textContent = L.join("\n");
+    }
+
+    modesEl.addEventListener('click', function (e) {
+      var b = e.target.closest('.cpb-mode'); if (!b) return;
+      mode = b.dataset.mode;
+      Array.prototype.forEach.call(modesEl.children, function (c) { c.classList.toggle('on', c === b); });
+      buildEl.hidden = (mode !== 'build');
+      hintEl.textContent = HINTS[mode];
+      render();
+    });
+    tests.addEventListener('change', function () { framework.hidden = !tests.checked; });
+    ['input', 'change'].forEach(function (ev) { document.querySelector('.cpb').addEventListener(ev, render); });
+
+    $('cpb-copy').addEventListener('click', function () {
+      var b = $('cpb-copy');
+      navigator.clipboard.writeText(out.textContent).then(function () {
+        var o = b.textContent; b.textContent = 'Copied'; setTimeout(function () { b.textContent = o; }, 1400);
+      });
+    });
+    $('cpb-example').addEventListener('click', function () {
+      mode = 'build';
+      Array.prototype.forEach.call(modesEl.children, function (c) { c.classList.toggle('on', c.dataset.mode === 'build'); });
+      buildEl.hidden = false; hintEl.textContent = HINTS.build;
+      task.value = "Given a URL, download a SQLite database to a temp file and verify it's valid before returning the path.";
+      stack.value = "Python 3.12";
+      sig.value = "def fetch_db(url: str) -> Path:";
+      typed.checked = true; err.checked = true; boring.checked = true; tests.checked = true; framework.hidden = false; framework.value = "pytest";
+      constraints.value = "Stream the download, don't hold the whole file in memory\nReject files larger than 100MB\nRun a SQLite integrity check before returning";
+      docs.value = "";
+      render();
+    });
+
+    hintEl.textContent = HINTS.build;
+    render();
+  })();
+</script>
