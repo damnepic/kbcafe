@@ -111,7 +111,7 @@ const STARTER_CSS = `.card {
   <h2 id="next">Where to go next</h2>
   <p>
     The fastest way to improve is to copy a design you like and rebuild it, leaning on DevTools to see how it was done.
-    For step-by-step CSS tutorials, real technique breakdowns, and a gallery of designs to learn from, our sister site
+    For step-by-step CSS tutorials, real technique breakdowns, and a gallery of designs to learn from,
     <strong>CSS Cr&egrave;me</strong> is built for exactly this stage:
   </p>
   <p class="csd-cta">
@@ -145,7 +145,7 @@ const STARTER_CSS = `.card {
   (function () {
     var css = document.getElementById('csd-css'), prev = document.getElementById('csd-prev');
     if (!css || !prev) return;
-    var HTML = '<div class="card"><h3>Fresh card</h3><p>Edit the CSS and this updates live.</p><button>Get started</button></div>';
+    var HTML = '<div class="card"><h3>Fresh card</h3><p>Edit the CSS and this updates live.</p><button>Test Button</button></div>';
     function render() {
       prev.srcdoc = '<!doctype html><meta charset="utf-8"><style>body{margin:0;padding:18px;display:grid;place-items:center;min-height:100vh;box-sizing:border-box}*{box-sizing:border-box}' + css.value + '</style>' + HTML;
     }
