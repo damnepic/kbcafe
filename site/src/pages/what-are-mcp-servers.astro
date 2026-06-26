@@ -1,0 +1,147 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What are MCP servers? The ones worth knowing | KB Cafe"
+  description="MCP servers are what you actually plug into an AI: files, databases, GitHub, the live web, browsers. A practical tour of the categories and real servers (filesystem, postgres, github, playwright, brave-search), how to read the list, and how to connect one. With a hands-on match-the-server exercise."
+  path="/what-are-mcp-servers"
+  eyebrow="AI Explained · Protocol"
+  h1="What are MCP servers?"
+  tagline="If MCP is the standard plug, a server is the appliance you plug in. Here are the kinds worth knowing, with real examples and a hands-on exercise."
+>
+  <h2>The protocol versus the servers</h2>
+  <p>
+    <a class="kb-term" href="/dictionary/mcp">MCP</a> is the standard; an MCP <strong>server</strong> is a thing you
+    connect through it. The protocol defines how an AI app and a server talk; each server exposes one specific
+    capability, your files, a database, a GitHub repo, the live web, and offers it to the model. You learn the protocol
+    once in <a href="/what-is-mcp">What is MCP</a>. This lesson is about the servers you actually plug in, because that is
+    where MCP stops being abstract.
+  </p>
+
+  <h2>What a server hands the model</h2>
+  <p>
+    A server gives the model a small set of named tools, and sometimes data resources, that it can call through
+    <a class="kb-term" href="/dictionary/tool-calling">tool calling</a>. A filesystem server offers tools like &ldquo;read
+    file,&rdquo; &ldquo;write file,&rdquo; and &ldquo;list directory.&rdquo; A Postgres server offers &ldquo;run
+    query.&rdquo; The model decides <em>when</em> to call a tool; your client runs the call and feeds the result back.
+    Connect three servers and the model can suddenly read your code, query your database, and search the web, all in one
+    conversation.
+  </p>
+
+  <h2>The categories worth knowing</h2>
+  <p>
+    The community directory, <a href="https://github.com/punkpeye/awesome-mcp-servers">awesome-mcp-servers</a>,
+    catalogues thousands of servers across roughly 45 categories. A handful cover most real-world use:
+  </p>
+  <ul>
+    <li><strong>File systems</strong> (<code>filesystem</code>): read, write, and move local files. The first server most people connect.</li>
+    <li><strong>Version control and dev tools</strong> (<code>git</code>, <code>github</code>): branches and commits locally; issues and pull requests on GitHub.</li>
+    <li><strong>Databases</strong> (<code>postgres</code>, <code>sqlite</code>): run real queries, read-only or read-write, against your data.</li>
+    <li><strong>Browser automation</strong> (<code>playwright</code>, <code>puppeteer</code>): drive a real browser to click, fill forms, and scrape pages.</li>
+    <li><strong>Search and fetch</strong> (<code>brave-search</code>, <code>fetch</code>): search the live web and read pages, which gets the model past its <a class="kb-term" href="/dictionary/training-cutoff">training cutoff</a>.</li>
+    <li><strong>Communication</strong> (<code>slack</code>): read and post messages, manage channels.</li>
+    <li><strong>Knowledge and memory</strong> (<code>memory</code>): a store the model can write to and recall across sessions, a simple form of <a class="kb-term" href="/dictionary/agent">agent</a> memory.</li>
+    <li><strong>Cloud and monitoring</strong>: connect to AWS, GCP, Sentry, and similar, so the model can read logs and resources.</li>
+  </ul>
+
+  <h2>How to read the list</h2>
+  <p>
+    Each entry on awesome-mcp-servers is tagged so you can pick well. The emoji legend marks the <strong>language</strong>
+    it is written in (Python, TypeScript, Go, Rust, and others), the <strong>scope</strong>, a local service that runs on
+    your machine or a cloud service that runs remotely, and the supported <strong>operating systems</strong>. The
+    local-versus-cloud mark is the one to read first, and not only for convenience.
+  </p>
+
+  <div class="mts" id="mts">
+    <div class="mts-head">Hands-on: match the task to the server</div>
+    <p class="mts-q" id="mts-q"></p>
+    <div class="mts-opts" id="mts-opts"></div>
+    <p class="mts-reveal" id="mts-reveal" hidden></p>
+    <div class="mts-foot"><span id="mts-prog"></span><button id="mts-next" type="button" hidden>Next &rarr;</button></div>
+  </div>
+
+  <h2>Local versus cloud, and the trust line</h2>
+  <p>
+    A local server runs on your computer and can touch your real files, environment variables, and credentials. That is
+    exactly what makes it useful, and exactly why you should only run servers you trust and have looked at. Treat adding
+    an MCP server like installing a browser extension with full access: convenient, powerful, and worth a moment of
+    caution. Cloud servers move that trust to a third party instead. The <a href="/what-is-mcp#security">security note in
+    the MCP explainer</a> goes deeper.
+  </p>
+
+  <h2>Connecting one</h2>
+  <p>
+    Connecting a server is usually a small block of JSON in your client&rsquo;s config file (for Claude Desktop, that is
+    <code>claude_desktop_config.json</code>): the command to start the server, its arguments, and any keys it needs.
+    Build a valid one, or paste an existing block to validate it, with the
+    <a href="/mcp-config-generator">MCP Config Generator</a>. Restart the client, and the server&rsquo;s tools show up
+    ready for the model to call.
+  </p>
+
+  <h2>Where to go next</h2>
+  <ul>
+    <li><a href="/what-is-mcp">What is MCP</a>, the protocol underneath all of this.</li>
+    <li><a href="/mcp-config-generator">MCP Config Generator</a>, build the config to connect a server.</li>
+    <li><a href="https://github.com/punkpeye/awesome-mcp-servers">awesome-mcp-servers</a>, the curated directory to browse thousands more.</li>
+  </ul>
+</AiPage>
+
+<style is:global>
+  .mts{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin:24px 0}
+  .mts-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .mts-q{font-size:15.5px;color:var(--ink);font-weight:600;margin:10px 0 12px}
+  .mts-opts{display:flex;flex-wrap:wrap;gap:8px}
+  .mts-opts button{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 13px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .mts-opts button:hover{border-color:var(--coral)}
+  .mts-opts button:disabled{cursor:default}
+  .mts-opts button.right{border-color:#0f9f82;background:rgba(15,159,130,.12)}
+  .mts-opts button.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .mts-reveal{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:11px 13px}
+  .mts-reveal code{font-family:var(--font-mono);font-size:.92em;background:rgba(30,24,19,.08);padding:1px 5px;border-radius:5px}
+  .mts-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;min-height:30px}
+  .mts-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  #mts-next{border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:13px;padding:7px 15px;border-radius:9px;cursor:pointer}
+</style>
+
+<script is:inline>
+  (function () {
+    var Q = [
+      { task: "Let the AI read, write, and reorganize files in a project folder.", opts: ["filesystem", "postgres", "brave-search", "slack"], a: 0, why: "A <code>filesystem</code> server exposes read, write, and list-directory tools over a folder you allow. It is the File Systems category, and usually the first server people connect." },
+      { task: "Let the AI run SQL queries against your app's Postgres database.", opts: ["github", "postgres", "puppeteer", "memory"], a: 1, why: "A <code>postgres</code> server (Databases) gives the model a run-query tool against a real database. You choose whether it is read-only or read-write." },
+      { task: "Let the AI search the live web and read the pages it finds.", opts: ["sqlite", "filesystem", "brave-search", "git"], a: 2, why: "<code>brave-search</code> (Search and fetch) returns live results, getting the model past its training cutoff. Pair it with a <code>fetch</code> server to read the pages." },
+      { task: "Let the AI open issues and read pull requests in your repo.", opts: ["github", "slack", "filesystem", "postgres"], a: 0, why: "The <code>github</code> server (Version control and dev tools) exposes issues, pull requests, and repository contents. <code>git</code> is its local-only cousin for commits and branches." },
+      { task: "Let the AI click through a real website and fill in a form.", opts: ["brave-search", "playwright", "memory", "postgres"], a: 1, why: "<code>playwright</code> (or <code>puppeteer</code>) drives a real browser, so the model can click, type, and scrape. That is the Browser Automation category." }
+    ];
+    var i = 0, answered = false;
+    var qEl = document.getElementById('mts-q'), optsEl = document.getElementById('mts-opts'),
+        rev = document.getElementById('mts-reveal'), prog = document.getElementById('mts-prog'), next = document.getElementById('mts-next');
+    function show() {
+      answered = false;
+      var q = Q[i];
+      qEl.textContent = q.task;
+      optsEl.innerHTML = '';
+      q.opts.forEach(function (o, k) {
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.dataset.k = k;
+        optsEl.appendChild(b);
+      });
+      rev.hidden = true; next.hidden = true;
+      prog.textContent = 'Question ' + (i + 1) + ' of ' + Q.length;
+    }
+    optsEl.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || answered) return;
+      answered = true;
+      var q = Q[i], k = +b.dataset.k, ok = k === q.a;
+      Array.prototype.forEach.call(optsEl.children, function (c) {
+        c.disabled = true;
+        if (+c.dataset.k === q.a) c.classList.add('right');
+        else if (c === b) c.classList.add('wrong');
+      });
+      rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>The right pick is ' + q.opts[q.a] + '.</strong> ') + q.why;
+      rev.hidden = false;
+      next.hidden = (i >= Q.length - 1);
+      if (i >= Q.length - 1) prog.textContent = 'Done, you have seen all ' + Q.length + '.';
+    });
+    next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
+    show();
+  })();
+</script>
