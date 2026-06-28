@@ -91,9 +91,9 @@ const active = (h) => h === path;
   </div>
 
   <div class="sb-foot">
-    <a class={active('/flashcards') ? 'on' : ''} href="/flashcards" title="Flashcards"><span class="sb-ic" set:html={I.cards} /><span class="sb-lbl">Flashcards</span></a>
-    <a class={active('/til') ? 'on' : ''} href="/til" title="Today I Learned"><span class="sb-ic" set:html={I.doc} /><span class="sb-lbl">Today I Learned</span></a>
-    <a class={active('/resources') ? 'on' : ''} href="/resources" title="Free resources"><span class="sb-ic" set:html={I.briefcase} /><span class="sb-lbl">Free resources</span></a>
+    <a class={active('/flashcards') ? 'on' : ''} href="/flashcards" title="Flashcards"><span class="sb-ic" set:html={I.cards} /><span class="sb-lbl">Flashcards</span><span class="sb-new">New</span></a>
+    <a class={active('/til') ? 'on' : ''} href="/til" title="Today I Learned"><span class="sb-ic" set:html={I.doc} /><span class="sb-lbl">Today I Learned</span><span class="sb-new">New</span></a>
+    <a class={active('/resources') ? 'on' : ''} href="/resources" title="Free resources"><span class="sb-ic" set:html={I.briefcase} /><span class="sb-lbl">Free resources</span><span class="sb-new">New</span></a>
     <a class={active('/map') ? 'on' : ''} href="/map" title="Knowledge map"><span class="sb-ic" set:html={I.map} /><span class="sb-lbl">Knowledge map</span></a>
   </div>
 </aside>
@@ -138,10 +138,11 @@ const active = (h) => h === path;
   .sb-foot{padding-top:4px}
   .sb-foot a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink-soft);border-radius:10px;padding:8px 9px;font-family:var(--font-display);font-weight:700;font-size:13.5px}
   .sb-foot a:hover{background:var(--paper-2);color:var(--ink)}
+  .sb-new{margin-left:auto;font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--coral);border-radius:5px;padding:2px 6px;line-height:1.1}
 
   /* collapsed = icon rail (desktop). class lives on .kb-sb so scoped CSS reaches it */
   .kb-sb.collapsed{width:72px;padding:12px 10px;align-items:center}
-  .kb-sb.collapsed .sb-lbl,.kb-sb.collapsed .sb-h,.kb-sb.collapsed .sb-chev,.kb-sb.collapsed .sb-list{display:none}
+  .kb-sb.collapsed .sb-lbl,.kb-sb.collapsed .sb-h,.kb-sb.collapsed .sb-chev,.kb-sb.collapsed .sb-list,.kb-sb.collapsed .sb-new{display:none}
   .kb-sb.collapsed .sb-bar{flex-direction:column;gap:6px}
   .kb-sb.collapsed .sb-collapse{transform:rotate(180deg)}
   .kb-sb.collapsed .sb-search{flex:none;width:40px;height:40px;justify-content:center;padding:0}
