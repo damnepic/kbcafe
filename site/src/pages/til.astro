@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ItemListLd from '../components/ItemListLd.astro';
+import { TILS } from '../data/til.js';
+const fmt = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+---
+<Layout
+  title="Today I Learned, short AI & coding snippets | KB Cafe"
+  description="Bite-sized things worth knowing about AI and modern development: token math, structured outputs, streaming, keeping secrets out of git. One idea, a little code, no fluff."
+  path="/til"
+>
+  <ItemListLd name="Today I Learned" items={TILS.map(t => ({ name: t.title, href: '/til#' + t.slug }))} />
+
+  <section class="til">
+    <header class="til-hero">
+      <div class="eyebrow">☕ Today I Learned</div>
+      <h1>Small things, <span class="mk">worth knowing.</span></h1>
+      <p class="til-lede">
+        One idea, a little code, no preamble. The kind of thing you wish someone had told you before you spent an
+        afternoon on it. New ones get added to the top.
+      </p>
+    </header>
+
+    <div class="til-list">
+      {TILS.map(t => (
+        <article class="til-item" id={t.slug}>
+          <div class="til-meta"><span class="til-tag">{t.tag}</span><time>{fmt(t.date)}</time></div>
+          <h2><a href={'#' + t.slug} class="til-anchor">{t.title}</a></h2>
+          <p class="til-lede-sm">{t.lede}</p>
+          <div class="til-body" set:html={t.body} />
+        </article>
+      ))}
+    </div>
+
+    <p class="til-foot">More depth in the <a href="/blog">field notes</a> and the <a href="/dictionary">dictionary</a>, or drill the terms with <a href="/flashcards">flashcards</a>.</p>
+  </section>
+</Layout>
+
+<style is:global>
+  .til{max-width:720px;margin:0 auto;padding:34px 0 30px}
+  .til .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:14px}
+  .til-hero h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.02;font-size:clamp(34px,5.4vw,52px);margin:0}
+  .til .mk{color:var(--coral)}
+  .til-lede{margin-top:16px;font-size:17.5px;line-height:1.55;color:var(--ink-soft)}
+  .til-list{margin-top:34px;display:flex;flex-direction:column;gap:18px}
+  .til-item{border:1.5px solid var(--line);border-radius:18px;background:var(--cream);padding:22px 24px;scroll-margin-top:90px}
+  .til-meta{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft)}
+  .til-tag{font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+  .til-item h2{font-family:var(--font-display);font-weight:800;font-size:23px;letter-spacing:-.015em;margin:8px 0 0;line-height:1.2}
+  .til-anchor{color:var(--ink);text-decoration:none}
+  .til-anchor:hover{color:var(--coral)}
+  .til-lede-sm{font-size:15.5px;color:var(--ink-soft);margin:8px 0 4px;line-height:1.5}
+  .til-body p{font-size:15.5px;line-height:1.62;color:var(--ink);margin:14px 0 0}
+  .til-body a{color:var(--coral);font-weight:600;text-decoration:none}
+  .til-body a:hover{text-decoration:underline}
+  .til-body code{font-family:var(--font-mono);font-size:.9em;background:var(--paper-2);padding:1px 6px;border-radius:5px}
+  .til-body pre.code{font-family:var(--font-mono);font-size:13px;line-height:1.55;background:#241a12;color:#eee4d3;border-radius:12px;padding:15px 17px;margin:14px 0 0;overflow-x:auto;white-space:pre}
+  .til-body pre.code code{background:none;padding:0;color:inherit}
+  .til-foot{margin-top:26px;font-size:14.5px;color:var(--ink-soft)}
+  .til-foot a{color:var(--coral);font-weight:600;text-decoration:none}
+</style>

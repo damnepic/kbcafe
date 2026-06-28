@@ -1,0 +1,67 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ItemListLd from '../components/ItemListLd.astro';
+
+const RESOURCES = [
+  { file: 'system-prompt-library.md', title: 'System Prompt Library', kind: 'Markdown',
+    desc: 'Seven reusable system prompts (assistant, code reviewer, strict extractor, tutor, and more), plus the rules that make them work. Copy one, swap the brackets, ship.' },
+  { file: 'prompt-patterns-cheatsheet.md', title: 'Prompt Patterns Cheat Sheet', kind: 'Markdown',
+    desc: 'Nine patterns that reliably improve LLM output, from few-shot examples to giving the model an out, with when to reach for each. One page, no fluff.' },
+  { file: 'ai-coding-agent-rules.md', title: 'AI Coding Agent Rules', kind: 'Markdown',
+    desc: 'A starter rules file for Claude Code, Cursor, and similar agents. Save it as CLAUDE.md or .cursorrules, fill in your stack, and the agent stops reinventing your codebase.' },
+];
+---
+<Layout
+  title="Free AI Resources, downloadable prompt & agent templates | KB Cafe"
+  description="Free, evergreen downloads for building with AI: a system prompt library, a prompt patterns cheat sheet, and an AI coding agent rules starter. No email, no account, just the files."
+  path="/resources"
+>
+  <ItemListLd name="Free AI resources" items={RESOURCES.map(r => ({ name: r.title, href: '/downloads/' + r.file }))} />
+
+  <section class="res">
+    <header class="res-hero">
+      <div class="eyebrow">☕ Free resources</div>
+      <h1>Take the <span class="mk">templates.</span></h1>
+      <p class="res-lede">
+        Downloadable starting points we actually use, kept evergreen so they do not go stale. No email wall,
+        no account, no tracking. Right-click and save, or open and copy.
+      </p>
+    </header>
+
+    <div class="res-list">
+      {RESOURCES.map(r => (
+        <article class="res-card">
+          <div class="res-top"><h2>{r.title}</h2><span class="res-kind">{r.kind}</span></div>
+          <p class="res-desc">{r.desc}</p>
+          <div class="res-actions">
+            <a class="res-dl" href={'/downloads/' + r.file} download>Download</a>
+            <a class="res-view" href={'/downloads/' + r.file} target="_blank" rel="noopener">View</a>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <p class="res-foot">Want the interactive versions? Assemble prompts with the <a href="/prompt-builder">Prompt Builder</a>, lock JSON output with the <a href="/structured-output-builder">Structured Output Builder</a>, or drill terms with <a href="/flashcards">flashcards</a>.</p>
+  </section>
+</Layout>
+
+<style is:global>
+  .res{max-width:760px;margin:0 auto;padding:34px 0 30px}
+  .res .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:14px}
+  .res-hero h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.02;font-size:clamp(34px,5.4vw,52px);margin:0}
+  .res .mk{color:var(--coral)}
+  .res-lede{margin-top:16px;font-size:17.5px;line-height:1.55;color:var(--ink-soft)}
+  .res-list{margin-top:32px;display:flex;flex-direction:column;gap:14px}
+  .res-card{border:1.5px solid var(--line);border-radius:18px;background:var(--cream);padding:22px 24px}
+  .res-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+  .res-card h2{font-family:var(--font-display);font-weight:800;font-size:21px;letter-spacing:-.015em;margin:0}
+  .res-kind{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper-2);padding:3px 9px;border-radius:6px;white-space:nowrap}
+  .res-desc{font-size:15px;line-height:1.55;color:var(--ink-soft);margin:10px 0 16px}
+  .res-actions{display:flex;gap:10px;align-items:center}
+  .res-dl{display:inline-flex;align-items:center;gap:7px;background:var(--ink);color:#fff;font-family:var(--font-display);font-weight:700;font-size:14px;text-decoration:none;padding:9px 18px;border-radius:11px;transition:background .12s}
+  .res-dl:hover{background:var(--coral)}
+  .res-view{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);text-decoration:none;font-weight:600}
+  .res-view:hover{color:var(--coral)}
+  .res-foot{margin-top:26px;font-size:14.5px;color:var(--ink-soft);line-height:1.6}
+  .res-foot a{color:var(--coral);font-weight:600;text-decoration:none}
+</style>

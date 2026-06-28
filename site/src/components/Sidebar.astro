@@ -92,6 +92,8 @@ const active = (h) => h === path;
 
   <div class="sb-foot">
     <a class={active('/flashcards') ? 'on' : ''} href="/flashcards" title="Flashcards"><span class="sb-ic" set:html={I.cards} /><span class="sb-lbl">Flashcards</span></a>
+    <a class={active('/til') ? 'on' : ''} href="/til" title="Today I Learned"><span class="sb-ic" set:html={I.doc} /><span class="sb-lbl">Today I Learned</span></a>
+    <a class={active('/resources') ? 'on' : ''} href="/resources" title="Free resources"><span class="sb-ic" set:html={I.briefcase} /><span class="sb-lbl">Free resources</span></a>
     <a class={active('/map') ? 'on' : ''} href="/map" title="Knowledge map"><span class="sb-ic" set:html={I.map} /><span class="sb-lbl">Knowledge map</span></a>
   </div>
 </aside>
