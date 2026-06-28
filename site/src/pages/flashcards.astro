@@ -1,0 +1,257 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ItemListLd from '../components/ItemListLd.astro';
+import { DECKS } from '../data/flashcards.js';
+const total = DECKS.reduce((n, d) => n + d.cards.length, 0);
+---
+<Layout
+  title="AI Flashcards, free spaced-repetition for AI & coding terms | KB Cafe"
+  description={`Free flashcards to memorize ${total} AI and coding terms, with spaced repetition that schedules each card to return right before you forget it. Flip, rate yourself, and the deck remembers. No account, runs in your browser.`}
+  path="/flashcards"
+>
+  <ItemListLd name="AI and coding flashcard decks" items={DECKS.map(d => ({ name: d.label, href: '/flashcards?deck=' + d.id }))} />
+
+  <section class="fc">
+    <header class="fc-hero">
+      <div class="eyebrow">☕ Study tool</div>
+      <h1>AI <span class="mk">flashcards.</span></h1>
+      <p class="fc-lede">
+        Memorize the vocabulary of AI and modern development with spaced repetition. Flip a card, rate how well you knew
+        it, and the deck schedules it to come back right before you would forget. {total} cards across {DECKS.length}
+        decks, free, no account, all in your browser.
+      </p>
+      <a class="fc-due" id="fc-due" href="#" hidden></a>
+    </header>
+
+    <div class="fc-grid" id="fc-grid">
+      {DECKS.map(d => (
+        <button class="fc-deck" data-deck={d.id} type="button">
+          <span class="fc-deck-top"><span class="fc-deck-name">{d.label}</span><span class="fc-deck-n">{d.cards.length}</span></span>
+          <span class="fc-deck-blurb">{d.blurb}</span>
+          <span class="fc-deck-bar"><i></i></span>
+          <span class="fc-deck-meta"><span class="fc-deck-due"></span><span class="fc-deck-go">Study &rarr;</span></span>
+        </button>
+      ))}
+    </div>
+
+    <div class="fc-study" id="fc-study" hidden>
+      <button class="fc-back" id="fc-back" type="button">&larr; All decks</button>
+      <div class="fc-study-head">
+        <h2 id="fc-study-title"></h2>
+        <div class="fc-study-prog"><span id="fc-study-count"></span><div class="fc-pbar"><i id="fc-pbar"></i></div></div>
+      </div>
+
+      <div class="fc-stage" id="fc-stage">
+        <div class="fc-card" id="fc-card" tabindex="0" role="button" aria-label="Flashcard, click or press space to flip">
+          <div class="fc-inner">
+            <div class="fc-face fc-front"><span class="fc-tag" id="fc-q-tag"></span><span class="fc-q" id="fc-q"></span><span class="fc-hint">tap to flip</span></div>
+            <div class="fc-face fc-back"><span class="fc-tag">Answer</span><span class="fc-a" id="fc-a"></span></div>
+          </div>
+        </div>
+        <div class="fc-rate" id="fc-rate">
+          <button class="fc-rbtn again" id="fc-again" type="button">Forgot</button>
+          <button class="fc-rbtn good" id="fc-good" type="button">Got it &check;</button>
+        </div>
+      </div>
+
+      <div class="fc-done" id="fc-done" hidden>
+        <p class="fc-done-h" id="fc-done-msg"></p>
+        <div class="fc-done-btns"><button class="fc-rbtn good" id="fc-again-all" type="button">Study again</button><button class="fc-rbtn" id="fc-done-back" type="button">All decks</button></div>
+      </div>
+      <p class="fc-foot">Press <kbd>Space</kbd> to flip. Progress and review schedule save in this browser only, nothing is uploaded.</p>
+    </div>
+
+    <section class="fc-browse">
+      <h2>Browse every card</h2>
+      <p>All {total} cards in plain text, pulled from the <a href="/dictionary">dictionary</a>. Study above, or just read through.</p>
+      {DECKS.map(d => (
+        <details class="fc-bd">
+          <summary>{d.label} <span>({d.cards.length})</span></summary>
+          <dl>{d.cards.map(c => (<><dt><a href={`/dictionary/${c.slug}`}>{c.q}</a></dt><dd>{c.a}</dd></>))}</dl>
+        </details>
+      ))}
+    </section>
+  </section>
+</Layout>
+
+<style is:global>
+  .fc{max-width:920px;margin:0 auto;padding:34px 0 30px}
+  .fc .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:14px}
+  .fc-hero h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(38px,6vw,58px);margin:0}
+  .fc .mk{color:var(--coral)}
+  .fc-lede{margin-top:16px;font-size:17.5px;line-height:1.55;color:var(--ink-soft);max-width:640px}
+  .fc-due{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:var(--ink);color:#fff;font-family:var(--font-display);font-weight:700;font-size:14px;text-decoration:none;padding:9px 16px;border-radius:11px}
+  .fc-due:hover{background:var(--coral)}
+
+  .fc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:30px}
+  .fc-deck{text-align:left;display:flex;flex-direction:column;gap:8px;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:17px 18px;cursor:pointer;transition:transform .14s,box-shadow .14s,border-color .14s;font-family:var(--font-body)}
+  .fc-deck:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(30,24,19,.08);border-color:var(--ink)}
+  .fc-deck-top{display:flex;align-items:center;justify-content:space-between}
+  .fc-deck-name{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
+  .fc-deck-n{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ink-soft);background:var(--paper-2);padding:3px 8px;border-radius:6px}
+  .fc-deck-blurb{font-size:13.5px;color:var(--ink-soft);line-height:1.45;flex:1}
+  .fc-deck-bar{height:7px;border-radius:5px;background:var(--paper-2);overflow:hidden}
+  .fc-deck-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16a37e,#0f9f82);transition:width .3s}
+  .fc-deck-meta{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:11.5px}
+  .fc-deck-due{color:var(--coral-deep);font-weight:700}
+  .fc-deck-go{color:var(--ink-soft);font-weight:700}
+
+  .fc-study{margin-top:24px}
+  .fc-back{border:0;background:none;cursor:pointer;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);padding:4px 0}
+  .fc-back:hover{color:var(--coral)}
+  .fc-study-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:8px 0 16px;flex-wrap:wrap}
+  .fc-study-head h2{font-family:var(--font-display);font-weight:800;font-size:24px;margin:0}
+  .fc-study-prog{flex:1;max-width:300px;min-width:180px}
+  .fc-study-prog span{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);display:block;margin-bottom:6px;text-align:right}
+  .fc-pbar{height:9px;border-radius:6px;background:var(--paper-2);overflow:hidden}
+  .fc-pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16a37e,#0f9f82);transition:width .35s}
+
+  .fc-stage{perspective:1600px}
+  .fc-card{width:100%;min-height:240px;cursor:pointer;outline:0}
+  .fc-card:focus-visible{box-shadow:0 0 0 3px rgba(238,75,43,.35);border-radius:20px}
+  .fc-inner{position:relative;width:100%;min-height:240px;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+  .fc-card.flipped .fc-inner{transform:rotateY(180deg)}
+  .fc-face{position:absolute;inset:0;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:20px;padding:30px 28px;min-height:240px}
+  .fc-front{background:linear-gradient(160deg,#fff,var(--paper-2));border:1.5px solid var(--line)}
+  .fc-back{background:linear-gradient(160deg,#241a12,#3a2716);transform:rotateY(180deg)}
+  .fc-tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .fc-back .fc-tag{color:#f4b25a}
+  .fc-q{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:-.02em;color:var(--ink);margin:12px 0}
+  .fc-a{font-size:17px;line-height:1.55;color:#eee4d3;margin-top:12px;max-width:540px}
+  .fc-hint{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);opacity:.7}
+  .fc-rate{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .fc-rbtn{border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:12px;font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--ink);cursor:pointer;transition:transform .1s,background .12s,border-color .12s}
+  .fc-rbtn:hover{transform:translateY(-1px)}
+  .fc-rbtn.again:hover{border-color:var(--coral);color:var(--coral-deep)}
+  .fc-rbtn.good{background:#0f9f82;color:#fff;border-color:#0f9f82}
+  .fc-rbtn.good:hover{filter:brightness(1.06)}
+  .fc-done{text-align:center;padding:30px 0}
+  .fc-done-h{font-family:var(--font-display);font-weight:800;font-size:20px;color:var(--ink);margin:0 0 16px}
+  .fc-done-btns{display:flex;gap:10px;justify-content:center}
+  .fc-done-btns .fc-rbtn{padding:10px 18px}
+  .fc-foot{margin-top:14px;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);text-align:center}
+  .fc-foot kbd{background:var(--paper-2);border-radius:5px;padding:1px 6px;font-size:.92em}
+
+  .fc-browse{margin-top:40px;border-top:1px solid var(--line);padding-top:28px}
+  .fc-browse h2{font-family:var(--font-display);font-weight:800;font-size:22px;margin:0 0 4px}
+  .fc-browse>p{font-size:14.5px;color:var(--ink-soft);margin:0 0 16px}
+  .fc-browse>p a,.fc-bd a{color:var(--coral);font-weight:600;text-decoration:none}
+  .fc-bd{border:1.5px solid var(--line);border-radius:13px;background:var(--cream);margin-bottom:10px;padding:2px 16px}
+  .fc-bd summary{font-family:var(--font-display);font-weight:800;font-size:16px;padding:13px 0;cursor:pointer;list-style:none}
+  .fc-bd summary::-webkit-details-marker{display:none}
+  .fc-bd summary span{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);font-weight:600}
+  .fc-bd dl{margin:0 0 12px}
+  .fc-bd dt{font-family:var(--font-display);font-weight:700;font-size:14.5px;color:var(--ink);margin-top:10px}
+  .fc-bd dd{margin:2px 0 0;font-size:13.5px;line-height:1.5;color:var(--ink-soft)}
+  @media(max-width:620px){.fc-grid{grid-template-columns:1fr}.fc-q{font-size:26px}.fc-face{min-height:210px;padding:24px}.fc-inner,.fc-card{min-height:210px}}
+</style>
+
+<script is:inline define:vars={{ DECKS }}>
+  (function () {
+    var KEY = 'kb-fc';
+    var INTERVALS = [0, 1, 2, 4, 9, 21]; // days until a card is due again, by Leitner box
+    var DAY = 86400000;
+    var byId = {}; DECKS.forEach(function (d) { byId[d.id] = d; });
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
+    function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+    function st(deckId, idx) { var s = load(); return (s[deckId] && s[deckId][idx]) || [0, 0]; } // [box, dueMs]
+    function rate(deckId, idx, known) {
+      var s = load(); s[deckId] = s[deckId] || {};
+      var box = (s[deckId][idx] || [0, 0])[0];
+      box = known ? Math.min(box + 1, INTERVALS.length - 1) : 0;
+      s[deckId][idx] = [box, Date.now() + INTERVALS[box] * DAY]; save(s);
+    }
+    function isDue(deckId, idx) { var c = (load()[deckId] || {})[idx]; return !c || c[1] <= Date.now(); }
+    function dueCount(deck) { var n = 0; for (var i = 0; i < deck.cards.length; i++) if (isDue(deck.id, i)) n++; return n; }
+    function masteredCount(deck) { var m = load()[deck.id] || {}, n = 0; for (var i = 0; i < deck.cards.length; i++) if (m[i] && m[i][0] >= 3) n++; return n; }
+
+    // ---- hub ----
+    var grid = document.getElementById('fc-grid'), dueBanner = document.getElementById('fc-due');
+    function paintHub() {
+      var totalDue = 0;
+      DECKS.forEach(function (d) {
+        var el = grid.querySelector('[data-deck="' + d.id + '"]'); if (!el) return;
+        var mast = masteredCount(d), due = dueCount(d); totalDue += due;
+        el.querySelector('.fc-deck-bar i').style.width = Math.round(mast / d.cards.length * 100) + '%';
+        el.querySelector('.fc-deck-due').textContent = due > 0 ? due + ' due' : (mast === d.cards.length ? 'all mastered' : '');
+      });
+      if (totalDue > 0) { dueBanner.hidden = false; dueBanner.textContent = '⏱ ' + totalDue + ' card' + (totalDue > 1 ? 's' : '') + ' due for review'; }
+      else dueBanner.hidden = true;
+    }
+
+    // ---- study ----
+    var hub = grid, studyEl = document.getElementById('fc-study'), browse = document.querySelector('.fc-browse');
+    var titleEl = document.getElementById('fc-study-title'), countEl = document.getElementById('fc-study-count'), pbar = document.getElementById('fc-pbar');
+    var stage = document.getElementById('fc-stage'), cardEl = document.getElementById('fc-card'), qEl = document.getElementById('fc-q'), aEl = document.getElementById('fc-a'), qTag = document.getElementById('fc-q-tag');
+    var doneEl = document.getElementById('fc-done'), doneMsg = document.getElementById('fc-done-msg');
+    var curDeck = null, queue = [], curIdx = -1;
+
+    function buildQueue(deck) {
+      var due = [], rest = [];
+      for (var i = 0; i < deck.cards.length; i++) (isDue(deck.id, i) ? due : rest).push(i);
+      if (due.length === 0) due = rest.slice(); // nothing due: review the whole deck
+      for (var j = due.length - 1; j > 0; j--) { var k = Math.floor(Math.random() * (j + 1)); var t = due[j]; due[j] = due[k]; due[k] = t; } // shuffle
+      return due;
+    }
+    function openStudy(id) {
+      var deck = byId[id]; if (!deck) return;
+      curDeck = deck; queue = buildQueue(deck);
+      hub.hidden = true; browse.style.display = 'none'; studyEl.hidden = false;
+      titleEl.textContent = deck.label;
+      doneEl.hidden = true; stage.hidden = false;
+      next();
+      try { history.replaceState(null, '', '/flashcards?deck=' + id); } catch (e) {}
+    }
+    function closeStudy() {
+      studyEl.hidden = true; hub.hidden = false; browse.style.display = '';
+      paintHub();
+      try { history.replaceState(null, '', '/flashcards'); } catch (e) {}
+    }
+    function progress() {
+      var mast = masteredCount(curDeck);
+      countEl.textContent = queue.length + ' to go · ' + mast + ' / ' + curDeck.cards.length + ' mastered';
+      pbar.style.width = Math.round(mast / curDeck.cards.length * 100) + '%';
+    }
+    function next() {
+      progress();
+      if (queue.length === 0) {
+        stage.hidden = true; doneEl.hidden = false;
+        var dueTomorrow = curDeck.cards.length - masteredCount(curDeck);
+        doneMsg.innerHTML = '<strong>Session done.</strong> ' + (masteredCount(curDeck) === curDeck.cards.length
+          ? 'You have mastered every card in this deck.' : 'Come back tomorrow and the cards you are still learning will be waiting.');
+        return;
+      }
+      curIdx = queue[0];
+      var c = curDeck.cards[curIdx];
+      cardEl.classList.remove('flipped');
+      qTag.textContent = c.tag; qEl.textContent = c.q; aEl.textContent = c.a;
+    }
+    function flip() { cardEl.classList.toggle('flipped'); }
+    function answer(known) {
+      rate(curDeck.id, curIdx, known);
+      queue.shift();
+      if (!known) queue.push(curIdx); // re-queue a forgotten card for later this session
+      next();
+    }
+
+    grid.addEventListener('click', function (e) { var b = e.target.closest('.fc-deck'); if (b) openStudy(b.dataset.deck); });
+    document.getElementById('fc-back').addEventListener('click', closeStudy);
+    document.getElementById('fc-done-back').addEventListener('click', closeStudy);
+    document.getElementById('fc-again-all').addEventListener('click', function () { queue = buildQueue(curDeck); if (queue.length === 0) queue = curDeck.cards.map(function (_, i) { return i; }); doneEl.hidden = true; stage.hidden = false; next(); });
+    cardEl.addEventListener('click', flip);
+    cardEl.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip(); } });
+    document.getElementById('fc-good').addEventListener('click', function () { answer(true); });
+    document.getElementById('fc-again').addEventListener('click', function () { answer(false); });
+    document.addEventListener('keydown', function (e) { if (studyEl.hidden || doneEl.hidden === false) return; if (e.key === ' ' && document.activeElement !== cardEl) { e.preventDefault(); flip(); } });
+    dueBanner.addEventListener('click', function (e) {
+      e.preventDefault(); // open the deck with the most due cards
+      var best = null; DECKS.forEach(function (d) { var due = dueCount(d); if (due > 0 && (!best || due > best.due)) best = { id: d.id, due: due }; });
+      if (best) openStudy(best.id);
+    });
+
+    paintHub();
+    var deep = new URLSearchParams(location.search).get('deck');
+    if (deep && byId[deep]) openStudy(deep);
+  })();
+</script>
