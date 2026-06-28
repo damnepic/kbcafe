@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { DICT, byKind, KIND_META, KIND_ORDER, POPULAR, findTerm } from '../../data/dictionary.js';
+import ItemListLd from '../../components/ItemListLd.astro';
 
 const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
 const gloss = (e) => { const p = plain(e.answer).replace(/^An?\s+|^The\s+/i, ''); return p.length > 52 ? p.slice(0, 52).replace(/\s+\S*$/, '') + '…' : p; };
@@ -30,6 +31,7 @@ const schema = {
   description="AI, coding, startup, and internet terms explained for beginners, in one sentence, with an example and a next step. No jargon, no gatekeeping."
   path="/dictionary"
 >
+  <ItemListLd name="Plain-English Tech Dictionary" items={DICT.map(d => ({ name: d.term, href: '/dictionary/' + d.slug }))} />
   <section class="dh" data-view="cats">
     <div class="eyebrow">&#10022; Plain-English Tech Dictionary</div>
     <h1>The words that get you <span class="mk">unstuck.</span></h1>

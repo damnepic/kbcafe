@@ -1,0 +1,11 @@
+---
+// Emits ItemList JSON-LD for a hub/index page so Google reads it as a curated collection.
+// items: [{ name, href }]. Head-only behavior; renders nothing visible.
+const { name, items } = Astro.props;
+const ld = {
+  '@context': 'https://schema.org', '@type': 'ItemList', name,
+  numberOfItems: items.length,
+  itemListElement: items.map((x, i) => ({ '@type': 'ListItem', position: i + 1, name: x.name, url: new URL(x.href, Astro.site).href })),
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />

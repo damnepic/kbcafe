@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { AI } from '../data/ai.js';
+import ItemListLd from '../components/ItemListLd.astro';
 const explainers = AI.filter(a => a.type === 'explainer');
 const tools = AI.filter(a => a.type === 'tool');
 ---
@@ -9,6 +10,7 @@ const tools = AI.filter(a => a.type === 'tool');
   description="Clear, no-hype explainers and tools for the infrastructure of modern AI: context windows, MCP, RAG, embeddings, tool calling, and structured outputs. Built for developers and curious newcomers."
   path="/ai"
 >
+  <ItemListLd name="AI Explained" items={[...explainers, ...tools].map(a => ({ name: a.nm, href: a.href }))} />
   <section class="ai-hub">
     <div class="eyebrow">☕ on the menu · AI Explained</div>
     <h1>How modern AI <span class="mk">actually works.</span></h1>

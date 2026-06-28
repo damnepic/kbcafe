@@ -1,12 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { REFERENCE } from '../data/reference.js';
+import ItemListLd from '../components/ItemListLd.astro';
 ---
 <Layout
   title="Reference, developer cheat-sheets &amp; explainers | KB Cafe"
   description="Clear, modern references and explainers for working developers, OOP concepts, concurrency, memory leaks, and more. The Knowledge Base half of KB Cafe."
   path="/reference"
 >
+  <ItemListLd name="Knowledge Base references" items={REFERENCE.map(r => ({ name: r.nm, href: r.href }))} />
   <section class="ref-hub">
     <div class="eyebrow">☕ on the menu · Knowledge Base</div>
     <h1>The <span class="mk">Knowledge Base.</span></h1>

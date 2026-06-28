@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { LEARNING_PATHS as PATHS } from '../data/learningPaths.js';
+import ItemListLd from '../components/ItemListLd.astro';
 const accents = { infra: '#0f9f82', agents: '#7657ff', prompting: '#ee4b2b' };
 const ICONS = {
   tree: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7Z"/><path d="M12 22v-3"/></svg>`,
@@ -13,6 +14,7 @@ const ICONS = {
   description="Learn modern AI your way: outcome-driven learning paths (build agents, master prompting, understand the infrastructure), an interactive skill tree, and a knowledge map. Free, no account."
   path="/learn"
 >
+  <ItemListLd name="Learning paths" items={PATHS.map(p => ({ name: p.title, href: p.route }))} />
   <section class="lh">
     <header class="lh-head">
       <div class="eyebrow">☕ Learn</div>
