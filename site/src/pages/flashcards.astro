@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ItemListLd from '../components/ItemListLd.astro';
+import Share from '../components/Share.astro';
 import { DECKS } from '../data/flashcards.js';
 const total = DECKS.reduce((n, d) => n + d.cards.length, 0);
 ---
@@ -71,6 +72,7 @@ const total = DECKS.reduce((n, d) => n + d.cards.length, 0);
         </details>
       ))}
     </section>
+    <Share path="/flashcards" title="AI Flashcards, on KB Cafe" variant="subtle" />
   </section>
 </Layout>
 

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ItemListLd from '../components/ItemListLd.astro';
+import Share from '../components/Share.astro';
 import { TILS } from '../data/til.js';
 const fmt = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 ---
@@ -33,6 +34,7 @@ const fmt = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month
     </div>
 
     <p class="til-foot">More depth in the <a href="/blog">field notes</a> and the <a href="/dictionary">dictionary</a>, or drill the terms with <a href="/flashcards">flashcards</a>.</p>
+    <Share path="/til" title="Today I Learned, on KB Cafe" variant="subtle" />
   </section>
 </Layout>
 

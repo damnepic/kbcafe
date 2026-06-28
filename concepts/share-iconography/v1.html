@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KB Cafe — Share iconography concepts v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --cream:#FFFDFA; --paper:#FAF7F1; --paper-2:#F2ECE2; --line:#E7E2DB;
+    --ink:#241a12; --ink-soft:#6f6457; --coral:#ee4b2b; --coral-deep:#c4391f;
+    --x:#0b0b0b; --reddit:#FF4500; --linkedin:#0A66C2; --facebook:#1877F2;
+    --font:'Sora',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:
+     radial-gradient(circle at 15% -5%,rgba(255,201,120,.14),transparent 30%),
+     radial-gradient(circle at 92% 4%,rgba(238,75,43,.05),transparent 24%),#FAF7F1;
+     -webkit-font-smoothing:antialiased;padding:40px 18px 80px}
+  .wrap{max-width:760px;margin:0 auto}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral)}
+  h1{font-weight:800;letter-spacing:-.03em;font-size:34px;margin:10px 0 6px}
+  .sub{color:var(--ink-soft);font-size:15.5px;line-height:1.6;margin:0 0 8px;max-width:620px}
+  .system{background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:14px 18px;margin:18px 0 26px;font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+  .system b{color:var(--ink)}
+  .swatch{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:middle;margin:0 3px 2px 8px}
+
+  details{background:var(--cream);border:1.5px solid var(--line);border-radius:18px;margin:0 0 14px;overflow:hidden}
+  details[open]{box-shadow:0 14px 34px rgba(40,24,12,.06)}
+  summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;align-items:center;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  .num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:var(--ink);width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex:none}
+  .stitle{font-weight:800;font-size:17px;letter-spacing:-.01em}
+  .rec{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--coral);padding:3px 8px;border-radius:6px;margin-left:auto;flex:none}
+  .chev{margin-left:auto;color:var(--ink-soft);transition:transform .2s}
+  .rec + .chev{margin-left:10px}
+  details[open] .chev{transform:rotate(180deg)}
+  .body{padding:4px 22px 24px}
+  .desc{font-size:14px;color:var(--ink-soft);line-height:1.6;margin:0 0 4px}
+  .fix{font-size:13px;color:var(--ink);background:var(--paper-2);border-left:3px solid var(--coral);border-radius:0 8px 8px 0;padding:9px 13px;margin:12px 0 0;line-height:1.55}
+  .fix b{font-weight:700}
+
+  /* faux in-situ article context */
+  .stage{margin:18px 0 0;background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:22px 22px 20px}
+  .stage h4{font-weight:800;font-size:17px;margin:0 0 8px;letter-spacing:-.01em}
+  .stage p{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:0}
+  .stage .rule{height:1px;background:var(--line);margin:18px 0 0}
+
+  svg{display:block}
+  .ic{width:18px;height:18px}
+
+  /* ============ shared base for a share button ============ */
+  .sh{display:grid;place-items:center;text-decoration:none;cursor:pointer;border:1.5px solid var(--line);
+      background:var(--cream);color:var(--ink-soft);transition:transform .13s,border-color .13s,color .13s,background .13s;position:relative}
+  .row{display:flex;align-items:center;gap:9px;margin-top:16px;flex-wrap:wrap}
+
+  /* tooltip helper */
+  .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);
+     background:var(--ink);color:#fff;font-size:11px;font-family:var(--mono);font-weight:600;letter-spacing:.02em;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .14s,transform .14s}
+  .tip:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ============ C1 anchor chip + divider ============ */
+  .c1 .sh{width:40px;height:40px;border-radius:11px}
+  .c1 .sh:hover{transform:translateY(-2px);border-color:currentColor}
+  .c1 .launch{color:var(--ink);background:var(--paper-2);border-color:transparent}
+  .c1 .launch:hover{color:#fff;background:var(--coral);transform:translateY(-2px)}
+  .c1 .divider{width:1px;height:24px;background:var(--line);margin:0 3px}
+  .c1 .p-x{color:var(--x)}.c1 .p-reddit{color:var(--reddit)}.c1 .p-linkedin{color:var(--linkedin)}
+  .c1 .p-facebook{color:var(--facebook)}.c1 .p-mail,.c1 .p-link{color:var(--coral)}
+
+  /* ============ C2 silent share (icon only, hover label) ============ */
+  .c2 .sh{width:40px;height:40px;border-radius:50%}
+  .c2 .sh:hover{transform:translateY(-2px);border-color:currentColor;color:currentColor}
+  .c2 .launch{color:var(--ink);border-color:var(--ink)}
+  .c2 .launch:hover{background:var(--ink);color:#fff}
+  .c2 .p-x{color:var(--x)}.c2 .p-reddit{color:var(--reddit)}.c2 .p-linkedin{color:var(--linkedin)}
+  .c2 .p-facebook{color:var(--facebook)}.c2 .p-mail,.c2 .p-link{color:var(--coral)}
+
+  /* ============ C3 segmented share bar ============ */
+  .c3 .bar{display:inline-flex;align-items:center;background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:5px;gap:2px;margin-top:16px}
+  .c3 .sh{width:38px;height:38px;border-radius:9px;border:0;background:transparent}
+  .c3 .sh:hover{background:var(--paper-2);color:currentColor}
+  .c3 .launch{color:var(--ink);font-weight:700}
+  .c3 .seg-div{width:1px;height:22px;background:var(--line);margin:0 5px}
+  .c3 .p-x{color:var(--x)}.c3 .p-reddit{color:var(--reddit)}.c3 .p-linkedin{color:var(--linkedin)}
+  .c3 .p-facebook{color:var(--facebook)}.c3 .p-mail,.c3 .p-link{color:var(--coral)}
+
+  /* ============ C4 mono at rest -> brand on hover ============ */
+  .c4 .sh{width:40px;height:40px;border-radius:11px;color:var(--ink-soft)}
+  .c4 .sh:hover{transform:translateY(-2px);border-color:var(--hov,var(--coral));color:var(--hov,var(--coral));background:#fff}
+  .c4 .launch{--hov:var(--coral)}
+  .c4 .p-x{--hov:var(--x)}.c4 .p-reddit{--hov:var(--reddit)}.c4 .p-linkedin{--hov:var(--linkedin)}
+  .c4 .p-facebook{--hov:var(--facebook)}.c4 .p-mail{--hov:var(--coral)}.c4 .p-link{--hov:var(--coral)}
+
+  /* ============ C5 brand-filled circles + node glyph ============ */
+  .c5 .sh{width:42px;height:42px;border-radius:50%;border:0;color:#fff}
+  .c5 .sh:hover{transform:translateY(-3px);filter:brightness(1.07)}
+  .c5 .launch{background:var(--coral)}
+  .c5 .p-x{background:var(--x)}.c5 .p-reddit{background:var(--reddit)}.c5 .p-linkedin{background:var(--linkedin)}
+  .c5 .p-facebook{background:var(--facebook)}.c5 .p-mail{background:#5b5048}.c5 .p-link{background:#5b5048}
+
+  /* ============ C6 micro-caption above a clean row ============ */
+  .c6 .cap{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-top:16px}
+  .c6 .row{margin-top:9px}
+  .c6 .sh{width:38px;height:38px;border-radius:10px}
+  .c6 .sh:hover{transform:translateY(-2px);border-color:currentColor;color:currentColor}
+  .c6 .launch{color:var(--ink);background:var(--paper-2);border-color:transparent}
+  .c6 .launch:hover{background:var(--coral);color:#fff}
+  .c6 .p-x{color:var(--x)}.c6 .p-reddit{color:var(--reddit)}.c6 .p-linkedin{color:var(--linkedin)}
+  .c6 .p-facebook{color:var(--facebook)}.c6 .p-mail,.c6 .p-link{color:var(--coral)}
+</style>
+</head>
+<body>
+<!-- glyph defs (the real KB Cafe share SVGs) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="g-x" viewBox="0 0 24 24"><path fill="currentColor" d="M18.9 2H22l-7.3 8.3L23 22h-6.6l-5.2-6.8L5.3 22H2l7.8-8.9L1.7 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.2 3.8H5.3L17.7 20Z"/></symbol>
+  <symbol id="g-reddit" viewBox="0 0 24 24"><path fill="currentColor" d="M22 12.1a2.1 2.1 0 0 0-3.6-1.5 10.3 10.3 0 0 0-5.3-1.7l.9-4.1 2.9.6a1.5 1.5 0 1 0 .2-1l-3.3-.7a.5.5 0 0 0-.6.4l-1 4.8a10.4 10.4 0 0 0-5.4 1.7 2.1 2.1 0 1 0-2.3 3.4 4 4 0 0 0 0 .6c0 3.1 3.6 5.6 8 5.6s8-2.5 8-5.6a4 4 0 0 0 0-.6 2.1 2.1 0 0 0 1.4-2Zm-13 1.4a1.4 1.4 0 1 1 1.4 1.4 1.4 1.4 0 0 1-1.4-1.4Zm7.8 3.6a5.2 5.2 0 0 1-3.8 1.2 5.2 5.2 0 0 1-3.8-1.2.5.5 0 0 1 .7-.7 4.3 4.3 0 0 0 3.1.9 4.3 4.3 0 0 0 3.1-.9.5.5 0 1 1 .7.7Zm-.3-2.2a1.4 1.4 0 1 1 1.4-1.4 1.4 1.4 0 0 1-1.4 1.4Z"/></symbol>
+  <symbol id="g-linkedin" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM3.3 8.4h3.3V21H3.3V8.4Zm5.5 0H12v1.7h.05a3.5 3.5 0 0 1 3.15-1.7c3.4 0 4 2.2 4 5.1V21h-3.3v-5.6c0-1.3 0-3-1.85-3s-2.1 1.4-2.1 2.9V21H8.8V8.4Z"/></symbol>
+  <symbol id="g-facebook" viewBox="0 0 24 24"><path fill="currentColor" d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z"/></symbol>
+  <symbol id="g-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3 7 9 6 9-6"/></g></symbol>
+  <symbol id="g-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15 15 9M10.5 6.5l1-1a4 4 0 0 1 6 6l-1 1M13.5 17.5l-1 1a4 4 0 0 1-6-6l1-1"/></g></symbol>
+  <symbol id="g-tray" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></g></symbol>
+  <symbol id="g-nodes" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6 15.4 6.4M8.6 13.4l6.8 4.2"/></g></symbol>
+</defs></svg>
+
+<div class="wrap">
+  <div class="eyebrow">☕ Concept set · v1</div>
+  <h1>Share iconography</h1>
+  <p class="sub">Six directions for a uniform, systematic share row. The brief: keep the recognizable social brand marks, and stop the <b>SHARE</b> control from reading like a separate text label, make it part of the icon family while still signalling &ldquo;share this, lots of ways.&rdquo;</p>
+
+  <div class="system">
+    <b>The colour system used below</b> (consistent across every concept): platform icons carry their own brand colour
+    <span class="swatch" style="background:#0b0b0b"></span>X
+    <span class="swatch" style="background:#FF4500"></span>Reddit
+    <span class="swatch" style="background:#0A66C2"></span>LinkedIn
+    <span class="swatch" style="background:#1877F2"></span>Facebook;
+    our own actions (email, copy link) carry KB Cafe coral
+    <span class="swatch" style="background:#ee4b2b"></span>.
+    The share launcher is always the <b>tray + up-arrow</b> (or connected-nodes) glyph, never the word competing inside the row. Hover any icon to feel the interaction.
+  </div>
+
+  <!-- ============ C1 ============ -->
+  <details open>
+    <summary><span class="num">1</span><span class="stitle">Anchor chip + hairline divider</span><span class="rec">Recommended</span><span class="chev"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+    <div class="body">
+      <p class="desc">The share launcher becomes a chip the exact size and shape of the icons, holding the tray glyph on a soft coral-tinted fill. A 1px divider after it groups the row as &ldquo;one launcher, then the destinations.&rdquo;</p>
+      <div class="stage c1">
+        <h4>What is a context window?</h4>
+        <p>A model can only &ldquo;see&rdquo; so much text at once. That budget is its context window, measured in tokens&hellip;</p>
+        <div class="rule"></div>
+        <div class="row">
+          <a class="sh launch tip" data-tip="Share" href="#"><svg class="ic"><use href="#g-tray"/></svg></a>
+          <span class="divider"></span>
+          <a class="sh p-mail" href="#"><svg class="ic"><use href="#g-mail"/></svg></a>
+          <a class="sh p-link" href="#"><svg class="ic"><use href="#g-link"/></svg></a>
+          <a class="sh p-facebook" href="#"><svg class="ic"><use href="#g-facebook"/></svg></a>
+          <a class="sh p-x" href="#"><svg class="ic"><use href="#g-x"/></svg></a>
+          <a class="sh p-reddit" href="#"><svg class="ic"><use href="#g-reddit"/></svg></a>
+          <a class="sh p-linkedin" href="#"><svg class="ic"><use href="#g-linkedin"/></svg></a>
+        </div>
+      </div>
+      <p class="fix"><b>SHARE fix:</b> same chip dimensions as every icon, so it blends into the family, but the tinted fill + divider make it unmistakably the &ldquo;start here&rdquo; control. Best balance of uniform and legible.</p>
+    </div>
+  </details>
+
+  <!-- ============ C2 ============ -->
+  <details>
+    <summary><span class="num">2</span><span class="stitle">Silent share (icon-only, label on hover)</span><span class="chev"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+    <div class="body">
+      <p class="desc">Round icons throughout. The launcher drops the word entirely and relies on the universally understood tray glyph, outlined in ink so it leads without shouting. The word &ldquo;Share&rdquo; appears only as a tooltip on hover.</p>
+      <div class="stage c2">
+        <h4>What is a context window?</h4>
+        <p>A model can only &ldquo;see&rdquo; so much text at once. That budget is its context window, measured in tokens&hellip;</p>
+        <div class="rule"></div>
+        <div class="row">
+          <a class="sh launch tip" data-tip="Share" href="#"><svg class="ic"><use href="#g-tray"/></svg></a>
+          <a class="sh p-mail" href="#"><svg class="ic"><use href="#g-mail"/></svg></a>
+          <a class="sh p-link" href="#"><svg class="ic"><use href="#g-link"/></svg></a>
+          <a class="sh p-facebook" href="#"><svg class="ic"><use href="#g-facebook"/></svg></a>
+          <a class="sh p-x" href="#"><svg class="ic"><use href="#g-x"/></svg></a>
+          <a class="sh p-reddit" href="#"><svg class="ic"><use href="#g-reddit"/></svg></a>
+          <a class="sh p-linkedin" href="#"><svg class="ic"><use href="#g-linkedin"/></svg></a>
+        </div>
+      </div>
+      <p class="fix"><b>SHARE fix:</b> maximum uniformity, the launcher is identical in size to the rest. Reads as multi-share purely from the glyph + lead position. Cleanest, but leans on the glyph being understood.</p>
+    </div>
+  </details>
+
+  <!-- ============ C3 ============ -->
+  <details>
+    <summary><span class="num">3</span><span class="stitle">Segmented share bar</span><span class="chev"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+    <div class="body">
+      <p class="desc">All controls live inside a single rounded container, like a toolbar or segmented control. The launcher is the first segment, set off by a faint inset divider. The container itself communicates &ldquo;this whole thing is for sharing.&rdquo;</p>
+      <div class="stage c3">
+        <h4>What is a context window?</h4>
+        <p>A model can only &ldquo;see&rdquo; so much text at once. That budget is its context window, measured in tokens&hellip;</p>
+        <div class="rule"></div>
+        <div class="bar">
+          <a class="sh launch tip" data-tip="Share" href="#"><svg class="ic"><use href="#g-tray"/></svg></a>
+          <span class="seg-div"></span>
+          <a class="sh p-mail" href="#"><svg class="ic"><use href="#g-mail"/></svg></a>
+          <a class="sh p-link" href="#"><svg class="ic"><use href="#g-link"/></svg></a>
+          <a class="sh p-facebook" href="#"><svg class="ic"><use href="#g-facebook"/></svg></a>
+          <a class="sh p-x" href="#"><svg class="ic"><use href="#g-x"/></svg></a>
+          <a class="sh p-reddit" href="#"><svg class="ic"><use href="#g-reddit"/></svg></a>
+          <a class="sh p-linkedin" href="#"><svg class="ic"><use href="#g-linkedin"/></svg></a>
+        </div>
+      </div>
+      <p class="fix"><b>SHARE fix:</b> the launcher is just another segment, so it never stands apart, while the enclosing bar makes the multi-share purpose obvious at a glance. Most &ldquo;designed component&rdquo; feel.</p>
+    </div>
+  </details>
+
+  <!-- ============ C4 ============ -->
+  <details>
+    <summary><span class="num">4</span><span class="stitle">Monochrome at rest, brand on hover</span><span class="rec">Pairs with #1</span><span class="chev"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+    <div class="body">
+      <p class="desc">Every icon is the same quiet ink-grey at rest, so the row is perfectly uniform and calm. The brand colour blooms only on hover, X goes black, Reddit orange, LinkedIn blue, and our actions go coral. The colour coding is a reward for interaction, not visual noise.</p>
+      <div class="stage c4">
+        <h4>What is a context window?</h4>
+        <p>A model can only &ldquo;see&rdquo; so much text at once. That budget is its context window, measured in tokens&hellip;</p>
+        <div class="rule"></div>
+        <div class="row">
+          <a class="sh launch tip" data-tip="Share" href="#"><svg class="ic"><use href="#g-tray"/></svg></a>
+          <span style="width:1px;height:24px;background:var(--line);margin:0 3px"></span>
+          <a class="sh p-mail" href="#"><svg class="ic"><use href="#g-mail"/></svg></a>
+          <a class="sh p-link" href="#"><svg class="ic"><use href="#g-link"/></svg></a>
+          <a class="sh p-facebook" href="#"><svg class="ic"><use href="#g-facebook"/></svg></a>
+          <a class="sh p-x" href="#"><svg class="ic"><use href="#g-x"/></svg></a>
+          <a class="sh p-reddit" href="#"><svg class="ic"><use href="#g-reddit"/></svg></a>
+          <a class="sh p-linkedin" href="#"><svg class="ic"><use href="#g-linkedin"/></svg></a>
+        </div>
+      </div>
+      <p class="fix"><b>SHARE fix:</b> identical resting state for all, including the launcher, so nothing stands out. This is a colour <i>philosophy</i> you can layer onto concept 1, 2, or 6. Calmest on the page.</p>
+    </div>
+  </details>
+
+  <!-- ============ C5 ============ -->
+  <details>
+    <summary><span class="num">5</span><span class="stitle">Brand-filled circles + node glyph</span><span class="chev"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+    <div class="body">
+      <p class="desc">Bold and unmissable: solid brand-coloured circles. The launcher is a coral circle carrying the connected-nodes glyph, the clearest possible &ldquo;send this outward to many places.&rdquo; Same circle size as the rest, so it sits in the family despite leading the action.</p>
+      <div class="stage c5">
+        <h4>What is a context window?</h4>
+        <p>A model can only &ldquo;see&rdquo; so much text at once. That budget is its context window, measured in tokens&hellip;</p>
+        <div class="rule"></div>
+        <div class="row">
+          <a class="sh launch tip" data-tip="Share" href="#"><svg class="ic"><use href="#g-nodes"/></svg></a>
+          <a class="sh p-mail" href="#"><svg class="ic"><use href="#g-mail"/></svg></a>
+          <a class="sh p-link" href="#"><svg class="ic"><use href="#g-link"/></svg></a>
+          <a class="sh p-facebook" href="#"><svg class="ic"><use href="#g-facebook"/></svg></a>
+          <a class="sh p-x" href="#"><svg class="ic"><use href="#g-x"/></svg></a>
+          <a class="sh p-reddit" href="#"><svg class="ic"><use href="#g-reddit"/></svg></a>
+          <a class="sh p-linkedin" href="#"><svg class="ic"><use href="#g-linkedin"/></svg></a>
+        </div>
+      </div>
+      <p class="fix"><b>SHARE fix:</b> the node glyph reads as multi-share on its own, and the coral fill ties it to KB Cafe while the circle shape keeps it uniform. Highest visual energy, least &ldquo;quiet brand.&rdquo;</p>
+    </div>
+  </details>
+
+  <!-- ============ C6 ============ -->
+  <details>
+    <summary><span class="num">6</span><span class="stitle">Micro-caption above a clean row</span><span class="chev"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+    <div class="body">
+      <p class="desc">Keep the word, but move it out of the way. A tiny uppercase &ldquo;Share this page&rdquo; caption sits above a perfectly even icon row. The launcher (tray glyph) still leads the row for people who skip captions.</p>
+      <div class="stage c6">
+        <h4>What is a context window?</h4>
+        <p>A model can only &ldquo;see&rdquo; so much text at once. That budget is its context window, measured in tokens&hellip;</p>
+        <div class="rule"></div>
+        <div class="cap">Share this page</div>
+        <div class="row">
+          <a class="sh launch tip" data-tip="Share" href="#"><svg class="ic"><use href="#g-tray"/></svg></a>
+          <a class="sh p-mail" href="#"><svg class="ic"><use href="#g-mail"/></svg></a>
+          <a class="sh p-link" href="#"><svg class="ic"><use href="#g-link"/></svg></a>
+          <a class="sh p-facebook" href="#"><svg class="ic"><use href="#g-facebook"/></svg></a>
+          <a class="sh p-x" href="#"><svg class="ic"><use href="#g-x"/></svg></a>
+          <a class="sh p-reddit" href="#"><svg class="ic"><use href="#g-reddit"/></svg></a>
+          <a class="sh p-linkedin" href="#"><svg class="ic"><use href="#g-linkedin"/></svg></a>
+        </div>
+      </div>
+      <p class="fix"><b>SHARE fix:</b> the word never competes inside the row, so the icons stay uniform, while the caption still labels the function for clarity and accessibility. Safest, most conventional.</p>
+    </div>
+  </details>
+
+  <p class="sub" style="margin-top:22px;font-size:13.5px">My pick: <b>Concept 1</b> (anchor chip + divider) for the blog/article &ldquo;subtle&rdquo; variant, optionally wearing <b>Concept 4&rsquo;s</b> brand-on-hover colour so the row stays calm until touched. Concept 3 (segmented bar) is the strongest fit for the boxed &ldquo;prominent&rdquo; tool variant. Tell me which to build and I&rsquo;ll wire it into <code>Share.astro</code> for both variants.</p>
+</div>
+</body>
+</html>

@@ -1,9 +1,12 @@
 ---
-// Reusable share row.
-//   variant="prominent" (tools, boxed) or "subtle" (articles).
-//   lead="general"  -> reorder to email, copy-link, facebook, then the rest, and emphasize those three.
-//                      (Facebook leads because its 40+ audience is a strong fit for beginner AI content.)
-const { path, title, variant = 'subtle', lead = null } = Astro.props;
+// Reusable share row. One system, three weights (set by `treatment`, auto-derived from variant/lead):
+//   chip    -> C1 anchor chip + divider   (blog / beginner, share-forward)   [subtle + lead]
+//   caption -> C6 caption + clean row     (explainers / references, quiet)   [subtle, no lead]
+//   bar     -> C3 segmented bar           (tools / paths / skill-tree)        [prominent]
+// Color system: social marks carry their brand colour; our own actions (email, copy) carry KB coral.
+// The launcher is always the native-share tray glyph (OS share sheet on mobile, copy-link on desktop).
+const { path, title, variant = 'subtle', lead = null, treatment: tOverride = null } = Astro.props;
+const treatment = tOverride || (variant === 'prominent' ? 'bar' : (lead ? 'chip' : 'caption'));
 const shareUrl = new URL(path, Astro.site).href;
 const u = encodeURIComponent(shareUrl);
 const ttl = encodeURIComponent(title);
@@ -26,73 +29,88 @@ const ICONS = {
   discord: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.3 5.3A16 16 0 0 0 15.4 4l-.25.5a12 12 0 0 1 3.4 1.1 11 11 0 0 0-9.1 0A12 12 0 0 1 12.9 4.5L12.6 4a16 16 0 0 0-3.9 1.3C5.2 8.7 4.6 12 4.8 15.2a16 16 0 0 0 4.8 2.4l.6-1a10 10 0 0 1-1.6-.8l.4-.3a8.4 8.4 0 0 0 7.2 0l.4.3a10 10 0 0 1-1.6.8l.6 1a16 16 0 0 0 4.8-2.4c.3-3.7-.6-7-2.3-9.9ZM9.7 13.5c-.8 0-1.4-.7-1.4-1.6s.6-1.6 1.4-1.6 1.4.7 1.4 1.6-.6 1.6-1.4 1.6Zm4.6 0c-.8 0-1.4-.7-1.4-1.6s.6-1.6 1.4-1.6 1.4.7 1.4 1.6-.6 1.6-1.4 1.6Z"/></svg>`,
   link: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15 15 9M10.5 6.5l1-1a4 4 0 0 1 6 6l-1 1M13.5 17.5l-1 1a4 4 0 0 1-6-6l1-1"/></svg>`,
 };
-// epicfail-style native-share glyph (tray + up arrow) for the functional "Share" button
-const SHARE_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>`;
+// native-share glyph (tray + up arrow) for the functional launcher
+const SHARE_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>`;
 const BTN = {
-  x:        { kind: 'link', href: href.x,        label: 'Share on X',           icon: ICONS.x,        blank: true },
-  reddit:   { kind: 'link', href: href.reddit,   label: 'Share on Reddit',      icon: ICONS.reddit,   blank: true },
-  linkedin: { kind: 'link', href: href.linkedin, label: 'Share on LinkedIn',    icon: ICONS.linkedin, blank: true },
-  facebook: { kind: 'link', href: href.facebook, label: 'Share on Facebook',    icon: ICONS.facebook, blank: true },
-  email:    { kind: 'link', href: href.email,    label: 'Share by email',       icon: ICONS.email },
-  discord:  { kind: 'copy', discord: true,       label: 'Copy link for Discord', icon: ICONS.discord },
-  link:     { kind: 'copy',                      label: 'Copy link',            icon: ICONS.link },
+  x:        { kind: 'link', href: href.x,        label: 'Share on X',            icon: ICONS.x,        blank: true, tone: 'x' },
+  reddit:   { kind: 'link', href: href.reddit,   label: 'Share on Reddit',       icon: ICONS.reddit,   blank: true, tone: 'reddit' },
+  linkedin: { kind: 'link', href: href.linkedin, label: 'Share on LinkedIn',     icon: ICONS.linkedin, blank: true, tone: 'linkedin' },
+  facebook: { kind: 'link', href: href.facebook, label: 'Share on Facebook',     icon: ICONS.facebook, blank: true, tone: 'facebook' },
+  email:    { kind: 'link', href: href.email,    label: 'Share by email',        icon: ICONS.email,    tone: 'mail' },
+  discord:  { kind: 'copy', discord: true,       label: 'Copy link for Discord', icon: ICONS.discord,  tone: 'link' },
+  link:     { kind: 'copy',                      label: 'Copy link',             icon: ICONS.link,     tone: 'link' },
 };
+// ordering only (emphasis dropped); revisit by click data once social buttons have goals
 const ORDER = lead === 'general'
   ? ['email', 'link', 'facebook', 'x', 'reddit', 'linkedin']
   : ['x', 'reddit', 'linkedin', 'facebook', 'email', 'discord', 'link'];
-const leadSet = lead === 'general' ? new Set(['email', 'link', 'facebook']) : new Set();
 const items = ORDER.map((k) => ({ key: k, ...BTN[k] }));
+const wrapClass = treatment === 'bar' ? 'share-bar' : 'share-btns';
 ---
-<aside class={`share ${variant}${lead ? ' has-lead' : ''}`} data-share>
-  {variant === 'prominent' ? (
-    <div class="share-copy"><strong>Find this tool helpful?</strong><span><b>Share</b> it with a friend, it&rsquo;s free and runs in the browser. No data <b>ever</b> stored. 100% <b>private</b>.</span></div>
-  ) : (
-    <button class="share-label js-nativeshare" type="button" data-title={title} aria-label="Share this page" title="Share this page">
-      <span class="sl-ic" set:html={SHARE_ICON} /><span class="sl-tx">Share</span>
-    </button>
+<aside class={`share ${variant} t-${treatment}`} data-share data-treat={treatment}>
+  {variant === 'prominent' && (
+    <div class="share-copy"><strong>Find this helpful?</strong><span><b>Share</b> it with a friend, it&rsquo;s free and runs in the browser. No data <b>ever</b> stored. 100% <b>private</b>.</span></div>
   )}
-  <div class="share-btns">
+  {treatment === 'caption' && <span class="share-cap">Share this page</span>}
+
+  <div class={wrapClass}>
+    <button class="sh sh-launch js-nativeshare" type="button" data-title={title} aria-label="Share this page" title="Share this page" set:html={SHARE_ICON} />
+    {treatment === 'chip' && <span class="sh-div" aria-hidden="true"></span>}
+    {treatment === 'bar' && <span class="seg-div" aria-hidden="true"></span>}
     {items.map((b) => b.kind === 'copy' ? (
-      <button class={`sh js-copylink${leadSet.has(b.key) ? ' is-lead' : ''}`} type="button" data-discord={b.discord ? '' : undefined} aria-label={b.label} title={b.label} set:html={b.icon} />
+      <button class={`sh tone-${b.tone} js-copylink`} type="button" data-discord={b.discord ? '' : undefined} aria-label={b.label} title={b.label} set:html={b.icon} />
     ) : (
-      <a class={`sh${leadSet.has(b.key) ? ' is-lead' : ''}`} href={b.href} target={b.blank ? '_blank' : undefined} rel={b.blank ? 'noopener noreferrer' : undefined} aria-label={b.label} title={b.label} set:html={b.icon} />
+      <a class={`sh tone-${b.tone}`} href={b.href} target={b.blank ? '_blank' : undefined} rel={b.blank ? 'noopener noreferrer' : undefined} aria-label={b.label} title={b.label} set:html={b.icon} />
     ))}
     <span class="share-done" hidden>Link copied</span>
   </div>
 </aside>
 
 <style>
-  .share{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .share{--x:#0b0b0b;--reddit:#FF4500;--linkedin:#0A66C2;--facebook:#1877F2;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .share.prominent{justify-content:space-between;border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:16px 20px;margin:28px 0 4px}
-  .share.subtle{margin:30px 0 0;gap:10px}
+  .share.subtle{margin:30px 0 0}
+  .share.t-caption{flex-direction:column;align-items:flex-start;gap:9px}
+
   .share-copy{display:flex;flex-direction:column;gap:2px}
   .share-copy strong{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink)}
   .share-copy span{font-size:13px;color:var(--ink-soft)}
   .share-copy span b{font-weight:800;color:var(--ink)}
-  /* the "Share" label is now a functional button: native OS share sheet on mobile, copy-link on desktop */
-  .share-label{display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:0;cursor:pointer;
-    font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--ink-soft);transition:color .12s,transform .12s}
-  .share-label:hover{color:var(--coral)}
-  .share-label:active{transform:scale(.95)}
-  .share-label .sl-ic{display:inline-flex}
-  .share-label svg{width:16px;height:16px}
-  /* in lead mode the button is sized to sit at the same height as the (larger) share buttons */
-  .share.has-lead .share-label{font-size:15px;height:44px}
-  .share.has-lead .share-label svg{width:21px;height:21px}
+  .share-cap{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+
   .share-btns{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .sh{display:grid;place-items:center;border:1.5px solid var(--line);border-radius:11px;background:var(--paper);color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:transform .12s,border-color .12s,color .12s,background .12s}
-  .share.prominent .sh{width:42px;height:42px}
-  .share.subtle .sh{width:34px;height:34px;border-radius:9px;background:transparent}
-  .sh svg{width:18px;height:18px}.share.subtle .sh svg{width:16px;height:16px}
-  .sh:hover{color:var(--coral);border-color:var(--coral);transform:translateY(-2px)}
-  /* lead emphasis: the primary share methods get filled + a touch larger */
-  .share.has-lead.subtle .sh{width:38px;height:38px}
-  .share.has-lead .sh.is-lead{background:var(--coral);border-color:var(--coral);color:#fff}
-  .share.has-lead.subtle .sh.is-lead{width:44px;height:44px;border-radius:11px}
-  .share.has-lead.subtle .sh.is-lead svg{width:19px;height:19px}
-  .share.has-lead .sh.is-lead:hover{background:var(--coral-deep);border-color:var(--coral-deep);color:#fff}
-  .share-done{font-family:var(--font-mono);font-size:12px;font-weight:700;color:#2f7d32}
+
+  /* per-platform tone (the colour the icon takes) */
+  .tone-x{--tone:var(--x)}.tone-reddit{--tone:var(--reddit)}.tone-linkedin{--tone:var(--linkedin)}
+  .tone-facebook{--tone:var(--facebook)}.tone-mail{--tone:var(--coral)}.tone-link{--tone:var(--coral)}
+
+  .sh{display:grid;place-items:center;border:1.5px solid var(--line);background:var(--cream);
+    color:var(--ink-soft);cursor:pointer;text-decoration:none;
+    transition:transform .12s,border-color .12s,color .12s,background .12s}
+  .sh svg{width:18px;height:18px}
+
+  /* ---- C1 chip + C6 caption share the icon family (40px rounded squares) ---- */
+  .t-chip .sh,.t-caption .sh{width:40px;height:40px;border-radius:11px}
+  /* chip: brand colour at rest */
+  .t-chip .sh{color:var(--tone,var(--ink-soft))}
+  .t-chip .sh:hover{transform:translateY(-2px);border-color:currentColor}
+  .t-chip .sh-launch{color:var(--ink);background:var(--paper-2);border-color:transparent}
+  .t-chip .sh-launch:hover{color:#fff;background:var(--coral)}
+  .t-chip .sh-div{width:1px;height:24px;background:var(--line);margin:0 3px}
+  /* caption: quiet grey at rest, brand colour blooms on hover */
+  .t-caption .sh-launch{color:var(--ink)}
+  .t-caption .sh:hover{transform:translateY(-2px);color:var(--tone,var(--coral));border-color:currentColor}
+  .t-caption .sh-launch:hover{color:#fff;background:var(--coral);border-color:var(--coral)}
+
+  /* ---- C3 segmented bar (prominent), sits as a subtle inset inside the card ---- */
+  .share-bar{display:inline-flex;align-items:center;background:var(--paper);border-radius:12px;padding:4px;gap:2px;flex-wrap:wrap}
+  .t-bar .sh{width:38px;height:38px;border-radius:9px;border:0;background:transparent;color:var(--tone,var(--ink-soft))}
+  .t-bar .sh:hover{background:var(--cream);transform:translateY(-1px)}
+  .t-bar .sh-launch{color:var(--ink)}
+  .t-bar .seg-div{width:1px;height:22px;background:var(--line);margin:0 5px}
+
+  .share-done{font-family:var(--font-mono);font-size:12px;font-weight:700;color:#2f7d32;margin-left:4px}
   @media(max-width:560px){.share.prominent{flex-direction:column;align-items:flex-start}}
 </style>
 
@@ -111,7 +129,7 @@ const items = ORDER.map((k) => ({ key: k, ...BTN[k] }));
       try { await navigator.clipboard.writeText(location.href); } catch {}
       kbFlash(b, b.hasAttribute('data-discord') ? 'Page URL copied, open Discord to share.' : 'Link copied');
     });
-    // functional "Share" button: native OS share sheet (mobile), clipboard fallback (desktop)
+    // functional launcher: native OS share sheet (mobile), clipboard fallback (desktop)
     document.addEventListener('click', async (e) => {
       const s = e.target.closest('.js-nativeshare'); if (!s) return;
       const url = location.href, title = s.getAttribute('data-title') || document.title;

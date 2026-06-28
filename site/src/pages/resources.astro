@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ItemListLd from '../components/ItemListLd.astro';
+import Share from '../components/Share.astro';
 
 const RESOURCES = [
   { file: 'system-prompt-library.md', title: 'System Prompt Library', kind: 'Markdown',
@@ -42,6 +43,7 @@ const RESOURCES = [
     </div>
 
     <p class="res-foot">Want the interactive versions? Assemble prompts with the <a href="/prompt-builder">Prompt Builder</a>, lock JSON output with the <a href="/structured-output-builder">Structured Output Builder</a>, or drill terms with <a href="/flashcards">flashcards</a>.</p>
+    <Share path="/resources" title="Free AI Resources, on KB Cafe" variant="subtle" />
   </section>
 </Layout>
 
