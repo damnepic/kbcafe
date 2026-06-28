@@ -21,12 +21,19 @@ const get = (h) => resolve[h] || EXTRA[h] || { href: h, label: h, ds: '', kind: 
 const steps = p.steps.map(get);
 const tools = steps.filter(s => s.kind === 'Tool').length;
 const reads = steps.length - tools;
+// Course JSON-LD: KB Cafe's learning paths are free, self-paced courses. (calmcode is a course site that ships none of this.)
+const courseLd = { '@context': 'https://schema.org', '@type': 'Course', name: `Learn ${p.shortTitle}`, description: p.blurb,
+  url: new URL(p.route, Astro.site).href, provider: { '@type': 'Organization', name: 'KB Cafe', url: 'https://kbcafe.com' },
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock', category: 'Free' },
+  hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: `PT${p.minutes}M`, instructor: { '@type': 'Organization', name: 'KB Cafe' } } };
 ---
 <Layout
   title={`Learn ${p.shortTitle}, a free, hands-on AI course | KB Cafe`}
   description={`${p.outcome.replace(/^I want to /, 'Learn to ')}. A free, self-paced path: ${reads} concepts and ${tools} hands-on tools, about ${p.minutes} minutes. No account, progress saved locally.`}
   path={p.route}
 >
+  <script type="application/ld+json" set:html={JSON.stringify(courseLd)} />
   <section class="lpp">
     <header class="lpp-head">
       <div class="eyebrow">☕ Learning path</div>

@@ -52,6 +52,16 @@ const OG_PAGES = new Set([
   'what-are-embeddings', 'what-is-tool-calling', 'what-are-structured-outputs',
 ]);
 const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.site).href;
+
+// Structured data. Sitewide: brand Organization + WebSite with a SearchAction (eligible for the sitelinks search box).
+// Per-page: a BreadcrumbList from the same trail the visible crumb uses (SERP breadcrumb = better CTR). Head-only, no pixels change.
+const siteRoot = new URL('/', Astro.site).href;
+const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'KB Cafe', url: siteRoot, logo: new URL('/logo.png', Astro.site).href };
+const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'KB Cafe', url: siteRoot,
+  potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: siteRoot + 'search?q={search_term_string}' }, 'query-input': 'required name=search_term_string' } };
+const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: [{ '@type': 'ListItem', position: 1, name: 'KB Cafe', item: siteRoot },
+    ...trail.map((c, i) => ({ '@type': 'ListItem', position: i + 2, name: c.label, item: c.href ? new URL(c.href, Astro.site).href : canonical }))] } : null;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -62,6 +72,9 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
 <meta name="description" content={description} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 <link rel="canonical" href={canonical} />
+<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(siteLd)} />
+{crumbLd && <script type="application/ld+json" set:html={JSON.stringify(crumbLd)} />}
 <link rel="alternate" type="application/rss+xml" title="KB Cafe" href="/feed.xml" />
 <!-- favicon = the KB cup mark (generated from logo.png via scripts/gen-favicon.cjs) -->
 <link rel="icon" href="/favicon.ico" sizes="any" />
