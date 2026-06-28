@@ -35,6 +35,15 @@ const ICONS = {
       ))}
     </div>
 
+    <a class="lh-flash" href="/flashcards">
+      <div class="lh-flash-main">
+        <span class="lh-flash-tag">☕ Study tool</span>
+        <h3>Make it stick with flashcards</h3>
+        <p>51 cards across five decks, built from the dictionary, with spaced repetition that brings each term back right before you would forget it. Free, no account, all in your browser.</p>
+      </div>
+      <span class="lh-flash-go" id="lh-flash-go">Study flashcards <span aria-hidden="true">&rarr;</span></span>
+    </a>
+
     <div class="lh-extra">
       <a class="lh-x lh-ai" href="/ai">
         <span class="lh-x-h"><span class="lh-x-ic" set:html={ICONS.concepts} />Browse all AI concepts</span>
@@ -72,6 +81,14 @@ const ICONS = {
   .lh-meta{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);display:flex;gap:9px;margin-bottom:14px}
   .lh-meta .dot{opacity:.45}
   .lh-go{margin-top:auto;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ac)}
+  .lh-flash{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:18px;text-decoration:none;color:var(--ink);background:linear-gradient(120deg,var(--cream),var(--paper-2));border:1.5px solid var(--line);border-radius:18px;padding:22px 26px;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .lh-flash:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(40,24,12,.09);border-color:var(--coral)}
+  .lh-flash-tag{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+  .lh-flash h3{font-family:var(--font-display);font-weight:800;font-size:21px;letter-spacing:-.02em;margin:7px 0 8px}
+  .lh-flash p{font-size:14px;color:var(--ink-soft);line-height:1.5;margin:0;max-width:560px}
+  .lh-flash-go{flex:none;font-family:var(--font-display);font-weight:800;font-size:15px;color:#fff;background:var(--ink);padding:11px 20px;border-radius:12px;white-space:nowrap}
+  .lh-flash:hover .lh-flash-go{background:var(--coral)}
+  @media(max-width:620px){.lh-flash{flex-direction:column;align-items:flex-start;gap:16px}}
   .lh-extra{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
   .lh-x{display:flex;flex-direction:column;gap:6px;text-decoration:none;border:1.5px solid var(--line);border-radius:16px;padding:18px 20px;background:rgba(255,255,255,.5);transition:transform .15s,border-color .15s}
   .lh-x:hover{transform:translateY(-3px);border-color:var(--ink)}
@@ -83,3 +100,14 @@ const ICONS = {
   .lh-foot a{color:var(--coral);font-weight:600;text-decoration:none}.lh-foot a:hover{text-decoration:underline}
   @media(max-width:720px){.lh-paths{grid-template-columns:1fr}.lh-extra{grid-template-columns:1fr}}
 </style>
+
+<script is:inline>
+  // mirror the flashcards return-loop on the Learn hub CTA
+  (function(){
+    try{
+      var s = JSON.parse(localStorage.getItem('kb-fc') || '{}'), due = 0, now = Date.now();
+      for(var d in s){ for(var i in s[d]){ if(s[d][i][1] <= now) due++; } }
+      if(due > 0){ var el = document.getElementById('lh-flash-go'); if(el) el.innerHTML = '⏱ ' + due + ' due · Study →'; }
+    }catch(e){}
+  })();
+</script>

@@ -35,7 +35,7 @@ const total = DECKS.reduce((n, d) => n + d.cards.length, 0);
     </div>
 
     <div class="fc-study" id="fc-study" hidden>
-      <button class="fc-back" id="fc-back" type="button">&larr; All decks</button>
+      <button class="fc-allbtn" id="fc-back" type="button">&larr; All decks</button>
       <div class="fc-study-head">
         <h2 id="fc-study-title"></h2>
         <div class="fc-study-prog"><span id="fc-study-count"></span><div class="fc-pbar"><i id="fc-pbar"></i></div></div>
@@ -80,6 +80,7 @@ const total = DECKS.reduce((n, d) => n + d.cards.length, 0);
   .fc-hero h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;font-size:clamp(38px,6vw,58px);margin:0}
   .fc .mk{color:var(--coral)}
   .fc-lede{margin-top:16px;font-size:17.5px;line-height:1.55;color:var(--ink-soft);max-width:640px}
+  .fc [hidden]{display:none!important}
   .fc-due{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:var(--ink);color:#fff;font-family:var(--font-display);font-weight:700;font-size:14px;text-decoration:none;padding:9px 16px;border-radius:11px}
   .fc-due:hover{background:var(--coral)}
 
@@ -97,8 +98,8 @@ const total = DECKS.reduce((n, d) => n + d.cards.length, 0);
   .fc-deck-go{color:var(--ink-soft);font-weight:700}
 
   .fc-study{margin-top:24px}
-  .fc-back{border:0;background:none;cursor:pointer;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);padding:4px 0}
-  .fc-back:hover{color:var(--coral)}
+  .fc-allbtn{border:0;background:none;cursor:pointer;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);padding:4px 0}
+  .fc-allbtn:hover{color:var(--coral)}
   .fc-study-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:8px 0 16px;flex-wrap:wrap}
   .fc-study-head h2{font-family:var(--font-display);font-weight:800;font-size:24px;margin:0}
   .fc-study-prog{flex:1;max-width:300px;min-width:180px}
