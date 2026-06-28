@@ -1,6 +1,9 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "flashcards-til-and-resources", title: "New on KB Cafe: Flashcards, TIL, and Free Resources",
+    date: "2026-06-27", tag: "News",
+    excerpt: "Three new ways to make AI knowledge stick: spaced-repetition flashcards built from the dictionary, a Today I Learned stream of bite-size snippets, and free downloadable templates with no email wall. All client-side, no account." },
   { slug: "hands-on-coding-with-ai", title: "Learn to Code With AI, Hands-On",
     date: "2026-06-26", tag: "News",
     excerpt: "New: a Coding with AI track with an interactive prompt builder and a spot-the-hallucination exercise, an MCP servers lesson with a match-the-server quiz, and a CSS starter with a live editor. Built to be used, not just read." },

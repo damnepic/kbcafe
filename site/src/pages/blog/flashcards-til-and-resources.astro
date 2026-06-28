@@ -1,0 +1,91 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="New on KB Cafe: Flashcards, TIL, and Free Resources"
+  description="Three new ways to make AI knowledge stick: spaced-repetition flashcards built from the dictionary, a Today I Learned stream of bite-size snippets, and free downloadable templates with no email wall. All client-side, no account."
+  slug="flashcards-til-and-resources"
+  tag="News"
+  date="2026-06-27"
+>
+  <p>
+    Reading something once is where learning starts, not where it ends. The hard part is remembering it a week later, when
+    you actually need it. KB Cafe&rsquo;s whole bet is learn by doing, so this batch is about the part most sites skip:
+    helping the ideas stick and giving you something to take with you. Three new things went live, all free, all running
+    entirely in your browser.
+  </p>
+
+  <h2>Flashcards, with spaced repetition</h2>
+  <p>
+    The headliner is <a href="/flashcards">AI Flashcards</a>: 51 cards across five decks, covering the core vocabulary of
+    AI and modern development, from <a href="/dictionary/token">tokens</a> and <a href="/dictionary/rag">RAG</a> to
+    <a href="/dictionary/mcp">MCP</a>, <a href="/dictionary/vibe-coding">vibe coding</a>, and the startup shorthand every
+    builder hears. The decks are built straight from our <a href="/dictionary">plain-English dictionary</a>, so the
+    answers are the same clear, one-sentence definitions, no jargon.
+  </p>
+
+  <figure>
+    <img src="/blog/flashcards-decks.jpg" alt="The AI Flashcards page: a 'study tool' header, a '51 cards due for review' badge, and five decks (AI fundamentals, AI agents and MCP, Coding with AI, Web and coding basics, Startup and SaaS) each showing a card count and a Study link" loading="lazy" width="1800" height="1628" />
+    <figcaption>Five decks, built from the dictionary. Each shows how many cards are due for review.</figcaption>
+  </figure>
+
+  <p>
+    What makes it more than a pretty card stack is <strong>spaced repetition</strong>. Flip a card, rate whether you knew
+    it, and the deck schedules it to come back: a card you nailed reappears in a few days, then a week, then weeks later,
+    while one you missed comes straight back. It is the difference between cramming and actually keeping something. The
+    homepage and Learn hub will quietly tell you when cards are due, so review fits into a minute here and there instead of
+    one doomed marathon session.
+  </p>
+  <p>
+    It is built the way everything here is: 100% in your browser, no account, nothing uploaded. Your progress and review
+    schedule live in this device&rsquo;s storage and go nowhere else. You can link straight to a single deck, and every
+    card is also on the page as plain text, so you can just read through a set without studying if that is what you want.
+  </p>
+
+  <h2>Today I Learned</h2>
+  <p>
+    Not everything needs to be a full guide. <a href="/til">Today I Learned</a> is a stream of small, practical things
+    worth knowing: one idea, a little code, no preamble. The kind of thing you wish someone had told you before you spent
+    an afternoon on it.
+  </p>
+
+  <figure>
+    <img src="/blog/til-stream.jpg" alt="The Today I Learned page with a 'Small things, worth knowing' heading and the first entry, 'Estimate tokens without calling an API', showing a short explanation and a one-line code snippet" loading="lazy" width="1440" height="1290" />
+    <figcaption>Today I Learned: short, useful, and to the point.</figcaption>
+  </figure>
+
+  <p>
+    The first few cover estimating <a href="/til#estimate-tokens-without-an-api">tokens without calling an API</a>, making
+    a model <a href="/til#make-a-model-return-json-you-can-trust">return JSON you can actually trust</a>,
+    <a href="/til#stream-a-model-response-in-the-browser">streaming a response in the browser</a>, and the two habits that
+    <a href="/til#stop-leaking-your-api-key">stop you leaking an API key</a>. New ones land at the top, and each has its
+    own link so you can share just the one.
+  </p>
+
+  <h2>Free resources, no email wall</h2>
+  <p>
+    Some things are more useful as a file you keep than a page you read. The new <a href="/resources">Free Resources</a>
+    page has downloadable, evergreen starting points we actually use: a
+    <a href="/downloads/system-prompt-library.md">system prompt library</a> of reusable roles, a
+    <a href="/downloads/prompt-patterns-cheatsheet.md">prompt patterns cheat sheet</a>, and an
+    <a href="/downloads/ai-coding-agent-rules.md">AI coding agent rules</a> starter you can save as your
+    <code>CLAUDE.md</code> or <code>.cursorrules</code>. No email wall, no account, no tracking. Download it, open it, copy
+    from it.
+  </p>
+
+  <h2>Quietly, under the hood</h2>
+  <p>
+    A couple of changes you will not see but search engines will: the section hubs now ship structured data describing
+    what they list, and the sitemap carries an accurate last-updated date for every page, so fresh content gets noticed
+    faster. None of it changed how anything looks. The promise stays the same as day one: no signups, no cookies, nothing
+    leaves your browser.
+  </p>
+
+  <h2>Where to start</h2>
+  <p>
+    Open <a href="/flashcards">a deck</a> and run through it once; the schedule starts the moment you rate your first card.
+    Skim <a href="/til">Today I Learned</a> for something you can use today, and grab a
+    <a href="/resources">template</a> while you are at it. Same idea as always: you keep this stuff by using it, so we
+    built things to use.
+  </p>
+</BlogPost>
