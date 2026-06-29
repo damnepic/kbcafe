@@ -184,8 +184,8 @@ const active = (h) => h === path;
     sb.querySelectorAll('.sb-sec').forEach(sec => {
       const key = 'kb-sb-' + sec.dataset.sec;
       const saved = ls.get(key);
-      // AI Explained opens by default so the lessons are right there to flip through; other sections stay tucked
-      if (saved === '1' || (saved !== '0' && sec.dataset.sec === 'explained')) sec.classList.add('open');
+      // every section stays tucked by default; opens only if the user expanded it before
+      if (saved === '1') sec.classList.add('open');
       const btn = sec.querySelector('.sb-toggle');
       btn.setAttribute('aria-expanded', sec.classList.contains('open'));
       btn.addEventListener('click', () => {
