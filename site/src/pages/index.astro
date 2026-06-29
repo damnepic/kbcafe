@@ -5,6 +5,8 @@ import { AI_SUB, AI_SUB_META, AI_SUB_ORDER } from '../data/toolMeta.js';
 import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
 import { DICT, findTerm } from '../data/dictionary.js';
+import { LATEST } from '../data/latest.js';
+const fmtFresh = (iso) => { const [y, m, d] = iso.split('-').map(Number); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m - 1] + ' ' + d; };
 
 // inline icons (white stroke on colored squares)
 const I = {
@@ -168,6 +170,23 @@ const UI_ICONS = {
             ))}
           </div>
         </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- FRESHLY BREWED: latest additions (curated, from data/latest.js) -->
+  <section class="fresh">
+    <div class="fresh-head">
+      <div><span class="fresh-eye">☕ Freshly brewed</span><h2 class="fresh-h">New on the menu</h2></div>
+      <a class="fresh-all" href="/blog">From the blog <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="fresh-grid">
+      {LATEST.slice(0, 6).map((it, idx) => (
+        <a class="fresh-card" href={it.href}>
+          <div class="fresh-top"><span class="fresh-tag">{it.tag}</span>{idx === 0 && <span class="fresh-new">New</span>}<time class="fresh-date">{fmtFresh(it.date)}</time></div>
+          <h3 class="fresh-title">{it.title}</h3>
+          <p class="fresh-blurb">{it.blurb}</p>
+        </a>
       ))}
     </div>
   </section>
@@ -405,6 +424,26 @@ const UI_ICONS = {
 
   /* ===== REDESIGN: triage heading ===== */
   .triage-sec{margin-top:46px}
+
+  /* Freshly brewed (latest additions) */
+  .fresh{max-width:1120px;margin:48px auto 0}
+  .fresh-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
+  .fresh-eye{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .fresh-h{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;font-size:clamp(22px,3vw,28px);margin:6px 0 0;color:var(--ink)}
+  .fresh-all{font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink-soft);text-decoration:none;white-space:nowrap}
+  .fresh-all:hover{color:var(--coral)}
+  .fresh-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .fresh-card{display:flex;flex-direction:column;gap:7px;text-decoration:none;background:var(--cream);border:1.5px solid var(--line);border-radius:16px;padding:16px 18px;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .fresh-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(40,24,12,.09);border-color:var(--ink)}
+  .fresh-top{display:flex;align-items:center;gap:8px}
+  .fresh-tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);background:rgba(238,75,43,.09);padding:3px 8px;border-radius:6px}
+  .fresh-new{font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--coral);padding:2px 6px;border-radius:5px}
+  .fresh-date{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--ink-soft)}
+  .fresh-title{font-family:var(--font-display);font-weight:800;font-size:16.5px;letter-spacing:-.01em;line-height:1.25;margin:0;color:var(--ink)}
+  .fresh-card:hover .fresh-title{color:var(--coral)}
+  .fresh-blurb{font-size:13.5px;line-height:1.5;color:var(--ink-soft);margin:0}
+  @media(max-width:860px){.fresh-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.fresh-grid{grid-template-columns:1fr}}
   .triage-h{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:-.02em;text-align:center;color:var(--ink);margin:0}
   .triage-sub{text-align:center;font-size:15px;color:var(--ink-soft);margin:8px 0 0}
   .triage-sec .o-grid{margin-top:22px}
