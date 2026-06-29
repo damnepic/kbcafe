@@ -1,0 +1,207 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+const FOLDER = `~/operator/
+  CLAUDE.md            the standing rules your agent reads every session
+  notes/               your linked markdown knowledge base (the "brain")
+  .claude/commands/    your routines, one markdown file per slash command
+  .claude/skills/      reusable instruction bundles
+  reports/             where routines write their output
+  .env                 keys, gitignored, never committed`;
+---
+<ReferencePage
+  title="Build your own agentic OS (with Claude Code or any agent) | KB Cafe"
+  description="An honest, hands-on guide to building a personal agentic OS: a local-first command center where a coding agent works over your own notes and tools, with saved rules, routines, and verify loops. The real primitives (CLAUDE.md, slash commands, skills, subagents, MCP), the security you actually need, and a builder that writes a real routine for you."
+  path="/build-an-agentic-os"
+  eyebrow="Knowledge Base · Agentic AI"
+  h1="Build your own agentic OS"
+  tagline="Strip away the branding and an 'agentic OS' is a simple, powerful idea: a local-first command center where one coding agent works over your own data, with saved rules, reusable routines, and loops that check their own work. Here is how to build one, with the real tools, not a product pitch."
+>
+  <h2>What an &ldquo;agentic OS&rdquo; actually is</h2>
+  <p>
+    It is not an operating system, and you do not need anyone&rsquo;s paid framework to build one. The honest definition:
+    a folder on your machine where a capable coding agent (Claude Code and others) can read your notes, run your tools,
+    and execute saved routines that <a href="/what-are-ai-loops">loop until the work is done</a>. Three layers do all the
+    work: a <strong>brain</strong> (your knowledge), a <strong>build</strong> (the agent plus the rules and routines that
+    drive it), and a way to <strong>ship</strong> it (run it on demand, or on a schedule). It is model-agnostic on
+    purpose, any sufficiently capable agent will do, so nothing here depends on a specific model or its context size.
+  </p>
+  <p>
+    The payoff is real: instead of re-explaining yourself every session, you teach the system once and then trigger it,
+    &ldquo;write my morning report,&rdquo; &ldquo;triage my inbox,&rdquo; &ldquo;plan today,&rdquo; and it runs the whole
+    job against your own data. The catch is also real, and we will get to it: this only pays off when the work repeats and
+    you can check the output automatically.
+  </p>
+
+  <h2>Step 1: the brain (your knowledge base)</h2>
+  <p>
+    Start with a folder of <strong>linked markdown notes</strong>. Plain <code>.md</code> files, one idea per note,
+    cross-referenced with links. Many people use <a href="https://obsidian.md">Obsidian</a> because it stores everything
+    as local markdown and shows the links as a graph, but the agent never needs Obsidian itself; it just reads the files
+    and follows the links between them as text. No database, no cloud, nothing uploaded. Your data stays yours, which is
+    the whole point of running this locally.
+  </p>
+  <p>
+    Why notes instead of a database? Because a coding agent is already excellent at reading files, grepping for a term,
+    and following references, the same way it reads a codebase. A well-linked notes folder becomes a knowledge base it can
+    search and cross-reference on demand. This is the same idea as <a href="/what-is-agent-memory">agent memory</a>: the
+    model is stateless, so durable knowledge has to live somewhere it can re-read.
+  </p>
+
+  <h2>Step 2: the build (rules, routines, and loops)</h2>
+  <p>
+    This is where the proprietary &ldquo;frameworks&rdquo; you see online are really just four built-in primitives. Learn
+    these and you can build the same thing yourself:
+  </p>
+  <ul>
+    <li><strong>CLAUDE.md</strong>, a markdown file at the root the agent reads every session. Your standing rules: how to write, what to never touch, your stack, your conventions. This is the &ldquo;memory&rdquo; that makes runs consistent. There is a ready starter in our <a href="/resources">free resources</a>.</li>
+    <li><strong>Custom slash commands</strong>, one markdown file per routine in <code>.claude/commands/</code>. A file named <code>plan-today.md</code> becomes the <code>/plan-today</code> command. The file is just the instructions to run, which is all a &ldquo;named command&rdquo; ever was. The builder below writes one for you.</li>
+    <li><strong>Skills</strong>, reusable instruction bundles the agent loads when relevant, so you are not re-pasting the same how-to into every routine.</li>
+    <li><strong>Subagents</strong>, a second agent that checks the first one&rsquo;s work. That separation is what stops a model approving its own homework, the <a href="/ai-patterns">Judge and Verification patterns</a> in practice.</li>
+  </ul>
+  <p>
+    Connect the agent to the outside world with <a href="/what-is-tool-calling">tool calling</a> and
+    <a href="/what-are-mcp-servers">MCP servers</a> (your files, a database, GitHub, the web). And every routine worth
+    automating is a <a href="/what-are-ai-loops">loop</a>: discover, plan, execute, verify against a real check, and
+    iterate until it passes or hits a stop limit. That verify gate is non-negotiable; without it you have an expensive
+    way to generate unchecked output.
+  </p>
+
+  <div class="rb-note">
+    <strong>Security, before you automate anything.</strong> A coding agent can run real commands and change real files.
+    By default it asks before risky actions, and you can relax that (auto-accept edits, or a read-only plan mode). There
+    is also a full &ldquo;bypass permissions&rdquo; mode, and the hype tends to leave it on. Treat that like
+    <code>sudo</code>: only in a throwaway or sandboxed directory you have looked at, never pointed at your whole machine
+    or your real credentials. Convenience is not worth handing an autonomous loop unrestricted access.
+  </div>
+
+  <div class="rb" id="rb">
+    <div class="rb-head">Hands-on: write a real routine</div>
+    <p class="rb-sub">Describe a job and we generate a working Claude Code slash command, a loop with a verify gate, ready to save and run. This is the honest version of those &ldquo;framework commands.&rdquo;</p>
+    <label class="rb-l" for="rb-name">Routine name <span>becomes the slash command</span></label>
+    <div class="rb-namerow"><span class="rb-slash">/</span><input id="rb-name" class="rb-in" type="text" value="morning-report" /></div>
+    <label class="rb-l" for="rb-goal">What it should do</label>
+    <textarea id="rb-goal" class="rb-ta" rows="2" placeholder="Write a short morning report: what changed yesterday, what needs attention today"></textarea>
+    <label class="rb-l" for="rb-read">What it should read first <span>your data</span></label>
+    <textarea id="rb-read" class="rb-ta" rows="2" placeholder="notes/ for project status, reports/ for yesterday's report"></textarea>
+    <label class="rb-l" for="rb-check">Done when <span>the verify gate</span></label>
+    <textarea id="rb-check" class="rb-ta" rows="2" placeholder="Under 200 words, every claim traces to a note, ends with 3 prioritized actions"></textarea>
+    <div class="rb-out-wrap">
+      <div class="rb-out-bar"><span id="rb-path">.claude/commands/morning-report.md</span><button id="rb-copy" type="button">Copy</button></div>
+      <pre class="rb-out" id="rb-out"></pre>
+    </div>
+    <p class="rb-foot">Save that file in your project, restart the agent, and run <code id="rb-run">/morning-report</code>.</p>
+  </div>
+
+  <h2>Step 3: ship it (run on demand, or 24/7)</h2>
+  <p>
+    Your &ldquo;command deck&rdquo; is just the set of routines you built: a morning report, an inbox triage, a weekly
+    review. Two ways to run them:
+  </p>
+  <ul>
+    <li><strong>Local, on demand.</strong> You sit down, run <code>/plan-today</code>, watch it work. Simplest, safest, and where everyone should start.</li>
+    <li><strong>Scheduled, hands-off.</strong> To have routines fire while you sleep, you need something that runs them on a timer. The real options, in rough order of effort: a <a href="/cron-generator">cron</a> job on your own machine, a <a href="https://docs.github.com/actions">GitHub Actions</a> scheduled workflow (free, runs in the cloud), or a small always-on host (Render, Fly.io, Railway, a cheap VPS). Pick the lightest one that fits; you do not need a platform to schedule a script.</li>
+  </ul>
+  <p>
+    Whichever you choose, the move is the same as any <a href="/what-are-ai-loops#order">loop system</a>: get one routine
+    reliable by hand first, then schedule it. Automating something that was never reliable just means it now fails on a
+    timer.
+  </p>
+
+  <h2>Package it as one repo</h2>
+  <p>
+    Once it works, the whole thing is a single folder you can version, clone, and reuse:
+  </p>
+  <pre class="rb-code">{FOLDER}</pre>
+  <p>
+    Commit it (with <code>.env</code> gitignored, see the <a href="/til#stop-leaking-your-api-key">key-hygiene note</a>),
+    and you can clone it onto a new machine, drop in your keys, and run. Want a variant for a different project or a
+    teammate? Fork the folder and adjust the rules and routines. That is all the &ldquo;one-click OS&rdquo; products are:
+    a repo of a <code>CLAUDE.md</code>, some commands, and some skills.
+  </p>
+
+  <h2>The honest part: when not to build one</h2>
+  <p>
+    An agentic OS is genuinely useful, and genuinely overkill for most one-off work. It earns its complexity only when the
+    same conditions that justify any <a href="/what-are-ai-loops">loop</a> hold: the task <strong>repeats</strong>, there
+    is an <strong>automatic way to check</strong> the output, and the agent can run it <strong>end to end</strong>. If you
+    are doing something once, or you would have to eyeball every result anyway, a single good prompt beats a whole system.
+    Build the smallest thing that works, then grow it one reliable routine at a time.
+  </p>
+
+  <h2>Where to go next</h2>
+  <ul>
+    <li><a href="/what-are-ai-loops">AI loops</a>, the engine inside every routine, and a builder for the loop itself.</li>
+    <li><a href="/what-are-mcp-servers">MCP servers</a>, how to connect the agent to your files, database, and the web.</li>
+    <li><a href="/what-is-agent-memory">Agent memory</a>, why the &ldquo;brain&rdquo; folder is necessary at all.</li>
+    <li><a href="/resources">Free resources</a>, including a <code>CLAUDE.md</code> / agent-rules starter you can drop in.</li>
+  </ul>
+</ReferencePage>
+
+<style is:global>
+  .rb-code{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;background:#241a12;color:#eee4d3;border-radius:12px;padding:16px 18px;margin:16px 0;overflow-x:auto;white-space:pre}
+  .rb-note{border:1.5px solid var(--line);border-left:3px solid var(--coral);background:var(--cream);border-radius:0 12px 12px 0;padding:14px 18px;margin:22px 0;font-size:14.5px;line-height:1.6;color:var(--ink)}
+  .rb-note code{font-family:var(--font-mono);font-size:.92em;background:var(--paper-2);padding:1px 5px;border-radius:5px}
+
+  .rb{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:18px 20px;margin:26px 0}
+  .rb-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .rb-sub{font-size:14.5px;line-height:1.55;color:var(--ink-soft);margin:8px 0 14px}
+  .rb-l{display:block;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink);margin:12px 0 6px}
+  .rb-l span{font-family:var(--font-mono);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-left:8px}
+  .rb-namerow{display:flex;align-items:center;gap:6px}
+  .rb-slash{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--coral)}
+  .rb-in,.rb-ta{width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:14px;line-height:1.5;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;resize:vertical}
+  .rb-in:focus,.rb-ta:focus{outline:0;border-color:var(--coral)}
+  .rb-out-wrap{margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid #3a2716}
+  .rb-out-bar{display:flex;align-items:center;justify-content:space-between;background:#1c140d;padding:7px 12px}
+  .rb-out-bar span{font-family:var(--font-mono);font-size:11.5px;color:#bda88c}
+  #rb-copy{border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:12px;padding:5px 13px;border-radius:8px;cursor:pointer}
+  #rb-copy.done{background:#0f9f82}
+  .rb-out{margin:0;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;background:#241a12;color:#eee4d3;padding:15px 17px;overflow-x:auto;white-space:pre-wrap}
+  .rb-foot{margin-top:12px;font-size:13.5px;color:var(--ink-soft)}
+  .rb-foot code,#rb-run{font-family:var(--font-mono);font-size:.92em;background:var(--paper-2);padding:1px 6px;border-radius:5px;color:var(--coral)}
+</style>
+
+<script is:inline>
+  (function () {
+    var name = document.getElementById('rb-name'), goal = document.getElementById('rb-goal'),
+        read = document.getElementById('rb-read'), check = document.getElementById('rb-check'),
+        out = document.getElementById('rb-out'), copy = document.getElementById('rb-copy'),
+        pathEl = document.getElementById('rb-path'), runEl = document.getElementById('rb-run');
+    if (!out) return;
+    function slug(s) { return (s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'my-routine'; }
+    function build() {
+      var n = slug(name.value);
+      var g = (goal.value || '').trim() || '[what this routine should produce]';
+      var r = (read.value || '').trim() || '[the files or folders to read first]';
+      var c = (check.value || '').trim() || '[the strict, checkable bar for "done"]';
+      pathEl.textContent = '.claude/commands/' + n + '.md';
+      runEl.textContent = '/' + n;
+      out.textContent =
+        '---\n' +
+        'description: ' + g.split('\n')[0].slice(0, 80) + '\n' +
+        '---\n\n' +
+        'You are running the "' + n + '" routine. Work in a loop until the goal is met. Do not stop early.\n\n' +
+        'GOAL:\n' + g + '\n\n' +
+        'READ FIRST (ground every claim in this, do not invent):\n' + r + '\n\n' +
+        'EACH ROUND, repeat:\n' +
+        '1. PLAN   - state the single next step.\n' +
+        '2. DO     - produce or improve the output.\n' +
+        '3. VERIFY - check honestly against the bar below. List anything still failing.\n' +
+        '4. DECIDE - if the bar is fully met, print the final output and stop. Otherwise fix the weakest point and go again.\n\n' +
+        'DONE WHEN:\n' + c + '\n\n' +
+        'RULES:\n' +
+        '- Do not ask me questions. Make a sensible assumption, note it, and keep going.\n' +
+        '- Do not edit files outside this project, and never touch .env or secrets.\n' +
+        '- Hard limit: stop after 6 rounds even if the bar is not fully met, and say what still falls short.\n\n' +
+        'Save the result to reports/ with today\'s date.';
+    }
+    [name, goal, read, check].forEach(function (el) { el.addEventListener('input', build); });
+    copy.addEventListener('click', function () {
+      navigator.clipboard.writeText(out.textContent).then(function () {
+        copy.textContent = 'Copied'; copy.classList.add('done');
+        setTimeout(function () { copy.textContent = 'Copy'; copy.classList.remove('done'); }, 1600);
+      }).catch(function () {});
+    });
+    build();
+  })();
+</script>

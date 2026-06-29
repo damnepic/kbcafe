@@ -83,4 +83,8 @@ export const REFERENCE = [
   { nm: "How to start CSS", href: "/how-to-start-css",
     ds: "What CSS is, the three ways to add it, selectors, the box model, sane sizing, and a live editor to try it in.", tag: "Front-end",
     rel: ["/http-explained", "/what-is-json", "/what-is-rss"] },
+  // Agentic AI
+  { nm: "Build your own agentic OS", href: "/build-an-agentic-os",
+    ds: "A local-first command center where a coding agent works over your own notes and tools, with saved rules, routines, and verify loops. The real primitives (CLAUDE.md, slash commands, skills, subagents, MCP), the security you need, and a builder that writes a routine for you.", tag: "Agentic AI",
+    rel: ["/what-are-ai-loops", "/what-are-mcp-servers", "/what-is-agent-memory"] },
 ];

@@ -12,6 +12,10 @@ const { title, description, path, eyebrow, h1, tagline, updated = '2026' } = Ast
 const STATIC = {
   '/feeds': { nm: 'RSS, Atom & OPML, the complete guide', tag: 'Feeds' },
   '/reference': { nm: 'All developer references', tag: 'Knowledge Base' },
+  '/what-are-ai-loops': { nm: 'What are AI loops?', tag: 'AI Explained' },
+  '/what-are-mcp-servers': { nm: 'What are MCP servers?', tag: 'AI Explained' },
+  '/what-is-agent-memory': { nm: 'What is agent memory?', tag: 'AI Explained' },
+  '/resources': { nm: 'Free AI resources', tag: 'Resources' },
 };
 const metaFor = (href) => {
   const r = REFERENCE.find(x => x.href === href);
