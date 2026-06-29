@@ -1,0 +1,230 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+// Plain-text code samples in frontmatter so literal characters never hit Astro's expression parser.
+const LOOP_SPEC = `GOAL      every test in tests/auth passes, lint is clean, no type errors
+EACH ROUND
+  1. run the test suite and read every failure
+  2. pick the single highest-impact failure
+  3. write the smallest change that fixes it
+  4. re-run the tests, lint, and the type checker
+VERIFY    green tests, zero lint warnings, zero type errors
+STOP WHEN verify passes, or 8 rounds reached
+ON STOP   summarize what changed and what still fails`;
+---
+<AiPage
+  title="What are AI loops? Let AI check and refine its own work | KB Cafe"
+  description="An AI loop gives a model a goal, a way to verify its own output, and a rule for when to stop, so it plans, does, checks, and iterates instead of answering one prompt at a time. What loops are, the verify gate that makes them work, when a loop is over-engineering, and a hands-on builder for your own self-checking loop."
+  path="/what-are-ai-loops"
+  eyebrow="AI Explained · Pattern"
+  h1="What are AI loops?"
+  tagline="Most people use AI one prompt at a time. A loop hands the model a goal and lets it plan, do, check its own work, and keep going until it is done. Here is how that works, when it is worth it, and how to build one."
+>
+  <h2>One prompt at a time, versus a loop</h2>
+  <p>
+    The usual way to use AI is a back-and-forth: you ask, it answers, you spot what is wrong, you ask again. You are
+    steering every single step. A loop flips that around. You give the goal <em>once</em>, and the model runs the whole
+    cycle itself, plans an approach, does the work, checks the result against the goal, and tries again if it is not
+    there yet. You stop managing each step and start managing the outcome.
+  </p>
+  <blockquote class="lp-quote">
+    &ldquo;You shouldn&rsquo;t be prompting coding agents anymore. You should be designing loops that prompt your
+    agents.&rdquo;
+    <cite><a href="https://x.com/steipete" rel="noopener">Peter Steinberger</a>, on X</cite>
+  </blockquote>
+
+  <h2>What a loop actually is</h2>
+  <p>
+    A <a class="kb-term" href="/dictionary/prompt">prompt</a> is a single instruction. A loop is a goal the model keeps
+    working toward until it is complete. Instead of giving one answer and waiting for your next command, it runs the
+    full cycle on its own:
+  </p>
+  <ul>
+    <li><strong>Discover</strong>:work out what actually needs doing.</li>
+    <li><strong>Plan</strong>:decide how to do it.</li>
+    <li><strong>Execute</strong>:do the work.</li>
+    <li><strong>Verify</strong>:check the result against the goal.</li>
+    <li><strong>Iterate</strong>:not there yet? feed the result back in and go again.</li>
+  </ul>
+  <p>
+    Five steps, but three of them carry the whole thing, and they are exactly where people go wrong.
+  </p>
+
+  <h2>The three pieces that make it work</h2>
+  <p>
+    <strong>Verify is the core.</strong> Without a real check on its output, a model just produces something and approves
+    its own homework. Progress only happens when there is a true gate, a test, a measurable metric, or a strict rubric,
+    that the work has to pass. No gate, no loop, just expensive repetition.
+  </p>
+  <p>
+    <strong>State is what stops it going in circles.</strong> The loop has to remember what it already tried, so each
+    round builds on the last instead of restarting from zero. That memory is what turns repetition into progress. (It is
+    the same idea as <a href="/what-is-agent-memory">agent memory</a>.)
+  </p>
+  <p>
+    <strong>A stop condition keeps it under control.</strong> Every loop needs a clear definition of success <em>and</em>
+    a hard limit, or it will happily run, and spend, forever. So the real difference is this: a prompt gives an
+    instruction; a loop gives a job, a way to judge success, a memory of progress, and a rule for when to stop.
+  </p>
+
+  <h2>Do you even need one?</h2>
+  <p>
+    Most write-ups explain how loops work and skip the more useful question: when are they <em>not</em> worth it? A loop
+    only earns its complexity when all four of these are true:
+  </p>
+  <ul>
+    <li>The task <strong>repeats</strong>, so the setup cost pays off over time.</li>
+    <li>There is an <strong>automatic way to reject bad output</strong>, a test, a rule, or a validator.</li>
+    <li>The agent can run <strong>end to end</strong> without you stepping in constantly.</li>
+    <li><strong>Success is objective</strong>, so &ldquo;done&rdquo; can be decided without a judgment call.</li>
+  </ul>
+  <p>
+    Miss any one and a loop becomes over-engineering. For a one-off task, or anything where &ldquo;good&rdquo; is a matter
+    of taste, a single well-structured <a href="/prompt-builder">prompt</a> is the better tool. Loops are powerful, but
+    only when the problem actually fits them.
+  </p>
+
+  <h2>The version built for code</h2>
+  <p>
+    Loops caught on in software first, because code is easy to verify: a test either passes or it does not, so there is
+    no argument about success. A coding loop is just a goal plus a strict way to check it:
+  </p>
+  <pre class="lp-code">{LOOP_SPEC}</pre>
+  <p>
+    That is the whole shape, a clear goal, a tight per-round routine, an unambiguous verify gate, and a hard stop so a
+    stuck loop gives up instead of burning money. It is the working pattern behind tools like
+    <a href="/how-to-write-code-with-ai">AI coding agents</a>.
+  </p>
+
+  <div class="lp" id="lp">
+    <div class="lp-head">Hands-on: build your own self-checking loop</div>
+    <p class="lp-sub">Fill these in and we assemble a loop prompt you can paste into any chat model. It keeps working and grading itself until it meets your bar, no code required.</p>
+    <label class="lp-l" for="lp-task">The task <span>what you want produced</span></label>
+    <textarea id="lp-task" class="lp-ta" rows="2" placeholder="Rewrite this landing-page headline to be clearer and punchier"></textarea>
+    <label class="lp-l" for="lp-crit">Success criteria <span>one per line, be strict</span></label>
+    <textarea id="lp-crit" class="lp-ta" rows="3" placeholder="Under 10 words&#10;Names the core benefit&#10;No jargon or hype"></textarea>
+    <label class="lp-l" for="lp-cap">Hard limit <span>so it cannot run forever</span></label>
+    <div class="lp-caprow"><input id="lp-cap" class="lp-num" type="number" min="1" max="20" value="6" /><span>rounds</span></div>
+    <div class="lp-out-wrap">
+      <div class="lp-out-bar"><span>Your loop prompt</span><button id="lp-copy" type="button">Copy</button></div>
+      <pre class="lp-out" id="lp-out"></pre>
+    </div>
+  </div>
+
+  <h2>What a real loop is built from</h2>
+  <p>
+    Under the hood, a production loop combines five parts, and modern agent tools (Claude Code, Codex, and the like) bundle
+    all of them:
+  </p>
+  <ul>
+    <li><strong>Automation</strong>:it runs on a schedule or trigger; you define the goal once and it keeps going without manual restarts.</li>
+    <li><strong>Skill</strong>:reusable instructions saved as a stable set of rules, so every run behaves consistently instead of leaning on you to re-prompt.</li>
+    <li><strong>Sub-agents</strong>:one agent does the work, another checks it; that separation is what stops a model rubber-stamping itself.</li>
+    <li><strong>Connectors</strong>:integrations (<a href="/what-is-tool-calling">tool calling</a>, <a href="/what-are-mcp-servers">MCP servers</a>) that let the loop take real action, not just suggest it.</li>
+    <li><strong>Verifier</strong>:the strict gate (a test, a build, a rubric) that decides whether the output is acceptable. This is the part that makes progress real.</li>
+  </ul>
+
+  <h2>The cost nobody mentions</h2>
+  <p>
+    Loops run on <a class="kb-term" href="/dictionary/token">tokens</a>, and tokens are money. The catch is not any single
+    step, it is how the cost compounds: every round re-sends the goal, the work so far, and all the previous failures, so
+    the <a href="/what-is-a-context-window">context</a> grows and each pass costs more than the last. Add a second model
+    to verify and you roughly double it, because both read the same expanding context.
+  </p>
+  <p>
+    Treat numbers here as orders of magnitude, not promises, they vary widely by model and task: a single agent on one
+    medium job might run anywhere from tens of thousands to a couple hundred thousand tokens, growing each pass, and a
+    fleet running in parallel multiplies all of it. The metric that actually matters is <strong>cost per accepted
+    change</strong>, not tokens or rounds. When more than roughly half the model&rsquo;s output gets rejected, the loop is
+    mostly shifting work into review instead of saving you time. Loops can also fail silently, running and spending on
+    incomplete output, unless a strict gate can stop bad results. That is why real loop systems need tight budgets, hard
+    caps, and monitoring, and why, for most people most of the time, a simpler setup wins.
+  </p>
+
+  <h2>The order that actually works</h2>
+  <p>
+    If you do build one, the sequence matters more than the tools. Systems that hold up in production are almost always
+    built in this order:
+  </p>
+  <ol>
+    <li>Get <strong>one manual run</strong> reliable first.</li>
+    <li>Turn that into a <strong>skill</strong> (save the instructions).</li>
+    <li>Wrap the skill in a <strong>loop</strong> (add the verify gate and the stop condition).</li>
+    <li><strong>Then</strong> put it on a schedule.</li>
+  </ol>
+  <p>
+    Skip to step four and you have automated something that was never reliable to begin with. Earn each step before the
+    next.
+  </p>
+
+  <h2>Where to go next</h2>
+  <ul>
+    <li><a href="/ai-patterns">AI patterns</a>, the Reflection, Verification, and Judge patterns are loops in miniature.</li>
+    <li><a href="/what-is-agent-memory">Agent memory</a>, the state that keeps a loop from repeating itself.</li>
+    <li><a href="/how-to-write-code-with-ai">How to write code with AI</a>, where the verify gate (tests) is cleanest.</li>
+    <li>New to all this? Start with the plain-English <a href="/beginner-ai/ai-loops">beginner guide to AI loops</a>.</li>
+  </ul>
+</AiPage>
+
+<style is:global>
+  .lp-quote{border-left:3px solid var(--coral);background:var(--cream);border-radius:0 10px 10px 0;padding:12px 18px;margin:22px 0;font-size:16px;line-height:1.5;color:var(--ink);font-style:italic}
+  .lp-quote cite{display:block;margin-top:8px;font-size:13px;font-style:normal;color:var(--ink-soft)}
+  .lp-quote a{color:var(--coral);text-decoration:none;font-weight:600}
+  .lp-code{font-family:var(--font-mono);font-size:13px;line-height:1.6;background:#241a12;color:#eee4d3;border-radius:12px;padding:16px 18px;margin:18px 0;overflow-x:auto;white-space:pre}
+
+  .lp{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:18px 20px;margin:26px 0}
+  .lp-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .lp-sub{font-size:14.5px;line-height:1.55;color:var(--ink-soft);margin:8px 0 14px}
+  .lp-l{display:block;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink);margin:12px 0 6px}
+  .lp-l span{font-family:var(--font-mono);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-left:8px}
+  .lp-ta{width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:14px;line-height:1.5;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;resize:vertical}
+  .lp-ta:focus{outline:0;border-color:var(--coral)}
+  .lp-caprow{display:flex;align-items:center;gap:9px}
+  .lp-num{width:74px;font-family:var(--font-mono);font-size:14px;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px}
+  .lp-num:focus{outline:0;border-color:var(--coral)}
+  .lp-caprow span{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+  .lp-out-wrap{margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid #3a2716}
+  .lp-out-bar{display:flex;align-items:center;justify-content:space-between;background:#1c140d;padding:7px 12px}
+  .lp-out-bar span{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#bda88c}
+  #lp-copy{border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:12px;padding:5px 13px;border-radius:8px;cursor:pointer}
+  #lp-copy.done{background:#0f9f82}
+  .lp-out{margin:0;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;background:#241a12;color:#eee4d3;padding:15px 17px;overflow-x:auto;white-space:pre-wrap}
+</style>
+
+<script is:inline>
+  (function () {
+    var task = document.getElementById('lp-task'), crit = document.getElementById('lp-crit'),
+        cap = document.getElementById('lp-cap'), out = document.getElementById('lp-out'), copy = document.getElementById('lp-copy');
+    if (!out) return;
+    function build() {
+      var t = (task.value || '').trim() || '[describe exactly what you want produced]';
+      var lines = (crit.value || '').split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
+      if (!lines.length) lines = ['[criterion 1]', '[criterion 2]', '[criterion 3]'];
+      var n = Math.max(1, Math.min(20, parseInt(cap.value, 10) || 6));
+      var crits = lines.map(function (l) { return '- ' + l; }).join('\n');
+      out.textContent =
+        'SELF-CHECKING LOOP\n\n' +
+        'You will work in a loop until the task meets the bar below. Do not stop early.\n\n' +
+        'TASK:\n' + t + '\n\n' +
+        'SUCCESS CRITERIA (be strict, no soft passes):\n' + crits + '\n\n' +
+        'EACH ROUND, repeat:\n' +
+        '1. PLAN   - state the single next step.\n' +
+        '2. DO     - produce or improve the work.\n' +
+        '3. VERIFY - score the result 1-10 on every criterion. Be brutally honest and list what is still weak.\n' +
+        '4. DECIDE - if every criterion is 8 or higher, print "FINAL" and stop. Otherwise print "ITERATING" and go again, fixing the weakest criterion first.\n\n' +
+        'RULES:\n' +
+        '- Never call it done until every criterion scores 8 or higher.\n' +
+        '- Each round must fix the weakest score from the last VERIFY.\n' +
+        '- Do not ask me questions. Make a sensible assumption, note it, and keep going.\n' +
+        '- Hard limit: stop after ' + n + ' rounds even if it is not perfect, and summarize what still falls short.\n\n' +
+        'Begin. Run the loop until FINAL.';
+    }
+    [task, crit, cap].forEach(function (el) { el.addEventListener('input', build); });
+    copy.addEventListener('click', function () {
+      navigator.clipboard.writeText(out.textContent).then(function () {
+        copy.textContent = 'Copied'; copy.classList.add('done');
+        setTimeout(function () { copy.textContent = 'Copy'; copy.classList.remove('done'); }, 1600);
+      }).catch(function () {});
+    });
+    build();
+  })();
+</script>

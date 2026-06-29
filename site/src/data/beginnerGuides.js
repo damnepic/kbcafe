@@ -251,6 +251,25 @@ export const BG_GUIDES = [
 </ul>
 <p>Here is the real secret: <strong>you do not have to choose forever.</strong> They are all free to start, so try the same question in two of them and see whose answer you like better. Many people keep two open and pick per task. You genuinely cannot go wrong.</p>`,
   },
+  {
+    slug: 'ai-loops', title: 'What Are AI Loops? Letting AI Check Its Own Work',
+    topic: 'productivity', level: 'Intermediate', minutes: 6,
+    excerpt: 'Most people use AI one question at a time. A loop hands it a goal and lets it keep improving and checking its own work until it is done. Here is the idea, in plain language.',
+    body: `
+<p>Most of us use AI like a vending machine: ask a question, get an answer, notice what is off, ask again. You are steering every step. An <strong>AI loop</strong> works differently. You give the goal once and let the AI keep working, and keep checking its own work, until it meets the mark. It is one of the simplest ways to get more out of AI with less back-and-forth.</p>
+<h2>A prompt asks once. A loop keeps going.</h2>
+<p>A prompt is a single request. A loop is a goal the AI keeps working toward. Instead of handing back one answer and waiting for you, it plans, does the work, looks at the result, and tries again if it is not good enough, all on its own.</p>
+<p>Think of the difference between editing a sentence yourself, line by line, and telling a helper: &ldquo;keep editing this until it is under ten words and sounds friendly.&rdquo; The second one is a loop. You set the goal; they keep going until they hit it.</p>
+<h2>The one thing that makes it work: a way to check</h2>
+<p>The whole trick is giving the AI a clear way to check its own work. Without a real test, it just produces something and declares it finished. With a clear bar, &ldquo;every sentence under fifteen words,&rdquo; or &ldquo;the recipe uses only what is in my fridge,&rdquo; it can actually tell whether it is done, and keep improving until it is.</p>
+<p>Two smaller things help too: it should remember what it already tried, so it improves instead of going in circles, and it needs a stop rule, so it does not run on forever.</p>
+<h2>When a loop is worth it, and when it is overkill</h2>
+<p>Loops shine when a task <strong>repeats</strong>, when there is a <strong>clear way to tell good from bad</strong>, and when &ldquo;done&rdquo; is not just a matter of taste. For a one-off, or anything judged purely by feel, a single well-written request is simpler and works better. More machinery is not always more help, and knowing when to skip it is half the skill.</p>
+<h2>Try a tiny loop yourself</h2>
+<p>You do not need any special tools. Paste something like this into ChatGPT or Claude, filling in the brackets:</p>
+<p><em>&ldquo;Keep improving this [thing] until it meets all three: [1], [2], [3]. After each try, score yourself 1 to 10 on each and be honest about what is still weak. Only stop when all three are at least 8. Do not ask me questions, just keep going.&rdquo;</em></p>
+<p>That is a loop in its simplest form: a goal, a clear bar, and a rule for when to stop. When you are ready to see how the bigger versions work, the ones behind tools like AI coding assistants, the main site breaks it down step by step.</p>`,
+  },
 ];
 
 // Graduation bridges: each beginner guide "levels up" into a matching destination on the main
@@ -268,6 +287,7 @@ export const BG_LEVELUP = {
   'ai-image-styles':            { href: '/dictionary',       label: 'Browse the plain-English AI dictionary' },
   'ai-ethics':                  { href: '/ai',               label: 'Go deeper in AI Explained' },
   'chatgpt-vs-claude-vs-gemini':{ href: '/ai',               label: 'See how these models actually work' },
+  'ai-loops':                   { href: '/what-are-ai-loops', label: 'See how AI loops actually work' },
 };
 
 export const bgGuide = (slug) => BG_GUIDES.find((g) => g.slug === slug);
