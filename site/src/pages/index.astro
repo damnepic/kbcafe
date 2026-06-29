@@ -6,7 +6,14 @@ import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
 import { DICT, findTerm } from '../data/dictionary.js';
 import { LATEST } from '../data/latest.js';
+import { BG_GUIDES } from '../data/beginnerGuides.js';
+import { POSTS } from '../data/blog.js';
 const fmtFresh = (iso) => { const [y, m, d] = iso.split('-').map(Number); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m - 1] + ' ' + d; };
+// "Freshly brewed" = curated highlights + the 2 newest blog posts, merged and shown newest-first.
+const freshItems = [
+  ...LATEST.slice(0, 4),
+  ...POSTS.slice(0, 2).map(p => ({ title: p.title, href: '/blog/' + p.slug, tag: 'Blog', blurb: p.excerpt, date: p.date })),
+].sort((a, b) => b.date.localeCompare(a.date));
 
 // inline icons (white stroke on colored squares)
 const I = {
@@ -66,6 +73,7 @@ const aiClusters = AI_SUB_ORDER.map(sub => ({
   items: aiToolsAll.filter(t => AI_SUB[t.href] === sub),
 }));
 const explainerCount = AI.filter(a => a.type === 'explainer').length; // concept explainers
+const lessonCount = explainerCount + REFERENCE.length + BG_GUIDES.length; // all teaching pages: AI explainers + KB references + beginner guides
 
 // goal-first workflows: bundle tools by what you're trying to do (vs browsing 34 tools)
 const WORKFLOWS = [
@@ -145,7 +153,7 @@ const UI_ICONS = {
     <a class="hr-due" id="hr-due" href="/flashcards" hidden></a>
     <ul class="hr-proof">
       <li><strong>{aiCount}</strong> tools</li>
-      <li><strong>{explainerCount}</strong> explainers</li>
+      <li><strong>{lessonCount}</strong> lessons</li>
       <li><strong>{dictCount}</strong> dictionary terms</li>
       <li><strong>{WORKFLOWS.length}</strong> learning paths</li>
       <li><strong>100%</strong> browser-based</li>
@@ -181,7 +189,7 @@ const UI_ICONS = {
       <a class="fresh-all" href="/blog">From the blog <span aria-hidden="true">→</span></a>
     </div>
     <div class="fresh-grid">
-      {LATEST.slice(0, 6).map((it, idx) => (
+      {freshItems.map((it, idx) => (
         <a class="fresh-card" href={it.href}>
           <div class="fresh-top"><span class="fresh-tag">{it.tag}</span>{idx === 0 && <span class="fresh-new">New</span>}<time class="fresh-date">{fmtFresh(it.date)}</time></div>
           <h3 class="fresh-title">{it.title}</h3>
@@ -441,7 +449,7 @@ const UI_ICONS = {
   .fresh-date{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--ink-soft)}
   .fresh-title{font-family:var(--font-display);font-weight:800;font-size:16.5px;letter-spacing:-.01em;line-height:1.25;margin:0;color:var(--ink)}
   .fresh-card:hover .fresh-title{color:var(--coral)}
-  .fresh-blurb{font-size:13.5px;line-height:1.5;color:var(--ink-soft);margin:0}
+  .fresh-blurb{font-size:13.5px;line-height:1.5;color:var(--ink-soft);margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
   @media(max-width:860px){.fresh-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:560px){.fresh-grid{grid-template-columns:1fr}}
   .triage-h{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:-.02em;text-align:center;color:var(--ink);margin:0}
