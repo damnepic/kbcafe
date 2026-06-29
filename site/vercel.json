@@ -14,6 +14,9 @@
     { "source": "/:path*", "has": [{ "type": "host", "value": "www.kbcafe.com" }], "destination": "https://kbcafe.com/:path*", "permanent": true },
     { "source": "/:path*", "has": [{ "type": "host", "value": "kbcafe.vercel.app" }], "destination": "https://kbcafe.com/:path*", "permanent": true },
 
+    { "source": "/", "has": [{ "type": "host", "value": "tips.kbcafe.com" }], "destination": "https://kbcafe.com/reference", "permanent": true },
+    { "source": "/:path*", "has": [{ "type": "host", "value": "tips.kbcafe.com" }], "destination": "https://kbcafe.com/reference", "permanent": true },
+
     { "source": "/ai-saas-profitability-calculator", "destination": "/ai-profit-calculator", "permanent": true },
 
     { "source": "/tips", "destination": "/reference", "permanent": true },
