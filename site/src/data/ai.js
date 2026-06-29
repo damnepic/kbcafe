@@ -33,9 +33,6 @@ export const AI = [
   { nm: "What are structured outputs?", href: "/what-are-structured-outputs", type: "explainer", tag: "Concept",
     ds: "Making a model return JSON that matches a schema every time, vs JSON mode, and why it powers extraction and tool calls.",
     rel: { related: ["/structured-output-builder", "/what-is-tool-calling"], next: ["/what-is-tool-calling"] } },
-  { nm: "What are AI loops?", href: "/what-are-ai-loops", type: "explainer", tag: "Pattern",
-    ds: "Giving a model a goal, a way to verify its own work, and a rule for when to stop, so it plans, does, checks, and iterates instead of answering one prompt at a time. The verify gate, when a loop is over-engineering, and a builder for your own.",
-    rel: { prereq: ["/what-is-agent-memory"], related: ["/ai-patterns", "/what-is-tool-calling"], next: ["/how-to-write-code-with-ai"] } },
 
   // ── Tools ──
   { nm: "Context Window Visualizer", href: "/context-window-visualizer", type: "tool", tag: "Tool",
@@ -66,6 +63,9 @@ export const AI = [
   { nm: "What is AI orchestration?", href: "/what-is-ai-orchestration", type: "explainer", tag: "Automation",
     ds: "The layer that coordinates models, tools, and data steps into one reliable pipeline, vs a single prompt, workflow, or agent.",
     rel: { prereq: ["/ai-agents-vs-workflows-vs-rpa"], related: ["/what-is-rag", "/what-is-tool-calling"], next: ["/ai-architecture-generator"] } },
+  { nm: "What are AI loops?", href: "/what-are-ai-loops", type: "explainer", tag: "Automation",
+    ds: "Giving a model a goal, a way to verify its own work, and a rule for when to stop, so it plans, does, checks, and iterates instead of answering one prompt at a time. The verify gate, when a loop is over-engineering, and a builder for your own.",
+    rel: { prereq: ["/what-is-ai-orchestration"], related: ["/ai-patterns", "/what-is-agent-memory", "/what-is-tool-calling"], next: ["/how-to-write-code-with-ai"] } },
   { nm: "Automation Blueprint Explorer", href: "/automation-blueprints", type: "tool", tag: "Automation",
     ds: "Five real automation blueprints broken into clickable steps, trigger, action, AI, human, and integration.",
     rel: { prereq: ["/what-is-workflow-automation"], related: ["/cron-generator", "/ai-pattern-explorer"], next: ["/what-is-ai-orchestration"] } },

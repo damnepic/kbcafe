@@ -26,7 +26,7 @@ export const LEARNING_PATHS = [
     route: '/learn-ai-automation', minutes: 40, outcome: 'I want to automate work with AI',
     blurb: 'From manual busywork to systems that run themselves: the trigger-to-action model, the agents-vs-workflows-vs-RPA map, how automations fire, and how AI orchestrates the steps.',
     intro: '<span class="lpp-primer-h">New to the lingo?</span> Automation wires apps together: a <a class="kb-term" href="/dictionary/webhook">webhook</a> fires the instant something happens, an <a class="kb-term" href="/dictionary/api">API</a> lets the steps talk to each other, and an <a class="kb-term" href="/dictionary/agent">agent</a> can decide what to do next. Hover any underlined word for a quick definition, or click to learn more.',
-    steps: ['/what-is-workflow-automation', '/automation-blueprints', '/cron-generator', '/webhooks-vs-polling', '/ai-agents-vs-workflows-vs-rpa', '/what-is-tool-calling', '/tool-call-visualizer', '/what-is-ai-orchestration', '/ai-architecture-generator'],
+    steps: ['/what-is-workflow-automation', '/automation-blueprints', '/cron-generator', '/webhooks-vs-polling', '/ai-agents-vs-workflows-vs-rpa', '/what-is-tool-calling', '/tool-call-visualizer', '/what-is-ai-orchestration', '/what-are-ai-loops', '/ai-architecture-generator'],
   },
   {
     id: 'coding', title: 'Coding with AI', shortTitle: 'Coding with AI', tag: 'Craft',
