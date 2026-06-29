@@ -1,0 +1,130 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What is an AI hallucination? Why models make things up | KB Cafe"
+  description="An AI hallucination is confident, plausible output that simply is not true. Why it happens (models predict likely text, they do not look facts up), where the risk is highest, why you cannot trust the model's tone, and the concrete ways to reduce it, with a hands-on risk-rating exercise."
+  path="/what-is-an-ai-hallucination"
+  eyebrow="AI Explained · Concept"
+  h1="What is an AI hallucination?"
+  tagline="A hallucination is when a model states something false with total confidence. It is not lying, there is no intent. Understanding why it happens tells you exactly when to trust the output and when to check."
+>
+  <h2>What it is</h2>
+  <p>
+    An AI <strong>hallucination</strong> is output that is fluent, confident, and wrong. A made-up citation, an invented
+    function, a plausible date that never happened. The unsettling part is not that models get things wrong, it is that
+    they get things wrong in the same calm, authoritative voice they use when they are right.
+  </p>
+
+  <h2>Why it happens</h2>
+  <p>
+    A language model does not look anything up. It predicts the next <a class="kb-term" href="/dictionary/token">token</a>
+    that is most likely to follow, based on patterns in its training data. It is optimizing for <em>plausible</em>, not
+    for <em>true</em>. When it has seen a fact many times, the plausible continuation happens to be correct. When it has
+    not, the model still produces the most plausible-sounding answer rather than stopping, because nothing in it says
+    &ldquo;I do not actually know this.&rdquo; Add a fixed <a class="kb-term" href="/dictionary/training-cutoff">training
+    cutoff</a> (no knowledge of anything after it) and no live access to the world, and the gaps get filled with
+    confident guesses.
+  </p>
+
+  <h2>Where the risk is highest</h2>
+  <p>
+    Hallucination risk is not uniform. It spikes wherever the answer is <strong>specific, checkable, and thinly
+    represented</strong> in training data: exact quotes, citations and references, API signatures, version numbers,
+    dates, statistics, prices, and anything recent or niche. It is lowest when the model is <strong>explaining a
+    well-known idea</strong>, <strong>transforming text you provided</strong> (summarizing, rewriting, translating), or
+    <strong>brainstorming</strong>, where there is no single fact to get wrong. Same model, very different trust level,
+    depending on the task.
+  </p>
+
+  <div class="hl" id="hl">
+    <div class="hl-head">Hands-on: rate the hallucination risk</div>
+    <p class="hl-sub">For each task, is the model likely to confidently make something up, or is this a safe use?</p>
+    <p class="hl-scn" id="hl-scn"></p>
+    <div class="hl-btns"><button class="hl-b" data-v="1" type="button">High risk</button><button class="hl-b" data-v="0" type="button">Low risk</button></div>
+    <p class="hl-reveal" id="hl-reveal" hidden></p>
+    <div class="hl-foot"><span id="hl-prog"></span><button id="hl-next" type="button" hidden>Next &rarr;</button></div>
+  </div>
+
+  <h2>You cannot trust the tone</h2>
+  <p>
+    The single most useful habit: stop reading confidence as correctness. A model writes &ldquo;the study by Henderson
+    (2019) found&hellip;&rdquo; with the exact same assurance whether that study exists or not. Tone is not a signal.
+    Treat specific, checkable claims as <em>unverified</em> until you have checked them, especially when they are the part
+    you are relying on.
+  </p>
+
+  <h2>How to reduce it</h2>
+  <ul>
+    <li><strong>Ground it.</strong> Give the model the source material and tell it to answer only from that. This is what <a href="/what-is-rag">RAG</a> does, and it is the biggest single lever.</li>
+    <li><strong>Give it an out.</strong> &ldquo;If the text does not say, answer &lsquo;not stated&rsquo;&rdquo; turns a confident guess into an honest gap. The most effective one-line fix there is.</li>
+    <li><strong>Ask for checkable citations</strong>, then actually check them. A reference you can click beats a reference that merely looks real.</li>
+    <li><strong>Use tools for facts.</strong> Web search or a database (<a href="/what-are-mcp-servers">via MCP</a>) gets the model past its cutoff and out of guessing.</li>
+    <li><strong>Use structured outputs</strong> for extraction, and return null for missing fields instead of inventing them. See <a href="/what-are-structured-outputs">structured outputs</a>.</li>
+    <li><strong>Verify in the workflow.</strong> For anything automated, add a real check, the same verify gate that powers <a href="/what-are-ai-loops">loops</a> and <a href="/what-are-ai-evals">evals</a>.</li>
+  </ul>
+  <p>
+    You reduce hallucinations, you do not switch them off. The goal is a workflow where a confident wrong answer gets
+    caught before it matters.
+  </p>
+
+  <h2>Where to go next</h2>
+  <ul>
+    <li><a href="/what-is-rag">RAG</a>, grounding the model in real sources, the main defense.</li>
+    <li><a href="/what-are-ai-evals">AI evals</a>, how to systematically measure whether output is actually right.</li>
+    <li>New to this? The plain-English <a href="/beginner-ai/ai-hallucinations">beginner guide to hallucinations</a>.</li>
+  </ul>
+</AiPage>
+
+<style is:global>
+  .hl{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin:24px 0}
+  .hl-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .hl-sub{font-size:14px;color:var(--ink-soft);margin:8px 0 12px}
+  .hl-scn{font-size:15.5px;font-weight:600;line-height:1.5;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:13px 15px;margin:0 0 12px}
+  .hl-btns{display:flex;gap:9px}
+  .hl-btns button{flex:1;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .hl-btns button:hover{border-color:var(--coral)}
+  .hl-btns button:disabled{cursor:default;opacity:.85}
+  .hl-btns button.right{border-color:#0f9f82;background:rgba(15,159,130,.12)}
+  .hl-btns button.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .hl-reveal{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:11px 13px}
+  .hl-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;min-height:30px}
+  .hl-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  #hl-next{border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:13px;padding:7px 15px;border-radius:9px;cursor:pointer}
+</style>
+
+<script is:inline>
+  (function () {
+    var Q = [
+      { t: 'Quote the exact opening sentence of a specific 1994 academic paper.', a: 1, why: 'High risk. Exact wording of a niche, older source is rarely memorized precisely, so the model reconstructs something plausible. Verify against the actual paper.' },
+      { t: 'Explain how photosynthesis works, in simple terms.', a: 0, why: 'Low risk. A well-known concept the model has seen explained thousands of ways. There is no single brittle fact to fabricate.' },
+      { t: 'List three peer-reviewed studies (author and year) that support a claim.', a: 1, why: 'High risk. Fabricated citations are the textbook hallucination, real-looking authors, years, and titles that do not exist. Always check each reference exists.' },
+      { t: 'Rewrite this paragraph I pasted to be shorter and clearer.', a: 0, why: 'Low risk. The model is transforming text you supplied, not recalling facts. Grounded in your input, with little room to invent.' },
+      { t: 'Who is the current CEO of a small startup founded last year?', a: 1, why: 'High risk. Recent and niche, likely past the training cutoff and thinly represented. Use a tool with live data rather than trusting a guess.' }
+    ];
+    var i = 0, answered = false;
+    var scn = document.getElementById('hl-scn'), btns = document.querySelectorAll('.hl-b'),
+        rev = document.getElementById('hl-reveal'), prog = document.getElementById('hl-prog'), next = document.getElementById('hl-next');
+    function show() {
+      answered = false; scn.textContent = Q[i].t;
+      Array.prototype.forEach.call(btns, function (b) { b.disabled = false; b.classList.remove('right', 'wrong'); });
+      rev.hidden = true; next.hidden = true;
+      prog.textContent = 'Task ' + (i + 1) + ' of ' + Q.length;
+    }
+    Array.prototype.forEach.call(btns, function (b) {
+      b.addEventListener('click', function () {
+        if (answered) return; answered = true;
+        var pick = +b.dataset.v, ok = pick === Q[i].a;
+        Array.prototype.forEach.call(btns, function (c) {
+          c.disabled = true;
+          if (+c.dataset.v === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
+        });
+        rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + Q[i].why;
+        rev.hidden = false; next.hidden = (i >= Q.length - 1);
+        if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+      });
+    });
+    next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
+    show();
+  })();
+</script>

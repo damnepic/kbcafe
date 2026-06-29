@@ -1,0 +1,143 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+const CORE_FLOW = `git status                  # what changed, and what is staged
+git add file.js             # stage one file for the next commit
+git add .                   # stage everything that changed
+git commit -m "message"     # save a snapshot of the staged changes
+git push                    # send your commits to the remote (e.g. GitHub)
+git pull                    # fetch and merge everyone else's commits`;
+const BRANCH_FLOW = `git switch -c new-feature    # create a branch and move onto it
+#  ...edit and commit on the branch, main stays untouched...
+git switch main             # return to the main line
+git merge new-feature       # fold the branch's work back into main`;
+const IGNORE = `# .gitignore  (one pattern per line)
+.env
+node_modules/
+dist/`;
+---
+<ReferencePage
+  title="Git and version control: the practical guide | KB Cafe"
+  description="Version control records snapshots of your work so you can see history, undo, and collaborate, and Git is the standard. The mental model (working tree, staging, commit, remote), the everyday commands, branches, the gotchas that bite, and why it is your safety net when an AI agent edits your code. With a match-the-command exercise."
+  path="/git-version-control"
+  eyebrow="Knowledge Base · Version control"
+  h1="Git and version control"
+  tagline="Version control is a time machine for your files: every snapshot saved, nothing truly lost, and a clean way to work with others. Git is the one almost everyone uses. Here is the practical core, minus the folklore."
+>
+  <h2>What version control is</h2>
+  <p>
+    Version control records the history of your project as a series of snapshots. Instead of <code>final_v2_REALfinal.zip</code>,
+    you get one folder with a complete, navigable timeline: see what changed and when, undo back to any point, and merge
+    work from several people without overwriting each other. <strong>Git</strong> is a distributed version control system,
+    meaning every copy of the project carries its full history, so you can work, commit, and review offline.
+  </p>
+
+  <h2>The mental model: four places your code lives</h2>
+  <p>
+    Almost everything in Git makes sense once you can picture four areas and the moves between them:
+  </p>
+  <ul>
+    <li><strong>Working tree</strong>, the actual files you edit.</li>
+    <li><strong>Staging area</strong>, a holding zone for the changes you want in your next snapshot. This in-between step is what trips up newcomers, and it is also what lets you commit some changes but not others.</li>
+    <li><strong>Local repository</strong>, the committed history on your machine.</li>
+    <li><strong>Remote</strong>, a shared copy (GitHub, GitLab) everyone pushes to and pulls from.</li>
+  </ul>
+
+  <h2>The everyday loop</h2>
+  <p>
+    Ninety percent of daily Git is one small cycle: edit, stage, commit, push.
+  </p>
+  <pre class="gv-code">{CORE_FLOW}</pre>
+  <p>
+    A <strong>commit</strong> is one saved snapshot with a message describing the change. Good messages are the difference
+    between a history you can read and a wall of &ldquo;stuff.&rdquo; <code>git push</code> shares your commits;
+    <code>git pull</code> brings in everyone else&rsquo;s.
+  </p>
+
+  <h2>Branches: work without breaking main</h2>
+  <p>
+    A <strong>branch</strong> is a parallel line of work. You branch off, build a feature in isolation, and merge it back
+    when it is ready, so the main line always stays working. It is the core of how teams collaborate and how you try
+    something risky without fear.
+  </p>
+  <pre class="gv-code">{BRANCH_FLOW}</pre>
+
+  <div class="gv" id="gv">
+    <div class="gv-head">Hands-on: match the command</div>
+    <p class="gv-sub">Which Git command does each job?</p>
+    <p class="gv-q" id="gv-q"></p>
+    <div class="gv-opts" id="gv-opts"></div>
+    <p class="gv-reveal" id="gv-reveal" hidden></p>
+    <div class="gv-foot"><span id="gv-prog"></span><button id="gv-next" type="button" hidden>Next &rarr;</button></div>
+  </div>
+
+  <h2>The gotchas that bite everyone</h2>
+  <ul>
+    <li><strong>.gitignore does not untrack what you already committed.</strong> Listing a file in <code>.gitignore</code> only stops it being added in future. If you already committed <code>.env</code>, you must run <code>git rm --cached .env</code> to stop tracking it (then commit). Add the ignore rule <em>before</em> the first commit.</li>
+    <li><strong>Never commit secrets.</strong> Keys belong in <code>.env</code>, and <code>.env</code> belongs in <code>.gitignore</code> from day one. If a key ever lands in history, rotate it; removing it from the latest commit does not erase it from the past.</li>
+    <li><strong>Merge conflicts are normal.</strong> When two people change the same lines, Git pauses and marks both versions for you to reconcile by hand. It is routine, not a disaster.</li>
+    <li><strong><code>reset --hard</code> and <code>checkout --</code> discard work.</strong> They are the few Git commands that genuinely delete uncommitted changes. Pause before running them.</li>
+  </ul>
+  <pre class="gv-code">{IGNORE}</pre>
+
+  <h2>Why this matters more in the AI era</h2>
+  <p>
+    AI coding agents make many changes quickly, and occasionally the wrong ones. Git is your undo button and your safety
+    net: <strong>commit before you let an agent loose</strong>, review its changes as a diff, and you can always roll back
+    to a known-good snapshot. A clean commit you can return to is what makes it safe to move fast with
+    <a href="/how-to-write-code-with-ai">AI-assisted coding</a> and an <a href="/build-an-agentic-os">agentic setup</a>.
+  </p>
+</ReferencePage>
+
+<style is:global>
+  .gv-code{font-family:var(--font-mono);font-size:13px;line-height:1.65;background:#241a12;color:#eee4d3;border-radius:12px;padding:16px 18px;margin:16px 0;overflow-x:auto;white-space:pre}
+  .gv{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin:24px 0}
+  .gv-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .gv-sub{font-size:14px;color:var(--ink-soft);margin:8px 0 12px}
+  .gv-q{font-size:15.5px;font-weight:600;line-height:1.5;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:13px 15px;margin:0 0 12px}
+  .gv-opts{display:flex;flex-wrap:wrap;gap:8px}
+  .gv-opts button{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 13px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .gv-opts button:hover{border-color:var(--coral)}
+  .gv-opts button:disabled{cursor:default}
+  .gv-opts button.right{border-color:#0f9f82;background:rgba(15,159,130,.12)}
+  .gv-opts button.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .gv-reveal{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:11px 13px}
+  .gv-reveal code{font-family:var(--font-mono);font-size:.92em;background:rgba(30,24,19,.08);padding:1px 5px;border-radius:5px}
+  .gv-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;min-height:30px}
+  .gv-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  #gv-next{border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:13px;padding:7px 15px;border-radius:9px;cursor:pointer}
+</style>
+
+<script is:inline>
+  (function () {
+    var OPTS = ['git add', 'git commit', 'git push', 'git pull', 'git switch -c', 'git rm --cached'];
+    var Q = [
+      { task: 'Save a snapshot of your staged changes, with a message.', a: 1, why: 'git commit records the staged changes as one snapshot. Add -m "message" to describe it.' },
+      { task: 'Mark a changed file to be included in your next commit.', a: 0, why: 'git add stages a file. Staging is the holding zone between editing and committing.' },
+      { task: 'Send your local commits up to GitHub.', a: 2, why: 'git push uploads your commits to the remote. git pull is the reverse, bringing remote changes down.' },
+      { task: 'Start a new isolated line of work without touching main.', a: 4, why: 'git switch -c new-name creates a branch and moves onto it. Your work stays separate until you merge.' },
+      { task: 'Stop tracking a file you already committed by mistake (like .env).', a: 5, why: 'git rm --cached removes it from tracking while keeping it on disk. .gitignore alone will not untrack an already-committed file.' },
+      { task: 'Bring in commits your teammates pushed.', a: 3, why: 'git pull fetches the remote commits and merges them into your branch.' }
+    ];
+    var i = 0, answered = false;
+    var qEl = document.getElementById('gv-q'), optsEl = document.getElementById('gv-opts'),
+        rev = document.getElementById('gv-reveal'), prog = document.getElementById('gv-prog'), next = document.getElementById('gv-next');
+    function show() {
+      answered = false; qEl.textContent = Q[i].task; optsEl.innerHTML = '';
+      OPTS.forEach(function (o, k) { var b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.dataset.k = k; optsEl.appendChild(b); });
+      rev.hidden = true; next.hidden = true; prog.textContent = 'Task ' + (i + 1) + ' of ' + Q.length;
+    }
+    optsEl.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || answered) return; answered = true;
+      var k = +b.dataset.k, ok = k === Q[i].a;
+      Array.prototype.forEach.call(optsEl.children, function (c) {
+        c.disabled = true;
+        if (+c.dataset.k === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
+      });
+      rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>The command is ' + OPTS[Q[i].a] + '.</strong> ') + Q[i].why;
+      rev.hidden = false; next.hidden = (i >= Q.length - 1);
+      if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+    });
+    next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
+    show();
+  })();
+</script>

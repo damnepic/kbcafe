@@ -1,0 +1,118 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What are AI evals? How to measure if your AI output is actually good | KB Cafe"
+  description="An AI eval is a repeatable test that measures whether a model's output is good enough, the difference between 'it seemed to work' and 'it works 94% of the time on these cases.' The anatomy of an eval, the four ways to score output (exact match, rubric, LLM-as-judge, human), the honest caveats, and a picker that matches a method to your task."
+  path="/what-are-ai-evals"
+  eyebrow="AI Explained · Practice"
+  h1="What are AI evals?"
+  tagline="If a prompt change fixes one case and silently breaks three others, how would you know? Evals are how. They turn 'it felt better' into a number you can track, the verify gate from loops, applied at scale."
+>
+  <h2>The problem evals solve</h2>
+  <p>
+    LLM output is non-deterministic and easy to fool yourself about. You tweak a prompt, the one example you tried looks
+    great, you ship, and three other cases quietly regressed. An <strong>eval</strong> (short for evaluation) is a
+    repeatable test that measures output quality across many cases, so &ldquo;it seemed to work&rdquo; becomes &ldquo;it
+    passes 47 of 50.&rdquo; It is the same idea as the verify gate in <a href="/what-are-ai-loops">AI loops</a>, scaled
+    from one run to a whole test set, and it is how you catch <a href="/what-is-an-ai-hallucination">hallucinations</a>
+    before users do.
+  </p>
+
+  <h2>The anatomy of an eval</h2>
+  <p>
+    Every eval has three parts: a <strong>dataset</strong> of inputs (often with an expected output or a rubric), a
+    <strong>scorer</strong> that decides pass or fail (or a number) for each, and a <strong>metric</strong> you track over
+    time. Run it after every prompt or model change and it becomes regression testing for AI: you see instantly whether a
+    change helped overall or just helped the one case you were staring at. A small, carefully chosen set of real cases
+    beats a huge sloppy one.
+  </p>
+
+  <h2>The four ways to score</h2>
+  <p>
+    Picking the right scorer is the whole game, and it depends entirely on what &ldquo;good&rdquo; means for your task:
+  </p>
+  <ul>
+    <li><strong>Exact / deterministic</strong>: the output must match a known answer, or pass a test, a regex, or a JSON schema. Cheap, fast, and unambiguous. Best when there is one right answer (extraction, classification, code that must pass tests).</li>
+    <li><strong>Rubric scoring</strong>: grade against an explicit checklist (covers the key points, right tone, no banned phrases). Best for open-ended quality where there is no single correct string.</li>
+    <li><strong>LLM-as-judge</strong>: a second model scores the output against your criteria. This scales rubric grading to thousands of cases for cents, but the judge is itself a model, it can be biased or gamed, so you validate it against human scores before trusting it.</li>
+    <li><strong>Human review</strong>: the gold standard. Slow and expensive, reserved for high-stakes decisions and for calibrating the cheaper methods above.</li>
+  </ul>
+
+  <div class="ev" id="ev">
+    <div class="ev-head">Hands-on: pick the eval method</div>
+    <p class="ev-sub">For each task, which scoring method fits best?</p>
+    <p class="ev-q" id="ev-q"></p>
+    <div class="ev-opts" id="ev-opts"></div>
+    <p class="ev-reveal" id="ev-reveal" hidden></p>
+    <div class="ev-foot"><span id="ev-prog"></span><button id="ev-next" type="button" hidden>Next &rarr;</button></div>
+  </div>
+
+  <h2>The honest caveats</h2>
+  <p>
+    Evals are powerful and easy to misuse. Three rules keep them honest: <strong>validate your judge</strong>, an
+    LLM-as-judge is not ground truth until you have checked its scores against human ones on a sample. <strong>Do not
+    optimize to the eval</strong>, if you tune endlessly against the same 50 cases, you start fitting the test instead of
+    the task (Goodhart&rsquo;s law). And <strong>keep a holdout</strong>, some cases you do not look at while iterating, so
+    your number reflects real performance, not memorized answers. An eval you have quietly gamed is worse than none,
+    because it gives false confidence.
+  </p>
+
+  <h2>Where to go next</h2>
+  <ul>
+    <li><a href="/what-are-ai-loops">AI loops</a>, where a single eval becomes the gate that decides when to stop.</li>
+    <li><a href="/what-is-an-ai-hallucination">Hallucinations</a>, the failure mode evals are built to catch.</li>
+    <li><a href="/what-are-structured-outputs">Structured outputs</a>, what makes exact-match scoring possible.</li>
+  </ul>
+</AiPage>
+
+<style is:global>
+  .ev{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin:24px 0}
+  .ev-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .ev-sub{font-size:14px;color:var(--ink-soft);margin:8px 0 12px}
+  .ev-q{font-size:15.5px;font-weight:600;line-height:1.5;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:13px 15px;margin:0 0 12px}
+  .ev-opts{display:flex;flex-wrap:wrap;gap:8px}
+  .ev-opts button{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 13px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .ev-opts button:hover{border-color:var(--coral)}
+  .ev-opts button:disabled{cursor:default}
+  .ev-opts button.right{border-color:#0f9f82;background:rgba(15,159,130,.12)}
+  .ev-opts button.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .ev-reveal{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:11px 13px}
+  .ev-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;min-height:30px}
+  .ev-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  #ev-next{border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:13px;padding:7px 15px;border-radius:9px;cursor:pointer}
+</style>
+
+<script is:inline>
+  (function () {
+    var OPTS = ['Exact match', 'Rubric', 'LLM-as-judge', 'Human review'];
+    var Q = [
+      { task: 'Check that the model pulled the correct invoice total from 500 receipts.', a: 0, why: 'Exact match. There is one right number per receipt, so a deterministic comparison is fast, free, and unambiguous. No judgment needed.' },
+      { task: 'Score whether 2,000 support replies are on-brand and genuinely helpful.', a: 2, why: 'LLM-as-judge. The quality is somewhat subjective and the volume is too high for humans, so a model grades against your rubric, after you validate it on a sample.' },
+      { task: 'Decide if an AI-written medical summary is safe to send to a patient.', a: 3, why: 'Human review. High stakes and real harm if wrong, so a qualified person signs off. Use the cheaper methods to triage, never to decide alone.' },
+      { task: 'Confirm generated code actually works.', a: 0, why: 'Exact / deterministic. Run the test suite: it passes or it fails. Code is the easiest thing to eval because the gate is unambiguous.' },
+      { task: 'During early prototyping, rate the helpfulness of 30 draft answers against a checklist.', a: 1, why: 'Rubric. Small set, open-ended quality, and you want to understand the failures. Score by hand against explicit criteria before automating anything.' }
+    ];
+    var i = 0, answered = false;
+    var qEl = document.getElementById('ev-q'), optsEl = document.getElementById('ev-opts'),
+        rev = document.getElementById('ev-reveal'), prog = document.getElementById('ev-prog'), next = document.getElementById('ev-next');
+    function show() {
+      answered = false; qEl.textContent = Q[i].task; optsEl.innerHTML = '';
+      OPTS.forEach(function (o, k) { var b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.dataset.k = k; optsEl.appendChild(b); });
+      rev.hidden = true; next.hidden = true; prog.textContent = 'Task ' + (i + 1) + ' of ' + Q.length;
+    }
+    optsEl.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || answered) return; answered = true;
+      var k = +b.dataset.k, ok = k === Q[i].a;
+      Array.prototype.forEach.call(optsEl.children, function (c) {
+        c.disabled = true;
+        if (+c.dataset.k === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
+      });
+      rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>The better fit is ' + OPTS[Q[i].a] + '.</strong> ') + Q[i].why;
+      rev.hidden = false; next.hidden = (i >= Q.length - 1);
+      if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+    });
+    next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
+    show();
+  })();
+</script>

@@ -33,6 +33,18 @@ export const AI = [
   { nm: "What are structured outputs?", href: "/what-are-structured-outputs", type: "explainer", tag: "Concept",
     ds: "Making a model return JSON that matches a schema every time, vs JSON mode, and why it powers extraction and tool calls.",
     rel: { related: ["/structured-output-builder", "/what-is-tool-calling"], next: ["/what-is-tool-calling"] } },
+  { nm: "What is an AI hallucination?", href: "/what-is-an-ai-hallucination", type: "explainer", tag: "Concept",
+    ds: "Why models state false things with total confidence, where the risk is highest, why you cannot trust the tone, and the concrete ways to reduce it.",
+    rel: { related: ["/what-is-rag", "/what-are-ai-evals"], next: ["/what-are-ai-evals"] } },
+  { nm: "What are reasoning models?", href: "/what-are-reasoning-models", type: "explainer", tag: "Concept",
+    ds: "Models that think step by step before answering, trading speed and cost for accuracy on hard problems. Chain of thought, what it is great at, where it is wasted, and the tradeoffs.",
+    rel: { prereq: ["/what-is-a-context-window"], related: ["/what-are-ai-loops"], next: ["/how-to-write-code-with-ai"] } },
+  { nm: "What are AI evals?", href: "/what-are-ai-evals", type: "explainer", tag: "Practice",
+    ds: "How to measure whether AI output is good enough: the dataset, the scorer, the metric, and the four ways to score (exact match, rubric, LLM-as-judge, human). The verify gate at scale.",
+    rel: { prereq: ["/what-are-ai-loops"], related: ["/what-is-an-ai-hallucination", "/what-are-structured-outputs"] } },
+  { nm: "Prompt injection and AI security", href: "/prompt-injection", type: "explainer", tag: "Security",
+    ds: "Why a model cannot tell your instructions from text it just read, the lethal trifecta that makes agents dangerous, and the architecture-level defenses that actually contain it.",
+    rel: { prereq: ["/what-is-tool-calling"], related: ["/what-are-mcp-servers", "/build-an-agentic-os"] } },
 
   // ── Tools ──
   { nm: "Context Window Visualizer", href: "/context-window-visualizer", type: "tool", tag: "Tool",

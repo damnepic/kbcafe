@@ -87,4 +87,8 @@ export const REFERENCE = [
   { nm: "Build your own agentic OS", href: "/build-an-agentic-os",
     ds: "A local-first command center where a coding agent works over your own notes and tools, with saved rules, routines, and verify loops. The real primitives (CLAUDE.md, slash commands, skills, subagents, MCP), the security you need, and a builder that writes a routine for you.", tag: "Agentic AI",
     rel: ["/what-are-ai-loops", "/what-are-mcp-servers", "/what-is-agent-memory"] },
+  // Version control
+  { nm: "Git and version control", href: "/git-version-control",
+    ds: "What version control is, the working-tree, staging, commit, and remote model, the everyday commands, branches, the gotchas (gitignore, secrets, conflicts), and why it is your safety net with AI coding.", tag: "Version control",
+    rel: ["/shell-scripting-explained", "/build-an-agentic-os", "/cron-explained"] },
 ];

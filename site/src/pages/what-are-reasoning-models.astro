@@ -1,0 +1,121 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="What are reasoning models? Thinking before answering | KB Cafe"
+  description="A reasoning model works through a problem step by step before giving its final answer, spending more compute at inference time to get hard problems right. What chain of thought is, what reasoning is great at, where it is wasted effort, the real tradeoffs (slower, pricier), and a picker for when it is worth it."
+  path="/what-are-reasoning-models"
+  eyebrow="AI Explained · Concept"
+  h1="What are reasoning models?"
+  tagline="The biggest recent shift in how models work: instead of answering in one pass, a reasoning model thinks first, working through the problem step by step. That buys accuracy on hard tasks, and wastes time and money on easy ones."
+>
+  <h2>Answer-in-one-pass versus think-first</h2>
+  <p>
+    A standard model reads your prompt and starts writing the answer immediately, predicting it one
+    <a class="kb-term" href="/dictionary/token">token</a> at a time. A <strong>reasoning model</strong> first generates a
+    chain of intermediate steps, working out the problem before committing to a final answer. That extra deliberation
+    happens at the moment you ask (often called test-time or inference-time compute), which is why these are sometimes
+    called &ldquo;thinking&rdquo; models. Many current models expose this as a mode or an effort setting you can turn up
+    or down, so it is increasingly a dial, not a separate product.
+  </p>
+
+  <h2>Why thinking first helps</h2>
+  <p>
+    The underlying idea is <strong>chain of thought</strong>: reasoning through the steps out loud produces better answers
+    on problems where one wrong intermediate step derails everything. A standard model asked a tricky multi-step question
+    can commit to a bad first move and then confidently build on it. A reasoning model gives itself room to try, check,
+    and correct before it answers, which is exactly what hard logic, math, and planning need.
+  </p>
+
+  <h2>What it is great at, and where it is wasted</h2>
+  <p>
+    Reasoning shines on <strong>math and logic</strong>, <strong>multi-step planning</strong>, <strong>debugging across
+    several files</strong>, and any task where the path to the answer matters as much as the answer. It is wasted effort
+    on <strong>simple lookups</strong>, <strong>formatting and rephrasing</strong>, <strong>extraction</strong>, and
+    casual back-and-forth, where there is nothing to deliberate about. Pointing a reasoning model at &ldquo;make this
+    friendlier&rdquo; just makes you wait longer and pay more for the same result.
+  </p>
+
+  <div class="rs" id="rs">
+    <div class="rs-head">Hands-on: is reasoning worth it?</div>
+    <p class="rs-sub">For each task, would a reasoning model earn its extra time and cost, or is a standard model the better call?</p>
+    <p class="rs-scn" id="rs-scn"></p>
+    <div class="rs-btns"><button class="rs-b" data-v="1" type="button">Use reasoning</button><button class="rs-b" data-v="0" type="button">Standard is fine</button></div>
+    <p class="rs-reveal" id="rs-reveal" hidden></p>
+    <div class="rs-foot"><span id="rs-prog"></span><button id="rs-next" type="button" hidden>Next &rarr;</button></div>
+  </div>
+
+  <h2>The tradeoffs, honestly</h2>
+  <p>
+    Thinking is not free. A reasoning model generates a lot of intermediate tokens you may never see, so it is
+    <strong>slower</strong> and <strong>costs more</strong> (you pay for the thinking, not just the answer). It can also
+    <em>overthink</em>, spending real effort second-guessing a question that had an obvious answer. The skill is matching
+    the tool to the task: turn reasoning up for genuinely hard problems, keep it off for the fast, cheap majority. This is
+    the same cost discipline that shows up in <a href="/what-are-ai-loops#the-cost-nobody-mentions">AI loops</a>, where
+    deliberation compounds across every round.
+  </p>
+  <p>
+    One honest caveat on specifics: model names, context sizes, prices, and benchmark scores in this space change
+    constantly, so this lesson stays at the level of the idea. For current numbers, check the provider directly rather
+    than trusting any figure you read secondhand.
+  </p>
+
+  <h2>Where to go next</h2>
+  <ul>
+    <li><a href="/what-is-a-context-window">Context window</a>, the budget all that thinking has to fit inside.</li>
+    <li><a href="/what-are-ai-loops">AI loops</a>, where reasoning plus a verify gate does multi-step work.</li>
+    <li><a href="/how-to-write-code-with-ai">Coding with AI</a>, where reasoning earns its keep on real debugging.</li>
+  </ul>
+</AiPage>
+
+<style is:global>
+  .rs{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin:24px 0}
+  .rs-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .rs-sub{font-size:14px;color:var(--ink-soft);margin:8px 0 12px}
+  .rs-scn{font-size:15.5px;font-weight:600;line-height:1.5;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:13px 15px;margin:0 0 12px}
+  .rs-btns{display:flex;gap:9px}
+  .rs-btns button{flex:1;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .rs-btns button:hover{border-color:var(--coral)}
+  .rs-btns button:disabled{cursor:default;opacity:.85}
+  .rs-btns button.right{border-color:#0f9f82;background:rgba(15,159,130,.12)}
+  .rs-btns button.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .rs-reveal{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:11px 13px}
+  .rs-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;min-height:30px}
+  .rs-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  #rs-next{border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:13px;padding:7px 15px;border-radius:9px;cursor:pointer}
+</style>
+
+<script is:inline>
+  (function () {
+    var Q = [
+      { t: 'Solve a multi-step word problem where each step depends on the last.', a: 1, why: 'Use reasoning. This is the home turf: a wrong intermediate step ruins the answer, so working through it carefully pays off.' },
+      { t: 'Reformat a messy list into clean JSON.', a: 0, why: 'Standard is fine. Pure transformation with nothing to deliberate. Reasoning just adds latency and cost for the same output.' },
+      { t: 'Debug why a function returns the wrong value, across several files.', a: 1, why: 'Use reasoning. Tracing logic through multiple files is exactly the multi-step problem deliberation is built for.' },
+      { t: 'Answer a simple factual question like a capital city.', a: 0, why: 'Standard is fine. A direct lookup. There is no chain of steps to reason through, so thinking mode is wasted.' },
+      { t: 'Plan a database migration with ordered, dependent steps and rollback points.', a: 1, why: 'Use reasoning. Real planning under constraints, where the order and dependencies matter, rewards careful step-by-step work.' }
+    ];
+    var i = 0, answered = false;
+    var scn = document.getElementById('rs-scn'), btns = document.querySelectorAll('.rs-b'),
+        rev = document.getElementById('rs-reveal'), prog = document.getElementById('rs-prog'), next = document.getElementById('rs-next');
+    function show() {
+      answered = false; scn.textContent = Q[i].t;
+      Array.prototype.forEach.call(btns, function (b) { b.disabled = false; b.classList.remove('right', 'wrong'); });
+      rev.hidden = true; next.hidden = true; prog.textContent = 'Task ' + (i + 1) + ' of ' + Q.length;
+    }
+    Array.prototype.forEach.call(btns, function (b) {
+      b.addEventListener('click', function () {
+        if (answered) return; answered = true;
+        var pick = +b.dataset.v, ok = pick === Q[i].a;
+        Array.prototype.forEach.call(btns, function (c) {
+          c.disabled = true;
+          if (+c.dataset.v === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
+        });
+        rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + Q[i].why;
+        rev.hidden = false; next.hidden = (i >= Q.length - 1);
+        if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+      });
+    });
+    next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
+    show();
+  })();
+</script>
