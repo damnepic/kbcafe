@@ -1,0 +1,217 @@
+---
+// End-of-page continuation system. Picks the right CTAs for the page (concepts v1):
+//   #2 big "read next" (standalone, no companion tool)   #6 fork: deeper + hands-on (standalone w/ tool)
+//   #4 recall quiz -> flashcards (concept lessons w/ a RECALL entry)
+//   tool card (path page w/ a companion tool)            #3 curiosity grid of related (all)
+//   #5 "resume" banner (client-side, returning users)
+// On path pages, PathNav already provides #1 (path progress + next), so we don't repeat it.
+import { AI, titleFor } from '../data/ai.js';
+import { REFERENCE } from '../data/reference.js';
+import { TOOLS } from '../data/tools.js';
+import { LEARNING_PATHS } from '../data/learningPaths.js';
+import { RECALL } from '../data/recall.js';
+
+const { path } = Astro.props;
+const aiBy = Object.fromEntries(AI.map(a => [a.href, a]));
+const refBy = Object.fromEntries(REFERENCE.map(r => [r.href, r]));
+const toolBy = Object.fromEntries(TOOLS.filter(t => t.href).map(t => [t.href, t]));
+const isTool = (h) => !!toolBy[h] || (aiBy[h] && aiBy[h].type === 'tool');
+function meta(h) {
+  if (aiBy[h]) return { href: h, nm: aiBy[h].nm, ds: aiBy[h].ds, tag: aiBy[h].tag };
+  if (refBy[h]) return { href: h, nm: refBy[h].nm, ds: refBy[h].ds, tag: refBy[h].tag };
+  if (toolBy[h]) return { href: h, nm: toolBy[h].nm, ds: toolBy[h].ds || 'A free, client-side tool.', tag: 'Tool' };
+  return { href: h, nm: h, ds: '', tag: '' };
+}
+
+const rel = aiBy[path]?.rel || {};
+const refRel = refBy[path]?.rel || [];
+const inPath = !!LEARNING_PATHS.find(p => p.steps.includes(path));
+const related = [...new Set([...(rel.prereq || []), ...(rel.related || []), ...(rel.next || []), ...refRel])].filter(h => h !== path);
+const companionTool = related.find(isTool);
+const nextHref = [...(rel.next || []), ...(rel.related || []), ...refRel].find(h => h !== path && !isTool(h));
+const recall = RECALL[path];
+
+const nextMeta = nextHref ? meta(nextHref) : null;
+const toolMeta = companionTool ? meta(companionTool) : null;
+const gridItems = related.filter(h => h !== companionTool && h !== nextHref && !isTool(h)).map(meta).slice(0, 3);
+const recallOpts = recall ? [recall.ok, ...recall.distractors] : [];
+
+const showBigNext = !inPath && !companionTool && nextMeta;
+const showFork = !inPath && toolMeta;
+const showToolCard = inPath && toolMeta;
+const pathsLite = LEARNING_PATHS.map(p => ({ title: p.title, route: p.route, steps: p.steps, titles: p.steps.map(titleFor) }));
+---
+{(showBigNext || showFork || recall || showToolCard || gridItems.length > 0) && (
+  <aside class="cont" aria-label="Keep going">
+    <a class="cont-resume" id="cont-resume" href="#" hidden></a>
+    <div class="cont-h">Keep going</div>
+
+    {showBigNext && (
+      <a class="cont-next" href={nextMeta.href}>
+        <span class="cont-next-l">
+          <span class="cont-eye">Read this next</span>
+          <span class="cont-next-t" set:html={nextMeta.nm} />
+          <span class="cont-next-d">{nextMeta.ds}</span>
+        </span>
+        <span class="cont-next-ar" aria-hidden="true">&rarr;</span>
+      </a>
+    )}
+
+    {showFork && (
+      <div class="cont-fork">
+        {nextMeta && (
+          <a class="cont-card learn" href={nextMeta.href}>
+            <span class="k">Go deeper</span>
+            <span class="t" set:html={nextMeta.nm} />
+            <span class="d">{nextMeta.ds}</span>
+            <span class="go">Read on &rarr;</span>
+          </a>
+        )}
+        <a class="cont-card do" href={toolMeta.href}>
+          <span class="k">Get hands-on</span>
+          <span class="t">{toolMeta.nm}</span>
+          <span class="d">{toolMeta.ds}</span>
+          <span class="go">Open the tool &rarr;</span>
+        </a>
+      </div>
+    )}
+
+    {recall && (
+      <div class="cont-recall" id="cont-recall" data-deck={recall.deck}>
+        <span class="cont-eye">Quick check</span>
+        <p class="cont-q">{recall.q}</p>
+        <div class="cont-opts" id="cont-opts">
+          {recallOpts.map((o, i) => (
+            <button class="cont-opt" type="button" data-ok={i === 0 ? '1' : '0'}>{o}</button>
+          ))}
+        </div>
+        <div class="cont-recall-cta" id="cont-recall-cta" hidden>
+          <span id="cont-recall-msg"></span>
+          <a class="cont-drill" href={`/flashcards?deck=${recall.deck}`}>Drill in flashcards &rarr;</a>
+        </div>
+      </div>
+    )}
+
+    {showToolCard && (
+      <a class="cont-toolcard" href={toolMeta.href}>
+        <span class="cont-tc-l"><span class="cont-eye">Get hands-on</span><span class="cont-tc-t">{toolMeta.nm}</span><span class="cont-tc-d">{toolMeta.ds}</span></span>
+        <span class="cont-next-ar" aria-hidden="true">&rarr;</span>
+      </a>
+    )}
+
+    {gridItems.length > 0 && (
+      <div class="cont-grid">
+        {gridItems.map(g => (
+          <a class="cont-gcard" href={g.href}>
+            <span class="cont-gtag">{g.tag}</span>
+            <span class="cont-gq" set:html={g.nm} />
+            <span class="cont-gd">{g.ds}</span>
+            <span class="cont-ggo" aria-hidden="true">&rarr;</span>
+          </a>
+        ))}
+      </div>
+    )}
+  </aside>
+)}
+
+<style is:global>
+  .cont [hidden]{display:none!important}
+  .cont{margin-top:32px;border-top:1px solid var(--line);padding-top:26px;display:flex;flex-direction:column;gap:14px}
+  .cont-h{font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:-.01em;color:var(--ink)}
+  .cont-eye{font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+
+  /* #5 resume */
+  .cont-resume{display:flex;align-items:center;gap:14px;text-decoration:none;border:1.5px dashed var(--coral);border-radius:14px;background:rgba(238,75,43,.04);padding:14px 18px;color:var(--ink)}
+  .cont-resume .rt{font-family:var(--font-display);font-weight:700;font-size:14.5px}
+  .cont-resume .rd{font-size:13px;color:var(--ink-soft);margin-top:2px}
+  .cont-resume .rb{margin-left:auto;flex:none;background:var(--ink);color:#fff;font-family:var(--font-display);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px}
+  .cont-resume:hover .rb{background:var(--coral)}
+
+  /* #2 big next */
+  .cont-next,.cont-toolcard{display:flex;align-items:center;gap:16px;text-decoration:none;color:#fff;background:var(--ink);border-radius:15px;padding:18px 22px;transition:background .14s}
+  .cont-next:hover,.cont-toolcard:hover{background:#3a2716}
+  .cont-next-l,.cont-tc-l{display:flex;flex-direction:column;gap:3px;flex:1}
+  .cont-next-t,.cont-tc-t{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.01em;color:#fff}
+  .cont-next-d,.cont-tc-d{font-size:13.5px;color:#cbb8a4;line-height:1.45}
+  .cont-toolcard .cont-eye,.cont-next .cont-eye{color:#f4b25a}
+  .cont-next-ar{flex:none;font-size:24px;font-weight:800;color:#f4b25a}
+
+  /* #6 fork */
+  .cont-fork{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cont-card{display:flex;flex-direction:column;gap:5px;text-decoration:none;border-radius:15px;padding:18px;transition:transform .14s,box-shadow .14s}
+  .cont-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(40,24,12,.1)}
+  .cont-card.learn{background:var(--cream);border:1.5px solid var(--line);color:var(--ink)}
+  .cont-card.do{background:#241a12;color:#eee4d3}
+  .cont-card .k{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+  .cont-card.learn .k{color:var(--coral)} .cont-card.do .k{color:#f4b25a}
+  .cont-card .t{font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:-.01em}
+  .cont-card .d{font-size:13px;line-height:1.45}
+  .cont-card.learn .d{color:var(--ink-soft)} .cont-card.do .d{color:#cbb8a4}
+  .cont-card .go{margin-top:auto;padding-top:8px;font-family:var(--font-display);font-weight:800;font-size:13.5px}
+  .cont-card.learn .go{color:var(--coral)} .cont-card.do .go{color:#f4b25a}
+
+  /* #4 recall */
+  .cont-recall{border:1.5px solid var(--line);border-radius:15px;background:var(--cream);padding:17px 20px}
+  .cont-q{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--ink);margin:7px 0 12px}
+  .cont-opts{display:flex;flex-wrap:wrap;gap:8px}
+  .cont-opt{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:9px 14px;font-family:var(--font-body);font-size:13.5px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .cont-opt:hover{border-color:var(--coral)}
+  .cont-opt:disabled{cursor:default}
+  .cont-opt.right{border-color:#0f9f82;background:rgba(15,159,130,.12)}
+  .cont-opt.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .cont-recall-cta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;border-top:1px dashed var(--line);padding-top:13px}
+  .cont-recall-cta span{font-size:13.5px;color:var(--ink-soft)}
+  .cont-drill{flex:none;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:800;font-size:13.5px;border-radius:10px;padding:9px 16px;text-decoration:none}
+  .cont-drill:hover{background:var(--coral-deep)}
+
+  /* #3 grid */
+  .cont-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .cont-gcard{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:15px 16px;min-height:120px;transition:transform .14s,border-color .14s}
+  .cont-gcard:hover{transform:translateY(-3px);border-color:var(--ink)}
+  .cont-gtag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+  .cont-gq{font-family:var(--font-display);font-weight:700;font-size:14.5px;line-height:1.25;flex:1}
+  .cont-gcard:hover .cont-gq{color:var(--coral)}
+  .cont-gd{font-size:12px;color:var(--ink-soft);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .cont-ggo{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+  @media(max-width:680px){.cont-fork,.cont-grid{grid-template-columns:1fr}}
+</style>
+
+<script is:inline define:vars={{ pathsLite }}>
+  (function () {
+    // #4 recall: shuffle options, grade, reveal flashcards CTA
+    var rc = document.getElementById('cont-recall');
+    if (rc) {
+      var opts = document.getElementById('cont-opts');
+      var kids = Array.prototype.slice.call(opts.children);
+      for (var i = kids.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); opts.appendChild(kids[j]); kids.splice(j, 1); kids.push(opts.lastChild); }
+      opts.addEventListener('click', function (e) {
+        var b = e.target.closest('.cont-opt'); if (!b || b.disabled) return;
+        var ok = b.dataset.ok === '1';
+        Array.prototype.forEach.call(opts.children, function (c) { c.disabled = true; if (c.dataset.ok === '1') c.classList.add('right'); else if (c === b) c.classList.add('wrong'); });
+        var cta = document.getElementById('cont-recall-cta');
+        document.getElementById('cont-recall-msg').textContent = ok ? 'Nailed it. Lock the rest in.' : 'Worth a review, drill the deck.';
+        cta.hidden = false;
+      });
+    }
+    // #5 resume: most-progressed unfinished path, next unread step
+    try {
+      var read = new Set(JSON.parse(localStorage.getItem('kbcafe-progress') || '[]'));
+      if (read.size >= 2) {
+        var best = null;
+        pathsLite.forEach(function (p) {
+          var n = p.steps.filter(function (s) { return read.has(s); }).length;
+          if (n > 0 && n < p.steps.length && (!best || n > best.n)) {
+            var ni = p.steps.findIndex(function (s) { return !read.has(s); });
+            best = { n: n, total: p.steps.length, title: p.title, nextHref: p.steps[ni], nextTitle: (p.titles[ni] || '').replace(/<[^>]+>/g, '') };
+          }
+        });
+        if (best && best.nextHref) {
+          var el = document.getElementById('cont-resume');
+          el.href = best.nextHref;
+          el.innerHTML = '<span><span class="rt">Welcome back, you are ' + best.n + ' of ' + best.total + ' through ' + best.title + '.</span><span class="rd">Next: ' + best.nextTitle + '</span></span><span class="rb">Resume &rarr;</span>';
+          el.hidden = false;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KB Cafe — End-of-page continuation CTAs · concepts v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--cream:#FFFDFA;--paper:#FAF7F1;--paper-2:#F2ECE2;--line:#E7E2DB;--ink:#241a12;--ink-soft:#6f6457;
+    --coral:#ee4b2b;--coral-deep:#c4391f;--green:#0f9f82;--font:'Sora',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:
+    radial-gradient(circle at 15% -5%,rgba(255,201,120,.14),transparent 30%),
+    radial-gradient(circle at 92% 4%,rgba(238,75,43,.05),transparent 24%),#FAF7F1;
+    -webkit-font-smoothing:antialiased;padding:40px 18px 80px}
+  .wrap{max-width:780px;margin:0 auto}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral)}
+  h1{font-weight:800;letter-spacing:-.03em;font-size:34px;margin:10px 0 6px}
+  .sub{color:var(--ink-soft);font-size:15.5px;line-height:1.6;margin:0 0 8px;max-width:640px}
+  .goal{background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:13px 18px;margin:18px 0 26px;font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+  .goal b{color:var(--ink)}
+
+  details{background:var(--cream);border:1.5px solid var(--line);border-radius:18px;margin:0 0 14px;overflow:hidden}
+  details[open]{box-shadow:0 14px 34px rgba(40,24,12,.06)}
+  summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;align-items:center;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  .num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:var(--ink);width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex:none}
+  .stitle{font-weight:800;font-size:17px;letter-spacing:-.01em}
+  .rec{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--coral);padding:3px 8px;border-radius:6px;margin-left:auto;flex:none}
+  .chev{margin-left:auto;color:var(--ink-soft);transition:transform .2s}.rec+.chev{margin-left:10px}
+  details[open] .chev{transform:rotate(180deg)}
+  .body{padding:2px 22px 24px}
+  .desc{font-size:14px;color:var(--ink-soft);line-height:1.6;margin:0}
+  .why{font-size:13px;color:var(--ink);background:var(--paper-2);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:9px 13px;margin:12px 0 0;line-height:1.55}
+  .why b{font-weight:700}
+
+  /* faux end-of-article context */
+  .stage{margin:16px 0 0;background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:20px 22px 24px}
+  .faux{color:var(--ink-soft);font-size:13.5px;line-height:1.6}
+  .faux .end{color:var(--ink)}
+  .rule{height:1px;background:var(--line);margin:18px 0 20px}
+  a{color:inherit;text-decoration:none}
+  .tag{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+
+  /* ============ C1 path progress + next ============ */
+  .c1-wrap{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:18px 20px}
+  .c1-top{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);margin-bottom:9px}
+  .c1-top b{color:var(--ink)}
+  .c1-bar{height:8px;border-radius:5px;background:var(--paper-2);overflow:hidden;margin-bottom:16px}
+  .c1-bar i{display:block;height:100%;width:33%;background:linear-gradient(90deg,#16a37e,var(--green))}
+  .c1-next{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--ink);border-radius:13px;padding:15px 20px}
+  .c1-next .l{color:#bda88c;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .c1-next .t{color:#fff;font-weight:800;font-size:17px;margin-top:3px}
+  .c1-next .go{flex:none;color:#fff;font-weight:800;font-size:22px}
+
+  /* ============ C2 single up-next card ============ */
+  .c2-eye{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral);margin-bottom:8px}
+  .c2-card{display:flex;align-items:center;gap:18px;border:1.5px solid var(--line);border-radius:18px;background:linear-gradient(120deg,var(--cream),var(--paper-2));padding:22px 24px}
+  .c2-card .ic{flex:none;width:46px;height:46px;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:22px}
+  .c2-card .body2{flex:1}
+  .c2-card .t{font-weight:800;font-size:20px;letter-spacing:-.01em}
+  .c2-card .d{font-size:13.5px;color:var(--ink-soft);margin-top:4px;line-height:1.5}
+  .c2-card .ar{flex:none;font-size:24px;color:var(--coral);font-weight:800}
+
+  /* ============ C3 curiosity grid ============ */
+  .c3-h{font-weight:800;font-size:18px;margin:0 0 12px}
+  .c3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .c3-card{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:15px 16px;display:flex;flex-direction:column;gap:7px;min-height:128px}
+  .c3-card .q{font-weight:700;font-size:14.5px;line-height:1.3;flex:1}
+  .c3-card .go{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--coral)}
+  @media(max-width:600px){.c3-grid{grid-template-columns:1fr}}
+
+  /* ============ C4 recall + flashcards ============ */
+  .c4-wrap{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:18px 20px}
+  .c4-eye{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+  .c4-q{font-weight:700;font-size:16px;margin:8px 0 12px}
+  .c4-opts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .c4-opts span{border:1.5px solid var(--line);background:var(--paper);border-radius:9px;padding:7px 12px;font-family:var(--mono);font-size:12.5px}
+  .c4-opts span.ok{border-color:var(--green);background:rgba(15,159,130,.12)}
+  .c4-cta{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px dashed var(--line);padding-top:13px}
+  .c4-cta .m{font-size:13.5px;color:var(--ink-soft)}
+  .c4-btn{flex:none;background:var(--coral);color:#fff;font-weight:800;font-size:13.5px;border-radius:10px;padding:9px 16px}
+
+  /* ============ C5 personalized resume ============ */
+  .c5-wrap{display:flex;align-items:center;gap:16px;border:1.5px dashed var(--coral);border-radius:16px;background:rgba(238,75,43,.04);padding:18px 20px}
+  .c5-ring{flex:none;width:52px;height:52px;border-radius:50%;background:conic-gradient(var(--green) 0 44%,var(--paper-2) 44% 100%);display:grid;place-items:center}
+  .c5-ring span{width:38px;height:38px;border-radius:50%;background:var(--cream);display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:700}
+  .c5-mid{flex:1}
+  .c5-mid .t{font-weight:800;font-size:15.5px}
+  .c5-mid .d{font-size:13px;color:var(--ink-soft);margin-top:2px}
+  .c5-btn{flex:none;background:var(--ink);color:#fff;font-weight:800;font-size:13.5px;border-radius:10px;padding:10px 17px}
+
+  /* ============ C6 fork: deeper vs hands-on ============ */
+  .c6-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .c6-card{border:1.5px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .c6-card.learn{background:var(--cream)}
+  .c6-card.do{background:#241a12;color:#eee4d3}
+  .c6-card .k{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+  .c6-card.learn .k{color:var(--coral)}.c6-card.do .k{color:#f4b25a}
+  .c6-card .t{font-weight:800;font-size:17px;letter-spacing:-.01em}
+  .c6-card .d{font-size:13px;line-height:1.5;opacity:.9}
+  .c6-card.learn .d{color:var(--ink-soft)}
+  .c6-card .go{margin-top:auto;font-weight:800;font-size:13.5px;padding-top:8px}
+  .c6-card.learn .go{color:var(--coral)}.c6-card.do .go{color:#f4b25a}
+  @media(max-width:600px){.c6-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">☕ Concept set · v1</div>
+  <h1>End-of-page continuation</h1>
+  <p class="sub">Six ways to end a lesson so the reader keeps going instead of leaving. Each is shown as it would appear right after the last paragraph of an article. Hover the buttons to feel the interaction.</p>
+  <div class="goal"><b>The goal:</b> more pageviews and more time on site, by always offering one obvious, low-friction next move. The enemy is the dead end, an article that just&hellip; stops. Today most pages end in a flat list of related links; these are stronger.</div>
+
+  <!-- C1 -->
+  <details open>
+    <summary><span class="num">1</span><span class="stitle">Path progress + the next step</span><span class="rec">Recommended</span><span class="chev">▾</span></summary>
+    <div class="body">
+      <p class="desc">When the page belongs to a learning path, show how far along they are and hand them the very next step as a big dark button. Turns a single read into a sequence.</p>
+      <div class="stage">
+        <p class="faux">&hellip;so the model can suddenly read your code, query your database, and search the web, all in one conversation. <span class="end">That is the whole point of MCP.</span></p>
+        <div class="rule"></div>
+        <div class="c1-wrap">
+          <div class="c1-top"><span>You are on the <b>Build AI Agents</b> path</span><span><b>step 3</b> of 9</span></div>
+          <div class="c1-bar"><i></i></div>
+          <a class="c1-next"><div><div class="l">Next up</div><div class="t">What is tool calling?</div></div><span class="go">→</span></a>
+        </div>
+      </div>
+      <p class="why"><b>Why it works:</b> progress bars are a completion magnet, people finish what they have started. This is the single biggest driver of multi-page sessions, and you already have the paths + local progress to power it.</p>
+    </div>
+  </details>
+
+  <!-- C2 -->
+  <details>
+    <summary><span class="num">2</span><span class="stitle">One big &ldquo;read this next&rdquo; card</span><span class="chev">▾</span></summary>
+    <div class="body">
+      <p class="desc">Instead of a list of five related links (choice paralysis), commit to the single best next page as one large, confident card. One obvious click beats five tentative ones.</p>
+      <div class="stage">
+        <p class="faux">&hellip;you contain the blast radius so a bad instruction cannot do real damage. <span class="end">Prompt injection is unsolved, but it is manageable.</span></p>
+        <div class="rule"></div>
+        <div class="c2-eye">Read this next</div>
+        <a class="c2-card"><span class="ic">⚙</span><div class="body2"><div class="t">Build your own agentic OS</div><div class="d">Where least privilege and permission modes actually live. The natural next move after security.</div></div><span class="ar">→</span></a>
+      </div>
+      <p class="why"><b>Why it works:</b> a curated single next removes decision cost. Editorially you point each page at its strongest successor, so the reader is always handed the right door, not a hallway of them.</p>
+    </div>
+  </details>
+
+  <!-- C3 -->
+  <details>
+    <summary><span class="num">3</span><span class="stitle">Curiosity-gap grid</span><span class="chev">▾</span></summary>
+    <div class="body">
+      <p class="desc">A three-card grid like today, but each card leads with an open <em>question</em> instead of a title. A question the reader cannot help wanting answered.</p>
+      <div class="stage">
+        <p class="faux">&hellip;a confident wrong answer gets caught before it matters. <span class="end">That is the job of evals.</span></p>
+        <div class="rule"></div>
+        <div class="c3-h">Keep pulling the thread</div>
+        <div class="c3-grid">
+          <a class="c3-card"><span class="tag">Concept</span><span class="q">Why does an AI confidently make things up?</span><span class="go">Hallucinations →</span></a>
+          <a class="c3-card"><span class="tag">Practice</span><span class="q">How do you grade 2,000 answers without reading them?</span><span class="go">LLM-as-judge →</span></a>
+          <a class="c3-card"><span class="tag">Pattern</span><span class="q">What makes an AI loop stop instead of run forever?</span><span class="go">AI loops →</span></a>
+        </div>
+      </div>
+      <p class="why"><b>Why it works:</b> a title states; a question opens a loop in the reader&rsquo;s head that only a click closes. Same links you have now, far higher pull. Low effort: add a one-line hook per page.</p>
+    </div>
+  </details>
+
+  <!-- C4 -->
+  <details>
+    <summary><span class="num">4</span><span class="stitle">Quick recall check &rarr; flashcards</span><span class="rec">Pairs with #1</span><span class="chev">▾</span></summary>
+    <div class="body">
+      <p class="desc">End with one fast question from the page. Answering it makes the reader active, then the result hands them straight into the flashcard deck for the rest. Turns a reader into a studier.</p>
+      <div class="stage">
+        <p class="faux">&hellip;and that memory is what turns repetition into progress. <span class="end">A loop without state just goes in circles.</span></p>
+        <div class="rule"></div>
+        <div class="c4-wrap">
+          <div class="c4-eye">Quick check</div>
+          <div class="c4-q">What stops an AI loop from repeating itself?</div>
+          <div class="c4-opts"><span>A bigger model</span><span class="ok">State / memory</span><span>A longer prompt</span></div>
+          <div class="c4-cta"><span class="m">Nice. Lock it in, 11 more cards in this deck.</span><a class="c4-btn">Drill in flashcards →</a></div>
+        </div>
+      </div>
+      <p class="why"><b>Why it works:</b> active recall beats passive reading, and it funnels into the spaced-repetition loop (the return-visit engine). Doubles as proof the page taught something. Best on concept lessons.</p>
+    </div>
+  </details>
+
+  <!-- C5 -->
+  <details>
+    <summary><span class="num">5</span><span class="stitle">Personalized &ldquo;resume&rdquo; banner</span><span class="chev">▾</span></summary>
+    <div class="body">
+      <p class="desc">For return visitors, use the local progress you already track: show what they have read and the next unread page, with a resume button. Continuity across sessions, zero accounts.</p>
+      <div class="stage">
+        <p class="faux">&hellip;earn each step before the next. <span class="end">That is the order that actually works.</span></p>
+        <div class="rule"></div>
+        <div class="c5-wrap">
+          <div class="c5-ring"><span>4/9</span></div>
+          <div class="c5-mid"><div class="t">Welcome back, you are 4 lessons into AI Agents.</div><div class="d">Next unread: <b>What are structured outputs?</b></div></div>
+          <a class="c5-btn">Resume →</a>
+        </div>
+      </div>
+      <p class="why"><b>Why it works:</b> personalization lifts return engagement hard, and it stays true to &ldquo;no accounts, no tracking&rdquo; (all local). Only shows when there is real history, so first-time readers never see an empty state.</p>
+    </div>
+  </details>
+
+  <!-- C6 -->
+  <details>
+    <summary><span class="num">6</span><span class="stitle">The fork: go deeper vs get hands-on</span><span class="chev">▾</span></summary>
+    <div class="body">
+      <p class="desc">Two doors side by side: one continues the reading (next concept), one switches to doing (a related tool). Matches the two reasons people are on the site, and lets each pick their lane.</p>
+      <div class="stage">
+        <p class="faux">&hellip;build a schema with the Structured Output Builder. <span class="end">That is the difference between hoping for JSON and getting it.</span></p>
+        <div class="rule"></div>
+        <div class="c6-grid">
+          <a class="c6-card learn"><span class="k">Go deeper</span><span class="t">What is tool calling?</span><span class="d">How structured outputs become an action the model can take.</span><span class="go">Read on →</span></a>
+          <a class="c6-card do"><span class="k">Get hands-on</span><span class="t">Structured Output Builder</span><span class="d">Turn fields into a JSON Schema you can paste into any API.</span><span class="go">Open the tool →</span></a>
+        </div>
+      </div>
+      <p class="why"><b>Why it works:</b> readers and builders both leave when offered only the other&rsquo;s path. Giving both a door captures more of each, and reinforces KB Cafe&rsquo;s &ldquo;Do <em>and</em> Learn&rdquo; identity.</p>
+    </div>
+  </details>
+
+  <p class="sub" style="margin-top:22px;font-size:13.5px">My pick: lead with <b>Concept 1</b> (path progress + next) as the primary engine on any page that sits in a learning path, falling back to <b>Concept 2</b> (one big next) on standalone pages. Layer <b>Concept 4</b> (recall &rarr; flashcards) on concept lessons, and <b>Concept 6</b> (the fork) on pages that have a natural companion tool. They compose, this is a system, not a single widget. Tell me which to build into the article layouts.</p>
+</div>
+</body>
+</html>

@@ -2,6 +2,7 @@
 import Layout from './Layout.astro';
 import Share from '../components/Share.astro';
 import PathNav from '../components/PathNav.astro';
+import Continuation from '../components/Continuation.astro';
 import ReadingEnhancers from '../components/ReadingEnhancers.astro';
 import { AI, titleFor } from '../data/ai.js';
 import { TOOLS } from '../data/tools.js';
@@ -42,51 +43,7 @@ const appearsIn = pathsWith(path);
   <Share path={path} title={h1} variant="subtle" />
   <PathNav />
 
-  {graphRows.length > 0 && (
-    <nav class="kgraph" aria-label="Related concepts">
-      <div class="kg-title">Related concepts</div>
-      {graphRows.map(row => (
-        <div class="kg-row">
-          <span class="kg-lbl">{row.label}</span>
-          <span class="kg-links">
-            {row.items.map(href => <a href={href} set:html={titleFor(href)} />)}
-          </span>
-        </div>
-      ))}
-    </nav>
-  )}
-
-  {(tryTools.length > 0 || appearsIn.length > 0) && (
-    <nav class="kgraph practice" aria-label="Put it into practice">
-      <div class="kg-title kg-practice">Put it into practice</div>
-      {tryTools.length > 0 && (
-        <div class="kg-row">
-          <span class="kg-lbl">Try it</span>
-          <span class="kg-links tools">{tryTools.map(h => <a href={h}>{toolLabel[h] || h}</a>)}</span>
-        </div>
-      )}
-      {appearsIn.length > 0 && (
-        <div class="kg-row">
-          <span class="kg-lbl">Appears in</span>
-          <span class="kg-links paths">{appearsIn.map(p => <a href={p.route}>{p.title} path</a>)}</span>
-        </div>
-      )}
-      <a class="kg-map" href="/map">See the whole knowledge map →</a>
-    </nav>
-  )}
-
-  <aside class="siblings">
-    <h2>More from AI Explained</h2>
-    <div class="sib-grid">
-      {others.map(a => (
-        <a class="sib" href={a.href}>
-          <span class="sib-ct">{a.tag}</span>
-          <span class="sib-nm" set:html={a.nm} />
-          <span class="sib-ds">{a.ds}</span>
-        </a>
-      ))}
-    </div>
-  </aside>
+  <Continuation path={path} />
 
   <ReadingEnhancers />
 </Layout>

@@ -14,6 +14,8 @@ const freshItems = [
   ...LATEST.slice(0, 4),
   ...POSTS.slice(0, 2).map(p => ({ title: p.title, href: '/blog/' + p.slug, tag: 'Blog', blurb: p.excerpt, date: p.date })),
 ].sort((a, b) => b.date.localeCompare(a.date));
+// Term of the day: compact dictionary pool, the day-seeded pick happens client-side (rotates daily, no rebuild).
+const totdTerms = DICT.map(d => ({ t: d.term, s: d.slug, a: (d.answer || '').replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 96) }));
 
 // inline icons (white stroke on colored squares)
 const I = {
@@ -158,6 +160,7 @@ const UI_ICONS = {
       <li><strong>{WORKFLOWS.length}</strong> learning paths</li>
       <li><strong>100%</strong> browser-based</li>
     </ul>
+    <a class="totd" id="totd" href="/dictionary" hidden></a>
   </section>
 
   <!-- TRIAGE: what are you trying to do? -->
@@ -394,6 +397,18 @@ const UI_ICONS = {
       if(due > 0){ var dueEl = document.getElementById('hr-due'); dueEl.innerHTML = '⏱ ' + due + ' flashcard' + (due>1?'s':'') + ' due to review →'; dueEl.hidden = false; }
     }catch(e){}
   </script>
+  <script is:inline define:vars={{ totdTerms }}>
+    (function () {
+      try {
+        var el = document.getElementById('totd'); if (!el || !totdTerms.length) return;
+        var day = Math.floor(Date.now() / 86400000);          // day-seeded: same all day, rotates daily
+        var t = totdTerms[day % totdTerms.length];
+        el.href = '/dictionary/' + t.s;
+        el.innerHTML = '<span class="e">☕ Term of the day</span><b>' + t.t + '</b><span class="d">' + t.a + '</span><span class="go">Look it up →</span>';
+        el.hidden = false;
+      } catch (e) {}
+    })();
+  </script>
 </Layout>
 
 <style is:global>
@@ -425,6 +440,14 @@ const UI_ICONS = {
   .hr-due[hidden]{display:none}
   .hr-due{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--ink);background:var(--cream);border:1.4px solid var(--line);border-radius:999px;padding:8px 16px;text-decoration:none;transition:transform .15s,border-color .15s}
   .hr-due:hover{transform:translateY(-2px);border-color:var(--coral);color:var(--coral)}
+  .totd[hidden]{display:none}
+  .totd{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:20px;max-width:100%;
+    background:var(--cream);border:1.4px solid var(--line);border-radius:999px;padding:8px 18px;text-decoration:none;font-size:13.5px;color:var(--ink);transition:border-color .15s}
+  .totd:hover{border-color:var(--coral)}
+  .totd .e{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+  .totd b{font-family:var(--font-display);font-weight:800}
+  .totd .d{color:var(--ink-soft)}
+  .totd .go{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--coral)}
   .hr-proof{list-style:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 20px;margin:24px 0 0;padding:0}
   .hr-proof li{position:relative;font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--ink-soft)}
   .hr-proof li+li::before{content:"";position:absolute;left:-11px;top:50%;width:4px;height:4px;border-radius:50%;background:var(--coral);transform:translateY(-50%);opacity:.5}

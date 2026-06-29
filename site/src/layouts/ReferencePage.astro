@@ -2,6 +2,7 @@
 import Layout from './Layout.astro';
 import Share from '../components/Share.astro';
 import ReadingEnhancers from '../components/ReadingEnhancers.astro';
+import Continuation from '../components/Continuation.astro';
 import { REFERENCE } from '../data/reference.js';
 import { TOOLS } from '../data/tools.js';
 
@@ -46,21 +47,7 @@ const guides = related.length ? related : others;
 
   <Share path={path} title={h1} variant="subtle" />
 
-  <aside class="siblings related-guides">
-    <div class="rg-head">
-      <h2>Continue learning</h2>
-      <a class="rg-all" href="/reference">All references &rarr;</a>
-    </div>
-    <div class="sib-grid">
-      {guides.map(g => (
-        <a class="sib" href={g.href}>
-          <span class="sib-ct">{g.tag}</span>
-          <span class="sib-nm">{g.nm}</span>
-          <span class="sib-ds">{g.ds}</span>
-        </a>
-      ))}
-    </div>
-  </aside>
+  <Continuation path={path} />
 
   <ReadingEnhancers />
 </Layout>
