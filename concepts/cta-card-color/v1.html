@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KB Cafe — CTA card colour alternatives · v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--cream:#FFFDFA;--paper:#FAF7F1;--line:#E7E2DB;--ink:#241a12;--ink-soft:#6f6457;--coral:#ee4b2b;
+    --font:'Sora',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:#FAF7F1;-webkit-font-smoothing:antialiased;padding:40px 18px 80px}
+  .wrap{max-width:680px;margin:0 auto}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral)}
+  h1{font-weight:800;letter-spacing:-.03em;font-size:32px;margin:10px 0 6px}
+  .sub{color:var(--ink-soft);font-size:15px;line-height:1.6;margin:0 0 26px;max-width:600px}
+  .item{margin:0 0 26px}
+  .label{display:flex;align-items:baseline;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+  .label .n{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--ink);width:22px;height:22px;border-radius:6px;display:inline-grid;place-items:center}
+  .label .nm{font-weight:800;font-size:15.5px}
+  .label .rec{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--coral);padding:2px 7px;border-radius:5px}
+  .label .hex{font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .note{font-size:12.5px;color:var(--ink-soft);margin:7px 2px 0;line-height:1.5}
+
+  /* the card (real structure: eyebrow / title / subtitle) */
+  .card{display:flex;flex-direction:column;gap:3px;border-radius:16px;padding:18px 22px;text-decoration:none;cursor:pointer;
+    transition:transform .14s,box-shadow .14s}
+  .card:hover{transform:translateY(-2px)}
+  .card .e{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .card .t{font-family:var(--font);font-weight:800;font-size:19px;letter-spacing:-.01em}
+  .card .d{font-size:13.5px;line-height:1.45}
+
+  /* ===== CURRENT (for reference) ===== */
+  .c-cur{color:#fff;background:radial-gradient(circle at 88% 25%,rgba(238,75,43,.30),transparent 45%),linear-gradient(135deg,#1c1410,#241813)}
+  .c-cur .e{color:#f4b25a} .c-cur .d{color:#cbb8a4}
+
+  /* ===== 1 Banana Cream (the lean) ===== */
+  .c1{color:#2A1E12;background:#FCEFC9;border:1.5px solid #EFD7A0;box-shadow:0 10px 26px rgba(140,110,40,.10)}
+  .c1 .e{color:#E8590C} .c1 .d{color:#9A8A66} .c1:hover{border-color:#E8590C}
+
+  /* ===== 2 Banana + warm glow ===== */
+  .c2{color:#2A1E12;background:radial-gradient(circle at 86% 22%,rgba(249,115,22,.20),transparent 46%),#FDF1CE;border:1.5px solid #F0DBA8}
+  .c2 .e{color:#EA580C} .c2 .d{color:#9A8A66} .c2:hover{box-shadow:0 14px 30px rgba(234,88,12,.14)}
+
+  /* ===== 3 Cream + orange frame ===== */
+  .c3{color:#2A1E12;background:#FFFBF0;border:2px solid #FB923C}
+  .c3 .e{color:#EA580C} .c3 .d{color:#8a7a5c} .c3:hover{background:#FFF6E6}
+
+  /* ===== 4 Sunrise gradient ===== */
+  .c4{color:#2A1E12;background:linear-gradient(135deg,#FFE7BF,#FFF7E6);border:1.5px solid #F3DCAE}
+  .c4 .e{color:#E8590C} .c4 .d{color:#9A8466} .c4:hover{box-shadow:0 14px 30px rgba(243,160,60,.18)}
+
+  /* ===== 5 Bold orange (loud pop) ===== */
+  .c5{color:#fff;background:linear-gradient(135deg,#FB8C3C,#F2710C);box-shadow:0 12px 28px rgba(242,113,12,.30)}
+  .c5 .e{color:#FFE6BE} .c5 .d{color:#FFE9CF} .c5:hover{filter:brightness(1.04)}
+
+  /* ===== 6 Honey amber (richer warm) ===== */
+  .c6{color:#2A1E12;background:#F7C95B;border:1.5px solid #EBB63B}
+  .c6 .e{color:#B5430A} .c6 .d{color:#7A5E1E} .c6:hover{box-shadow:0 14px 30px rgba(235,182,59,.34)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">☕ Concept set · v1</div>
+  <h1>CTA card colour</h1>
+  <p class="sub">The dark-brown "next step" card, with six warmer alternatives. Each is the real card (eyebrow / title / subtitle) on the live cream page, so the contrast reads true. Hover to feel the lift. Whatever we pick gets applied everywhere this config lives: the dictionary next-step card and the new "Keep going" CTA cards.</p>
+
+  <div class="item">
+    <div class="label"><span class="nm" style="color:var(--ink-soft)">Current (what we are replacing)</span></div>
+    <a class="card c-cur"><span class="e">Next step</span><span class="t">Finding it: AI Business →</span><span class="d">Building something people actually want.</span></a>
+  </div>
+
+  <div class="item">
+    <div class="label"><span class="n">1</span><span class="nm">Banana Cream</span><span class="rec">Your lean</span><span class="hex">#FCEFC9 · accent #E8590C</span></div>
+    <a class="card c1"><span class="e">Next step</span><span class="t">Finding it: AI Business →</span><span class="d">Building something people actually want.</span></a>
+    <p class="note">Warm pale banana, deep-orange accents, ink title, soft border for definition on cream. Friendliest and most on-brand for a cafe. The closest match to what you described.</p>
+  </div>
+
+  <div class="item">
+    <div class="label"><span class="n">2</span><span class="nm">Banana + Warm Glow</span><span class="hex">#FDF1CE + orange radial · #EA580C</span></div>
+    <a class="card c2"><span class="e">Next step</span><span class="t">Finding it: AI Business →</span><span class="d">Building something people actually want.</span></a>
+    <p class="note">Banana base that keeps the original card's corner glow, just warm orange instead of coral on dark. Adds a little depth without going dark.</p>
+  </div>
+
+  <div class="item">
+    <div class="label"><span class="n">3</span><span class="nm">Cream + Orange Frame</span><span class="hex">#FFFBF0 · 2px #FB923C</span></div>
+    <a class="card c3"><span class="e">Next step</span><span class="t">Finding it: AI Business →</span><span class="d">Building something people actually want.</span></a>
+    <p class="note">Near-white cream with a bold orange outline doing the work. Crispest and most minimal, pops via the frame rather than fill.</p>
+  </div>
+
+  <div class="item">
+    <div class="label"><span class="n">4</span><span class="nm">Sunrise Gradient</span><span class="hex">#FFE7BF → #FFF7E6</span></div>
+    <a class="card c4"><span class="e">Next step</span><span class="t">Finding it: AI Business →</span><span class="d">Building something people actually want.</span></a>
+    <p class="note">Soft peach-to-cream wash, orange highlights. A touch more dimensional than a flat banana while staying light and airy.</p>
+  </div>
+
+  <div class="item">
+    <div class="label"><span class="n">5</span><span class="nm">Bold Orange</span><span class="hex">#FB8C3C → #F2710C, white text</span></div>
+    <a class="card c5"><span class="e">Next step</span><span class="t">Finding it: AI Business →</span><span class="d">Building something people actually want.</span></a>
+    <p class="note">The loud option: a confident orange fill with cream text. Pops as hard as the dark card did, but warm. Use if you want the CTA to really shout.</p>
+  </div>
+
+  <div class="item">
+    <div class="label"><span class="n">6</span><span class="nm">Honey Amber</span><span class="hex">#F7C95B · accent #B5430A</span></div>
+    <a class="card c6"><span class="e">Next step</span><span class="t">Finding it: AI Business →</span><span class="d">Building something people actually want.</span></a>
+    <p class="note">Richer, more saturated banana (honey/amber). Warmest and most golden, more presence than the pale banana without a border.</p>
+  </div>
+
+  <p class="sub" style="margin-top:24px;font-size:13px">My pick: <b>#1 Banana Cream</b> for the everyday cards (it is exactly your banana/cream + orange, and reads calm), with <b>#5 Bold Orange</b> reserved if you want one truly loud variant. Pick one (or a primary + a loud one) and I will replace the dark config in the dictionary next-step card and the Continuation cards sitewide.</p>
+</div>
+</body>
+</html>

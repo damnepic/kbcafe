@@ -128,27 +128,27 @@ const pathsLite = LEARNING_PATHS.map(p => ({ title: p.title, route: p.route, ste
   .cont-resume:hover .rb{background:var(--coral)}
 
   /* #2 big next */
-  .cont-next,.cont-toolcard{display:flex;align-items:center;gap:16px;text-decoration:none;color:#fff;background:var(--ink);border-radius:15px;padding:18px 22px;transition:background .14s}
-  .cont-next:hover,.cont-toolcard:hover{background:#3a2716}
+  .cont-next,.cont-toolcard{display:flex;align-items:center;gap:16px;text-decoration:none;color:#2A1E12;background:#FCEFC9;border:1.5px solid #EFD7A0;border-radius:15px;padding:18px 22px;transition:border-color .14s,box-shadow .14s}
+  .cont-next:hover,.cont-toolcard:hover{border-color:#E8590C;box-shadow:0 14px 30px rgba(232,89,12,.13)}
   .cont-next-l,.cont-tc-l{display:flex;flex-direction:column;gap:3px;flex:1}
-  .cont-next-t,.cont-tc-t{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.01em;color:#fff}
-  .cont-next-d,.cont-tc-d{font-size:13.5px;color:#cbb8a4;line-height:1.45}
-  .cont-toolcard .cont-eye,.cont-next .cont-eye{color:#f4b25a}
-  .cont-next-ar{flex:none;font-size:24px;font-weight:800;color:#f4b25a}
+  .cont-next-t,.cont-tc-t{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.01em;color:#2A1E12}
+  .cont-next-d,.cont-tc-d{font-size:13.5px;color:#9A8A66;line-height:1.45}
+  .cont-toolcard .cont-eye,.cont-next .cont-eye{color:#E8590C}
+  .cont-next-ar{flex:none;font-size:24px;font-weight:800;color:#E8590C}
 
   /* #6 fork */
   .cont-fork{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .cont-card{display:flex;flex-direction:column;gap:5px;text-decoration:none;border-radius:15px;padding:18px;transition:transform .14s,box-shadow .14s}
   .cont-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(40,24,12,.1)}
   .cont-card.learn{background:var(--cream);border:1.5px solid var(--line);color:var(--ink)}
-  .cont-card.do{background:#241a12;color:#eee4d3}
+  .cont-card.do{background:#FCEFC9;border:1.5px solid #EFD7A0;color:#2A1E12}
   .cont-card .k{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
-  .cont-card.learn .k{color:var(--coral)} .cont-card.do .k{color:#f4b25a}
+  .cont-card.learn .k{color:var(--coral)} .cont-card.do .k{color:#E8590C}
   .cont-card .t{font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:-.01em}
   .cont-card .d{font-size:13px;line-height:1.45}
-  .cont-card.learn .d{color:var(--ink-soft)} .cont-card.do .d{color:#cbb8a4}
+  .cont-card.learn .d{color:var(--ink-soft)} .cont-card.do .d{color:#9A8A66}
   .cont-card .go{margin-top:auto;padding-top:8px;font-family:var(--font-display);font-weight:800;font-size:13.5px}
-  .cont-card.learn .go{color:var(--coral)} .cont-card.do .go{color:#f4b25a}
+  .cont-card.learn .go{color:var(--coral)} .cont-card.do .go{color:#E8590C}
 
   /* #4 recall */
   .cont-recall{border:1.5px solid var(--line);border-radius:15px;background:var(--cream);padding:17px 20px}
