@@ -53,6 +53,17 @@ const tools = AI.filter(a => a.type === 'tool');
       <span class="pf-go">Browse patterns →</span>
     </a>
 
+    <section class="ai-status">
+      <div class="as-eyebrow">Live · from a sister tool</div>
+      <h2 class="as-title">When the AI you build on goes down</h2>
+      <p class="as-desc">
+        Everything on this page ultimately runs on a handful of providers, and when one of them
+        has an outage it cascades to every tool built on top of it. Here is the live status of the
+        major AI services, with <a href="https://aidowncheck.com/status-map" target="_blank" rel="noopener">the live AI dependency map</a> behind it, from our sister tool AIDownCheck.
+      </p>
+      <iframe class="as-frame" src="https://aidowncheck.com/embed/ai-status" title="Live AI status, by AIDownCheck" loading="lazy"></iframe>
+    </section>
+
     <div class="prose">
       <h2>What&rsquo;s coming</h2>
       <p>
@@ -107,5 +118,12 @@ const tools = AI.filter(a => a.type === 'tool');
   .prose p{font-size:16px;line-height:1.65;color:var(--ink-soft);margin:0 0 14px}
   .prose a{color:var(--coral);text-decoration:none;font-weight:600}.prose a:hover{text-decoration:underline}
   .prose .note{font-size:13.5px;background:var(--paper-2);border-radius:10px;padding:11px 14px}
+  .ai-status{margin-top:30px;border:1.5px solid var(--line);border-radius:18px;background:var(--paper-2);padding:24px 26px}
+  .as-eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-bottom:10px}
+  .as-title{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:0 0 10px}
+  .as-desc{font-size:15.5px;line-height:1.6;color:var(--ink-soft);max-width:640px;margin:0 0 18px}
+  .as-desc a{color:var(--coral);text-decoration:none;font-weight:600}.as-desc a:hover{text-decoration:underline}
+  .as-frame{display:block;border:0;width:100%;max-width:360px;height:330px;border-radius:14px;background:var(--cream)}
+  @media(max-width:680px){.ai-status{padding:20px}}
   @media(max-width:680px){.grid{grid-template-columns:1fr}}
 </style>
