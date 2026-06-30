@@ -36,6 +36,21 @@ import BlogPost from '../../layouts/BlogPost.astro';
     homepage and Learn hub will quietly tell you when cards are due, so review fits into a minute here and there instead of
     one doomed marathon session.
   </p>
+
+  <div class="fcd" id="fcd">
+    <div class="fcd-card" id="fcd-card" tabindex="0" role="button" aria-label="Demo flashcard, click to flip">
+      <div class="fcd-inner">
+        <div class="fcd-face fcd-front"><span class="fcd-tag">AI fundamentals</span><span class="fcd-q">Context window</span><span class="fcd-hint">tap to flip</span></div>
+        <div class="fcd-face fcd-back"><span class="fcd-tag">Answer</span><span class="fcd-a">A model&rsquo;s working memory: how much text it can consider at once, measured in tokens.</span></div>
+      </div>
+    </div>
+    <div class="fcd-rate">
+      <button class="fcd-btn again" id="fcd-again" type="button">Forgot</button>
+      <button class="fcd-btn good" id="fcd-good" type="button">Got it &check;</button>
+    </div>
+    <p class="fcd-msg" id="fcd-msg">A real card. Click it to flip, then rate yourself.</p>
+    <a class="fcd-cta" href="/flashcards">Try all 51 cards, free and no account &rarr;</a>
+  </div>
   <p>
     It is built the way everything here is: 100% in your browser, no account, nothing uploaded. Your progress and review
     schedule live in this device&rsquo;s storage and go nowhere else. You can link straight to a single deck, and every
@@ -89,3 +104,39 @@ import BlogPost from '../../layouts/BlogPost.astro';
     built things to use.
   </p>
 </BlogPost>
+
+<style is:global>
+  .fcd{margin:24px 0;text-align:center}
+  .fcd-card{width:100%;max-width:440px;margin:0 auto;min-height:184px;cursor:pointer;outline:0;perspective:1400px}
+  .fcd-card:focus-visible{box-shadow:0 0 0 3px rgba(238,75,43,.35);border-radius:18px}
+  .fcd-inner{position:relative;width:100%;min-height:184px;transition:transform .5s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+  .fcd-card.flipped .fcd-inner{transform:rotateY(180deg)}
+  .fcd-face{position:absolute;inset:0;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:18px;padding:24px;min-height:184px}
+  .fcd-front{background:linear-gradient(160deg,#fff,var(--paper-2));border:1.5px solid var(--line)}
+  .fcd-back{background:linear-gradient(160deg,#241a12,#3a2716);transform:rotateY(180deg)}
+  .fcd-tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .fcd-back .fcd-tag{color:#f4b25a}
+  .fcd-q{font-family:var(--font-display);font-weight:800;font-size:27px;letter-spacing:-.02em;color:var(--ink);margin:10px 0}
+  .fcd-a{font-size:16px;line-height:1.55;color:#eee4d3;margin-top:10px;max-width:340px}
+  .fcd-hint{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);opacity:.7}
+  .fcd-rate{display:flex;gap:10px;max-width:440px;margin:12px auto 0}
+  .fcd-btn{flex:1;border:1.5px solid var(--line);background:var(--paper);border-radius:11px;padding:11px;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);cursor:pointer;transition:transform .1s,background .12s,border-color .12s}
+  .fcd-btn:hover{transform:translateY(-1px)}
+  .fcd-btn.again:hover{border-color:var(--coral);color:var(--coral-deep)}
+  .fcd-btn.good{background:#0f9f82;color:#fff;border-color:#0f9f82}
+  .fcd-msg{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);margin:13px 0 0;min-height:18px}
+  .fcd-cta{display:inline-block;margin-top:10px;font-family:var(--font-display);font-weight:800;font-size:14.5px;color:var(--coral);text-decoration:none}
+  .fcd-cta:hover{text-decoration:underline}
+</style>
+
+<script is:inline>
+  (function () {
+    var card = document.getElementById('fcd-card'), msg = document.getElementById('fcd-msg');
+    if (!card) return;
+    function flip() { card.classList.toggle('flipped'); }
+    card.addEventListener('click', flip);
+    card.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip(); } });
+    document.getElementById('fcd-again').addEventListener('click', function (e) { e.stopPropagation(); msg.textContent = 'No worries, this one comes back tomorrow.'; });
+    document.getElementById('fcd-good').addEventListener('click', function (e) { e.stopPropagation(); msg.textContent = 'Nice. It returns in a few days, then a week, then later.'; });
+  })();
+</script>
