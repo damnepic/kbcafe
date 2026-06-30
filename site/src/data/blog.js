@@ -1,6 +1,9 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "what-happens-when-anthropic-goes-down", title: "What Actually Happens When Anthropic Goes Down?",
+    date: "2026-06-30", tag: "AI",
+    excerpt: "When Claude has an outage, dozens of AI tools degrade at once while their own status pages stay green. What an upstream provider outage looks like, why it's so confusing to debug, and how to tell in seconds whether it's you, your tool, or the model underneath." },
   { slug: "flashcards-til-and-resources", title: "New on KB Cafe: Flashcards, TIL, and Free Resources",
     date: "2026-06-27", tag: "News",
     excerpt: "Three new ways to make AI knowledge stick: spaced-repetition flashcards built from the dictionary, a Today I Learned stream of bite-size snippets, and free downloadable templates with no email wall. All client-side, no account." },

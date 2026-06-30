@@ -1,0 +1,93 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="What Actually Happens When Anthropic Goes Down?"
+  description="When Claude has an outage it does not break Anthropic alone. Cursor, Windsurf, Bolt and dozens of AI tools sit on top of it and degrade at once, while their own status pages stay green. Here is what an upstream provider outage looks like, why it is so confusing to debug, and how to tell in seconds whether the problem is you, your tool, or the model underneath."
+  slug="what-happens-when-anthropic-goes-down"
+  tag="AI"
+  date="2026-06-30"
+>
+  <p>
+    Your AI coding agent freezes mid-task. The cursor blinks. You retry, and it stalls again. The
+    first instinct is to blame the tool: restart it, clear the cache, maybe file a bug. But a lot of
+    the time the tool is perfectly healthy. What broke is the model provider underneath it, and your
+    tool is just the messenger.
+  </p>
+  <p>
+    Anthropic, the company behind Claude, is one of those providers. A surprising amount of the AI
+    tooling developers use every day does not run its own model. It calls Claude through
+    Anthropic&rsquo;s API. When Anthropic has an incident, every one of those tools feels it at the
+    same moment, even though each has its own name, its own login, and its own status page.
+  </p>
+
+  <h2>The dependency nobody prints on the box</h2>
+  <p>
+    Open a typical AI development stack and trace where the intelligence actually comes from. Coding
+    assistants like Cursor and Windsurf, app builders like Bolt and Lovable, and a long tail of
+    writing, support, and agent tools all offer Claude as a model, and many default to it. None of
+    them put &ldquo;powered by Anthropic&rdquo; on the front page, because to the user it is just
+    &ldquo;the AI.&rdquo; Under the hood it is one API call to one provider.
+  </p>
+  <p>
+    That is what makes an outage so disorienting. The failure is shared, but the branding is not.
+    Several tools can break in several different ways, all tracing back to the same root cause, and
+    nothing on screen tells you they are connected.
+  </p>
+
+  <h2>What an upstream outage actually looks like</h2>
+  <p>
+    Provider outages rarely show up as a clean &ldquo;everything is down&rdquo; banner. More often it
+    is the API returning overloaded errors under load, requests timing out, latency climbing until
+    responses feel broken, or a partial degradation where some models answer and others do not. From
+    inside your tool, that surfaces as the agent hanging, a generation that never finishes, or an
+    error the tool was never really designed to explain.
+  </p>
+  <p>
+    Meanwhile the tool&rsquo;s own status page is usually green, and honestly it should be. The
+    tool&rsquo;s servers are fine. Its database is fine. The thing that is struggling is one hop
+    upstream, on infrastructure the tool does not own and cannot fix.
+  </p>
+
+  <h2>Why it is so hard to debug</h2>
+  <p>
+    This is the classic &ldquo;is it me, my tool, or the provider?&rdquo; trap, and it eats a lot of
+    time. You check your internet. You check the tool&rsquo;s status page, green. You do not have an
+    easy way to check the provider, because the provider is invisible from where you sit. So you keep
+    poking at the tool, which is the one layer that is not actually broken.
+  </p>
+  <p>
+    The shortcut is to flip the order. When more than one AI tool wobbles at once, stop debugging the
+    tools and look at what they share. If Cursor and a separate writing app both stall in the same ten
+    minutes, the odds are very good that the common provider underneath them is having a moment.
+  </p>
+
+  <h2>How to check in seconds</h2>
+  <p>
+    The fastest answer is to look at the provider directly instead of guessing through the tools. We
+    keep a live view of <a href="https://aidowncheck.com/what-breaks-when-anthropic-goes-down" target="_blank" rel="noopener">the full blast radius of an Anthropic outage</a>:
+    the actual list of products that degrade when Anthropic does, updated in real time. If that page
+    lights up at the same moment your agent stalls, you have your answer, and it is not you.
+  </p>
+  <p>
+    For the bigger picture, <a href="https://aidowncheck.com/providers/anthropic" target="_blank" rel="noopener">Anthropic&rsquo;s provider profile</a>
+    maps how central Anthropic is to the wider ecosystem: how many downstream products depend on it,
+    and what that concentration means. It is worth a glance before you commit a project to a single
+    model vendor.
+  </p>
+
+  <h2>The takeaway: reliability is a provider choice</h2>
+  <p>
+    When you pick an AI model, you are also picking a single point of failure. Build your whole stack
+    on one provider and a single bad hour upstream can take the entire thing offline at once, no
+    matter how solid your own code is. That is not a reason to avoid Anthropic, Claude is excellent.
+    It is a reason to know your dependencies, to recognize the symptom of an upstream outage quickly,
+    and ideally to keep a fallback path for when the model you rely on is the thing that is down.
+  </p>
+  <p>
+    If you want the concepts underneath all of this, the rest of our <a href="/ai">AI Explained</a>
+    pillar covers how these systems are wired together, from <a href="/what-is-tool-calling">tool calling</a>
+    to <a href="/what-is-a-context-window">context windows</a>. Knowing what depends on what is the
+    difference between a five-minute diagnosis and an afternoon lost to the wrong layer.
+  </p>
+</BlogPost>
