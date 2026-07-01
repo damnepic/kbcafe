@@ -70,6 +70,24 @@ import BlogPost from '../../layouts/BlogPost.astro';
     lights up at the same moment your agent stalls, you have your answer, and it is not you.
   </p>
   <p>
+    You do not even have to leave this page to run that check. The card below is that live view,
+    embedded straight into this post with a single <code>&lt;iframe&gt;</code>. It reads each
+    provider&rsquo;s official status feed and refreshes about once a minute, and the moment one goes
+    down it flips from a quiet status list into an alert that names how many downstream AI tools are
+    caught in the blast radius.
+  </p>
+
+  <figure class="aidc-embed" style="text-align:center">
+    <iframe src="https://aidowncheck.com/embed/ai-status?theme=light&amp;services=claude,chatgpt,gemini,cursor"
+      title="Live AI status by AIDownCheck" width="340" height="330" loading="lazy"
+      style="border:0;width:100%;max-width:340px;border-radius:12px"></iframe>
+    <figcaption>
+      Live status right now for Claude and the tools that lean on it. It is AIDownCheck&rsquo;s free
+      embeddable widget, one <code>&lt;iframe&gt;</code> you can drop on any page. Grab your own from
+      <a href="https://aidowncheck.com/embed" target="_blank" rel="noopener">Live AI status &amp; outage intelligence by AIDownCheck</a>.
+    </figcaption>
+  </figure>
+  <p>
     For the bigger picture, <a href="https://aidowncheck.com/providers/anthropic" target="_blank" rel="noopener">Anthropic&rsquo;s provider profile</a>
     maps how central Anthropic is to the wider ecosystem: how many downstream products depend on it,
     and what that concentration means. It is worth a glance before you commit a project to a single
