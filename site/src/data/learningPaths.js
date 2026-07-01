@@ -13,7 +13,7 @@ export const LEARNING_PATHS = [
     route: '/learn-ai-agents', minutes: 55, outcome: 'I want to build an AI agent that takes actions',
     blurb: 'From a model that can only talk to a system that can act: tools, structured calls, patterns, memory, and how to architect it.',
     intro: '<span class="lpp-primer-h">New to the lingo?</span> An <a class="kb-term" href="/dictionary/agent">agent</a> is an AI that does not just answer but takes actions: it uses <a class="kb-term" href="/dictionary/tool-calling">tool calling</a> to run steps, returns <a class="kb-term" href="/dictionary/structured-outputs">structured outputs</a> your code can trust, and plugs into tools over <a class="kb-term" href="/dictionary/mcp">MCP</a>. Hover any underlined word for a quick definition, or click to learn more.',
-    steps: ['/what-is-tool-calling', '/tool-call-visualizer', '/what-are-structured-outputs', '/structured-output-builder', '/ai-patterns', '/ai-pattern-builder', '/what-is-agent-memory', '/agent-memory-simulator', '/what-is-mcp', '/what-are-mcp-servers', '/mcp-config-generator', '/ai-architecture-generator'],
+    steps: ['/how-to-build-an-ai-agent', '/what-is-tool-calling', '/tool-call-visualizer', '/what-are-structured-outputs', '/structured-output-builder', '/ai-patterns', '/ai-pattern-builder', '/what-is-agent-memory', '/agent-memory-simulator', '/what-is-mcp', '/what-are-mcp-servers', '/mcp-config-generator', '/ai-architecture-generator'],
   },
   {
     id: 'prompting', title: 'Master Prompting', shortTitle: 'Prompting', tag: 'Craft',

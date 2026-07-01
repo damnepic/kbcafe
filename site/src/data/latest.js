@@ -1,6 +1,8 @@
 // Homepage "Freshly brewed" strip: a hand-curated list of recent additions worth featuring.
 // Newest first. Append a one-liner when you ship something notable, drop old ones off the bottom.
 export const LATEST = [
+  { title: 'How to build an AI agent', href: '/how-to-build-an-ai-agent', tag: 'Lesson', date: '2026-06-30',
+    blurb: 'A chatbot answers; an agent acts. The five parts, the loop, the security, and a spec builder.' },
   { title: 'Prompt injection & AI security', href: '/prompt-injection', tag: 'Lesson', date: '2026-06-29',
     blurb: 'Why an agent cannot tell your instructions from text it just read, and how to contain it.' },
   { title: 'What are AI evals?', href: '/what-are-ai-evals', tag: 'Lesson', date: '2026-06-29',
