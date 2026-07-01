@@ -1,0 +1,227 @@
+---
+import AiPage from '../layouts/AiPage.astro';
+---
+<AiPage
+  title="How to prompt Claude Fable 5: what changes and why | KB Cafe"
+  description="Claude Fable 5 is built for long, hard, autonomous work, and that shifts how you prompt it. The behavioral changes from Opus 4.8, effort as the main dial, why you can say less, keeping long runs honest, setting boundaries, and the migration gotcha that quietly falls back to Opus. Grounded in Anthropic's official guidance, with a match-the-fix exercise."
+  path="/how-to-prompt-claude-fable-5"
+  eyebrow="AI Explained · Practice"
+  h1="How to prompt Claude Fable 5"
+  tagline="Fable 5 is built to take on long, ambiguous, hours-to-weeks work. The single biggest prompting shift: it is capable enough that you can say less and steer with intent, so many of the careful instructions you wrote for older models now get in its way."
+>
+  <h2>What actually changed</h2>
+  <p>
+    Claude Fable 5 is Anthropic's most capable widely released model, built for problems that were previously too complex,
+    long-running, or ambiguous for prior models: end-to-end work that takes a person hours, days, or weeks. Anthropic's own
+    advice is to point it at your <em>hardest</em> unsolved problems, because testing it only on simple tasks undersells it.
+    (Its limited-release sibling, Claude Mythos 5, shares the same capabilities; the refusal and safety behavior described
+    below is specific to Fable 5.) For prompting, three shifts matter most:
+  </p>
+  <p class="f5-note">
+    <strong>On the &ldquo;re-release.&rdquo;</strong> Fable 5 launched in June 2026, was briefly suspended, and was restored
+    on July 1, 2026 with a strengthened safety classifier that routes blocked requests to Claude Opus 4.8. That was an
+    availability and safety event, not a retraining: the prompting guidance below is unchanged either way.
+  </p>
+  <ul>
+    <li><strong>Longer turns by default.</strong> A single hard request can run for many minutes at higher effort, and autonomous runs can go for hours. Raise client timeouts and progress indicators, and prefer checking on runs asynchronously over blocking.</li>
+    <li><strong>Stronger instruction following.</strong> You can steer most behavior with one brief instruction instead of enumerating every case by name. Long, prescriptive prompts written for older models can now <em>degrade</em> output.</li>
+    <li><strong>More initiative.</strong> It plans, verifies, delegates to subagents, and occasionally acts beyond what you asked. That is powerful, and it is exactly why setting boundaries becomes part of the prompt.</li>
+  </ul>
+  <p>
+    A capability jump like this is a good moment to re-read your existing prompts and skills and delete instructions the
+    model no longer needs. This guide distills Anthropic's official
+    <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5">Prompting Claude Fable 5</a>
+    guidance into the patterns you will reach for most.
+  </p>
+
+  <h2>Effort is your main dial</h2>
+  <p>
+    On Fable 5, <strong>effort</strong> is the primary control for the trade-off between intelligence, latency, and cost.
+    Use <code>high</code> as the default, <code>xhigh</code> for the most capability-sensitive work, and <code>medium</code>
+    or <code>low</code> for routine tasks. A key surprise: Fable 5 at <em>lower</em> effort still performs well and often
+    beats <code>xhigh</code> on prior models. If a task finishes correctly but takes longer than you want, or you want a
+    quicker, more interactive feel, turn effort <em>down</em>.
+  </p>
+  <p>
+    Higher effort produces the most rigorous reasoning and verification, but on routine work it can also over-gather context
+    and do unrequested tidying. When you want it to stay in its lane, say so once:
+  </p>
+  <pre class="f5-code">Don't add features, refactor, or introduce abstractions beyond what the task
+requires. A bug fix doesn't need surrounding cleanup. Do the simplest thing that
+works well; only validate at real system boundaries (user input, external APIs).</pre>
+
+  <h2>Say less, steer with intent</h2>
+  <p>
+    Because instruction following is so much better, a short instruction usually does the work of a long checklist. Two
+    patterns pay off repeatedly. First, a single <strong>brevity</strong> instruction beats listing every verbose habit:
+  </p>
+  <pre class="f5-code">Lead with the outcome. Your first sentence should answer "what happened" or
+"what did you find." Supporting detail comes after. Be selective about what you
+include rather than compressing into fragments, arrow chains, or jargon.</pre>
+  <p>
+    Second, <strong>give the reason, not only the request.</strong> Context lets Fable 5 connect a task to the right
+    information instead of guessing your intent, which matters most for long-running work drawing on several threads:
+  </p>
+  <pre class="f5-code">I'm working on [the larger task] for [who it's for]. They need [what the output
+enables]. With that in mind: [request].</pre>
+  <p>
+    This is the same &ldquo;name the audience, state the goal&rdquo; discipline from
+    <a href="/good-vs-bad-prompts">good vs bad prompts</a>, and it matters more here, not less, because the model is doing
+    more on its own.
+  </p>
+
+  <h2>Keep long runs honest</h2>
+  <p>
+    The failure mode that bites hardest on long autonomous work is a confident status report for work that was never
+    actually verified. Fable 5 responds well to being told to audit its claims against real evidence. In Anthropic's
+    testing this nearly eliminated fabricated progress reports even on tasks designed to provoke them:
+  </p>
+  <pre class="f5-code">Before reporting progress, audit each claim against a tool result from this
+session. Only report work you can point to evidence for; if something is not yet
+verified, say so. If tests fail, say so with the output; if a step was skipped,
+say that.</pre>
+  <p>
+    Pair this with explicit self-verification: fresh-context <a class="kb-term" href="/how-to-build-an-ai-agent">verifier
+    subagents</a> tend to outperform self-critique, so for long builds, instruct it to check its work against the spec at
+    a set interval as it goes.
+  </p>
+
+  <h2>State the boundaries</h2>
+  <p>
+    More initiative means you should be explicit about what counts as &ldquo;done&rdquo; and when to stop. Two boundaries
+    are worth setting on almost every agentic task. The first separates <strong>assessment from action</strong>:
+  </p>
+  <pre class="f5-code">When the user is describing a problem or thinking out loud rather than requesting
+a change, the deliverable is your assessment. Report your findings and stop.
+Don't apply a fix until they ask for one.</pre>
+  <p>
+    The second defines when to <strong>pause for a human</strong>, so it stops only where it genuinely needs you rather
+    than at every fork:
+  </p>
+  <pre class="f5-code">Pause for the user only when the work genuinely requires them: a destructive or
+irreversible action, a real scope change, or input only they can provide. Then
+ask and end the turn, rather than ending on a promise.</pre>
+  <p>
+    For fully autonomous pipelines where no one is watching, invert it: tell the model to proceed on reversible actions
+    that follow from the original request, and to check its last paragraph before ending. If that paragraph is a plan, a
+    question, or an &ldquo;I'll now do X&rdquo; promise, it should do the work with tool calls instead of ending the turn.
+  </p>
+
+  <div class="f5" id="f5">
+    <div class="f5-head">Hands-on: match the Fable 5 situation to the fix</div>
+    <p class="f5-sub">Each is a real Fable 5 behavior. Which prompt move corrects it?</p>
+    <p class="f5-q" id="f5-q"></p>
+    <div class="f5-opts" id="f5-opts"></div>
+    <p class="f5-reveal" id="f5-reveal" hidden></p>
+    <div class="f5-foot"><span id="f5-prog"></span><button id="f5-next" type="button" hidden>Next &rarr;</button></div>
+  </div>
+
+  <h2>The migration gotcha: don't ask it to show its reasoning</h2>
+  <p>
+    This one is easy to miss and quietly expensive. Fable 5 runs safety classifiers, and one of them,
+    <strong>reasoning extraction</strong>, fires when a prompt tells the model to echo, transcribe, or explain its internal
+    reasoning as response text. That triggers a <code>refusal</code> and an elevated rate of
+    <a href="https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback">fallback to Claude Opus 4.8</a>,
+    so a &ldquo;show your work&rdquo; line copied from an older prompt can silently downgrade your model. When migrating,
+    audit skills and system prompts for reflect-and-explain instructions. If you need reasoning visibility, read the
+    structured <code>thinking</code> blocks from adaptive thinking instead, and surface progress with a send-to-user tool.
+  </p>
+  <p>
+    Two related notes from the same guidance: Fable 5 also runs classifiers for offensive cybersecurity and life-sciences
+    content, so configure a fallback to Opus 4.8 for legitimate work near those areas. And in very long sessions it can
+    offer to summarize and hand off; that is usually triggered by a visible token countdown. Avoid surfacing exact
+    context-budget numbers, and if you must, reassure it: <code>You have ample context remaining. Continue the work.</code>
+  </p>
+  <p>A few API essentials that catch teams migrating older scaffolding:</p>
+  <ul>
+    <li><strong>Adaptive thinking is always on.</strong> Control reasoning depth with <code>effort</code>, not a thinking budget; setting <code>budget_tokens</code> now returns an error.</li>
+    <li><strong>Only summarized thinking is returned</strong>, never raw chain-of-thought. Pass thinking blocks back unchanged across turns on the same model.</li>
+    <li><strong>Last-turn assistant prefill is not supported.</strong> Use <a class="kb-term" href="/what-are-structured-outputs">structured outputs</a> or tools to shape the response instead.</li>
+  </ul>
+
+  <h2>Let it delegate, and give it a memory</h2>
+  <p>
+    Fable 5 dispatches parallel <a class="kb-term" href="/how-to-build-an-ai-agent">subagents</a> more readily and manages
+    them reliably. Encourage delegation, and prefer asynchronous communication over blocking on each subagent's return.
+    It also performs noticeably better when it can record and reuse lessons, which can be as simple as a Markdown file:
+  </p>
+  <pre class="f5-code">Delegate independent subtasks to subagents and keep working while they run.
+Store one lesson per file with a one-line summary at the top; record corrections
+and confirmed approaches alike, and why they mattered. Update an existing note
+rather than duplicating, and delete notes that turn out to be wrong.</pre>
+  <p>
+    The through-line across all of this: Fable 5 rewards <strong>intent and boundaries</strong> over enumerated
+    instructions. Tell it what you are trying to achieve, where the edges are, and how to prove its work, then get out of
+    its way. When a prompt written for an older model underperforms, the fix is usually to remove instructions, not add
+    them.
+  </p>
+
+</AiPage>
+
+<style is:global>
+  .f5-code{font-family:var(--font-mono);font-size:13px;line-height:1.65;background:#241a12;color:#eee4d3;border-radius:12px;padding:15px 17px;margin:14px 0;overflow-x:auto;white-space:pre-wrap}
+  .f5-note{background:var(--cream);border:1.2px solid var(--line);border-left:3px solid var(--coral);border-radius:10px;padding:12px 15px;font-size:14.5px;color:var(--ink)}
+  .f5{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin:24px 0}
+  .f5-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .f5-sub{font-size:14px;color:var(--ink-soft);margin:8px 0 12px}
+  .f5-q{font-size:15.5px;font-weight:600;line-height:1.5;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:13px 15px;margin:0 0 12px}
+  .f5-opts{display:flex;flex-direction:column;gap:8px}
+  .f5-opts button{text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 13px;font-family:var(--font-body);font-size:13.5px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .f5-opts button:hover{border-color:var(--coral)}
+  .f5-opts button:disabled{cursor:default}
+  .f5-opts button.right{border-color:#0f9f82;background:rgba(15,159,130,.12)}
+  .f5-opts button.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+  .f5-reveal{margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:11px 13px}
+  .f5-reveal code{font-family:var(--font-mono);font-size:.92em;background:rgba(30,24,19,.08);padding:1px 5px;border-radius:5px}
+  .f5-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;min-height:30px}
+  .f5-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  #f5-next{border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:13px;padding:7px 15px;border-radius:9px;cursor:pointer}
+</style>
+
+<script is:inline>
+  (function () {
+    var OPTS = [
+      'Turn effort down (or say "do the simplest thing that works")',
+      'Add: "audit each claim against a tool result before reporting progress"',
+      'Remove the "show your reasoning" line; read the thinking blocks instead',
+      'Add: "the deliverable is your assessment; report and stop until asked"',
+      'Say: "when you have enough to act, act; give a recommendation, not a survey"',
+      'Reassure it: "you have ample context remaining; continue the work"'
+    ];
+    var Q = [
+      { task: 'On an ambiguous task, it spends ages planning and surveying options it will not pursue before doing anything.', a: 4,
+        why: 'Fable 5 can overplan on ambiguous work, especially at high effort. A short "act when you have enough, recommend rather than survey" instruction settles it. (This does not apply to its private thinking blocks.)' },
+      { task: 'On a long autonomous run, it reports steps as finished that it never actually verified.', a: 1,
+        why: 'The fix is grounding: make it check each claim against a real tool result from the session. Anthropic found this nearly eliminates fabricated status reports, even on tasks built to provoke them.' },
+      { task: 'You copied a "reproduce your full reasoning in the response" line from an old prompt, and now you are getting elevated fallbacks to Opus 4.8.', a: 2,
+        why: 'That line trips the reasoning-extraction safety classifier, which returns a refusal and falls back to Opus 4.8. Delete it; if you need visibility, read the structured thinking blocks from adaptive thinking.' },
+      { task: 'You only wanted its assessment of a bug, but it went ahead and changed the code.', a: 3,
+        why: 'More initiative needs an explicit boundary. Tell it that when you are describing a problem rather than requesting a change, the deliverable is the assessment: report findings and stop until asked.' },
+      { task: 'A routine task comes out correct but slower and more elaborately than you wanted, with extra cleanup.', a: 0,
+        why: 'Effort is the main dial. Lower it for routine work (lower effort on Fable 5 still beats xhigh on older models), and/or tell it not to refactor or add beyond what the task requires.' },
+      { task: 'Deep in a long session, it offers to summarize and start a fresh session to save context.', a: 5,
+        why: 'This is usually triggered by a visible token countdown. Avoid surfacing exact budget numbers, and reassure it that it has ample context remaining and should continue.' }
+    ];
+    var i = 0, answered = false, score = 0;
+    var qEl = document.getElementById('f5-q'), optsEl = document.getElementById('f5-opts'),
+        rev = document.getElementById('f5-reveal'), prog = document.getElementById('f5-prog'), next = document.getElementById('f5-next');
+    function show() {
+      answered = false; qEl.textContent = Q[i].task; optsEl.innerHTML = '';
+      OPTS.forEach(function (o, k) { var b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.dataset.k = k; optsEl.appendChild(b); });
+      rev.hidden = true; next.hidden = true; prog.textContent = 'Situation ' + (i + 1) + ' of ' + Q.length;
+    }
+    optsEl.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || answered) return; answered = true;
+      var k = +b.dataset.k, ok = k === Q[i].a; if (ok) score++;
+      Array.prototype.forEach.call(optsEl.children, function (c) {
+        c.disabled = true;
+        if (+c.dataset.k === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
+      });
+      rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>The better fix: ' + OPTS[Q[i].a] + '.</strong> ') + Q[i].why;
+      rev.hidden = false; next.hidden = (i >= Q.length - 1);
+      if (i >= Q.length - 1) { prog.textContent = 'Done, all ' + Q.length + ' seen.'; if (window.__kbQuizShare) window.__kbQuizShare(score, Q.length, 'f5', 'the prompt-Fable-5 quiz'); }
+    });
+    next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
+    show();
+  })();
+</script>

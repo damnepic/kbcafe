@@ -48,6 +48,9 @@ export const AI = [
   { nm: "Prompt injection and AI security", href: "/prompt-injection", type: "explainer", tag: "Security",
     ds: "Why a model cannot tell your instructions from text it just read, the lethal trifecta that makes agents dangerous, and the architecture-level defenses that actually contain it.",
     rel: { prereq: ["/what-is-tool-calling"], related: ["/what-are-mcp-servers", "/build-an-agentic-os"] } },
+  { nm: "How to prompt Claude Fable 5", href: "/how-to-prompt-claude-fable-5", type: "explainer", tag: "Practice",
+    ds: "Fable 5 is built for long, hard, autonomous work, and that shifts how you prompt it: effort as the main dial, saying less, grounding long runs, setting boundaries, and the migration gotcha that quietly falls back to Opus 4.8.",
+    rel: { prereq: ["/what-are-reasoning-models"], related: ["/how-to-build-an-ai-agent", "/what-are-ai-loops", "/what-are-ai-evals"], next: ["/how-to-build-an-ai-agent"] } },
 
   // ── Tools ──
   { nm: "Context Window Visualizer", href: "/context-window-visualizer", type: "tool", tag: "Tool",
