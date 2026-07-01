@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mobile sidebar access — 6 concepts | KB Cafe</title>
+<style>
+  :root{
+    --cream:#F7F1E6; --paper:#FFFCF5; --paper-2:#F0E7D6; --ink:#1E1813; --ink-soft:#6b5f50;
+    --line:#e3d9c6; --coral:#EE4B2B; --coral-deep:#c9391d;
+    --disp:'Sora',system-ui,sans-serif; --mono:'DM Mono',ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#efe7d7;color:var(--ink);font-family:var(--disp);line-height:1.5;
+    background-image:radial-gradient(circle at 20% -10%,#fff8ec,transparent 60%)}
+  .page{max-width:1180px;margin:0 auto;padding:34px 20px 90px}
+  header.hd{margin-bottom:22px}
+  .kb{display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:20px}
+  .kb .cup{width:34px;height:34px;border-radius:9px;background:var(--coral);display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800}
+  h1{font-size:30px;margin:14px 0 6px;letter-spacing:-.01em}
+  .lede{color:var(--ink-soft);max-width:760px;font-size:15.5px}
+  .eyebrow{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral)}
+  .diag{background:var(--paper);border:1.4px solid var(--line);border-radius:14px;padding:16px 18px;margin:18px 0 26px;font-size:14.5px;color:var(--ink-soft)}
+  .diag b{color:var(--ink)}
+
+  details.c{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;margin:14px 0;overflow:hidden;
+    box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  details.c[open]{border-color:var(--coral)}
+  summary{list-style:none;cursor:pointer;padding:17px 20px;display:flex;align-items:center;gap:14px}
+  summary::-webkit-details-marker{display:none}
+  .num{font-family:var(--mono);font-weight:800;font-size:13px;color:#fff;background:var(--ink);width:30px;height:30px;
+    border-radius:9px;display:grid;place-items:center;flex-shrink:0}
+  details.c[open] .num{background:var(--coral)}
+  .st{flex:1}
+  .st .t{font-weight:800;font-size:17px}
+  .st .s{color:var(--ink-soft);font-size:13.5px}
+  .chev{color:var(--ink-soft);transition:transform .2s;flex-shrink:0}
+  details.c[open] .chev{transform:rotate(180deg);color:var(--coral)}
+  .body{padding:4px 20px 24px;display:grid;grid-template-columns:320px 1fr;gap:26px;align-items:start}
+  @media(max-width:720px){.body{grid-template-columns:1fr}}
+
+  /* phone frame */
+  .phone{width:300px;justify-self:center;border:9px solid #14110d;border-radius:34px;overflow:hidden;
+    background:var(--paper);box-shadow:0 18px 40px rgba(20,17,13,.28);position:relative;height:560px}
+  .stat{height:26px;background:var(--paper);display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;font-size:10px;font-family:var(--mono);color:var(--ink);font-weight:700}
+  .scr{position:relative;height:calc(100% - 26px);overflow:hidden}
+
+  /* generic mock header */
+  .mh{height:52px;border-bottom:1.2px solid var(--line);display:flex;align-items:center;padding:0 12px;gap:10px;
+    background:var(--paper);position:relative;z-index:5}
+  .brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:15px}
+  .brand .cup{width:24px;height:24px;border-radius:7px;background:var(--coral);color:#fff;display:grid;place-items:center;font-size:9px}
+  .ibtn{width:34px;height:34px;border:1.2px solid var(--line);border-radius:9px;background:var(--paper);display:grid;place-items:center;cursor:pointer;color:var(--ink);flex-shrink:0}
+  .ibtn:active{background:var(--paper-2)}
+  .ibtn svg{width:18px;height:18px}
+  .spacer{flex:1}
+
+  /* content stub */
+  .cont{padding:14px 14px 40px;overflow-y:auto;height:100%}
+  .crumb{font-family:var(--mono);font-size:9px;color:var(--ink-soft);letter-spacing:.04em}
+  .h2{font-size:20px;font-weight:800;margin:8px 0 6px;line-height:1.15}
+  .line{height:9px;border-radius:5px;background:var(--paper-2);margin:7px 0}
+  .line.s{width:70%}.line.m{width:88%}
+  .toc{background:var(--cream);border:1.2px solid var(--line);border-radius:11px;padding:11px 12px;margin:12px 0}
+  .toc .th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+  .toc a{display:inline-block;color:var(--coral);font-size:12px;font-weight:600;margin:0 9px 5px 0;text-decoration:none}
+
+  /* sidebar list rows (reused) */
+  .sbwrap{padding:10px}
+  .srow{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:13px;font-weight:700}
+  .srow small{display:block;font-weight:500;color:var(--ink-soft);font-size:10.5px}
+  .srow .ic{width:22px;height:22px;border-radius:6px;background:var(--paper-2);display:grid;place-items:center;color:var(--coral);flex-shrink:0;font-size:11px}
+  .srow.on{background:#ffe5dd}
+  .sec{border-top:1px solid var(--line);padding:8px 10px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+
+  .notes{font-size:14px}
+  .notes h4{margin:2px 0 8px;font-size:13px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+  .notes .pc{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .notes ul{margin:0;padding-left:17px;color:var(--ink-soft)}
+  .notes ul li{margin:4px 0}
+  .pro li::marker{color:#0f9f82}.con li::marker{color:var(--coral)}
+  .verdict{background:var(--cream);border:1.2px solid var(--line);border-left:3px solid var(--coral);border-radius:9px;padding:10px 13px;color:var(--ink);font-size:13.5px}
+  .try{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:6px}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--paper-2);color:var(--ink-soft);margin-left:6px}
+  .tag.rec{background:#0f9f82;color:#fff}
+  .tag.your{background:var(--coral);color:#fff}
+
+  /* overlay + drawer bits */
+  .ov{position:absolute;inset:0;background:rgba(20,17,13,.42);opacity:0;pointer-events:none;transition:opacity .22s;z-index:8}
+  .ov.on{opacity:1;pointer-events:auto}
+  .footnote{text-align:center;color:var(--ink-soft);font-size:12px;font-family:var(--mono);margin-top:40px}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="hd">
+  <div class="kb"><span class="cup">KB</span> Cafe</div>
+  <div class="eyebrow" style="margin-top:14px">Design concepts · mobile</div>
+  <h1>Fixing the two-hamburger header on mobile</h1>
+  <p class="lede">Six ways to give phone users access to the site nav <em>and</em> the Knowledge Base sidebar without two identical ☰ icons flanking the logo. Every mockup is interactive — tap the controls to feel the mechanic. Concepts 1 and 2 are your ideas; 3–6 are additional directions.</p>
+  <div class="diag">
+    <b>The problem:</b> today an article page shows two identical hamburgers. Left = site nav (Home · Knowledge Base · Tools · Learn · Study · Search). Right = the rich sidebar drawer (browse-everything). Same icon, different menus, no way to tell them apart — and the sidebar is nearly a superset of the nav.
+  </div>
+</header>
+
+<!-- ============ CONCEPT 1 ============ -->
+<details class="c" open>
+  <summary>
+    <span class="num">1</span>
+    <span class="st"><span class="t">Arrow-Down Disclosure Rail <span class="tag your">your idea</span></span><span class="s">Sidebar collapses to a labeled bar under the header; tap ▾ to expand it inline.</span></span>
+    <svg class="chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <div class="phone">
+      <div class="stat"><span>7:48</span><span>▮▮▮ ⌟</span></div>
+      <div class="scr">
+        <div class="mh">
+          <div class="ibtn" id="c1nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
+          <div class="spacer"></div>
+          <div class="brand"><span class="cup">KB</span> Cafe</div>
+          <div class="spacer"></div>
+          <div style="width:34px"></div>
+        </div>
+        <!-- disclosure bar -->
+        <div id="c1bar" style="display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--cream);border-bottom:1.2px solid var(--line);cursor:pointer;font-weight:700;font-size:13px;color:var(--ink);position:relative;z-index:6">
+          <span style="color:var(--coral)">☰</span> Browse the Knowledge Base
+          <span class="spacer"></span>
+          <svg id="c1chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--coral)" stroke-width="2.4" stroke-linecap="round" style="transition:transform .22s"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div id="c1panel" style="max-height:0;overflow:hidden;transition:max-height .28s ease;background:var(--paper);border-bottom:1.2px solid var(--line)">
+          <div class="sbwrap">
+            <div class="srow on"><span class="ic">◆</span> New to AI? <small>start from zero</small></div>
+            <div class="srow"><span class="ic">▤</span> AI Explained</div>
+            <div class="srow"><span class="ic">⚒</span> Use a tool</div>
+            <div class="srow"><span class="ic">🎓</span> Learning paths</div>
+            <div class="srow"><span class="ic">▦</span> References</div>
+          </div>
+        </div>
+        <div class="cont">
+          <div class="crumb">KB Cafe / Knowledge Base</div>
+          <div class="h2">Object-Oriented Programming</div>
+          <div class="line m"></div><div class="line"></div><div class="line s"></div>
+          <div class="toc"><div class="th">On this page</div><a>Classes</a><a>Four pillars</a><a>In code</a><a>Mistakes</a></div>
+          <div class="line"></div><div class="line m"></div><div class="line s"></div><div class="line"></div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="verdict">The sidebar stops being a hidden second menu and becomes an obvious, labeled <b>“Browse”</b> shelf. One real hamburger (site nav) stays top-left; the sidebar is text, not a twin icon.</div>
+      <div class="pc" style="margin-top:14px">
+        <div><h4>Strengths</h4><ul class="pro"><li>Kills the twin-icon confusion — the sidebar is now words</li><li>Discoverable: users see “Browse” without guessing</li><li>Zero overlay; content just pushes down</li></ul></div>
+        <div><h4>Trade-offs</h4><ul class="con"><li>Expanded list pushes the article down the page</li><li>Long sidebar = long accordion; may need section collapse</li><li>Still two separate controls (nav ☰ + Browse bar)</li></ul></div>
+      </div>
+      <p class="try">Tap “Browse the Knowledge Base ▾” in the mock →</p>
+    </div>
+  </div>
+</details>
+
+<!-- ============ CONCEPT 2 ============ -->
+<details class="c">
+  <summary>
+    <span class="num">2</span>
+    <span class="st"><span class="t">Edge Pull-Tab Drawer <span class="tag your">your idea</span></span><span class="s">A slim handle clings to the screen edge; tap/pull it to slide the sidebar out.</span></span>
+    <svg class="chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <div class="phone">
+      <div class="stat"><span>7:48</span><span>▮▮▮ ⌟</span></div>
+      <div class="scr">
+        <div class="mh">
+          <div class="ibtn" id="c2nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
+          <div class="spacer"></div>
+          <div class="brand"><span class="cup">KB</span> Cafe</div>
+          <div class="spacer"></div>
+          <div style="width:34px"></div>
+        </div>
+        <div class="cont">
+          <div class="crumb">KB Cafe / Knowledge Base</div>
+          <div class="h2">Object-Oriented Programming</div>
+          <div class="line m"></div><div class="line"></div><div class="line s"></div>
+          <div class="toc"><div class="th">On this page</div><a>Classes</a><a>Four pillars</a><a>In code</a><a>Mistakes</a></div>
+          <div class="line"></div><div class="line m"></div><div class="line s"></div><div class="line"></div><div class="line m"></div>
+        </div>
+        <!-- edge tab -->
+        <div id="c2tab" style="position:absolute;left:0;top:46%;z-index:9;background:var(--coral);color:#fff;padding:14px 6px;border-radius:0 12px 12px 0;cursor:pointer;box-shadow:2px 2px 10px rgba(20,17,13,.25);display:flex;flex-direction:column;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+          <span style="writing-mode:vertical-rl">BROWSE</span>
+        </div>
+        <div class="ov" id="c2ov"></div>
+        <!-- drawer -->
+        <div id="c2drawer" style="position:absolute;left:0;top:0;height:100%;width:230px;background:var(--paper);z-index:10;transform:translateX(-105%);transition:transform .25s;box-shadow:0 0 40px rgba(20,17,13,.3);overflow-y:auto">
+          <div style="display:flex;align-items:center;padding:12px;gap:8px;border-bottom:1.2px solid var(--line)">
+            <b style="font-size:14px">Browse</b><span class="spacer"></span>
+            <div class="ibtn" id="c2close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></div>
+          </div>
+          <div class="sbwrap">
+            <div class="srow on"><span class="ic">◆</span> New to AI?</div>
+            <div class="srow"><span class="ic">▤</span> AI Explained</div>
+            <div class="srow"><span class="ic">⚒</span> Use a tool</div>
+            <div class="srow"><span class="ic">🎓</span> Learning paths</div>
+            <div class="srow"><span class="ic">▦</span> References</div>
+            <div class="sec">Flashcards · TIL · Map</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="verdict">A persistent edge <b>handle</b> is a constant, discoverable affordance — like a bookmark tab poking out. It maps perfectly to “pull the sidebar out,” and the header carries only one hamburger (site nav).</div>
+      <div class="pc" style="margin-top:14px">
+        <div><h4>Strengths</h4><ul class="pro"><li>Always-visible cue; no guessing what a 2nd ☰ does</li><li>Feels physical — labeled “Browse” tab</li><li>Header stays clean; brand can center</li></ul></div>
+        <div><h4>Trade-offs</h4><ul class="con"><li>Floating tab overlaps content edge; can catch scroll</li><li>Left-edge swipe conflicts with iOS back-gesture</li><li>Some find persistent tabs visually noisy</li></ul></div>
+      </div>
+      <p class="try">Tap the coral “BROWSE” tab on the mock’s left edge →</p>
+    </div>
+  </div>
+</details>
+
+<!-- ============ CONCEPT 3 ============ -->
+<details class="c">
+  <summary>
+    <span class="num">3</span>
+    <span class="st"><span class="t">One Unified Menu <span class="tag rec">recommended</span></span><span class="s">Delete the second button entirely. One ☰ opens the rich drawer with nav folded in.</span></span>
+    <svg class="chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <div class="phone">
+      <div class="stat"><span>7:48</span><span>▮▮▮ ⌟</span></div>
+      <div class="scr">
+        <div class="mh">
+          <div class="brand"><span class="cup">KB</span> Cafe</div>
+          <div class="spacer"></div>
+          <div class="ibtn" id="c3btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
+        </div>
+        <div class="cont">
+          <div class="crumb">KB Cafe / Knowledge Base</div>
+          <div class="h2">Object-Oriented Programming</div>
+          <div class="line m"></div><div class="line"></div><div class="line s"></div>
+          <div class="toc"><div class="th">On this page</div><a>Classes</a><a>Four pillars</a><a>In code</a><a>Mistakes</a></div>
+          <div class="line"></div><div class="line m"></div><div class="line s"></div><div class="line"></div>
+        </div>
+        <div class="ov" id="c3ov"></div>
+        <div id="c3drawer" style="position:absolute;right:0;top:0;height:100%;width:250px;background:var(--paper);z-index:10;transform:translateX(105%);transition:transform .25s;box-shadow:0 0 40px rgba(20,17,13,.3);overflow-y:auto">
+          <div style="display:flex;align-items:center;padding:12px;gap:8px;border-bottom:1.2px solid var(--line)">
+            <b style="font-size:14px">Menu</b><span class="spacer"></span>
+            <div class="ibtn" id="c3close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></div>
+          </div>
+          <div class="sbwrap">
+            <div class="srow"><span class="ic">⌂</span> Home</div>
+            <div class="srow"><span class="ic">▤</span> Knowledge Base</div>
+            <div class="srow"><span class="ic">⚒</span> Tools</div>
+            <div class="srow"><span class="ic">🎓</span> Learn</div>
+            <div class="srow"><span class="ic">▥</span> Study window</div>
+            <div class="sec">Browse</div>
+            <div class="srow on"><span class="ic">◆</span> New to AI?</div>
+            <div class="srow"><span class="ic">▤</span> AI Explained</div>
+            <div class="srow"><span class="ic">▦</span> References</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="verdict">The two menus were ~90% the same surface. This merges them: brand left, a <b>single</b> ☰ top-right, one drawer that starts with the top-nav links then flows into the browse sections. Nothing to disambiguate because there’s only one control.</div>
+      <div class="pc" style="margin-top:14px">
+        <div><h4>Strengths</h4><ul class="pro"><li>Zero ambiguity — one button, one place to go</li><li>Standard, boring-in-a-good-way mobile pattern</li><li>Cleanest header; consistent site-wide</li></ul></div>
+        <div><h4>Trade-offs</h4><ul class="con"><li>One long drawer; needs tidy grouping</li><li>Loses the “sidebar as a distinct thing” identity</li><li>Most code churn in Layout + Sidebar</li></ul></div>
+      </div>
+      <p class="try">Tap the single ☰ top-right →</p>
+    </div>
+  </div>
+</details>
+
+<!-- ============ CONCEPT 4 ============ -->
+<details class="c">
+  <summary>
+    <span class="num">4</span>
+    <span class="st"><span class="t">Segmented Bottom Sheet</span><span class="s">One ☰ opens a thumb-reachable sheet with a Navigate | Browse toggle.</span></span>
+    <svg class="chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <div class="phone">
+      <div class="stat"><span>7:48</span><span>▮▮▮ ⌟</span></div>
+      <div class="scr">
+        <div class="mh">
+          <div class="brand"><span class="cup">KB</span> Cafe</div>
+          <div class="spacer"></div>
+          <div class="ibtn" id="c4btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
+        </div>
+        <div class="cont">
+          <div class="crumb">KB Cafe / Knowledge Base</div>
+          <div class="h2">Object-Oriented Programming</div>
+          <div class="line m"></div><div class="line"></div><div class="line s"></div>
+          <div class="toc"><div class="th">On this page</div><a>Classes</a><a>Four pillars</a><a>In code</a></div>
+          <div class="line"></div><div class="line m"></div><div class="line s"></div>
+        </div>
+        <div class="ov" id="c4ov"></div>
+        <div id="c4sheet" style="position:absolute;left:0;right:0;bottom:0;background:var(--paper);z-index:10;transform:translateY(105%);transition:transform .26s;border-radius:18px 18px 0 0;box-shadow:0 -8px 40px rgba(20,17,13,.28);max-height:82%;overflow:hidden">
+          <div style="width:40px;height:4px;border-radius:3px;background:var(--line);margin:9px auto 4px"></div>
+          <div style="display:flex;gap:5px;margin:8px 12px;background:var(--paper-2);border-radius:10px;padding:4px">
+            <button class="seg" data-seg="nav" style="flex:1;border:0;background:var(--paper);border-radius:8px;padding:8px;font-family:var(--disp);font-weight:800;font-size:13px;cursor:pointer">Navigate</button>
+            <button class="seg" data-seg="brw" style="flex:1;border:0;background:transparent;border-radius:8px;padding:8px;font-family:var(--disp);font-weight:800;font-size:13px;cursor:pointer;color:var(--ink-soft)">Browse</button>
+          </div>
+          <div id="c4nav" class="sbwrap" style="overflow-y:auto;max-height:330px">
+            <div class="srow"><span class="ic">⌂</span> Home</div>
+            <div class="srow"><span class="ic">▤</span> Knowledge Base</div>
+            <div class="srow"><span class="ic">⚒</span> Tools</div>
+            <div class="srow"><span class="ic">🎓</span> Learn</div>
+            <div class="srow"><span class="ic">▥</span> Study window</div>
+          </div>
+          <div id="c4brw" class="sbwrap" style="display:none;overflow-y:auto;max-height:330px">
+            <div class="srow on"><span class="ic">◆</span> New to AI?</div>
+            <div class="srow"><span class="ic">▤</span> AI Explained</div>
+            <div class="srow"><span class="ic">⚒</span> Use a tool</div>
+            <div class="srow"><span class="ic">🎓</span> Learning paths</div>
+            <div class="srow"><span class="ic">▦</span> References</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="verdict">One trigger, but the sheet rises from the <b>bottom</b> (thumb zone) and splits the two purposes into an explicit <b>Navigate&nbsp;/&nbsp;Browse</b> toggle. Keeps both menus’ full contents, names them, and is very reachable one-handed.</div>
+      <div class="pc" style="margin-top:14px">
+        <div><h4>Strengths</h4><ul class="pro"><li>Both menus preserved but clearly labeled</li><li>Bottom sheet = best thumb ergonomics</li><li>Modern, app-native feel</li></ul></div>
+        <div><h4>Trade-offs</h4><ul class="con"><li>Two taps to reach “Browse” (open, then switch)</li><li>Segmented control adds a small learning beat</li><li>More markup/JS than the disclosure options</li></ul></div>
+      </div>
+      <p class="try">Tap ☰, then toggle Navigate / Browse →</p>
+    </div>
+  </div>
+</details>
+
+<!-- ============ CONCEPT 5 ============ -->
+<details class="c">
+  <summary>
+    <span class="num">5</span>
+    <span class="st"><span class="t">Sticky Context Sub-Bar</span><span class="s">Header keeps one ☰; a labeled sub-bar carries “Contents ▾” and “Browse ▾”.</span></span>
+    <svg class="chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <div class="phone">
+      <div class="stat"><span>7:48</span><span>▮▮▮ ⌟</span></div>
+      <div class="scr">
+        <div class="mh">
+          <div class="ibtn" id="c5nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
+          <div class="spacer"></div>
+          <div class="brand"><span class="cup">KB</span> Cafe</div>
+          <div class="spacer"></div><div style="width:34px"></div>
+        </div>
+        <!-- sub bar -->
+        <div style="display:flex;gap:8px;padding:9px 12px;background:var(--cream);border-bottom:1.2px solid var(--line);position:relative;z-index:6">
+          <button id="c5contents" style="flex:1;border:1.2px solid var(--line);background:var(--paper);border-radius:9px;padding:8px;font-family:var(--disp);font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">📄 Contents ▾</button>
+          <button id="c5browse" style="flex:1;border:1.2px solid var(--line);background:var(--paper);border-radius:9px;padding:8px;font-family:var(--disp);font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🧭 Browse ▾</button>
+        </div>
+        <div id="c5panel" style="max-height:0;overflow:hidden;transition:max-height .26s;background:var(--paper);border-bottom:1.2px solid var(--line)">
+          <div id="c5body" class="sbwrap"></div>
+        </div>
+        <div class="cont">
+          <div class="crumb">KB Cafe / Knowledge Base</div>
+          <div class="h2">Object-Oriented Programming</div>
+          <div class="line m"></div><div class="line"></div><div class="line s"></div><div class="line"></div><div class="line m"></div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="verdict">Differentiate by <b>words + distinct icons</b>, not twin ☰. The header ☰ is unambiguously “site menu”; a thin sticky bar exposes the two page-scoped surfaces — the page <b>Contents</b> (TOC) and <b>Browse</b> (sidebar) — each self-labeling.</div>
+      <div class="pc" style="margin-top:14px">
+        <div><h4>Strengths</h4><ul class="pro"><li>Every control is labeled — no icon guessing</li><li>Surfaces the page TOC too (great for long articles)</li><li>Low risk; additive, doesn’t restructure nav</li></ul></div>
+        <div><h4>Trade-offs</h4><ul class="con"><li>Eats a strip of vertical space below the header</li><li>Three controls total (☰ + 2 pills) = busiest option</li><li>Two panels to manage open/close state</li></ul></div>
+      </div>
+      <p class="try">Tap “Contents ▾” or “Browse ▾” →</p>
+    </div>
+  </div>
+</details>
+
+<!-- ============ CONCEPT 6 ============ -->
+<details class="c">
+  <summary>
+    <span class="num">6</span>
+    <span class="st"><span class="t">App-Style Bottom Tab Bar</span><span class="s">A persistent bottom bar: Menu · Contents · Search · Study. Header holds brand only.</span></span>
+    <svg class="chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <div class="phone">
+      <div class="stat"><span>7:48</span><span>▮▮▮ ⌟</span></div>
+      <div class="scr">
+        <div class="mh" style="justify-content:center">
+          <div class="brand"><span class="cup">KB</span> Cafe</div>
+        </div>
+        <div class="cont" style="height:calc(100% - 52px - 56px)">
+          <div class="crumb">KB Cafe / Knowledge Base</div>
+          <div class="h2">Object-Oriented Programming</div>
+          <div class="line m"></div><div class="line"></div><div class="line s"></div>
+          <div class="toc"><div class="th">On this page</div><a>Classes</a><a>Four pillars</a><a>In code</a></div>
+          <div class="line"></div><div class="line m"></div><div class="line s"></div><div class="line"></div>
+        </div>
+        <div class="ov" id="c6ov"></div>
+        <div id="c6drawer" style="position:absolute;right:0;top:0;height:100%;width:250px;background:var(--paper);z-index:10;transform:translateX(105%);transition:transform .25s;box-shadow:0 0 40px rgba(20,17,13,.3);overflow-y:auto">
+          <div style="display:flex;align-items:center;padding:12px;gap:8px;border-bottom:1.2px solid var(--line)"><b style="font-size:14px">Menu</b><span class="spacer"></span><div class="ibtn" id="c6close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></div></div>
+          <div class="sbwrap">
+            <div class="srow on"><span class="ic">◆</span> New to AI?</div>
+            <div class="srow"><span class="ic">▤</span> AI Explained</div>
+            <div class="srow"><span class="ic">⚒</span> Use a tool</div>
+            <div class="srow"><span class="ic">🎓</span> Learning paths</div>
+            <div class="srow"><span class="ic">▦</span> References</div>
+          </div>
+        </div>
+        <!-- bottom tab bar -->
+        <div style="position:absolute;left:0;right:0;bottom:0;height:56px;background:var(--paper);border-top:1.2px solid var(--line);display:flex;z-index:9">
+          <div class="tabb" id="c6menu" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-family:var(--mono);color:var(--coral);cursor:pointer">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</div>
+          <div class="tabb" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-family:var(--mono);color:var(--ink-soft)">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M9 13h6M9 17h4"/></svg>Contents</div>
+          <div class="tabb" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-family:var(--mono);color:var(--ink-soft)">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Search</div>
+          <div class="tabb" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-family:var(--mono);color:var(--ink-soft)">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg>Study</div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="verdict">Move navigation out of the header entirely. A fixed <b>bottom bar</b> puts Menu, Contents, Search and Study in the thumb zone — the header becomes just the brand. This is the most “native app” of the set.</div>
+      <div class="pc" style="margin-top:14px">
+        <div><h4>Strengths</h4><ul class="pro"><li>Header fully de-cluttered; brand only</li><li>All key actions one thumb-tap away, always</li><li>Search + Study get first-class visibility</li></ul></div>
+        <div><h4>Trade-offs</h4><ul class="con"><li>Bottom bar eats ~56px of every screen</li><li>Heaviest departure from the current desktop feel</li><li>Can feel “appy” for a docs/reading site</li></ul></div>
+      </div>
+      <p class="try">Tap the “Menu” tab at the bottom →</p>
+    </div>
+  </div>
+</details>
+
+<p class="footnote">6 concepts · interactive mockups · KB Cafe · concepts/mobile-sidebar-access</p>
+</div>
+
+<script>
+  // Concept 1 — disclosure rail
+  (function(){
+    var bar=document.getElementById('c1bar'),p=document.getElementById('c1panel'),ch=document.getElementById('c1chev');
+    bar.addEventListener('click',function(){var open=p.style.maxHeight&&p.style.maxHeight!=='0px';p.style.maxHeight=open?'0px':'320px';ch.style.transform=open?'':'rotate(180deg)';});
+  })();
+  // Concept 2 — edge tab drawer
+  (function(){
+    var t=document.getElementById('c2tab'),d=document.getElementById('c2drawer'),o=document.getElementById('c2ov'),c=document.getElementById('c2close');
+    function open(v){d.style.transform=v?'translateX(0)':'translateX(-105%)';o.classList.toggle('on',v);t.style.opacity=v?'0':'1';}
+    t.addEventListener('click',function(){open(true);});o.addEventListener('click',function(){open(false);});c.addEventListener('click',function(){open(false);});
+  })();
+  // Concept 3 — unified drawer (right)
+  (function(){
+    var b=document.getElementById('c3btn'),d=document.getElementById('c3drawer'),o=document.getElementById('c3ov'),c=document.getElementById('c3close');
+    function open(v){d.style.transform=v?'translateX(0)':'translateX(105%)';o.classList.toggle('on',v);}
+    b.addEventListener('click',function(){open(true);});o.addEventListener('click',function(){open(false);});c.addEventListener('click',function(){open(false);});
+  })();
+  // Concept 4 — bottom sheet + segments
+  (function(){
+    var b=document.getElementById('c4btn'),s=document.getElementById('c4sheet'),o=document.getElementById('c4ov');
+    var nav=document.getElementById('c4nav'),brw=document.getElementById('c4brw'),segs=s.querySelectorAll('.seg');
+    function open(v){s.style.transform=v?'translateY(0)':'translateY(105%)';o.classList.toggle('on',v);}
+    b.addEventListener('click',function(){open(true);});o.addEventListener('click',function(){open(false);});
+    segs.forEach(function(btn){btn.addEventListener('click',function(){
+      var isNav=btn.dataset.seg==='nav';nav.style.display=isNav?'block':'none';brw.style.display=isNav?'none':'block';
+      segs.forEach(function(x){var a=x===btn;x.style.background=a?'var(--paper)':'transparent';x.style.color=a?'var(--ink)':'var(--ink-soft)';});
+    });});
+  })();
+  // Concept 5 — sub-bar dual panels
+  (function(){
+    var cB=document.getElementById('c5contents'),bB=document.getElementById('c5browse'),p=document.getElementById('c5panel'),body=document.getElementById('c5body');
+    var CONTENTS='<div class="toc" style="margin:0"><div class="th">On this page</div><a>Classes &amp; objects</a><a>The four pillars</a><a>In code</a><a>Inheritance vs composition</a><a>Common mistakes</a><a>When to use OOP</a></div>';
+    var BROWSE='<div class="srow on"><span class="ic">◆</span> New to AI?</div><div class="srow"><span class="ic">▤</span> AI Explained</div><div class="srow"><span class="ic">⚒</span> Use a tool</div><div class="srow"><span class="ic">🎓</span> Learning paths</div><div class="srow"><span class="ic">▦</span> References</div>';
+    var cur=null;
+    function toggle(which,html){
+      if(cur===which){p.style.maxHeight='0px';cur=null;return;}
+      body.innerHTML=html;p.style.maxHeight='340px';cur=which;
+    }
+    cB.addEventListener('click',function(){toggle('c',CONTENTS);});
+    bB.addEventListener('click',function(){toggle('b',BROWSE);});
+  })();
+  // Concept 6 — bottom tab bar drawer
+  (function(){
+    var m=document.getElementById('c6menu'),d=document.getElementById('c6drawer'),o=document.getElementById('c6ov'),c=document.getElementById('c6close');
+    function open(v){d.style.transform=v?'translateX(0)':'translateX(105%)';o.classList.toggle('on',v);}
+    m.addEventListener('click',function(){open(true);});o.addEventListener('click',function(){open(false);});c.addEventListener('click',function(){open(false);});
+  })();
+</script>
+</body>
+</html>

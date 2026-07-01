@@ -136,8 +136,8 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
   </symbol>
 </defs></svg>
 
-<nav class="site-nav">
-    {sidebar && <button class="sb-burger" id="sb-burger" type="button" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>}
+<nav class={`site-nav${sidebar ? ' has-sb' : ''}`}>
+    {sidebar && <button class="sb-burger" id="sb-burger" type="button" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="sbb-bars" d="M4 7h16M4 12h16M4 17h16"/><path class="sbb-x" d="M6 6l12 12M18 6 6 18"/></svg></button>}
     <a class="brand" href="/" aria-label="KB Cafe, home">
       <img class="mark" src="/logo.png" width="50" height="50" alt="KB Cafe, a coffee cup with an open book inside" />
       <span class="cf">Cafe</span>
@@ -525,6 +525,10 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
   .layout-main{flex:1;min-width:0;max-width:900px}
   .sb-burger{display:none;place-items:center;width:38px;height:38px;border-radius:10px;border:1.2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;margin-right:14px}
   .sb-burger svg{width:20px;height:20px}
+  /* hamburger ⇄ X: the single mobile menu button reflects the drawer's open state */
+  .sb-burger .sbb-x{display:none}
+  .sb-burger.open .sbb-bars{display:none}
+  .sb-burger.open .sbb-x{display:block}
   .sb-overlay{display:none}
   @media(max-width:900px){
     .layout-sb{display:block;margin-top:0}
@@ -535,10 +539,13 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
 
   @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
   @media(max-width:520px){
-    /* phone: hide inline nav, center the brand; sidebar burger floats left, menu burger floats right */
+    /* phone: ONE menu button, pinned top-right site-wide; brand sits left. On pages with a sidebar the
+       single button is the rich sidebar drawer (sb-burger) and the nav dropdown burger is suppressed;
+       on the homepage/other pages the single button is the nav dropdown burger. No more twin hamburgers. */
     .nav-links{display:none}
-    .site-nav{justify-content:center}
-    .nav-burger{display:grid;position:absolute;left:16px;top:50%;transform:translateY(-50%);margin:0;z-index:3}
+    .site-nav{justify-content:flex-start;padding-left:16px;padding-right:16px}
+    .nav-burger{display:grid;position:absolute;right:16px;left:auto;top:50%;transform:translateY(-50%);margin:0;z-index:3}
+    .site-nav.has-sb .nav-burger{display:none}
     .sb-burger{position:absolute;right:16px;top:50%;transform:translateY(-50%);margin:0;z-index:2}
     /* open: the header nav becomes a full-width dropdown panel */
     .site-nav.menu-open .nav-links{display:flex;flex-direction:column;align-items:stretch;gap:2px;
