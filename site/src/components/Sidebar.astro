@@ -5,7 +5,7 @@ import { TOOLS } from '../data/tools.js';
 import { LEARNING_PATHS } from '../data/learningPaths.js';
 import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
-const { path = '' } = Astro.props;
+const { path = '', drawerOnly = false } = Astro.props;   // drawerOnly: no desktop rail, mobile drawer only (rail-less pages)
 const aiTools = TOOLS.filter(t => t.href && t.cat === 'ai');
 const explainers = AI.filter(a => a.type === 'explainer');
 
@@ -35,7 +35,7 @@ const TRIAGE = [
 ];
 const active = (h) => h === path;
 ---
-<aside class="kb-sb" id="kb-sb" aria-label="Site navigation">
+<aside class:list={["kb-sb", { "drawer-only": drawerOnly }]} id="kb-sb" aria-label="Site navigation">
   <div class="sb-bar">
     <a class="sb-search" href="/search"><span class="sb-ic" set:html={I.search} /><span class="sb-lbl">Search</span></a>
     <button class="sb-collapse" id="sb-collapse" type="button" aria-label="Collapse sidebar" title="Collapse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 6-6 6 6 6M18 6l-6 6 6 6"/></svg></button>
@@ -160,10 +160,14 @@ const active = (h) => h === path;
      so the single drawer is a true superset of the old header menu + sidebar */
   .sb-primary{display:none}
 
+  /* rail-less pages (homepage, map, beginner-ai…): no desktop rail, just the mobile drawer */
+  .kb-sb.drawer-only{display:none}
+
   /* mobile = drawer */
   .sb-burger{display:none}
   .sb-close{display:none}
   @media(max-width:900px){
+    .kb-sb.drawer-only{display:flex}
     .sb-primary{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:2px 2px 10px;margin-bottom:2px;border-bottom:1px solid var(--line)}
     .sb-primary a{text-align:center;text-decoration:none;font-family:var(--font-display);font-weight:800;font-size:13.5px;
       color:var(--ink);background:var(--paper-2);border-radius:9px;padding:11px 8px;transition:background .12s,color .12s}
