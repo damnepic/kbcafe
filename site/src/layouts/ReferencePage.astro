@@ -3,6 +3,7 @@ import Layout from './Layout.astro';
 import Share from '../components/Share.astro';
 import ReadingEnhancers from '../components/ReadingEnhancers.astro';
 import Continuation from '../components/Continuation.astro';
+import QuizShare from '../components/QuizShare.astro';
 import { REFERENCE } from '../data/reference.js';
 import { TOOLS } from '../data/tools.js';
 
@@ -47,6 +48,7 @@ const guides = related.length ? related : others;
 
   <Share path={path} title={h1} variant="subtle" />
 
+  <QuizShare title={h1} path={path} />
   <Continuation path={path} />
 
   <ReadingEnhancers />

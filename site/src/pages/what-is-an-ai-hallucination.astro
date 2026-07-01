@@ -96,7 +96,7 @@ import AiPage from '../layouts/AiPage.astro';
       { t: 'Rewrite this paragraph I pasted to be shorter and clearer.', a: 0, why: 'Low risk. The model is transforming text you supplied, not recalling facts. Grounded in your input, with little room to invent.' },
       { t: 'Who is the current CEO of a small startup founded last year?', a: 1, why: 'High risk. Recent and niche, likely past the training cutoff and thinly represented. Use a tool with live data rather than trusting a guess.' }
     ];
-    var i = 0, answered = false;
+    var i = 0, answered = false, score = 0;
     var scn = document.getElementById('hl-scn'), btns = document.querySelectorAll('.hl-b'),
         rev = document.getElementById('hl-reveal'), prog = document.getElementById('hl-prog'), next = document.getElementById('hl-next');
     function show() {
@@ -108,14 +108,14 @@ import AiPage from '../layouts/AiPage.astro';
     Array.prototype.forEach.call(btns, function (b) {
       b.addEventListener('click', function () {
         if (answered) return; answered = true;
-        var pick = +b.dataset.v, ok = pick === Q[i].a;
+        var pick = +b.dataset.v, ok = pick === Q[i].a; if (ok) score++;
         Array.prototype.forEach.call(btns, function (c) {
           c.disabled = true;
           if (+c.dataset.v === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
         });
         rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + Q[i].why;
         rev.hidden = false; next.hidden = (i >= Q.length - 1);
-        if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+        if (i >= Q.length - 1) { prog.textContent = 'Done, all ' + Q.length + ' seen.'; if (window.__kbQuizShare) window.__kbQuizShare(score, Q.length, 'hl', 'the hallucination-risk quiz'); }
       });
     });
     next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });

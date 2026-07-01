@@ -118,7 +118,7 @@ dist/`;
       { task: 'Stop tracking a file you already committed by mistake (like .env).', a: 5, why: 'git rm --cached removes it from tracking while keeping it on disk. .gitignore alone will not untrack an already-committed file.' },
       { task: 'Bring in commits your teammates pushed.', a: 3, why: 'git pull fetches the remote commits and merges them into your branch.' }
     ];
-    var i = 0, answered = false;
+    var i = 0, answered = false, score = 0;
     var qEl = document.getElementById('gv-q'), optsEl = document.getElementById('gv-opts'),
         rev = document.getElementById('gv-reveal'), prog = document.getElementById('gv-prog'), next = document.getElementById('gv-next');
     function show() {
@@ -128,14 +128,14 @@ dist/`;
     }
     optsEl.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b || answered) return; answered = true;
-      var k = +b.dataset.k, ok = k === Q[i].a;
+      var k = +b.dataset.k, ok = k === Q[i].a; if (ok) score++;
       Array.prototype.forEach.call(optsEl.children, function (c) {
         c.disabled = true;
         if (+c.dataset.k === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
       });
       rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>The command is ' + OPTS[Q[i].a] + '.</strong> ') + Q[i].why;
       rev.hidden = false; next.hidden = (i >= Q.length - 1);
-      if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+      if (i >= Q.length - 1) { prog.textContent = 'Done, all ' + Q.length + ' seen.'; if (window.__kbQuizShare) window.__kbQuizShare(score, Q.length, 'gv', 'the Git command quiz'); }
     });
     next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
     show();

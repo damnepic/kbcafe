@@ -87,7 +87,7 @@ import AiPage from '../layouts/AiPage.astro';
       { task: 'Confirm generated code actually works.', a: 0, why: 'Exact / deterministic. Run the test suite: it passes or it fails. Code is the easiest thing to eval because the gate is unambiguous.' },
       { task: 'During early prototyping, rate the helpfulness of 30 draft answers against a checklist.', a: 1, why: 'Rubric. Small set, open-ended quality, and you want to understand the failures. Score by hand against explicit criteria before automating anything.' }
     ];
-    var i = 0, answered = false;
+    var i = 0, answered = false, score = 0;
     var qEl = document.getElementById('ev-q'), optsEl = document.getElementById('ev-opts'),
         rev = document.getElementById('ev-reveal'), prog = document.getElementById('ev-prog'), next = document.getElementById('ev-next');
     function show() {
@@ -97,14 +97,14 @@ import AiPage from '../layouts/AiPage.astro';
     }
     optsEl.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b || answered) return; answered = true;
-      var k = +b.dataset.k, ok = k === Q[i].a;
+      var k = +b.dataset.k, ok = k === Q[i].a; if (ok) score++;
       Array.prototype.forEach.call(optsEl.children, function (c) {
         c.disabled = true;
         if (+c.dataset.k === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
       });
       rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>The better fit is ' + OPTS[Q[i].a] + '.</strong> ') + Q[i].why;
       rev.hidden = false; next.hidden = (i >= Q.length - 1);
-      if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+      if (i >= Q.length - 1) { prog.textContent = 'Done, all ' + Q.length + ' seen.'; if (window.__kbQuizShare) window.__kbQuizShare(score, Q.length, 'ev', 'the pick-the-eval-method quiz'); }
     });
     next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
     show();

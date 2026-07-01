@@ -169,7 +169,7 @@ STEP 4  CHECK   all criteria met. STOP and return the email.`;
       { task: 'Turns a photo into a caption in one call.', a: 0, why: 'A single model call (chatbot-style). One input, one output, no tools and no loop.' },
       { task: 'Books a meeting: checks your calendar, finds a slot, sends the invite, and handles a reschedule reply.', a: 2, why: 'An agent. Multiple tools, real decisions, and it adapts to a reply. This is where tools plus a loop earn their keep.' }
     ];
-    var i = 0, answered = false;
+    var i = 0, answered = false, score = 0;
     var qEl = document.getElementById('hbaq-q'), optsEl = document.getElementById('hbaq-opts'),
         rev = document.getElementById('hbaq-reveal'), prog = document.getElementById('hbaq-prog'), next = document.getElementById('hbaq-next');
     function show() {
@@ -179,11 +179,11 @@ STEP 4  CHECK   all criteria met. STOP and return the email.`;
     }
     optsEl.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b || answered) return; answered = true;
-      var k = +b.dataset.k, ok = k === Q[i].a;
+      var k = +b.dataset.k, ok = k === Q[i].a; if (ok) score++;
       Array.prototype.forEach.call(optsEl.children, function (c) { c.disabled = true; if (+c.dataset.k === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong'); });
       rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>It is a ' + OPTS[Q[i].a] + '.</strong> ') + Q[i].why;
       rev.hidden = false; next.hidden = (i >= Q.length - 1);
-      if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+      if (i >= Q.length - 1) { prog.textContent = 'Done, all ' + Q.length + ' seen.'; if (window.__kbQuizShare) window.__kbQuizShare(score, Q.length, 'hbaq', 'the chatbot vs agent quiz'); }
     });
     next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
     show();

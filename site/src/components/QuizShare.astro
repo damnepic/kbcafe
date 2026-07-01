@@ -1,0 +1,55 @@
+---
+// Reusable "Challenge a friend" strip shown when a quiz is completed. Rendered once per article
+// (in AiPage / ReferencePage); a quiz reveals it by calling
+//   window.__kbQuizShare(correct, total, quizElementId, quizLabel)
+// on its final answer. It relocates itself right under that quiz, shows the score, and shares a
+// result-based, deep-linked challenge. No per-page markup needed.
+const { title, path } = Astro.props;
+const url = new URL(path, Astro.site).href;
+---
+<div class="qs" id="qs-block" hidden>
+  <div class="qs-l"><span class="qs-score" id="qs-score"></span> <span class="qs-cta">Think your friends can beat it?</span></div>
+  <div class="qs-btns">
+    <button class="qs-b qs-native" type="button" id="qs-native">&#8599; Challenge a friend</button>
+    <a class="qs-b" id="qs-x" target="_blank" rel="noopener">Post on X</a>
+    <a class="qs-b" id="qs-reddit" target="_blank" rel="noopener">Reddit</a>
+    <button class="qs-b" type="button" id="qs-copy">Copy link</button>
+  </div>
+</div>
+
+<style is:global>
+  .qs[hidden]{display:none}
+  .qs{margin:14px 0 0;background:var(--cream);border:1.5px solid var(--line);border-radius:12px;padding:13px 16px;display:flex;flex-direction:column;gap:10px}
+  .qs-l{font-size:14.5px;color:var(--ink)}
+  .qs-score{font-family:var(--font-display);font-weight:800}
+  .qs-cta{color:var(--ink-soft)}
+  .qs-btns{display:flex;flex-wrap:wrap;gap:8px}
+  .qs .qs-b{border:1.5px solid var(--line);background:var(--paper);border-radius:9px;padding:7px 13px;font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--ink);text-decoration:none;cursor:pointer;transition:border-color .12s,color .12s}
+  .qs .qs-b:hover{border-color:var(--coral)}
+  #qs-x:hover{border-color:#0b0b0b;color:#0b0b0b}
+  #qs-reddit:hover{border-color:#FF4500;color:#FF4500}
+  .qs-native{background:var(--coral)!important;color:#fff!important;border-color:var(--coral)!important}
+  .qs-native:hover{background:var(--coral-deep)!important;border-color:var(--coral-deep)!important}
+</style>
+
+<script is:inline define:vars={{ url, title }}>
+  window.__kbQuizShare = function (correct, total, quizId, label) {
+    var block = document.getElementById('qs-block'); if (!block) return;
+    var quiz = quizId && document.getElementById(quizId);
+    if (quiz && quiz.parentNode) quiz.insertAdjacentElement('afterend', block);
+    var link = url + (quizId ? '#' + quizId : '');
+    document.getElementById('qs-score').textContent = 'You got ' + correct + '/' + total + '.';
+    var shareText = 'I scored ' + correct + '/' + total + ' on ' + (label || title) + ' at KB Cafe. Can you beat it?';
+    var u = encodeURIComponent(link), t = encodeURIComponent(shareText);
+    document.getElementById('qs-x').href = 'https://x.com/intent/tweet?text=' + t + '&url=' + u;
+    document.getElementById('qs-reddit').href = 'https://www.reddit.com/submit?url=' + u + '&title=' + t;
+    block.hidden = false;
+    var nat = document.getElementById('qs-native');
+    nat.onclick = function () {
+      if (navigator.share) { navigator.share({ title: title, text: shareText, url: link }).catch(function () {}); }
+      else { navigator.clipboard.writeText(link).then(function () { nat.textContent = 'Link copied'; }).catch(function () {}); }
+    };
+    var cp = document.getElementById('qs-copy');
+    cp.onclick = function () { navigator.clipboard.writeText(link).then(function () { cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy link'; }, 1500); }).catch(function () {}); };
+  };
+</script>

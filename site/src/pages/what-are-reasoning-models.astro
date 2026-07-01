@@ -88,7 +88,7 @@ import AiPage from '../layouts/AiPage.astro';
       { t: 'Answer a simple factual question like a capital city.', a: 0, why: 'Standard is fine. A direct lookup. There is no chain of steps to reason through, so thinking mode is wasted.' },
       { t: 'Plan a database migration with ordered, dependent steps and rollback points.', a: 1, why: 'Use reasoning. Real planning under constraints, where the order and dependencies matter, rewards careful step-by-step work.' }
     ];
-    var i = 0, answered = false;
+    var i = 0, answered = false, score = 0;
     var scn = document.getElementById('rs-scn'), btns = document.querySelectorAll('.rs-b'),
         rev = document.getElementById('rs-reveal'), prog = document.getElementById('rs-prog'), next = document.getElementById('rs-next');
     function show() {
@@ -99,14 +99,14 @@ import AiPage from '../layouts/AiPage.astro';
     Array.prototype.forEach.call(btns, function (b) {
       b.addEventListener('click', function () {
         if (answered) return; answered = true;
-        var pick = +b.dataset.v, ok = pick === Q[i].a;
+        var pick = +b.dataset.v, ok = pick === Q[i].a; if (ok) score++;
         Array.prototype.forEach.call(btns, function (c) {
           c.disabled = true;
           if (+c.dataset.v === Q[i].a) c.classList.add('right'); else if (c === b) c.classList.add('wrong');
         });
         rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + Q[i].why;
         rev.hidden = false; next.hidden = (i >= Q.length - 1);
-        if (i >= Q.length - 1) prog.textContent = 'Done, all ' + Q.length + ' seen.';
+        if (i >= Q.length - 1) { prog.textContent = 'Done, all ' + Q.length + ' seen.'; if (window.__kbQuizShare) window.__kbQuizShare(score, Q.length, 'rs', 'the reasoning-model quiz'); }
       });
     });
     next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });

@@ -106,7 +106,7 @@ import AiPage from '../layouts/AiPage.astro';
       { task: "Let the AI open issues and read pull requests in your repo.", opts: ["github", "slack", "filesystem", "postgres"], a: 0, why: "The <code>github</code> server (Version control and dev tools) exposes issues, pull requests, and repository contents. <code>git</code> is its local-only cousin for commits and branches." },
       { task: "Let the AI click through a real website and fill in a form.", opts: ["brave-search", "playwright", "memory", "postgres"], a: 1, why: "<code>playwright</code> (or <code>puppeteer</code>) drives a real browser, so the model can click, type, and scrape. That is the Browser Automation category." }
     ];
-    var i = 0, answered = false;
+    var i = 0, answered = false, score = 0;
     var qEl = document.getElementById('mts-q'), optsEl = document.getElementById('mts-opts'),
         rev = document.getElementById('mts-reveal'), prog = document.getElementById('mts-prog'), next = document.getElementById('mts-next');
     function show() {
@@ -124,7 +124,7 @@ import AiPage from '../layouts/AiPage.astro';
     optsEl.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b || answered) return;
       answered = true;
-      var q = Q[i], k = +b.dataset.k, ok = k === q.a;
+      var q = Q[i], k = +b.dataset.k, ok = k === q.a; if (ok) score++;
       Array.prototype.forEach.call(optsEl.children, function (c) {
         c.disabled = true;
         if (+c.dataset.k === q.a) c.classList.add('right');
@@ -133,7 +133,7 @@ import AiPage from '../layouts/AiPage.astro';
       rev.innerHTML = (ok ? '<strong>Correct.</strong> ' : '<strong>The right pick is ' + q.opts[q.a] + '.</strong> ') + q.why;
       rev.hidden = false;
       next.hidden = (i >= Q.length - 1);
-      if (i >= Q.length - 1) prog.textContent = 'Done, you have seen all ' + Q.length + '.';
+      if (i >= Q.length - 1) { prog.textContent = 'Done, you have seen all ' + Q.length + '.'; if (window.__kbQuizShare) window.__kbQuizShare(score, Q.length, 'mts', 'the match-the-server quiz'); }
     });
     next.addEventListener('click', function () { if (i < Q.length - 1) { i++; show(); } });
     show();
