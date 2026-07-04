@@ -49,6 +49,8 @@ const active = (h) => h === path;
     <a class={active('/learn') ? 'on' : ''} href="/learn">Learn</a>
   </nav>
 
+  <a class="sb-xp" id="sb-xp" href="/learn" hidden>&#128293;&nbsp;<b data-st>0</b>-day streak<span>&nbsp;&middot;&nbsp;&#11088;&nbsp;<b data-xp>0</b> XP</span></a>
+
   <nav class="sb-triage">
     <span class="sb-h">What are you doing?</span>
     {TRIAGE.map(t => t.soon ? (
@@ -159,6 +161,11 @@ const active = (h) => h === path;
   /* primary site nav — surfaced only inside the mobile drawer (the desktop header already carries it),
      so the single drawer is a true superset of the old header menu + sidebar */
   .sb-primary{display:none}
+
+  /* practice streak/XP badge (shown once any XP is earned) */
+  .sb-xp{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin:4px 2px 2px;padding:8px 11px;border:1.3px solid var(--line);border-radius:10px;background:var(--paper);text-decoration:none;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink)}
+  .sb-xp b{font-weight:800}
+  .sb-xp span{color:var(--ink-soft)}
 
   /* rail-less pages (homepage, map, beginner-ai…): no desktop rail, just the mobile drawer */
   .kb-sb.drawer-only{display:none}

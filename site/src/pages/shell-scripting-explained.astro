@@ -1,7 +1,28 @@
 ---
 import ReferencePage from '../layouts/ReferencePage.astro';
+import Practice from '../components/Practice.astro';
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const QUOTE_P = [
+  { type: 'choice', q: 'Which is the correct variable assignment in bash?',
+    options: ['<code>name="value"</code>', '<code>name = "value"</code>', '<code>$name = "value"</code>'], answer: 0,
+    why: 'No spaces around <code>=</code>, and no <code>$</code> on the left when assigning. You only use <code>$name</code> to <em>read</em> it.' },
+  { type: 'input', q: 'A log file might have spaces in its name. Fix this line so it doesn&rsquo;t break: <code>gzip $file</code>',
+    accept: ['gzip "$file"', 're:^gzip\\s+"\\$file"$'], placeholder: 'gzip ...',
+    why: 'Wrap the variable in double quotes, <code>"$file"</code>, so a name with spaces stays a single argument.' },
+];
+const GOTCHA_P = [
+  { type: 'input', q: 'Make the script <code>deploy.sh</code> executable.',
+    accept: ['chmod +x deploy.sh', 're:^chmod\\s+\\+x\\s+deploy\\.sh$'], placeholder: 'chmod ...',
+    why: '<code>chmod +x deploy.sh</code> adds the execute bit; then run it with <code>./deploy.sh</code>.' },
+  { type: 'input', q: 'Run <code>echo hi</code> and write its output into <code>out.txt</code>, <strong>overwriting</strong> the file.',
+    accept: ['echo hi > out.txt', 're:^echo\\s+hi\\s*>\\s*out\\.txt$'], placeholder: 'echo hi ...',
+    why: 'A single <code>&gt;</code> overwrites the file; <code>&gt;&gt;</code> would append to it instead.' },
+  { type: 'choice', q: 'What does <code>set -euo pipefail</code> at the top of a script do?',
+    options: ['Fails loudly on the first error, unset variable, or failed pipe', 'Makes the script run faster', 'Silences all error messages'], answer: 0,
+    why: 'It is the standard safety header: exit on error (<code>-e</code>), error on unset vars (<code>-u</code>), and fail a pipeline if any stage fails (<code>pipefail</code>).' },
+];
 
 const scriptCode = `#!/usr/bin/env bash
 set -euo pipefail                 # exit on error, unset var, or failed pipe
@@ -63,6 +84,8 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
     spaces or wildcards stays a single argument. Unquoted variables are the number-one cause of shell bugs.
   </p>
 
+  <Practice set="sh-quote" title="Assignment and quoting" items={QUOTE_P} />
+
   <h2 id="flow">Conditionals and loops</h2>
   <p>
     Tests go inside <code>[ ... ]</code> (or bash&rsquo;s <code>[[ ... ]]</code>): <code>[ -f "$f" ]</code> (file
@@ -112,6 +135,8 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
     <li><strong>Parsing <code>ls</code>.</strong> Loop over a glob (<code>for f in *.log</code>) instead;
       <code>ls</code> output is for humans, not scripts.</li>
   </ul>
+
+  <Practice set="sh-gotcha" title="Permissions, redirection, safety" items={GOTCHA_P} />
 
   <h2 id="faq">FAQ</h2>
   {FAQ.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}

@@ -5,6 +5,59 @@ import { TOOLS } from '../data/tools.js';
 import { AI } from '../data/ai.js';
 import { LEARNING_PATHS } from '../data/learningPaths.js';
 import DictHover from '../components/DictHover.astro';
+import Capstone from '../components/Capstone.astro';
+
+// One "build this" capstone per path, keyed by path id. The doing that turns a read path into a skill.
+const CAPSTONES = {
+  infra: {
+    title: 'Trace a real question through the stack',
+    brief: 'Pick a question you would actually ask an AI. Now follow it through the machinery you just learned, using the tools from this path. Progress saves on this device.',
+    tasks: [
+      'Paste your question into the <a href="/token-counter">Token Counter</a> and note how many <strong>tokens</strong> it is.',
+      'Open the <a href="/context-window-visualizer">Context Window Visualizer</a> and see what else would share the budget with it.',
+      'In the <a href="/embedding-explorer">Embedding Explorer</a>, compare your question to two rephrasings and watch the <strong>similarity</strong> change.',
+      'Run a document through the <a href="/rag-chunking-visualizer">RAG Chunking Visualizer</a> to see how it splits for retrieval.',
+      'In one sentence, explain how <a href="/what-is-rag">RAG</a> would answer your question from your own documents.',
+    ],
+    uses: [{ nm: 'Token Counter', href: '/token-counter' }, { nm: 'Embedding Explorer', href: '/embedding-explorer' }, { nm: 'RAG Chunking Visualizer', href: '/rag-chunking-visualizer' }],
+  },
+  agents: {
+    title: 'Spec a real agent, end to end',
+    brief: 'Design an agent for a task you actually care about, no code yet. Define its job, its tools, and the guardrails, using the builders from this path.',
+    tasks: [
+      'Write the agent&rsquo;s <strong>one job</strong> in a sentence, and the single <strong>stop</strong> condition that means it is done.',
+      'List the <a href="/what-is-tool-calling">tools</a> it needs; for each, note what breaks if it misfires.',
+      'Pick a control-flow <a href="/ai-patterns">pattern</a> (reflection, router, judge…) and say why it fits.',
+      'Generate a starter config in the <a href="/mcp-config-generator">MCP Config Generator</a> for one tool it connects to.',
+      'Write the two guardrails you will <em>not</em> skip: what needs human sign-off, and what it must never do unasked.',
+    ],
+    uses: [{ nm: 'AI Architecture Generator', href: '/ai-architecture-generator' }, { nm: 'Pattern Builder', href: '/ai-pattern-builder' }, { nm: 'MCP Config Generator', href: '/mcp-config-generator' }],
+  },
+  automate: {
+    title: 'Design one automation that runs itself',
+    brief: 'Pick one repetitive task you do by hand. Turn it into a system on paper, deciding where a plain workflow ends and an agent begins.',
+    tasks: [
+      'Name the <strong>trigger</strong>: what event or schedule kicks it off? If it is time-based, build it in the <a href="/cron-generator">Cron Generator</a>.',
+      'List the steps from trigger to result, in order.',
+      'For each step, decide: does it need an <a href="/ai-agents-vs-workflows-vs-rpa">agent&rsquo;s judgment</a>, or is a fixed workflow enough?',
+      'Pick how the pieces talk: <a href="/webhooks-vs-polling">webhook or polling</a>, and why.',
+      'Sketch where AI <a href="/what-is-ai-orchestration">orchestrates</a> the steps, and what happens when one fails.',
+    ],
+    uses: [{ nm: 'Cron Generator', href: '/cron-generator' }, { nm: 'Automation Blueprints', href: '/automation-blueprints' }, { nm: 'AI Architecture Generator', href: '/ai-architecture-generator' }],
+  },
+  coding: {
+    title: 'Ship one change with AI',
+    brief: 'Take a real, small change you want in some code and drive it the deliberate way: plan first, then build, then review.',
+    tasks: [
+      'Write the change as a <strong>plan-mode</strong> prompt in the <a href="/ai-coding-prompt-builder">AI Coding Prompt Builder</a>: signature, types, and what &ldquo;done&rdquo; looks like.',
+      'Give it the <strong>context</strong> it needs and note the library versions, so it does not code against its <a href="/what-is-a-context-window">training cutoff</a>.',
+      'Have it produce the change, then read the <strong>diff</strong> yourself before accepting anything.',
+      'Commit the working state first (your <a href="/git-version-control">safety net</a>), then let it iterate.',
+      'Write one sentence on what it got wrong and how you steered it, your note for next time.',
+    ],
+    uses: [{ nm: 'AI Coding Prompt Builder', href: '/ai-coding-prompt-builder' }, { nm: 'Context Window Visualizer', href: '/context-window-visualizer' }, { nm: 'Git & version control', href: '/git-version-control' }],
+  },
+};
 
 export function getStaticPaths() {
   return LEARNING_PATHS
@@ -67,6 +120,9 @@ const courseLd = { '@context': 'https://schema.org', '@type': 'Course', name: `L
     </ol>
 
     <p class="lpp-foot" id="foot"></p>
+
+    {CAPSTONES[p.id] && <Capstone id={p.id} title={CAPSTONES[p.id].title} brief={CAPSTONES[p.id].brief} tasks={CAPSTONES[p.id].tasks} uses={CAPSTONES[p.id].uses} />}
+
     <Share path={p.route} title={`Learn ${p.shortTitle}`} variant="prominent" />
     <p class="lpp-links">More routes: <a href="/learn">all learning paths</a>, the <a href="/skill-tree">skill tree</a>, or the <a href="/map">knowledge map</a>.</p>
   </section>
@@ -126,7 +182,11 @@ const courseLd = { '@context': 'https://schema.org', '@type': 'Course', name: `L
     doneEl.textContent = n; reset.hidden = n === 0;
     foot.textContent = n === 0 ? '' : n === total ? '🎉 Path complete. Nicely done.' : `${n} of ${total} done, saved locally on this device.`;
   }
-  steps.forEach(s => s.querySelector('.lpp-check').addEventListener('click', () => { KP.toggle(key(s.dataset.href)); refresh(); }));
+  steps.forEach(s => s.querySelector('.lpp-check').addEventListener('click', () => {
+    const on = KP.toggle(key(s.dataset.href));
+    if (on && window.kbAwardOnce) window.kbAwardOnce('step:' + location.pathname + ':' + s.dataset.href, 5);
+    refresh();
+  }));
   reset.addEventListener('click', () => { steps.forEach(s => KP.set(key(s.dataset.href), false)); refresh(); });
   refresh();
 </script>

@@ -1,6 +1,8 @@
 // Homepage "Freshly brewed" strip: a hand-curated list of recent additions worth featuring.
 // Newest first. Append a one-liner when you ship something notable, drop old ones off the bottom.
 export const LATEST = [
+  { title: 'Learning Path Builder', href: '/learning-path-builder', tag: 'New tool', date: '2026-07-04',
+    blurb: 'Say a goal, get a custom route through KB Cafe’s real guides, tools, and hands-on exercises. No signup.' },
   { title: 'How to prompt Claude Fable 5', href: '/how-to-prompt-claude-fable-5', tag: 'Lesson', date: '2026-07-01',
     blurb: 'Fable 5 rewards fewer instructions, not more. Effort as the main dial, and the migration gotcha that quietly falls back to Opus.' },
   { title: 'How to build an AI agent', href: '/how-to-build-an-ai-agent', tag: 'Lesson', date: '2026-06-30',

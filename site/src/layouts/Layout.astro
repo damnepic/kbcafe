@@ -106,6 +106,37 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
     set(h, on) { const s = this.all(); on ? s.add(h) : s.delete(h); this.save(s); },
     count() { return this.all().size },
   };
+  // Shared "learn by doing" reward: bumps XP and a per-day streak (local only), fires an event the
+  // header badge listens to. Called by Practice exercises, Capstones, and path-step check-offs.
+  window.kbAward = function (n) {
+    try {
+      var xp = (JSON.parse(localStorage.getItem('kb-xp') || '0') || 0) + (n || 0);
+      localStorage.setItem('kb-xp', JSON.stringify(xp));
+      var st = JSON.parse(localStorage.getItem('kb-streak') || '{"d":"","n":0}');
+      var t = new Date().toISOString().slice(0, 10);
+      if (st.d !== t) { var y = new Date(Date.now() - 864e5).toISOString().slice(0, 10); st.n = (st.d === y) ? (st.n || 0) + 1 : 1; st.d = t; localStorage.setItem('kb-streak', JSON.stringify(st)); }
+      window.dispatchEvent(new CustomEvent('kb-xp-change'));
+      return st.n || 1;
+    } catch (e) { return 0; }
+  };
+  // Award XP once per unique key (for path steps / capstones that can be re-toggled).
+  window.kbAwardOnce = function (key, n) {
+    try { var a = JSON.parse(localStorage.getItem('kb-xp-awarded') || '{}'); if (a[key]) return 0; a[key] = 1; localStorage.setItem('kb-xp-awarded', JSON.stringify(a)); return window.kbAward(n); } catch (e) { return 0; }
+  };
+  // Header streak/XP badge: appears once any XP is earned, refreshes on every change.
+  (function () {
+    function render() {
+      var xp = 0, st = 0;
+      try { xp = JSON.parse(localStorage.getItem('kb-xp') || '0') || 0; var s = JSON.parse(localStorage.getItem('kb-streak') || '{}'); st = (s && s.n) || 0; } catch (e) {}
+      ['nav-xp', 'sb-xp'].forEach(function (id) {
+        var el = document.getElementById(id); if (!el) return;
+        if (xp > 0) { el.hidden = false; var a = el.querySelector('[data-st]'), b = el.querySelector('[data-xp]'); if (a) a.textContent = st; if (b) b.textContent = xp; }
+        else el.hidden = true;
+      });
+    }
+    window.addEventListener('kb-xp-change', render);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render); else render();
+  })();
 </script>
 <!-- Privacy-friendly analytics by Plausible (cookieless, no personal data, aggregate only) -->
 <script is:inline async src="https://plausible.io/js/pa-jVkxTQgljXyiSvPl7VnJU.js"></script>
@@ -149,6 +180,7 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
       <a href="/reference" class={navActive('/reference') ? 'on' : ''}>Knowledge Base</a>
       <a href="/tools" class={navActive('/tools') ? 'on' : ''}>Tools</a>
       <a href="/learn" class={navActive('/learn') ? 'on' : ''}>Learn</a>
+      <a class="nav-xp" id="nav-xp" href="/learn" hidden title="Your practice streak and XP, saved on this device">&#128293;&nbsp;<b data-st>0</b><span class="nx-x">&#11088;&nbsp;<b data-xp>0</b></span></a>
       <button class="nav-study" id="nav-study" type="button" aria-pressed="false" aria-label="Open a study window: read two pages side by side" title="Study window: open a second page beside this one">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/><path d="m10 15-3-3 3-3"/></svg>
         <span>Study</span>
@@ -449,6 +481,11 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
   .nav-links a:hover{color:var(--ink)}
   .nav-links a.on{color:var(--ink);font-weight:700}
   .nav-links a.on::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:2.5px;border-radius:2px;background:var(--coral)}
+  /* practice streak/XP badge (shown once the visitor has earned any XP) */
+  .nav-xp{display:inline-flex;align-items:center;gap:5px;text-decoration:none;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--ink);background:var(--cream);border:1.3px solid var(--line);border-radius:20px;padding:5px 11px;line-height:1;transition:border-color .14s}
+  .nav-xp:hover{border-color:var(--coral)}
+  .nav-xp b{font-weight:800}
+  .nav-xp .nx-x{color:var(--ink-soft);display:inline-flex;align-items:center;gap:4px;padding-left:7px;border-left:1px solid var(--line)}
   /* search: magnifier by default; ⌘K box on Mac; expands to an inline bar */
   .nav-search{position:relative;display:flex;align-items:center}
   .ns-toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;background:none;border:0;color:var(--ink-soft);padding:6px;border-radius:10px;transition:color .15s,border-color .15s}

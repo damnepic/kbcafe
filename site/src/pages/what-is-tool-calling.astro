@@ -1,5 +1,17 @@
 ---
 import AiPage from '../layouts/AiPage.astro';
+import Practice from '../components/Practice.astro';
+const TC_P = [
+  { type: 'choice', q: 'When a model makes a tool call, what does it actually return?',
+    options: ['A structured request: a function name plus JSON arguments', 'The final answer as plain text', 'The result of running the function'], answer: 0,
+    why: 'The model only <em>asks</em>. It emits a function name and JSON arguments; your code runs the real function and hands the result back.' },
+  { type: 'choice', q: 'Who executes the actual function?',
+    options: ['Your code', 'The model', 'The JSON schema'], answer: 0,
+    why: 'The model never executes anything itself, it requests a call, and your program decides whether and how to run it.' },
+  { type: 'choice', q: 'What, in one line, makes behavior &ldquo;agentic&rdquo;?',
+    options: ['A model choosing tools in a loop until the task is done', 'A larger model', 'A longer prompt'], answer: 0,
+    why: 'Call a tool, read the result, decide what is next, repeated until done, is the core loop of an agent.' },
+];
 ---
 <AiPage
   title="What is tool calling (function calling)?, explained | KB Cafe"
@@ -34,6 +46,8 @@ import AiPage from '../layouts/AiPage.astro';
     That last loop, call a tool, read the result, decide what&rsquo;s next, repeated until the task is
     done, is the core of an <strong>agent</strong>.
   </p>
+
+  <Practice set="tc-flow" title="Check your understanding" items={TC_P} />
 
   <h2>Why it matters</h2>
   <ul>

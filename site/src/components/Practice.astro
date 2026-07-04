@@ -129,12 +129,9 @@ const stripTags = (s = '') => String(s).replace(/<[^>]+>/g, '');
       var id = item.dataset.id;
       if (done[id]) return;
       done[id] = true; LS.set('kb-practice-done', done);
-      var xp = (LS.get('kb-xp', 0) || 0) + 10; LS.set('kb-xp', xp);
-      var st = LS.get('kb-streak', { d: '', n: 0 });
-      var t = day(Date.now());
-      if (st.d !== t) { st.n = (st.d === day(Date.now() - 864e5)) ? (st.n || 0) + 1 : 1; st.d = t; LS.set('kb-streak', st); }
+      var streak = window.kbAward ? window.kbAward(10) : 0;   // shared XP + day-streak, updates the header badge
       refreshSet(item.closest('.kbp'));
-      toast('Nice. +10 XP  ·  🔥 ' + st.n + '-day streak');
+      toast('Nice. +10 XP' + (streak ? '  ·  🔥 ' + streak + '-day streak' : ''));
     }
 
     function reveal(item) { var w = item.querySelector('.kbp-why'); if (w && w.textContent.trim()) w.hidden = false; }

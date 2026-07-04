@@ -66,6 +66,7 @@ const { id, title = 'Capstone project', brief = '', tasks = [], uses = [] } = As
           fill.style.width = total ? Math.round((n / total) * 100) + '%' : '0';
           count.textContent = n + '/' + total; count.classList.toggle('full', n === total && total > 0);
           if (doneMsg) doneMsg.hidden = !(n === total && total > 0);
+          if (n === total && total > 0 && window.kbAwardOnce) window.kbAwardOnce('capstone:' + sec.dataset.cap, 50);
         }
         boxes.forEach(function (b) {
           if (state[b.dataset.i]) b.checked = true;
