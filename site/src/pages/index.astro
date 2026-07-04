@@ -9,11 +9,13 @@ import { LATEST } from '../data/latest.js';
 import { BG_GUIDES } from '../data/beginnerGuides.js';
 import { POSTS } from '../data/blog.js';
 const fmtFresh = (iso) => { const [y, m, d] = iso.split('-').map(Number); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m - 1] + ' ' + d; };
-// "Freshly brewed" = curated highlights + the 2 newest blog posts, merged and shown newest-first.
-const freshItems = [
-  ...LATEST.slice(0, 4),
-  ...POSTS.slice(0, 2).map(p => ({ title: p.title, href: '/blog/' + p.slug, tag: 'Blog', blurb: p.excerpt, date: p.date })),
+// "Freshly brewed" = every menu addition (curated highlights + blog posts), merged newest-first.
+// The homepage shows the 9 newest; the full history lives at /menu.
+const menuItems = [
+  ...LATEST,
+  ...POSTS.map(p => ({ title: p.title, href: '/blog/' + p.slug, tag: 'Blog', blurb: p.excerpt, date: p.date })),
 ].sort((a, b) => b.date.localeCompare(a.date));
+const freshItems = menuItems.slice(0, 9);
 // Term of the day: compact dictionary pool, the day-seeded pick happens client-side (rotates daily, no rebuild).
 const totdTerms = DICT.map(d => ({ t: d.term, s: d.slug, a: (d.answer || '').replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 96) }));
 
@@ -189,7 +191,7 @@ const UI_ICONS = {
   <section class="fresh">
     <div class="fresh-head">
       <div><span class="fresh-eye">☕ Freshly brewed</span><h2 class="fresh-h">New on the menu</h2></div>
-      <a class="fresh-all" href="/blog">From the blog <span aria-hidden="true">→</span></a>
+      <a class="fresh-all" href="/menu">The whole menu <span aria-hidden="true">→</span></a>
     </div>
     <div class="fresh-grid">
       {freshItems.map((it, idx) => (
