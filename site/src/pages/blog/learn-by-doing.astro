@@ -1,0 +1,146 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+import Practice from '../../components/Practice.astro';
+
+// Live demo, all three exercise types, so the post itself is something you do, not just read.
+const DEMO = [
+  { type: 'choice', q: 'A model makes a <strong>tool call</strong>. What does it actually return?',
+    options: ['A structured request: a function name plus JSON arguments', 'The finished answer as plain text', 'The result of running the function'], answer: 0,
+    why: 'It only <em>asks</em>. Your code runs the real function and hands the result back. (More in <a href="/what-is-tool-calling">tool calling</a>.)' },
+  { type: 'input', q: 'In Git, stage <strong>every</strong> changed file for your next commit.',
+    accept: ['git add .', 're:^git\\s+add\\s+\\.$', 'git add -A', 'git add --all'], placeholder: 'git ...',
+    why: '<code>git add .</code> stages everything that changed. (Try the full set on the <a href="/git-version-control">Git lesson</a>.)' },
+  { type: 'code', q: 'Write a function <code>add(a, b)</code> that returns their sum. It runs right here in your browser.',
+    starter: 'function add(a, b) {\n  // your code\n}', rows: 5,
+    tests: [{ expr: 'add(2, 3)', expect: 5 }, { expr: 'add(-1, 1)', expect: 0 }, { expr: 'add(10, 0)', expect: 10 }],
+    why: 'A one-liner, <code>return a + b</code>, passes all three tests. No server involved.' },
+];
+---
+<BlogPost
+  title="New on KB Cafe: Practice in Every Lesson, Capstones, and a Path Builder"
+  description="KB Cafe's biggest update yet: interactive practice interleaved into lessons, build-this capstones on every learning path, a streak and XP system, a learning path builder, and two new guides (prompting Claude Fable 5 and monetizing a channel with AI). All free, no account, in your browser."
+  slug="learn-by-doing"
+  tag="Build in Public"
+  date="2026-07-04"
+>
+  <p>
+    KB Cafe has always said &ldquo;learn by doing.&rdquo; For a while, the honest version of that was: read a clear
+    explainer, then go play with a tool. Good, but the reading and the doing lived in different places. This update closes
+    that gap. Now the doing happens <em>inside the lesson</em>, the moment you learn a thing you get to use it, and the
+    whole system remembers your progress. Plus two substantial new guides and a pile of polish. As always: free, no
+    account, nothing leaves your browser.
+  </p>
+
+  <h2>Practice, right in the lesson</h2>
+  <p>
+    The headline is a new <strong>practice engine</strong>. Instead of a single quiz bolted onto the end of a page,
+    lessons now interleave short exercises between the ideas: read a concept, do it, read the next, do that. There are
+    three kinds of exercise, and the best way to explain them is to just try them. This is live, it grades right here:
+  </p>
+
+  <Practice set="blog-demo" title="Try all three, right now" items={DEMO} />
+
+  <p>
+    That was a multiple-choice check, a fill-in-the-command with real answer matching (it accepts
+    <code>git add .</code>, <code>git add -A</code>, and the regex in between), and a <strong>code exercise that actually
+    ran</strong>: your function executed against hidden tests, in your browser, with no server in the loop. Every exercise
+    also has a <strong>&ldquo;Check it with your AI&rdquo;</strong> button that copies the task, your answer, and a
+    tutoring prompt to your clipboard, so you can paste it into Claude or ChatGPT and get a hint. That is our honest
+    take on the &ldquo;AI tutor&rdquo; that paid platforms charge a subscription for: use the one you already have.
+  </p>
+  <p>
+    It is already interleaved into the <a href="/git-version-control">Git lesson</a> (run the everyday loop, branch and
+    merge, dodge the <code>.gitignore</code> traps), <a href="/shell-scripting-explained">shell scripting</a> (quoting,
+    permissions, redirection), and <a href="/what-is-tool-calling">tool calling</a>, with more lessons landing the same
+    treatment. Your completions are saved on your device, so a page you half-finished remembers where you were.
+  </p>
+
+  <h2>A streak, XP, and a badge that means something</h2>
+  <p>
+    Doing things now counts. Every exercise you pass, every capstone you finish, every step you check off feeds a running
+    <strong>XP total and a day-streak</strong>, shown as a small badge in the header once you have earned anything. It is
+    deliberately low-key: no leaderboards, no notifications, no dark patterns. Just a quiet nudge that you have been
+    showing up. And because it is all in local storage, the streak is yours and private, it never touches a server.
+  </p>
+
+  <h2>Capstones: build the thing</h2>
+  <p>
+    Reading a path and <em>building</em> something at the end of it are different skills. Every learning path now ends
+    with a <strong>capstone</strong>: a real, small project with a checklist that tracks your progress. Not a toy, a thing
+    you actually make:
+  </p>
+  <ul>
+    <li><a href="/learn-prompting">Master Prompting</a> &rarr; write and optimize a real prompt for a task you need done this week.</li>
+    <li><a href="/learn-ai-infrastructure">AI Infrastructure</a> &rarr; trace one of your own questions through tokens, context, embeddings, and retrieval.</li>
+    <li><a href="/learn-ai-agents">Build AI Agents</a> &rarr; spec a real agent end to end: its job, its tools, and the guardrails you will not skip.</li>
+    <li><a href="/learn-ai-automation">Automate Work</a> &rarr; design one automation that runs itself, deciding where a workflow ends and an agent begins.</li>
+    <li><a href="/learn-ai-coding">Coding with AI</a> &rarr; ship one real change with AI, plan first, read the diff, commit your safety net.</li>
+  </ul>
+  <p>Each links the exact tools for the job, and checking off the last box is worth a satisfying chunk of XP.</p>
+
+  <h2>The Learning Path Builder</h2>
+  <p>
+    Not sure where to start? The new <a href="/learning-path-builder">Learning Path Builder</a> takes a goal in plain
+    language, &ldquo;build an AI agent that can search the web,&rdquo; &ldquo;get better at prompting,&rdquo;
+    &ldquo;monetize a channel with AI,&rdquo; and assembles an ordered route for you: foundations first, then the core,
+    then where to go deeper, with the hands-on tools marked.
+  </p>
+  <p>
+    Here is the important part, and where it differs from an AI &ldquo;course generator&rdquo;: <strong>every step is a
+    real page a human wrote and checked.</strong> Nothing is generated on the fly, so you never get a confident-sounding
+    lesson that is subtly wrong. It composes a path out of KB Cafe&rsquo;s existing, vetted guides and tools, following
+    the same prerequisite graph that powers the <a href="/map">knowledge map</a>. It runs entirely in your browser, and it
+    is now featured on the <a href="/learn">Learn hub</a> too.
+  </p>
+
+  <h2>Two new guides</h2>
+  <p>
+    Alongside the system, two meaty new pages went up, both built the KB Cafe way: mechanism first, real numbers, no guru
+    nonsense.
+  </p>
+  <h3>How to prompt Claude Fable 5</h3>
+  <p>
+    <a href="/how-to-prompt-claude-fable-5">How to prompt Claude Fable 5</a> covers what actually changes when you move to
+    a model built for long, autonomous work: effort as the main dial, why you can steer it with <em>fewer</em>
+    instructions rather than more, keeping long runs honest, and the migration gotcha that quietly falls back to Opus if
+    you tell it to show its reasoning. It is grounded in Anthropic&rsquo;s official guidance, with a hands-on
+    match-the-fix exercise, and an honest note on the June-to-July re-release.
+  </p>
+  <h3>Monetize a YouTube channel with AI</h3>
+  <p>
+    <a href="/monetize-youtube-with-ai">Monetize a YouTube channel with AI</a> is the anti-hype version of every
+    &ldquo;get monetized in 90 days&rdquo; post. It uses AI as your strategist to plan, package, script, and diversify a
+    channel, but it is honest about what that requires: the real 2026 Partner Program thresholds (with an
+    <strong>interactive eligibility checker</strong> that tells you exactly what you still need), how the money actually
+    splits, and the 2025 policy that quietly demonetizes mass-produced AI &ldquo;slop.&rdquo; Every number is from
+    YouTube&rsquo;s own docs; the eight planning prompts are rebuilt with the income guarantees stripped out.
+  </p>
+
+  <h2>Smaller things, worth mentioning</h2>
+  <ul>
+    <li><strong>One clean menu on mobile.</strong> The header used to show two identical hamburger icons on phones. It is
+      now a single menu button, in the same place on every page, opening one tidy drawer. No more guessing which icon does what.</li>
+    <li><strong>The knowledge map is tappable again.</strong> On the <a href="/map">constellation view</a>, tapping a star
+      now reliably opens its detail card, a subtle touch-input bug was swallowing taps.</li>
+    <li><strong>A live status widget in the wild.</strong> Our post on <a href="/blog/what-happens-when-anthropic-goes-down">what
+      happens when Anthropic goes down</a> now embeds a live AI-status widget, so you can see the exact thing the article
+      describes, updating in real time, without leaving the page.</li>
+  </ul>
+
+  <h2>The through-line</h2>
+  <p>
+    We spent a while studying the best paid, practice-first learning platforms, the ones that get people to actually
+    <em>do</em> the work. They are good. They are also behind a login and a monthly bill. The question we kept asking was:
+    why does any of this need an account? Grading a code exercise, remembering a streak, assembling a path, none of it
+    requires a server or your email. So we built it the way we build everything here: it runs in your browser, it stores
+    your progress on your device, and it never asks who you are.
+  </p>
+
+  <h2>Where to start</h2>
+  <p>
+    Open the <a href="/git-version-control">Git lesson</a> and actually run the exercises, then check off a capstone on
+    <a href="/learn-prompting">the prompting path</a>. If you are not sure what to learn, tell the
+    <a href="/learning-path-builder">Path Builder</a> your goal and follow the route it gives you. Watch the streak in the
+    header tick up. Same promise as day one: you keep this stuff by using it, so we keep building things to use.
+  </p>
+</BlogPost>

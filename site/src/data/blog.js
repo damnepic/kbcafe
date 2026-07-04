@@ -1,6 +1,9 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "learn-by-doing", title: "New on KB Cafe: Practice in Every Lesson, Capstones, and a Path Builder",
+    date: "2026-07-04", tag: "Build in Public",
+    excerpt: "Our biggest update yet: interactive practice interleaved into lessons (try it live in the post), build-this capstones on every path, a streak and XP system, a learning path builder that composes real vetted pages, and two new guides. All free, no account, in your browser." },
   { slug: "what-happens-when-anthropic-goes-down", title: "What Actually Happens When Anthropic Goes Down?",
     date: "2026-06-30", tag: "AI",
     excerpt: "When Claude has an outage, dozens of AI tools degrade at once while their own status pages stay green. What an upstream provider outage looks like, why it's so confusing to debug, and how to tell in seconds whether it's you, your tool, or the model underneath." },
