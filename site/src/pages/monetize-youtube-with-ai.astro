@@ -1,0 +1,259 @@
+---
+import ReferencePage from '../layouts/ReferencePage.astro';
+
+// The 8 AI "roles" for planning a channel, rebuilt from a viral prompt list into honest,
+// usable strategist prompts (the hype and income guarantees stripped out).
+const ROLES = [
+  { t: "The 90-day plan", u: "A realistic first-quarter roadmap",
+    p: "Act as a YouTube strategist. I'm starting a channel in [niche]. Give me an honest 90-day plan: a specific angle that isn't already saturated, my first 10 videos in an order that builds on each other, which monetization I could realistically turn on first and the exact subscriber and watch-hour bar it needs, and a range of outcomes at 30/60/90 days assuming I upload consistently. Flag anything that depends on luck rather than effort." },
+  { t: "The concept architect", u: "Package a video so it gets clicked and watched",
+    p: "Act as a YouTube packaging specialist for [niche]. For a video about [topic], give me: 3 title options and why each might earn a click, a thumbnail concept that reads clearly at a glance, a first-15-seconds hook that sets one clear promise, and a retention structure that actually pays that promise off. No clickbait the video can't deliver, since a high click rate with low watch time gets demoted." },
+  { t: "The script coach", u: "A script that holds attention honestly",
+    p: "Act as a YouTube script editor. Draft a script for [topic] aimed at [audience]: a hook that states the payoff in one line, a short intro that earns the next 30 seconds, a main body with natural re-hooks so attention doesn't sag, and a call to action that fits the video instead of feeling bolted on. Keep my voice; flag any spot that pads length without adding value." },
+  { t: "The discovery planner", u: "Get found through search and suggestions",
+    p: "Act as a YouTube SEO and discovery helper for [niche]. Find realistic search terms a small channel could actually rank for, a title that serves both search and click-through, and a description that covers the topic honestly. Then set expectations: which of these are search-driven versus suggestion-driven, and roughly how long discovery takes for a brand-new channel with little watch history." },
+  { t: "The early-income mapper", u: "Make money before you hit the ad program",
+    p: "Act as a creator-economy advisor. I have [X] subscribers and I'm not in the ad program yet. Map income I can start now without ads: relevant affiliate options for a [niche] audience, one small digital product or service I could realistically ship this month, and how to introduce them without alienating viewers. Give conservative estimates and name the assumptions behind them." },
+  { t: "The Shorts strategy", u: "Use Shorts to feed the main channel",
+    p: "Act as a Shorts strategist. I want Shorts to grow my main channel in [niche]. Suggest a content type that suits Shorts now, a strong first-second hook, an honest take on how well Shorts viewers actually convert into long-form subscribers, and a simple 30-day posting plan I can sustain without burning out. Don't assume any single Short goes viral." },
+  { t: "The thumbnail critic", u: "Fix thumbnails that don't get clicked",
+    p: "Act as a thumbnail reviewer. My thumbnails underperform even when the video is good. Give me principles for instant clarity (one focal point, strong contrast, minimal text), 3 concepts for a video about [topic], and a free workflow to produce them quickly. Prioritize clarity over hype, and note what tends to read poorly on a small mobile screen." },
+  { t: "The long-term business plan", u: "Turn a channel into durable income",
+    p: "Act as a creator-business advisor. I want this channel to become real income over time, not a lottery ticket. Map the subscriber and watch-time milestones that unlock each monetization feature, a diversified income mix (ads plus memberships plus a product plus sponsorship) rather than ads alone, and an honest timeline with the assumptions it depends on. Tell me where most channels stall and why." },
+];
+---
+<ReferencePage
+  title="Monetize a YouTube channel with AI (honestly) | KB Cafe"
+  description="The mechanism-first, no-hype guide to monetizing YouTube with AI as your strategist. The real 2026 Partner Program thresholds, how the money actually splits, the AI-content policy that demonetizes 'slop', 8 planning prompts rebuilt without the guru claims, and what genuinely grows a channel. With an eligibility checker."
+  path="/monetize-youtube-with-ai"
+  eyebrow="Knowledge Base · Monetization"
+  h1="Monetize a YouTube channel with AI"
+  tagline="AI is a superb strategist, scriptwriter, and packaging critic. What it cannot do is manufacture the two things monetization actually requires: an audience, and content worth watching. This is the honest version, real thresholds, real economics, and the AI-content rule that quietly demonetizes shortcuts."
+>
+  <nav class="toc" aria-label="On this page">
+    <span class="toc-h">On this page</span>
+    <a href="#reality">The honest part</a>
+    <a href="#eligible">Are you eligible?</a>
+    <a href="#money">How the money works</a>
+    <a href="#trap">The AI-content trap</a>
+    <a href="#prompts">8 AI roles</a>
+    <a href="#works">What actually works</a>
+    <a href="#myths">Myths vs reality</a>
+  </nav>
+
+  <h2 id="reality">First, the honest part</h2>
+  <p>
+    Every &ldquo;get monetized in 90 days, hit $100K/year&rdquo; post sells the same fantasy: that the bottleneck is a
+    clever prompt. It isn&rsquo;t. YouTube earnings follow a brutal power law. Pew Research found that among popular
+    channels, the top 10% of videos captured <strong>79% of all views</strong>, and in the largest survey of full-time
+    creators only about <strong>12% cleared $50,000 a year</strong> while nearly half earned under $1,000. YouTube has
+    paid creators over <strong>$70 billion</strong> in three years across 3M+ channels, but that average hides a median
+    that sits far, far below it.
+  </p>
+  <p>
+    That is exactly where AI earns its keep. Used well, a model is your always-on strategist and production crew: it
+    pressure-tests a channel angle, orders your first videos, drafts and tightens scripts, rewrites titles and thumbnails
+    until they earn the click, finds search terms a new channel can realistically rank for, and maps income streams
+    before you have a single subscriber. What it <em>cannot</em> do is watch the videos for people or conjure an
+    audience, so treat every income figure it hands you as a hypothesis to test, never a promise. The
+    <a href="#prompts">eight AI roles below</a> put a model to work across that whole journey; the thresholds, splits,
+    and policy in between are the guardrails that keep its advice honest, all from YouTube&rsquo;s own documentation.
+  </p>
+
+  <h2 id="eligible">Are you even eligible yet?</h2>
+  <p>
+    You cannot turn on most monetization until you&rsquo;re in the <strong>YouTube Partner Program (YPP)</strong>, and
+    there are two rungs. The lower one unlocks fan funding; the higher one unlocks ad revenue. These numbers are current
+    as of 2026, straight from YouTube Help:
+  </p>
+  <table class="cmp">
+    <thead><tr><th>Tier</th><th>Bar to clear</th><th>Unlocks</th></tr></thead>
+    <tbody>
+      <tr><td>Fan-funding tier</td><td>500 subscribers, 3 public uploads in 90 days, and either 3,000 valid public watch hours (past 12 months) or 3M Shorts views (past 90 days)</td><td>Memberships, Super Thanks, Super Chat &amp; Stickers, Shopping</td></tr>
+      <tr><td>Full (ads) tier</td><td>1,000 subscribers, and either 4,000 valid public watch hours (past 12 months) or 10M Shorts views (past 90 days)</td><td>Watch-page &amp; Shorts ads, YouTube Premium share (plus everything above)</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Both rungs also require the obvious housekeeping: living in a country where YPP is available, 2-Step Verification on
+    your Google account, no active Community Guidelines strikes, following the monetization policies, and a linked AdSense
+    for YouTube account. After you apply, a review decision typically takes about a month.
+  </p>
+
+  <div class="ym" id="ym">
+    <div class="ym-head">Eligibility checker</div>
+    <p class="ym-sub">Enter your numbers. This checks the thresholds only, not the country/strikes/verification requirements above.</p>
+    <div class="ym-grid">
+      <label>Subscribers<input type="number" id="ym-subs" min="0" placeholder="0" inputmode="numeric"></label>
+      <label>Public uploads (last 90 days)<input type="number" id="ym-up" min="0" placeholder="0" inputmode="numeric"></label>
+      <label>Valid public watch hours (last 12 mo)<input type="number" id="ym-wh" min="0" placeholder="0" inputmode="numeric"></label>
+      <label>Shorts views (last 90 days)<input type="number" id="ym-sv" min="0" placeholder="0" inputmode="numeric"></label>
+    </div>
+    <div class="ym-out" id="ym-out" aria-live="polite"></div>
+  </div>
+
+  <h2 id="money">How the money actually works</h2>
+  <p>
+    &ldquo;Monetized&rdquo; is not one thing. YouTube itself lists six-plus earning features, and they pay very
+    differently. Here is what you actually keep, and the honest reality of each:
+  </p>
+  <table class="cmp">
+    <thead><tr><th>Stream</th><th>You keep</th><th>Reality check</th></tr></thead>
+    <tbody>
+      <tr><td>Long-form ads</td><td>55% of ad revenue</td><td>Net RPM roughly $1&ndash;$30 per 1,000 views, hugely niche-dependent (finance and software high, gaming and entertainment low). Most views never even serve an ad.</td></tr>
+      <tr><td>Shorts ads</td><td>45% of a pooled fund</td><td>Around $0.01&ndash;$0.10 per 1,000 views. A reach and funnel play, not a living on its own.</td></tr>
+      <tr><td>Memberships &amp; Supers</td><td>70% (after tax and iOS fees)</td><td>Needs a fanbase that wants to pay; only a small fraction of viewers ever do. Great once you have true fans.</td></tr>
+      <tr><td>Shopping affiliate</td><td>Merchant-set commission (~15% median)</td><td>Bar dropped to 500 subs in 2026. Works when your content has real buying intent; paid via AdSense 60&ndash;120 days out.</td></tr>
+      <tr><td>Sponsorships</td><td>You set the price (off-platform)</td><td>Often the biggest line for mid-size channels; roughly $15&ndash;$70 CPM by niche. Negotiated directly with brands.</td></tr>
+      <tr><td>Your own product or service</td><td>Nearly all of it</td><td>Highest-margin path, and it doesn&rsquo;t need YPP at all. The most durable income most creators build.</td></tr>
+    </tbody>
+  </table>
+  <p>
+    The pattern that falls out of this is the single most useful monetization insight there is:
+    <strong>ads are rarely the biggest line.</strong> Per YouTube&rsquo;s own 2024 data, more than half of channels
+    earning five figures or more made that money from something <em>other</em> than ads and Premium. A 2025 report on
+    1,000+ full-time creators found those who added brand deals earned about $64,000 more on average than the
+    AdSense-only crowd. Plan for a mix from day one; don&rsquo;t wait for the ad program to be your whole business.
+  </p>
+
+  <h2 id="trap">The AI-content trap (read this before you automate)</h2>
+  <p>
+    This is the part the &ldquo;AI YouTube empire&rdquo; crowd conveniently skips. On <strong>July 15, 2025</strong>,
+    YouTube renamed and clarified its long-standing &ldquo;repetitious content&rdquo; policy as
+    <strong>&ldquo;inauthentic content.&rdquo;</strong> Mass-produced, templated, low-effort content, <em>whether a human
+    or an AI made it</em>, is ineligible for monetization. Named examples that don&rsquo;t qualify: image slideshows or
+    scrolling text with little narrative, near-identical videos churned out at scale, and readings of material you
+    didn&rsquo;t create.
+  </p>
+  <p>
+    Crucially, this is <strong>not a ban on AI.</strong> AI-assisted content stays fully monetizable when you add real,
+    original value, your perspective, editing, commentary, a genuine transformation. The line isn&rsquo;t
+    &ldquo;AI or not,&rdquo; it&rsquo;s &ldquo;original and worth watching, or mass-produced filler.&rdquo; Two more rules
+    worth knowing:
+  </p>
+  <ul>
+    <li><strong>Disclose realistic synthetic media.</strong> If AI makes a real person appear to say or do something they didn&rsquo;t, or fabricates a realistic scene or event, you must label it. Disclosure does <em>not</em> reduce your reach or earnings. It&rsquo;s not required for clearly unreal content, minor edits, or cloning your own voice for dubs.</li>
+    <li><strong>Slop doesn&rsquo;t just fail to earn, it can sink the channel.</strong> Channels built on automated, unedited AI mass-production have been demonetized and removed outright. Using AI to <em>produce faster</em> is fine; using it to <em>produce filler</em> is a dead end.</li>
+  </ul>
+
+  <h2 id="prompts">Put AI to work: 8 roles across the journey</h2>
+  <p>
+    This is the practical heart of monetizing <em>with AI</em>. Every &ldquo;god-tier YouTube prompts&rdquo; list is
+    really the same handful of jobs, so here they are rebuilt as honest strategist prompts with the income guarantees
+    stripped out, arranged in the order you&rsquo;d actually use them: <strong>plan the channel, package and script each
+    video, get it discovered, switch on early income, then diversify toward durable revenue.</strong> Fill in the
+    <code>[brackets]</code>, run them in whichever model you use (they suit
+    <a href="/how-to-prompt-claude-fable-5">a capable model</a> well), and treat the output as a first draft to
+    challenge, not gospel.
+  </p>
+  <div class="pk">
+    {ROLES.map((r, i) => (
+      <div class="pk-card">
+        <div class="pk-top"><span class="pk-n">{String(i + 1).padStart(2, '0')}</span><div class="pk-ttl"><b>{r.t}</b><small>{r.u}</small></div><button class="pk-copy" type="button" data-copy={r.p}>Copy</button></div>
+        <p class="pk-prompt">{r.p}</p>
+      </div>
+    ))}
+  </div>
+
+  <h2 id="works">What actually moves the needle</h2>
+  <p>
+    Strip away the hacks and YouTube&rsquo;s own documentation points at a short list of things that genuinely matter:
+  </p>
+  <ul>
+    <li><strong>Packaging is the lever.</strong> Viewers see your title and thumbnail first; YouTube literally calls this &ldquo;packaging&rdquo; and 90% of top-performing videos use a custom thumbnail. As one well-known strategist puts it, the difference between a million views and 28 million is often just how it was packaged.</li>
+    <li><strong>Click <em>and</em> watch, not click alone.</strong> A high click-through rate with low watch time reads as clickbait and gets demoted. In YouTube&rsquo;s own A/B tests, the winning thumbnail is the one with the most <em>watch time</em>, not the most clicks. Half of all videos sit between a 2% and 10% click-through rate, so obsessing over CTR in isolation is a trap.</li>
+    <li><strong>Recommendations beat subscribers.</strong> The system finds videos for viewers based on what they actually watch and enjoy, not your subscriber count, and recommendations drive more views than subscriptions or search. A focused niche helps because the system learns your &ldquo;favored themes, topics, and formats.&rdquo;</li>
+    <li><strong>Consistency over cadence.</strong> YouTube says &ldquo;quality over quantity&rdquo; and that the algorithm doesn&rsquo;t penalize breaks, and publish time doesn&rsquo;t affect long-term performance. Uploading more can correlate with faster growth, but a schedule you can sustain beats a heroic pace you&rsquo;ll abandon.</li>
+    <li><strong>Diversify early.</strong> See the money table: the creators who earn real income almost never rely on ads alone.</li>
+  </ul>
+
+  <h2 id="myths">Myths vs reality</h2>
+  <ul>
+    <li><strong>&ldquo;Subscribers = money.&rdquo;</strong> No. Ad revenue tracks watch time and valid views, not subscriber count. YPP requires watch hours or Shorts views <em>on top of</em> subscribers for a reason.</li>
+    <li><strong>&ldquo;Go viral once and you&rsquo;re set.&rdquo;</strong> Virality is concentrated and episodic, not a durable income base. A hit resets your baseline; it doesn&rsquo;t guarantee the next one.</li>
+    <li><strong>&ldquo;You get paid a flat rate per view.&rdquo;</strong> No. You get a share of ad and subscription revenue that swings with niche, season, and viewer geography.</li>
+    <li><strong>&ldquo;Just let AI mass-produce videos.&rdquo;</strong> That&rsquo;s the exact pattern the inauthentic-content policy demonetizes. Faster production, yes; filler, no.</li>
+    <li><strong>&ldquo;Ad revenue will support me.&rdquo;</strong> For most channels it won&rsquo;t. Memberships, products, and sponsorships are where durable income lives.</li>
+  </ul>
+
+  <p class="mono-note">
+    Thresholds, revenue splits, and the content policy here are from YouTube&rsquo;s official Help and blog. Income and
+    RPM ranges are industry estimates that vary widely by niche and audience, treat them as ballparks, not quotes.
+  </p>
+</ReferencePage>
+
+<style is:global>
+  /* eligibility checker */
+  .ym{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:16px 18px;margin:22px 0}
+  .ym-head{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .ym-sub{font-size:13.5px;color:var(--ink-soft);margin:8px 0 14px}
+  .ym-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ym-grid label{display:flex;flex-direction:column;gap:6px;font-family:var(--font-mono);font-size:11.5px;font-weight:700;letter-spacing:.03em;color:var(--ink-soft);text-transform:uppercase}
+  .ym-grid input{border:1.5px solid var(--line);background:var(--paper);border-radius:9px;padding:9px 11px;font-family:var(--font-body);font-size:15px;color:var(--ink);width:100%}
+  .ym-grid input:focus{outline:0;border-color:var(--coral)}
+  .ym-out{margin-top:14px;font-size:14.5px;line-height:1.55;color:var(--ink)}
+  .ym-row{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);margin-top:8px}
+  .ym-row.ok{border-color:#0f9f82;background:rgba(15,159,130,.1)}
+  .ym-row.no{border-color:var(--line)}
+  .ym-ic{font-weight:800;flex:0 0 auto}
+  .ym-row.ok .ym-ic{color:#0f9f82}
+  .ym-row.no .ym-ic{color:var(--ink-soft)}
+  .ym-row b{color:var(--ink)}
+  .ym-row small{display:block;color:var(--ink-soft);font-size:12.5px;font-weight:400}
+  @media(max-width:560px){.ym-grid{grid-template-columns:1fr}}
+
+  /* prompt pack cards */
+  .pk{display:flex;flex-direction:column;gap:12px;margin:16px 0 8px}
+  .pk-card{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:14px 16px}
+  .pk-top{display:flex;align-items:center;gap:12px}
+  .pk-n{font-family:var(--font-mono);font-weight:800;font-size:13px;color:#fff;background:var(--coral);width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:0 0 auto}
+  .pk-ttl{display:flex;flex-direction:column;min-width:0;flex:1}
+  .pk-ttl b{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink);line-height:1.15}
+  .pk-ttl small{font-size:12.5px;color:var(--ink-soft)}
+  .pk-copy{flex:0 0 auto;border:1.5px solid var(--line);background:var(--paper);border-radius:8px;padding:6px 12px;font-family:var(--font-display);font-weight:700;font-size:12.5px;color:var(--ink);cursor:pointer;transition:border-color .12s,color .12s}
+  .pk-copy:hover{border-color:var(--coral);color:var(--coral)}
+  .pk-prompt{margin:11px 0 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;color:var(--ink);background:var(--paper-2);border-radius:10px;padding:11px 13px;white-space:pre-wrap}
+  .pk-prompt code{background:rgba(238,75,43,.12);color:var(--coral-deep);padding:0 4px;border-radius:4px}
+
+  .mono-note{font-family:var(--font-mono);font-size:12px;line-height:1.6;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:16px;margin-top:26px}
+</style>
+
+<script is:inline>
+  (function () {
+    // ── Eligibility checker
+    var subs = document.getElementById('ym-subs'), up = document.getElementById('ym-up'),
+        wh = document.getElementById('ym-wh'), sv = document.getElementById('ym-sv'), out = document.getElementById('ym-out');
+    function n(el) { var v = parseFloat(el.value); return isNaN(v) || v < 0 ? 0 : v; }
+    function row(ok, title, detail) {
+      return '<div class="ym-row ' + (ok ? 'ok' : 'no') + '"><span class="ym-ic">' + (ok ? '✓' : '•') + '</span><span><b>' + title + '</b><small>' + detail + '</small></span></div>';
+    }
+    function render() {
+      if (!subs.value && !up.value && !wh.value && !sv.value) { out.innerHTML = ''; return; }
+      var s = n(subs), u = n(up), w = n(wh), v = n(sv);
+      var fan = s >= 500 && u >= 3 && (w >= 3000 || v >= 3000000);
+      var ads = s >= 1000 && (w >= 4000 || v >= 10000000);
+      var fanMiss = [];
+      if (s < 500) fanMiss.push((500 - s) + ' more subscribers');
+      if (u < 3) fanMiss.push((3 - u) + ' more uploads');
+      if (w < 3000 && v < 3000000) fanMiss.push('either ' + (3000 - w) + ' more watch hours or ' + (3000000 - v).toLocaleString() + ' more Shorts views');
+      var adsMiss = [];
+      if (s < 1000) adsMiss.push((1000 - s) + ' more subscribers');
+      if (w < 4000 && v < 10000000) adsMiss.push('either ' + (4000 - w) + ' more watch hours or ' + (10000000 - v).toLocaleString() + ' more Shorts views');
+      out.innerHTML =
+        row(fan, 'Fan-funding tier ' + (fan ? 'reached' : 'not yet'), fan ? 'Memberships, Super Thanks, Super Chat, Shopping are within reach.' : 'Still need: ' + fanMiss.join(', ') + '.') +
+        row(ads, 'Full ads tier ' + (ads ? 'reached' : 'not yet'), ads ? 'Watch-page and Shorts ads plus YouTube Premium share are within reach.' : 'Still need: ' + adsMiss.join(', ') + '.') +
+        '<p style="font-size:12.5px;color:var(--ink-soft);margin:10px 2px 0">Thresholds only. You also need an available country, 2-Step Verification, no active strikes, and a linked AdSense account. YouTube then reviews the channel (about a month).</p>';
+    }
+    [subs, up, wh, sv].forEach(function (el) { el.addEventListener('input', render); });
+
+    // ── Copy buttons on the prompt cards
+    document.querySelectorAll('.pk-copy').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var txt = b.getAttribute('data-copy');
+        navigator.clipboard.writeText(txt).then(function () {
+          var old = b.textContent; b.textContent = 'Copied ✓';
+          setTimeout(function () { b.textContent = old; }, 1500);
+        }).catch(function () {});
+      });
+    });
+  })();
+</script>

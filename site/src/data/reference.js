@@ -91,4 +91,8 @@ export const REFERENCE = [
   { nm: "Git and version control", href: "/git-version-control",
     ds: "What version control is, the working-tree, staging, commit, and remote model, the everyday commands, branches, the gotchas (gitignore, secrets, conflicts), and why it is your safety net with AI coding.", tag: "Version control",
     rel: ["/shell-scripting-explained", "/build-an-agentic-os", "/cron-explained"] },
+  // Monetization
+  { nm: "Monetize a YouTube channel with AI", href: "/monetize-youtube-with-ai",
+    ds: "Use AI as your strategist to plan, package, script, and diversify a channel, grounded in the real 2026 Partner Program thresholds, the honest economics, and the AI-content policy that demonetizes 'slop'. With an eligibility checker and 8 rebuilt prompts.", tag: "Monetization",
+    rel: ["/ai-business", "/how-to-prompt-claude-fable-5", "/good-vs-bad-prompts"] },
 ];
