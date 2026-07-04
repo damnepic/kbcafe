@@ -1,6 +1,21 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import DictHover from '../components/DictHover.astro';
+import Capstone from '../components/Capstone.astro';
+const CAP_TASKS = [
+  'State the <strong>goal</strong> in one sentence: what does a good result actually do?',
+  'Name the <strong>audience</strong> and the tone that fits them.',
+  'Paste in the <strong>context</strong> the model needs (the article, code, data, or brand voice).',
+  'Add <strong>constraints</strong>: length, what to include, what to avoid.',
+  'Specify the exact <strong>output format</strong> you want back.',
+  'Run it through the <a href="/prompt-optimizer">Prompt Optimizer</a> and fix what it flags.',
+  'Test it on the real task, tweak once, and compare versions with <a href="/prompt-diff">Prompt Diff</a>.',
+];
+const CAP_USES = [
+  { nm: 'Prompt Builder', href: '/prompt-builder' },
+  { nm: 'Prompt Optimizer', href: '/prompt-optimizer' },
+  { nm: 'Prompt Diff', href: '/prompt-diff' },
+];
 // `s` = the tool's index in the 'prompting' learning path (learningPaths.js), so each
 // "Try it" link carries ?p=prompting&s=<step> and the step page shows the STEP X of 6 tracker.
 const LESSONS = [
@@ -44,6 +59,14 @@ const LESSONS = [
         </li>
       ))}
     </ol>
+
+    <Capstone
+      id="prompting"
+      title="Write and optimize a real prompt"
+      brief="Reading the method isn&rsquo;t the same as owning it. Pick a task you actually need done this week, an email, a piece of code, a summary, and write the prompt for it using the five moves above. Then tighten it with the tools. Check off each step; your progress is saved on this device."
+      tasks={CAP_TASKS}
+      uses={CAP_USES}
+    />
 
     <div class="cp-foot">
       <h2>That&rsquo;s the whole method</h2>

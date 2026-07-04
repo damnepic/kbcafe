@@ -20,6 +20,7 @@ export const TOOLS = [
   { cat:"ai",       ctl:"AI",          nm:"prompt optimizer",  ds:"Score, fix & restructure any prompt, all-in-one.", color:"c-coral", href:"/prompt-optimizer" },
   { cat:"ai",       ctl:"AI",          nm:"ai coding prompt builder", ds:"Plan-or-build mode: signature, types, tests, stable libs, fresh docs.", color:"c-gold", href:"/ai-coding-prompt-builder" },
   { cat:"ai",       ctl:"AI",          nm:"good vs bad prompts", ds:"Before/after prompt rewrites, with the why.",    color:"c-cream", href:"/good-vs-bad-prompts" },
+  { cat:"ai",       ctl:"AI",          nm:"learning path builder", ds:"Say a goal, get an ordered route through KB Cafe's real guides & tools.", color:"c-gold", href:"/learning-path-builder" },
   { cat:"ai",       ctl:"AI",          nm:"llm vram calculator", ds:"Estimate VRAM to run a model locally.",          color:"c-coral", href:"/llm-vram-calculator" },
   { cat:"ai",       ctl:"AI",          nm:"llm cost calculator", ds:"Estimate API cost from token usage.",            color:"c-cream", href:"/llm-cost-calculator" },
   { cat:"ai",       ctl:"AI",          nm:"ai profit calculator", ds:"Price, users & usage in. Margin & break-even out.", color:"c-coral", href:"/ai-profit-calculator" },

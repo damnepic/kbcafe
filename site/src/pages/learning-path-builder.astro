@@ -1,0 +1,205 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { AI } from '../data/ai.js';
+import { REFERENCE } from '../data/reference.js';
+import { TOOLS } from '../data/tools.js';
+import { LEARNING_PATHS } from '../data/learningPaths.js';
+
+// Pages that have hands-on interactivity beyond reading (practice sets, live checkers, builders).
+const PRACTICE = new Set(['/git-version-control', '/monetize-youtube-with-ai']);
+
+// One vetted index of everything a path can be built from. Deduped by href (AI entries win, they
+// carry the prereq/next graph used for ordering). Unlike an AI course generator, every step here
+// links a real, human-written KB Cafe page, nothing is invented on the fly.
+const raw = [
+  ...AI.filter(a => a.href).map(a => ({ href: a.href, nm: a.nm, ds: a.ds || '', tag: a.tag || '', type: a.type === 'tool' ? 'Tool' : (a.type === 'pattern' ? 'Pattern' : 'Concept'), hands: a.type === 'tool', prereq: (a.rel && a.rel.prereq) || [], next: (a.rel && a.rel.next) || [] })),
+  ...REFERENCE.map(r => ({ href: r.href, nm: r.nm, ds: r.ds || '', tag: r.tag || '', type: 'Reference', hands: false, prereq: [], next: Array.isArray(r.rel) ? r.rel : [] })),
+  ...TOOLS.filter(t => t.href).map(t => ({ href: t.href, nm: t.nm, ds: t.ds || '', tag: t.ctl || 'Tool', type: 'Tool', hands: true, prereq: [], next: [] })),
+];
+const seen = new Set();
+const IDX = raw.filter(x => (seen.has(x.href) ? false : seen.add(x.href))).map(x => ({ ...x, hands: x.hands || PRACTICE.has(x.href) }));
+const PATHS = LEARNING_PATHS.map(p => ({ route: p.route, title: p.title, outcome: p.outcome || '', blurb: p.blurb || '', steps: p.steps }));
+const EXAMPLES = ['get better at prompting', 'build an AI agent', 'understand RAG', 'learn Git', 'monetize a channel with AI', 'how AI actually works'];
+---
+<Layout
+  title="Learning Path Builder, a custom route through KB Cafe | KB Cafe"
+  description="Tell it what you want to learn and it assembles an ordered path from KB Cafe's real, hand-written guides, tools, and hands-on exercises. No AI-invented lessons, no signup. Runs in your browser."
+  path="/learning-path-builder"
+>
+  <section class="lpb">
+    <div class="eyebrow">Learn · Path Builder</div>
+    <h1>Build your own <span class="mk">learning path.</span></h1>
+    <p class="lede">
+      Say what you want to learn. It assembles an ordered route from KB Cafe&rsquo;s real guides, tools, and
+      hands-on exercises, foundations first. <strong>Every step is a page a human wrote and checked</strong>, nothing is
+      generated on the fly, so you never get confident-sounding nonsense. Free, no account, runs in your browser.
+    </p>
+
+    <div class="lpb-form">
+      <input id="lpb-q" type="text" placeholder="e.g. build an AI agent that can search the web" autocomplete="off" spellcheck="false" />
+      <button id="lpb-go" type="button">Build my path</button>
+    </div>
+    <div class="lpb-ex">
+      <span>Try:</span>
+      {EXAMPLES.map(e => <button class="lpb-chip" type="button" data-q={e}>{e}</button>)}
+    </div>
+
+    <div class="lpb-out" id="lpb-out" aria-live="polite"></div>
+  </section>
+
+  <script type="application/json" id="lpb-idx" set:html={JSON.stringify(IDX)} />
+  <script type="application/json" id="lpb-paths" set:html={JSON.stringify(PATHS)} />
+</Layout>
+
+<style is:global>
+  .lpb{max-width:800px;padding:38px 0 30px}
+  .lpb .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .lpb h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.02;font-size:clamp(36px,6vw,58px);margin:0}
+  .lpb .mk{position:relative;white-space:nowrap;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%23EE4B2B' fill-opacity='.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center bottom;background-size:100% .2em;padding-bottom:.14em}
+  .lpb .lede{margin-top:20px;font-size:18px;line-height:1.6;color:var(--ink-soft);max-width:660px}
+  .lpb .lede strong{color:var(--ink)}
+  .lpb-form{display:flex;gap:10px;margin:26px 0 12px;flex-wrap:wrap}
+  .lpb-form input{flex:1;min-width:240px;border:1.6px solid var(--line);background:var(--paper);border-radius:12px;padding:13px 16px;font-family:var(--font-body);font-size:16px;color:var(--ink)}
+  .lpb-form input:focus{outline:0;border-color:var(--coral)}
+  .lpb-form button{flex:0 0 auto;border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:800;font-size:15px;padding:13px 22px;border-radius:12px;cursor:pointer;transition:filter .12s,transform .12s}
+  .lpb-form button:hover{filter:brightness(.94);transform:translateY(-1px)}
+  .lpb-ex{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+  .lpb-chip{border:1.3px solid var(--line);background:var(--cream);border-radius:20px;padding:5px 12px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink);cursor:pointer;transition:border-color .12s,color .12s}
+  .lpb-chip:hover{border-color:var(--coral);color:var(--coral)}
+
+  .lpb-out{margin-top:26px}
+  .lpb-out:empty{display:none}
+  .lpb-guided{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--cream);border:1.5px solid var(--line);border-left:3px solid var(--coral);border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:14.5px;color:var(--ink-soft)}
+  .lpb-guided a{color:var(--coral);font-weight:700;text-decoration:none}.lpb-guided a:hover{text-decoration:underline}
+  .lpb-res-h{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
+  .lpb-res-h b{color:var(--ink)}
+  .lpb-step{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+  .lpb-step:first-of-type{border-top:0}
+  .lpb-n{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--font-mono);font-weight:800;font-size:13px;display:grid;place-items:center}
+  .lpb-step.hands .lpb-n{background:var(--coral)}
+  .lpb-body{flex:1;min-width:0}
+  .lpb-role{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+  .lpb-nm{display:inline-block;font-family:var(--font-display);font-weight:800;font-size:17px;color:var(--ink);text-decoration:none;margin:2px 0 3px}
+  .lpb-nm:hover{color:var(--coral)}
+  .lpb-badges{display:inline-flex;gap:6px;margin-left:8px;vertical-align:middle}
+  .lpb-badge{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:20px;padding:2px 8px;background:var(--paper-2);color:var(--ink-soft)}
+  .lpb-badge.hands{background:#ffe5dd;color:var(--coral-deep)}
+  .lpb-ds{font-size:14px;line-height:1.5;color:var(--ink-soft);margin:0}
+  .lpb-meta{margin:18px 0 0;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+  .lpb-empty{background:var(--paper-2);border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;font-size:15px;color:var(--ink-soft)}
+  .lpb-empty a{color:var(--coral);font-weight:600;text-decoration:none}
+</style>
+
+<script is:inline>
+  (function () {
+    var IDX = JSON.parse(document.getElementById('lpb-idx').textContent);
+    var PATHS = JSON.parse(document.getElementById('lpb-paths').textContent);
+    var byHref = {}; IDX.forEach(function (x) { byHref[x.href] = x; });
+    // Precompute word tokens per field so matching is word-aware, not raw substring
+    // ("git" must not match "legit", but "prompt" should match "prompting").
+    function wtok(s) { return (String(s).toLowerCase().match(/[a-z0-9]+/g) || []); }
+    IDX.forEach(function (x) { x._nm = wtok(x.nm); x._tag = wtok(x.tag); x._ds = wtok(x.ds); x._href = wtok(x.href); });
+    function tmatch(qt, arr) {
+      for (var i = 0; i < arr.length; i++) {
+        var w = arr[i];
+        if (w === qt) return true;
+        if (w.length >= 4 && qt.length >= 4 && (w.indexOf(qt) === 0 || qt.indexOf(w) === 0)) return true; // stem: prompt~prompting
+      }
+      return false;
+    }
+    var STOP = { i: 1, a: 1, an: 1, the: 1, to: 1, want: 1, learn: 1, learning: 1, my: 1, me: 1, how: 1, do: 1, with: 1, for: 1, and: 1, of: 1, in: 1, on: 1, get: 1, getting: 1, better: 1, at: 1, using: 1, use: 1, make: 1, that: 1, can: 1, it: 1, you: 1, your: 1, is: 1, are: 1, about: 1, understand: 1, understanding: 1, know: 1, need: 1 };
+    function toks(s) { return (String(s).toLowerCase().match(/[a-z0-9]+/g) || []).filter(function (t) { return t.length > 1 && !STOP[t]; }); }
+
+    function score(item, qts) {
+      var s = 0;
+      qts.forEach(function (q) {
+        if (tmatch(q, item._nm)) s += 3;
+        else if (tmatch(q, item._href)) s += 2;
+        if (tmatch(q, item._tag)) s += 1.5;
+        if (tmatch(q, item._ds)) s += 1;
+      });
+      return s;
+    }
+
+    function build(query) {
+      var qts = toks(query);
+      if (!qts.length) return null;
+
+      var scored = IDX.map(function (x) { return { x: x, s: score(x, qts) }; })
+        .filter(function (r) { return r.s > 0; })
+        .sort(function (a, b) { return b.s - a.s; });
+
+      // Closest ready-made path (matched on its goal + title). Drop ultra-common tokens so a bare
+      // "ai" doesn't make everything look like a match; title hits weigh most.
+      var GENERIC = { ai: 1, data: 1, model: 1, models: 1, work: 1, works: 1, working: 1, system: 1, systems: 1, app: 1, apps: 1 };
+      var pqts = qts.filter(function (t) { return !GENERIC[t]; });
+      var bestPath = PATHS.map(function (p) {
+        var t = wtok(p.title), o = wtok(p.outcome), b = wtok(p.blurb), s = 0;
+        pqts.forEach(function (q) { if (tmatch(q, t)) s += 3; else if (tmatch(q, o)) s += 2; else if (tmatch(q, b)) s += 1; });
+        return { p: p, s: s };
+      }).sort(function (a, b) { return b.s - a.s; })[0];
+
+      if (!scored.length) return { steps: [], path: bestPath && bestPath.s >= 2 ? bestPath.p : null };
+
+      // Prefer confidently-scored seeds; fall back to whatever matched if nothing clears the bar.
+      var pool = scored.filter(function (r) { return r.s >= 2; });
+      if (!pool.length) pool = scored;
+      var seeds = pool.slice(0, 4).map(function (r) { return r.x; });
+      var used = {}; seeds.forEach(function (x) { used[x.href] = true; });
+
+      // Foundation = prereqs of the seeds (put first); Deeper = their `next` (put last).
+      var foundation = [], deeper = [];
+      seeds.forEach(function (x) {
+        (x.prereq || []).forEach(function (h) { if (byHref[h] && !used[h] && foundation.length < 3) { used[h] = true; foundation.push(byHref[h]); } });
+      });
+      seeds.forEach(function (x) {
+        (x.next || []).forEach(function (h) { if (byHref[h] && !used[h] && deeper.length < 3) { used[h] = true; deeper.push(byHref[h]); } });
+      });
+
+      var steps = []
+        .concat(foundation.map(function (x) { return { x: x, role: 'Foundation' }; }))
+        .concat(seeds.map(function (x) { return { x: x, role: 'Core' }; }))
+        .concat(deeper.map(function (x) { return { x: x, role: 'Go deeper' }; }))
+        .slice(0, 7);
+
+      return { steps: steps, path: bestPath && bestPath.s >= 2 ? bestPath.p : null };
+    }
+
+    function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+
+    function render(query) {
+      var out = document.getElementById('lpb-out');
+      var res = build(query);
+      if (!res) { out.innerHTML = ''; return; }
+      if (!res.steps.length) {
+        out.innerHTML = '<div class="lpb-empty">No direct match yet. Browse the <a href="/learn">guided paths</a> or the full <a href="/reference">Knowledge Base</a>, or try a broader phrase like &ldquo;prompting&rdquo; or &ldquo;agents.&rdquo;' +
+          (res.path ? ' Closest ready-made path: <a href="' + res.path.route + '">' + esc(res.path.title) + '</a>.' : '') + '</div>';
+        return;
+      }
+      var handsN = res.steps.filter(function (s) { return s.x.hands; }).length;
+      var html = '';
+      if (res.path) html += '<div class="lpb-guided">Closest ready-made path: <a href="' + res.path.route + '">' + esc(res.path.title) + ' &rarr;</a> <span>(or follow your custom route below)</span></div>';
+      html += '<div class="lpb-res-h">Your path &middot; <b>' + res.steps.length + ' steps</b>' + (handsN ? ' &middot; <b>' + handsN + ' hands-on</b>' : '') + '</div>';
+      res.steps.forEach(function (st, i) {
+        var x = st.x;
+        html += '<div class="lpb-step' + (x.hands ? ' hands' : '') + '">' +
+          '<div class="lpb-n">' + (i + 1) + '</div>' +
+          '<div class="lpb-body">' +
+          '<div class="lpb-role">' + st.role + '</div>' +
+          '<a class="lpb-nm" href="' + x.href + '">' + esc(x.nm) + '</a>' +
+          '<span class="lpb-badges"><span class="lpb-badge">' + esc(x.type) + '</span>' + (x.hands ? '<span class="lpb-badge hands">Hands-on</span>' : '') + '</span>' +
+          '<p class="lpb-ds">' + esc(x.ds) + '</p>' +
+          '</div></div>';
+      });
+      html += '<p class="lpb-meta">Built from ' + IDX.length + ' vetted KB Cafe pages. Start at step 1 and work down.</p>';
+      out.innerHTML = html;
+    }
+
+    var q = document.getElementById('lpb-q'), go = document.getElementById('lpb-go');
+    go.addEventListener('click', function () { render(q.value); });
+    q.addEventListener('keydown', function (e) { if (e.key === 'Enter') render(q.value); });
+    document.querySelectorAll('.lpb-chip').forEach(function (c) {
+      c.addEventListener('click', function () { q.value = c.dataset.q; render(q.value); q.scrollIntoView({ block: 'nearest' }); });
+    });
+  })();
+</script>

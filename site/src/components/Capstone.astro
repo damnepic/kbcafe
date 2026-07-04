@@ -1,0 +1,82 @@
+---
+// A "build this" capstone for the end of a learning path. Kodree gives paid learners a capstone
+// project; this is the free, no-account version: a real project brief with a checklist that
+// remembers your progress in the browser (localStorage). `id` must be unique.
+// Props: { id, title, brief, tasks:[html], uses:[{nm,href}] }
+const { id, title = 'Capstone project', brief = '', tasks = [], uses = [] } = Astro.props;
+---
+<section class="kbc" data-cap={id} data-total={tasks.length}>
+  <div class="kbc-tag">Capstone &middot; build it</div>
+  <h2 class="kbc-title">{title}</h2>
+  <p class="kbc-brief" set:html={brief} />
+  <div class="kbc-list">
+    {tasks.map((t, i) => (
+      <label class="kbc-task"><input type="checkbox" data-i={i} /><span set:html={t} /></label>
+    ))}
+  </div>
+  <div class="kbc-foot">
+    <div class="kbc-bar"><span class="kbc-fill"></span></div>
+    <span class="kbc-count" data-count>0/{tasks.length}</span>
+  </div>
+  {uses.length > 0 && (
+    <p class="kbc-uses"><span>Tools for the job:</span> {uses.map((u, i) => (<>{i > 0 && <span aria-hidden="true"> &middot; </span>}<a href={u.href}>{u.nm}</a></>))}</p>
+  )}
+  <div class="kbc-done" hidden>🎉 Capstone complete. You didn&rsquo;t just read it, you did it.</div>
+</section>
+
+<style is:global>
+  .kbc{border:1.6px solid var(--coral);border-radius:16px;background:var(--cream);padding:20px 22px;margin:34px 0}
+  .kbc-tag{font-family:var(--font-mono);font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--coral);border-radius:6px;padding:3px 9px;display:inline-block}
+  .kbc-title{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--ink);margin:12px 0 8px}
+  .kbc-brief{font-size:15.5px;line-height:1.6;color:var(--ink-soft);margin:0 0 16px}
+  .kbc-brief a,.kbc-task a,.kbc-uses a{color:var(--coral);font-weight:600;text-decoration:none}
+  .kbc-brief a:hover,.kbc-task a:hover,.kbc-uses a:hover{text-decoration:underline}
+  .kbc-list{display:flex;flex-direction:column;gap:2px;margin-bottom:16px}
+  .kbc-task{display:flex;align-items:flex-start;gap:11px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:15px;line-height:1.5;color:var(--ink);transition:background .12s}
+  .kbc-task:hover{background:var(--paper-2)}
+  .kbc-task input{margin:3px 0 0;width:17px;height:17px;accent-color:var(--coral);cursor:pointer;flex:0 0 auto}
+  .kbc-task.done span{color:var(--ink-soft);text-decoration:line-through;text-decoration-color:var(--coral)}
+  .kbc-task span code{font-family:var(--font-mono);font-size:.9em;background:rgba(30,24,19,.08);padding:1px 5px;border-radius:5px}
+  .kbc-foot{display:flex;align-items:center;gap:12px}
+  .kbc-bar{flex:1;height:8px;border-radius:6px;background:var(--paper-2);overflow:hidden}
+  .kbc-fill{display:block;height:100%;width:0;background:var(--coral);border-radius:6px;transition:width .3s}
+  .kbc-count{font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+  .kbc-count.full{color:#0f9f82}
+  .kbc-uses{margin:14px 0 0;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+  .kbc-uses span{opacity:.8}
+  .kbc-done{margin-top:14px;background:rgba(15,159,130,.1);border:1.5px solid rgba(15,159,130,.35);border-radius:11px;padding:12px 15px;font-family:var(--font-display);font-weight:700;font-size:15px;color:#0b7a63}
+</style>
+
+<script is:inline>
+  (function () {
+    if (window.__kbcInit) return; window.__kbcInit = true;
+    function init() {
+      var LS = {
+        get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+        set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+      };
+      document.querySelectorAll('.kbc').forEach(function (sec) {
+        var key = 'kb-capstone-' + sec.dataset.cap, total = +sec.dataset.total;
+        var state = LS.get(key, {});
+        var boxes = sec.querySelectorAll('.kbc-task input');
+        var fill = sec.querySelector('.kbc-fill'), count = sec.querySelector('[data-count]'), doneMsg = sec.querySelector('.kbc-done');
+        function refresh() {
+          var n = 0;
+          boxes.forEach(function (b) { if (b.checked) n++; b.closest('.kbc-task').classList.toggle('done', b.checked); });
+          fill.style.width = total ? Math.round((n / total) * 100) + '%' : '0';
+          count.textContent = n + '/' + total; count.classList.toggle('full', n === total && total > 0);
+          if (doneMsg) doneMsg.hidden = !(n === total && total > 0);
+        }
+        boxes.forEach(function (b) {
+          if (state[b.dataset.i]) b.checked = true;
+          b.addEventListener('change', function () {
+            state[b.dataset.i] = b.checked; LS.set(key, state); refresh();
+          });
+        });
+        refresh();
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+</script>
