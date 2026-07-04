@@ -389,7 +389,7 @@ nodes.forEach(n => {
         const g = e.target.closest('.node'); sx0 = e.clientX; sy0 = e.clientY; moved = false; svg.classList.add('grabbing');
         try { svg.setPointerCapture(e.pointerId); } catch (_) {}
         if (!g) { mode = 'pan'; dragI = -1; }
-        else { mode = null; dragI = +g.dataset.i; clearLong(); longT = setTimeout(() => { mode = 'pan'; moved = true; }, 340); }   // long-press on a star -> pan the map
+        else { mode = null; dragI = +g.dataset.i; clearLong(); longT = setTimeout(() => { mode = 'pan'; moved = true; }, 500); }   // long-press on a star -> pan the map
       });
       svg.addEventListener('pointermove', (e) => {
         const dx = e.clientX - sx0, dy = e.clientY - sy0; const far = Math.abs(dx) + Math.abs(dy) > 4;
@@ -399,12 +399,13 @@ nodes.forEach(n => {
         else { const rect = svg.getBoundingClientRect(); const ppu = (rect.width / W) * scale || 1; moveNode(dragI, nodes[dragI].x + dx / ppu, nodes[dragI].y + dy / ppu); }
         sx0 = e.clientX; sy0 = e.clientY;
       });
-      const end = () => { clearLong(); mode = null; dragI = -1; svg.classList.remove('grabbing'); };
-      svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
+      // Open the detail modal on a clean TAP, detected at pointerup, this fires reliably even when
+      // svg.setPointerCapture has redirected the synthetic click away from the node (the old bug:
+      // taps did nothing on touch). A drag or a long-press (mode 'pan') is not a tap.
+      function end(open) { clearLong(); if (open && dragI >= 0 && !moved && mode !== 'pan') openModal(nodes[dragI].id); mode = null; dragI = -1; svg.classList.remove('grabbing'); }
+      svg.addEventListener('pointerup', () => end(true)); svg.addEventListener('pointercancel', () => end(false));
       gNodes.addEventListener('click', (e) => {
-        e.preventDefault();              // never navigate away; the modal explains it in place
-        if (moved) return;               // that was a drag, not a tap
-        const g = e.target.closest('.node'); if (g) openModal(nodes[+g.dataset.i].id);
+        const g = e.target.closest('.node'); if (g) e.preventDefault();   // block the <a> navigation; the tap opens the modal on pointerup
       }, true);
 
       // snap-back: glide every node home + reset pan/zoom
