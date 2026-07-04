@@ -15,6 +15,11 @@ const DEMO = [
     tests: [{ expr: 'add(2, 3)', expect: 5 }, { expr: 'add(-1, 1)', expect: 0 }, { expr: 'add(10, 0)', expect: 10 }],
     why: 'A one-liner, <code>return a + b</code>, passes all three tests. No server involved.' },
 ];
+
+// The real badge icons, so the examples below match exactly what you see in the header.
+const FLAME = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></svg>`;
+const STAR = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.1 2.1 0 0 0 1.6 1.16l5.16.76a.53.53 0 0 1 .3.9l-3.74 3.64a2.1 2.1 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.1 2.1 0 0 0-1.97 0L6.4 21.94a.53.53 0 0 1-.77-.56l.88-5.14a2.1 2.1 0 0 0-.61-1.88L2.16 10.72a.53.53 0 0 1 .29-.9l5.17-.76a2.1 2.1 0 0 0 1.6-1.16z"/></svg>`;
+const XP_EG = [{ st: 1, xp: 10 }, { st: 6, xp: 210 }, { st: 23, xp: 740 }];
 ---
 <BlogPost
   title="New on KB Cafe: Practice in Every Lesson, Capstones, and a Path Builder"
@@ -62,6 +67,16 @@ const DEMO = [
     deliberately low-key: no leaderboards, no notifications, no dark patterns. Just a quiet nudge that you have been
     showing up. And because it is all in local storage, the streak is yours and private, it never touches a server.
   </p>
+  <p>Here is the exact badge, from your first exercise to a month of showing up:</p>
+  <div class="xpx">
+    {XP_EG.map((e, i) => (
+      <>
+        {i > 0 && <span class="xpx-ar" aria-hidden="true">&rarr;</span>}
+        <span class="xpx-b"><span class="xpx-ic xpx-flame" set:html={FLAME} /><b>{e.st}</b><span class="xpx-x"><span class="xpx-ic xpx-star" set:html={STAR} /><b>{e.xp}</b></span></span>
+      </>
+    ))}
+  </div>
+  <p class="xpx-cap">Day one, a week in, a month deep. It lives in the top-right of every page, right next to Learn, and quietly climbs.</p>
 
   <h2>Capstones: build the thing</h2>
   <p>
@@ -144,3 +159,15 @@ const DEMO = [
     header tick up. Same promise as day one: you keep this stuff by using it, so we keep building things to use.
   </p>
 </BlogPost>
+
+<style is:global>
+  .xpx{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 6px}
+  .xpx-b{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:14px;font-weight:800;color:var(--ink);background:var(--cream);border:1.5px solid var(--line);border-radius:22px;padding:8px 14px}
+  .xpx-ic{display:inline-flex;align-items:center;width:15px;height:15px;flex:0 0 auto}
+  .xpx-ic svg{width:100%;height:100%;display:block}
+  .xpx-flame{color:var(--coral)}
+  .xpx-star{color:var(--gold)}
+  .xpx-x{display:inline-flex;align-items:center;gap:5px;color:var(--ink-soft);padding-left:9px;border-left:1px solid var(--line)}
+  .xpx-ar{color:var(--ink-soft);font-family:var(--font-mono);font-size:16px}
+  .xpx-cap{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+</style>

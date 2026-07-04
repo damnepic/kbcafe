@@ -49,7 +49,7 @@ const active = (h) => h === path;
     <a class={active('/learn') ? 'on' : ''} href="/learn">Learn</a>
   </nav>
 
-  <a class="sb-xp" id="sb-xp" href="/learn" hidden>&#128293;&nbsp;<b data-st>0</b>-day streak<span>&nbsp;&middot;&nbsp;&#11088;&nbsp;<b data-xp>0</b> XP</span></a>
+  <a class="sb-xp" id="sb-xp" href="/learn" hidden><span class="sx-ic sx-flame"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></svg></span><b data-st>0</b>&nbsp;day streak<span class="sx-sep">&middot;</span><span class="sx-ic sx-star"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.1 2.1 0 0 0 1.6 1.16l5.16.76a.53.53 0 0 1 .3.9l-3.74 3.64a2.1 2.1 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.1 2.1 0 0 0-1.97 0L6.4 21.94a.53.53 0 0 1-.77-.56l.88-5.14a2.1 2.1 0 0 0-.61-1.88L2.16 10.72a.53.53 0 0 1 .29-.9l5.17-.76a2.1 2.1 0 0 0 1.6-1.16z"/></svg></span><b data-xp>0</b>&nbsp;XP</a>
 
   <nav class="sb-triage">
     <span class="sb-h">What are you doing?</span>
@@ -108,7 +108,7 @@ const active = (h) => h === path;
 </aside>
 
 <style>
-  .kb-sb{position:sticky;top:78px;align-self:start;width:260px;flex-shrink:0;max-height:calc(100vh - 92px);overflow-y:auto;
+  .kb-sb{position:sticky;top:78px;align-self:start;width:260px;flex-shrink:0;max-height:calc(100vh - 92px);overflow-y:auto;overflow-x:hidden;
     background:var(--cream);border:1.2px solid var(--line);border-radius:16px;padding:12px 12px 14px;display:flex;flex-direction:column;gap:6px;
     scrollbar-width:thin}
   .sb-bar{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -162,10 +162,16 @@ const active = (h) => h === path;
      so the single drawer is a true superset of the old header menu + sidebar */
   .sb-primary{display:none}
 
-  /* practice streak/XP badge (shown once any XP is earned) */
-  .sb-xp{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin:4px 2px 2px;padding:8px 11px;border:1.3px solid var(--line);border-radius:10px;background:var(--paper);text-decoration:none;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink)}
+  /* practice streak/XP badge, mobile drawer only (the header badge covers desktop) */
+  .sb-xp{display:none;align-items:center;gap:4px;flex-wrap:nowrap;white-space:nowrap;overflow:hidden;margin:4px 2px 2px;padding:9px 12px;border:1.3px solid var(--line);border-radius:10px;background:var(--paper);text-decoration:none;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink)}
+  .sb-xp[hidden]{display:none}
   .sb-xp b{font-weight:800}
-  .sb-xp span{color:var(--ink-soft)}
+  .sb-xp .sx-ic{display:inline-flex;align-items:center;width:14px;height:14px;flex:0 0 auto}
+  .sb-xp .sx-ic svg{width:100%;height:100%;display:block}
+  .sb-xp .sx-flame{color:var(--coral)}
+  .sb-xp .sx-star{color:var(--gold)}
+  .sb-xp .sx-sep{color:var(--ink-soft);margin:0 3px}
+  @media(max-width:900px){ .sb-xp:not([hidden]){display:flex} }
 
   /* rail-less pages (homepage, map, beginner-ai…): no desktop rail, just the mobile drawer */
   .kb-sb.drawer-only{display:none}

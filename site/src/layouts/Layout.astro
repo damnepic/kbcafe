@@ -180,7 +180,7 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
       <a href="/reference" class={navActive('/reference') ? 'on' : ''}>Knowledge Base</a>
       <a href="/tools" class={navActive('/tools') ? 'on' : ''}>Tools</a>
       <a href="/learn" class={navActive('/learn') ? 'on' : ''}>Learn</a>
-      <a class="nav-xp" id="nav-xp" href="/learn" hidden title="Your practice streak and XP, saved on this device">&#128293;&nbsp;<b data-st>0</b><span class="nx-x">&#11088;&nbsp;<b data-xp>0</b></span></a>
+      <a class="nav-xp" id="nav-xp" href="/learn" hidden title="Your practice streak and XP, saved on this device"><span class="nx-ic nx-flame"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></svg></span><b data-st>0</b><span class="nx-x"><span class="nx-ic nx-star"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.1 2.1 0 0 0 1.6 1.16l5.16.76a.53.53 0 0 1 .3.9l-3.74 3.64a2.1 2.1 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.1 2.1 0 0 0-1.97 0L6.4 21.94a.53.53 0 0 1-.77-.56l.88-5.14a2.1 2.1 0 0 0-.61-1.88L2.16 10.72a.53.53 0 0 1 .29-.9l5.17-.76a2.1 2.1 0 0 0 1.6-1.16z"/></svg></span><b data-xp>0</b></span></a>
       <button class="nav-study" id="nav-study" type="button" aria-pressed="false" aria-label="Open a study window: read two pages side by side" title="Study window: open a second page beside this one">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/><path d="m10 15-3-3 3-3"/></svg>
         <span>Study</span>
@@ -483,8 +483,13 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
   .nav-links a.on::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:2.5px;border-radius:2px;background:var(--coral)}
   /* practice streak/XP badge (shown once the visitor has earned any XP) */
   .nav-xp{display:inline-flex;align-items:center;gap:5px;text-decoration:none;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--ink);background:var(--cream);border:1.3px solid var(--line);border-radius:20px;padding:5px 11px;line-height:1;transition:border-color .14s}
+  .nav-xp[hidden]{display:none}
   .nav-xp:hover{border-color:var(--coral)}
   .nav-xp b{font-weight:800}
+  .nav-xp .nx-ic{display:inline-flex;align-items:center;width:14px;height:14px;flex:0 0 auto}
+  .nav-xp .nx-ic svg{width:100%;height:100%;display:block}
+  .nav-xp .nx-flame{color:var(--coral)}
+  .nav-xp .nx-star{color:var(--gold)}
   .nav-xp .nx-x{color:var(--ink-soft);display:inline-flex;align-items:center;gap:4px;padding-left:7px;border-left:1px solid var(--line)}
   /* search: magnifier by default; ⌘K box on Mac; expands to an inline bar */
   .nav-search{position:relative;display:flex;align-items:center}
