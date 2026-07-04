@@ -1,5 +1,6 @@
 ---
 import ReferencePage from '../layouts/ReferencePage.astro';
+import Practice from '../components/Practice.astro';
 const CORE_FLOW = `git status                  # what changed, and what is staged
 git add file.js             # stage one file for the next commit
 git add .                   # stage everything that changed
@@ -14,6 +15,35 @@ const IGNORE = `# .gitignore  (one pattern per line)
 .env
 node_modules/
 dist/`;
+
+// Inline "do it" sets, interleaved with the reading so the everyday commands stick.
+const LOOP_PRACTICE = [
+  { type: 'input', q: 'You edited <code>app.js</code>. Which command <strong>stages</strong> just that one file for your next commit?',
+    accept: ['git add app.js', 're:^git\\s+add\\s+app\\.js$'], placeholder: 'git ...',
+    why: 'Correct. <code>git add app.js</code> stages one file; <code>git add .</code> would stage everything that changed.' },
+  { type: 'input', q: 'Everything you want is staged. Save it as a snapshot with the message <strong>fix login</strong>.',
+    accept: ['git commit -m "fix login"', "git commit -m 'fix login'", 're:^git\\s+commit\\s+-m\\s+.fix login.$'], placeholder: 'git ...',
+    why: 'Yes. <code>git commit -m "fix login"</code> records the staged changes as one snapshot, with that message.' },
+  { type: 'input', q: 'Your commits are local. Send them up to GitHub.',
+    accept: ['git push', 're:^git\\s+push$'], placeholder: 'git ...',
+    why: '<code>git push</code> uploads your commits to the remote. <code>git pull</code> is the reverse, bringing others&rsquo; commits down.' },
+];
+const BRANCH_PRACTICE = [
+  { type: 'input', q: 'Create a branch called <code>login-form</code> and move onto it, in one command.',
+    accept: ['git switch -c login-form', 'git checkout -b login-form', 're:^git\\s+switch\\s+-c\\s+login-form$'], placeholder: 'git ...',
+    why: '<code>git switch -c login-form</code> creates the branch and checks it out. (<code>git checkout -b</code> is the older equivalent.)' },
+  { type: 'choice', q: 'Back on <code>main</code>, you run <code>git merge login-form</code>. What happens?',
+    options: ['The work from <code>login-form</code> is folded into <code>main</code>', '<code>main</code> is deleted', 'You switch onto the <code>login-form</code> branch'], answer: 0,
+    why: 'Merge folds the named branch&rsquo;s commits into the branch you are currently on, here, <code>main</code>.' },
+];
+const GOTCHA_PRACTICE = [
+  { type: 'choice', q: 'You already committed <code>.env</code> by mistake. Does adding it to <code>.gitignore</code> now stop tracking it?',
+    options: ['No, <code>.gitignore</code> only ignores files that aren&rsquo;t already tracked', 'Yes, immediately', 'Only after you restart Git'], answer: 0,
+    why: 'Right. <code>.gitignore</code> does not untrack an already-committed file. You have to run <code>git rm --cached .env</code>, then commit.' },
+  { type: 'input', q: 'Stop tracking the already-committed <code>.env</code>, but keep the file on your disk.',
+    accept: ['git rm --cached .env', 're:^git\\s+rm\\s+--cached\\s+\\.env$'], placeholder: 'git ...',
+    why: '<code>git rm --cached .env</code> removes it from tracking while leaving your local copy. Commit that, and it stops being tracked going forward.' },
+];
 ---
 <ReferencePage
   title="Git and version control: the practical guide | KB Cafe"
@@ -53,6 +83,8 @@ dist/`;
     <code>git pull</code> brings in everyone else&rsquo;s.
   </p>
 
+  <Practice set="gv-loop" title="Run the everyday loop" items={LOOP_PRACTICE} />
+
   <h2>Branches: work without breaking main</h2>
   <p>
     A <strong>branch</strong> is a parallel line of work. You branch off, build a feature in isolation, and merge it back
@@ -60,6 +92,8 @@ dist/`;
     something risky without fear.
   </p>
   <pre class="gv-code">{BRANCH_FLOW}</pre>
+
+  <Practice set="gv-branch" title="Branch, then merge" items={BRANCH_PRACTICE} />
 
   <div class="gv" id="gv">
     <div class="gv-head">Hands-on: match the command</div>
@@ -78,6 +112,8 @@ dist/`;
     <li><strong><code>reset --hard</code> and <code>checkout --</code> discard work.</strong> They are the few Git commands that genuinely delete uncommitted changes. Pause before running them.</li>
   </ul>
   <pre class="gv-code">{IGNORE}</pre>
+
+  <Practice set="gv-gotcha" title="Dodge the classic traps" items={GOTCHA_PRACTICE} />
 
   <h2>Why this matters more in the AI era</h2>
   <p>

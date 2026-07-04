@@ -1,0 +1,235 @@
+---
+// "Learn by doing" practice block. Drops a small set of graded exercises inline in a lesson so
+// a page becomes concept -> DO IT -> concept -> DO IT, not read-then-one-quiz. Fully client-side:
+// grading, completion, XP and day-streaks all run in the browser (localStorage), no account, no
+// backend, nothing uploaded. Three exercise types:
+//   choice: { type:'choice', q, options:[...], answer:<index>, why }
+//   input:  { type:'input',  q, accept:[...], placeholder?, why }   // strings match case-insensitively; "re:<pattern>" = regex
+//   code:   { type:'code',   q, starter?, tests:[{expr, expect}], rows?, why }   // JS; expr uses the learner's code, compared to expect
+// Every item also gets a "Check with your AI" button that copies the task + the learner's answer
+// plus a tutoring rubric to the clipboard, KB Cafe's honest take on Kodree's paywalled "AI buddy":
+// use the AI you already have. `set` must be unique per page (used as the storage key prefix).
+const { set, title = 'Your turn', items = [] } = Astro.props;
+const stripTags = (s = '') => String(s).replace(/<[^>]+>/g, '');
+---
+<section class="kbp" data-set={set} data-total={items.length}>
+  <div class="kbp-bar">
+    <span class="kbp-tag">Practice</span>
+    <span class="kbp-title">{title}</span>
+    <span class="kbp-prog" data-prog>0/{items.length}</span>
+  </div>
+
+  {items.map((it, i) => (
+    <div class="kbp-item" data-id={`${set}.${i}`} data-type={it.type}>
+      <p class="kbp-q" set:html={it.q} />
+
+      {it.type === 'choice' && (
+        <div class="kbp-opts">
+          {it.options.map((o, k) => (
+            <button class="kbp-opt" type="button" data-k={k} data-correct={k === it.answer ? '1' : '0'} set:html={o} />
+          ))}
+        </div>
+      )}
+
+      {it.type === 'input' && (
+        <div class="kbp-inrow">
+          <input class="kbp-input" type="text" placeholder={it.placeholder || 'Type your answer'} spellcheck="false" autocomplete="off" autocapitalize="off" />
+          <button class="kbp-check" type="button">Check</button>
+        </div>
+      )}
+
+      {it.type === 'code' && (
+        <div class="kbp-code">
+          <textarea class="kbp-ta" spellcheck="false" rows={it.rows || 6}>{it.starter || ''}</textarea>
+          <button class="kbp-run" type="button">Run tests</button>
+        </div>
+      )}
+
+      <div class="kbp-out" hidden />
+      <div class="kbp-why" hidden set:html={it.why || ''} />
+      <button class="kbp-ai" type="button" data-task={stripTags(it.q)}>Stuck? Check it with your AI &#8599;</button>
+
+      <script type="application/json" class="kbp-meta" set:html={JSON.stringify({ accept: it.accept || null, tests: it.tests || null })} />
+    </div>
+  ))}
+</section>
+
+<style is:global>
+  .kbp{border:1.6px solid var(--line);border-radius:16px;background:var(--paper-2);padding:6px 16px 16px;margin:26px 0}
+  .kbp-bar{display:flex;align-items:center;gap:10px;padding:12px 2px 4px;border-bottom:1px solid var(--line);margin-bottom:6px}
+  .kbp-tag{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--coral);border-radius:5px;padding:3px 8px}
+  .kbp-title{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink)}
+  .kbp-prog{margin-left:auto;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink-soft)}
+  .kbp-prog.full{color:#0f9f82}
+  .kbp-item{padding:14px 0 6px;border-top:1px solid var(--line)}
+  .kbp-item:first-of-type{border-top:0}
+  .kbp .kbp-q{font-size:15.5px;line-height:1.55;color:var(--ink);margin:0 0 11px;font-weight:500}
+  .kbp .kbp-q code{font-family:var(--font-mono);font-size:.9em;background:rgba(30,24,19,.09);padding:1px 5px;border-radius:5px}
+
+  .kbp-opts{display:flex;flex-direction:column;gap:7px}
+  .kbp-opt{text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 13px;font-family:var(--font-body);font-size:14px;color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .kbp-opt:hover:not(:disabled){border-color:var(--coral)}
+  .kbp-opt:disabled{cursor:default}
+  .kbp-opt.right{border-color:#0f9f82;background:rgba(15,159,130,.12)}
+  .kbp-opt.wrong{border-color:var(--coral);background:rgba(238,75,43,.08)}
+
+  .kbp-inrow{display:flex;gap:8px;flex-wrap:wrap}
+  .kbp-input{flex:1;min-width:0;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 13px;font-family:var(--font-mono);font-size:14px;color:var(--ink)}
+  .kbp-input:focus{outline:0;border-color:var(--coral)}
+  .kbp-input.right{border-color:#0f9f82;background:rgba(15,159,130,.1)}
+  .kbp-input.wrong{border-color:var(--coral)}
+  .kbp-check,.kbp-run{flex:0 0 auto;border:0;background:var(--coral);color:#fff;font-family:var(--font-display);font-weight:700;font-size:13px;padding:9px 16px;border-radius:10px;cursor:pointer;transition:filter .12s}
+  .kbp-check:hover,.kbp-run:hover{filter:brightness(.93)}
+
+  .kbp-code{display:flex;flex-direction:column;gap:8px}
+  .kbp-ta{width:100%;box-sizing:border-box;font-family:var(--font-mono);font-size:13px;line-height:1.55;background:#1e1813;color:#f4e9d6;border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:12px 14px;resize:vertical}
+  .kbp-ta:focus{outline:0;border-color:var(--coral)}
+  .kbp-run{align-self:flex-start}
+
+  .kbp-out{margin-top:10px;font-family:var(--font-mono);font-size:12.5px;line-height:1.6;border-radius:9px;padding:9px 12px;white-space:pre-wrap}
+  .kbp-out.pass{background:rgba(15,159,130,.1);color:#0b7a63;border:1px solid rgba(15,159,130,.3)}
+  .kbp-out.fail{background:rgba(238,75,43,.07);color:var(--coral-deep);border:1px solid rgba(238,75,43,.25)}
+  .kbp-why{margin-top:10px;font-size:13.5px;line-height:1.55;color:var(--ink);background:var(--cream);border-radius:9px;padding:10px 13px;border-left:3px solid #0f9f82}
+  .kbp-why code{font-family:var(--font-mono);font-size:.9em;background:rgba(30,24,19,.08);padding:1px 5px;border-radius:5px}
+  .kbp-ai{margin-top:9px;background:none;border:0;padding:0;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink-soft);cursor:pointer}
+  .kbp-ai:hover{color:var(--coral)}
+  .kbp-ai.copied{color:#0f9f82}
+
+  .kbp-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(12px);z-index:80;background:var(--ink);color:#fff;font-family:var(--font-display);font-weight:700;font-size:14px;padding:11px 18px;border-radius:12px;box-shadow:0 12px 34px rgba(20,16,12,.3);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
+  .kbp-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+
+<script is:inline>
+  (function () {
+    if (window.__kbpInit) return; window.__kbpInit = true;
+    function init() {
+
+    var LS = {
+      get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+      set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    };
+    var done = LS.get('kb-practice-done', {});
+    function day(ts) { return new Date(ts).toISOString().slice(0, 10); }
+
+    var toastEl;
+    function toast(msg) {
+      if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'kbp-toast'; document.body.appendChild(toastEl); }
+      toastEl.textContent = msg; toastEl.classList.add('on');
+      clearTimeout(toastEl._t); toastEl._t = setTimeout(function () { toastEl.classList.remove('on'); }, 2200);
+    }
+
+    function refreshSet(sec) {
+      var items = sec.querySelectorAll('.kbp-item'), n = 0;
+      items.forEach(function (it) { if (done[it.dataset.id]) n++; });
+      var p = sec.querySelector('[data-prog]');
+      if (p) { p.textContent = n + '/' + items.length; p.classList.toggle('full', n === items.length && items.length > 0); }
+    }
+
+    function award(item) {
+      var id = item.dataset.id;
+      if (done[id]) return;
+      done[id] = true; LS.set('kb-practice-done', done);
+      var xp = (LS.get('kb-xp', 0) || 0) + 10; LS.set('kb-xp', xp);
+      var st = LS.get('kb-streak', { d: '', n: 0 });
+      var t = day(Date.now());
+      if (st.d !== t) { st.n = (st.d === day(Date.now() - 864e5)) ? (st.n || 0) + 1 : 1; st.d = t; LS.set('kb-streak', st); }
+      refreshSet(item.closest('.kbp'));
+      toast('Nice. +10 XP  ·  🔥 ' + st.n + '-day streak');
+    }
+
+    function reveal(item) { var w = item.querySelector('.kbp-why'); if (w && w.textContent.trim()) w.hidden = false; }
+    function meta(item) { try { return JSON.parse(item.querySelector('.kbp-meta').textContent); } catch (e) { return {}; } }
+
+    function matches(val, accept) {
+      var v = String(val).trim().toLowerCase();
+      if (!v) return false;
+      return (accept || []).some(function (a) {
+        if (typeof a === 'string' && a.slice(0, 3) === 're:') { try { return new RegExp(a.slice(3), 'i').test(String(val).trim()); } catch (e) { return false; } }
+        return String(a).trim().toLowerCase() === v;
+      });
+    }
+
+    // Run learner JS against declared tests. Each test: {expr, expect}. expr is evaluated with the
+    // learner's code in scope; result is compared (JSON) to expect. Errors -> fail (no loop guard).
+    function runCode(code, tests) {
+      var results = [];
+      for (var i = 0; i < tests.length; i++) {
+        var t = tests[i];
+        try {
+          var fn = new Function('"use strict";\n' + code + '\n;return (' + t.expr + ');');
+          var got = fn();
+          var ok = JSON.stringify(got) === JSON.stringify(t.expect);
+          results.push({ ok: ok, expr: t.expr, got: got, expect: t.expect });
+        } catch (e) {
+          results.push({ ok: false, expr: t.expr, err: String(e && e.message || e) });
+        }
+      }
+      return results;
+    }
+
+    document.querySelectorAll('.kbp-item').forEach(function (item) {
+      var type = item.dataset.type, isDone = !!done[item.dataset.id];
+
+      if (type === 'choice') {
+        item.querySelectorAll('.kbp-opt').forEach(function (b) {
+          if (isDone) { b.disabled = true; if (b.dataset.correct === '1') b.classList.add('right'); }
+          b.addEventListener('click', function () {
+            if (item._answered) return; item._answered = true;
+            var ok = b.dataset.correct === '1';
+            item.querySelectorAll('.kbp-opt').forEach(function (c) { c.disabled = true; if (c.dataset.correct === '1') c.classList.add('right'); });
+            if (!ok) b.classList.add('wrong');
+            reveal(item);
+            if (ok) award(item); else item._answered = false, item.querySelectorAll('.kbp-opt').forEach(function (c) { if (c !== b || c.dataset.correct === '1') return; }); // allow retry on wrong
+            if (!ok) { setTimeout(function () { item._answered = false; b.disabled = false; b.classList.remove('wrong'); }, 900); }
+          });
+        });
+      }
+
+      if (type === 'input') {
+        var inp = item.querySelector('.kbp-input'), btn = item.querySelector('.kbp-check'), acc = meta(item).accept || [];
+        if (isDone) { inp.classList.add('right'); reveal(item); }
+        var check = function () {
+          if (matches(inp.value, acc)) { inp.classList.remove('wrong'); inp.classList.add('right'); reveal(item); award(item); }
+          else { inp.classList.add('wrong'); setTimeout(function () { inp.classList.remove('wrong'); }, 700); }
+        };
+        btn.addEventListener('click', check);
+        inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      }
+
+      if (type === 'code') {
+        var ta = item.querySelector('.kbp-ta'), run = item.querySelector('.kbp-run'), out = item.querySelector('.kbp-out'), tests = meta(item).tests || [];
+        if (isDone) reveal(item);
+        run.addEventListener('click', function () {
+          var res = runCode(ta.value, tests), passed = res.filter(function (r) { return r.ok; }).length;
+          out.hidden = false; out.className = 'kbp-out ' + (passed === tests.length ? 'pass' : 'fail');
+          out.textContent = res.map(function (r) {
+            return (r.ok ? '✓ ' : '✗ ') + r.expr + (r.ok ? '' : (r.err ? '  → error: ' + r.err : '  → got ' + JSON.stringify(r.got) + ', expected ' + JSON.stringify(r.expect)));
+          }).join('\n') + '\n\n' + passed + '/' + tests.length + ' tests passing';
+          if (passed === tests.length) { reveal(item); award(item); }
+        });
+      }
+
+      // "Check with your AI": copy the task + current answer + a tutoring rubric. No backend, no cost.
+      var aiBtn = item.querySelector('.kbp-ai');
+      aiBtn.addEventListener('click', function () {
+        var ans = '';
+        if (type === 'input') ans = item.querySelector('.kbp-input').value;
+        else if (type === 'code') ans = item.querySelector('.kbp-ta').value;
+        else { var picked = item.querySelector('.kbp-opt.wrong, .kbp-opt.right'); ans = picked ? picked.textContent : '(no option chosen yet)'; }
+        var prompt = 'You are a patient tutor. Here is a practice task:\n\n' + aiBtn.dataset.task +
+          '\n\nHere is my answer:\n\n' + (ans || '(blank)') +
+          '\n\nTell me whether it is correct. If it is wrong, give me ONE hint about what to fix, without revealing the full answer.';
+        navigator.clipboard.writeText(prompt).then(function () {
+          aiBtn.classList.add('copied'); var old = aiBtn.textContent;
+          aiBtn.textContent = 'Copied — paste into Claude or ChatGPT';
+          setTimeout(function () { aiBtn.classList.remove('copied'); aiBtn.textContent = old; }, 2400);
+        }).catch(function () {});
+      });
+    });
+
+    document.querySelectorAll('.kbp').forEach(refreshSet);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+</script>
