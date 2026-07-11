@@ -1,6 +1,9 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "building-stocktools-ai", title: "Using AI to Create an Impressive Stock Tools Site for Investors, Swing Traders, and Day Traders",
+    date: "2026-07-04", tag: "Build in Public",
+    excerpt: "A build-in-public tour of StockTools.AI, the newest site in our network: a free, filing-backed research platform that tracks Congress trades, insider buys, whale 13F holdings, CEO pay, and AI research, all built with AI on top of public SEC data, for investors and traders." },
   { slug: "learn-by-doing", title: "New on KB Cafe: Practice in Every Lesson, Capstones, and a Path Builder",
     date: "2026-07-04", tag: "Build in Public",
     excerpt: "Our biggest update yet: interactive practice interleaved into lessons (try it live in the post), build-this capstones on every path, a streak and XP system, a learning path builder that composes real vetted pages, and two new guides. All free, no account, in your browser." },

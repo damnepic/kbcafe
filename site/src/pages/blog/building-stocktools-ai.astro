@@ -1,0 +1,133 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+<BlogPost
+  title="Using AI to Create an Impressive Stock Tools Site for Investors, Swing Traders, and Day Traders"
+  description="A build-in-public look at StockTools.AI, the newest site in our network: a free, filing-backed research platform that tracks Congress trades, insider buys, whale 13Fs, CEO pay, and AI research, built with AI, from SEC data, for investors and traders."
+  slug="building-stocktools-ai"
+  tag="Build in Public"
+  date="2026-07-04"
+>
+  <p>
+    KB Cafe is a build-in-public shop: we use AI to build real sites, then write about how it went. Our newest one is a
+    big one, and it is live. Meet <a href="https://www.stocktools.ai" target="_blank" rel="noopener"><strong>StockTools.AI</strong></a>,
+    a free stock-research platform for investors, swing traders, and day traders, built almost entirely with AI on top of
+    public SEC data. This is the tour: what it does, who it is for, and how AI helped put it together.
+  </p>
+
+  <h2>The one-line pitch</h2>
+  <p>
+    <a href="https://www.stocktools.ai" target="_blank" rel="noopener">StockTools.AI</a> calls itself
+    <strong>&ldquo;the research edge Wall Street pays for, free.&rdquo;</strong> The idea is simple and a little
+    contrarian: most finance sites are a <em>data</em> layer, endless quotes and charts. StockTools aims to be the
+    <strong>decision</strong> layer, one connected workspace where SEC filings, insider trading, congressional trades,
+    institutional ownership, executive pay, earnings, and AI research all live together and hand off to each other.
+    Research any public company in one place, then act on evidence instead of vibes.
+  </p>
+
+  <h2>The part that hooks people: who is actually buying</h2>
+  <p>
+    The strongest section is the smart-money group, the answer to &ldquo;forget the pundits, who is putting real money
+    in?&rdquo; It is all built from primary filings, not scraped estimates:
+  </p>
+  <ul>
+    <li><a href="https://www.stocktools.ai/congress" target="_blank" rel="noopener">Congressional stock trades</a>, straight from STOCK Act disclosures, with each trade&rsquo;s return since it was filed versus the S&amp;P 500, the filing delay, and late-filer flags.</li>
+    <li><a href="https://www.stocktools.ai/insiders" target="_blank" rel="noopener">Insider trades from SEC Form 4</a>, the exact shares and prices executives and directors bought or sold, with cluster-buy signals, refreshed daily.</li>
+    <li><a href="https://www.stocktools.ai/whales" target="_blank" rel="noopener">Whale 13F holdings</a>, what the big institutions own (Buffett, Burry, Ackman, Dalio and the rest), plus a <a href="https://www.stocktools.ai/gurus" target="_blank" rel="noopener">guru portfolios</a> view of legendary investors&rsquo; latest buys.</li>
+    <li><a href="https://www.stocktools.ai/flow" target="_blank" rel="noopener">A single money-flow feed</a> that merges 13F changes, Form 4 insider activity, and congressional trades into one ranked stream of big buys and sells, every row linked back to its source filing.</li>
+    <li><a href="https://www.stocktools.ai/ceos" target="_blank" rel="noopener">A CEO pay tracker</a> pulled from DEF 14A proxy statements: salary, bonus, and stock awards, the real numbers from the filing, no net-worth guesses.</li>
+  </ul>
+
+  <h2>AI research that cites its sources</h2>
+  <p>
+    This is where StockTools overlaps most with what we care about at KB Cafe: using AI honestly. The
+    <a href="https://www.stocktools.ai/ai" target="_blank" rel="noopener">StockTools AI</a> section is pitched as
+    &ldquo;not another chatbot.&rdquo; You point it at a stock and it reads every underlying engine, filings, Congress,
+    insiders, 13Fs, exec pay, valuation, red flags, then synthesizes a brief where <strong>every conclusion traces back
+    to the exact filing it came from</strong>. Its motto is &ldquo;conclusion left, evidence right.&rdquo; A few flavors:
+  </p>
+  <ul>
+    <li><a href="https://www.stocktools.ai/ai/brief" target="_blank" rel="noopener">The Research Brief</a>: a plain-English overview and auto-SWOT for any ticker, built only from SEC filings and market data. Every point is cited, and it makes <strong>no price predictions</strong>.</li>
+    <li><a href="https://www.stocktools.ai/ai/committee" target="_blank" rel="noopener">The Research Committee</a>: a bull, a bear, a risk manager, and a portfolio manager debate a stock using only its filings. You get the arguments from every side, cited, with <strong>no buy or sell call</strong> at the end. It is a genuinely clever way to use AI: not to tell you what to think, but to stress-test what you already think.</li>
+    <li><a href="https://www.stocktools.ai/ai/trader" target="_blank" rel="noopener">The AI Trade Planner</a> (paper, not advice): fuses the filings, the health checks, and the smart-money engines into a single conviction score, then lays out a sized paper plan with an honest backtest. It never places a trade; it is a thinking tool.</li>
+  </ul>
+  <p>
+    The whole thing runs on the Anthropic Claude API, and here is a nice engineering touch: each shared AI write-up is
+    generated <em>once</em> and cached against the hash of its source filing, so thousands of readers share one
+    generation. Good for cost, good for consistency.
+  </p>
+
+  <h2>Built for how you actually trade</h2>
+  <p>The site has three front doors, one for each kind of trader:</p>
+  <h3>Day traders</h3>
+  <p>
+    A small-cap research desk built for speed: <a href="https://www.stocktools.ai/halts" target="_blank" rel="noopener">live US trading halts</a>
+    with the reason and resume time, plus quick reads on dilution risk, float, cash runway (&ldquo;do they need
+    money?&rdquo;), and a filing-based <a href="https://www.stocktools.ai/tools/red-flags" target="_blank" rel="noopener">red-flag health score</a>.
+    Then the risk math you should do before every trade: position size, max loss, R multiples, and risk of ruin, all in
+    the <a href="https://www.stocktools.ai/tools" target="_blank" rel="noopener">free calculator set</a>. There is even a
+    <a href="https://www.stocktools.ai/journal" target="_blank" rel="noopener">free trading journal</a> with a P&amp;L
+    calendar so you can grade your own decisions over time.
+  </p>
+  <h3>Swing traders</h3>
+  <p>
+    Risk-reward and timing tools, an <a href="https://www.stocktools.ai/calendar/earnings" target="_blank" rel="noopener">earnings calendar</a>
+    derived from each company&rsquo;s own 8-K cadence (so it confirms on the filing, not on a rumor), and
+    <a href="https://www.stocktools.ai/industries" target="_blank" rel="noopener">industry hubs</a> that rank each sector
+    by market cap and overlay the insider buying and Congress trades happening across it. A fast way to see where the
+    smart money is leaning within a theme.
+  </p>
+  <h3>Long-term investors</h3>
+  <p>
+    The fundamentals kit: a <a href="https://www.stocktools.ai/tools/dcf-calculator" target="_blank" rel="noopener">DCF calculator</a>,
+    a Graham number, WACC and Sharpe, dividend and compounding math, and a
+    <a href="https://www.stocktools.ai/compare" target="_blank" rel="noopener">side-by-side compare view</a> that scores
+    companies on the classic forensic checks (Piotroski F-Score, Altman Z-Score, Beneish M-Score). Every number is built
+    from roughly fifteen years of EDGAR financials, not a data vendor&rsquo;s estimate.
+  </p>
+
+  <h2>The rest of the menu</h2>
+  <p>
+    A few more that are worth a click. <a href="https://www.stocktools.ai/options" target="_blank" rel="noopener">Options explained</a>
+    walks through calls, puts, premium, and the Greeks with a free dashboard that computes delta, gamma, theta, and vega
+    live. The <a href="https://www.stocktools.ai/research" target="_blank" rel="noopener">Quant Research Library</a>
+    decodes the newest arXiv quantitative-finance papers into plain English. The
+    <a href="https://www.stocktools.ai/lab" target="_blank" rel="noopener">Lab</a> shows every scoring formula it uses,
+    no black boxes, and there is an <a href="https://www.stocktools.ai/ipos" target="_blank" rel="noopener">IPO radar</a>
+    that reads fresh S-1 prospectuses. To learn the vocabulary, there is a
+    <a href="https://www.stocktools.ai/glossary" target="_blank" rel="noopener">worked-example glossary</a> and
+    <a href="https://www.stocktools.ai/flashcards" target="_blank" rel="noopener">study flashcards</a>, the same
+    learn-by-doing idea we lean on here.
+  </p>
+
+  <h2>How AI actually helped build it</h2>
+  <p>
+    The title of this post is honest: AI did a lot of the work. The site is a Next.js app on Vercel, backed by Postgres,
+    that turns raw SEC EDGAR filings (Form 4, 13F, 8-K, S-1, DEF 14A) into clean datasets. AI wrote large amounts of that
+    plumbing, designed and iterated the interface (there is a whole gallery of AI-generated design explorations in the
+    repo), and powers the research features themselves. The build was documentation-driven, an architecture doc, a
+    strategy doc, and a numbered log of design decisions, which is exactly the kind of setup that lets an AI coding agent
+    stay coherent across a project this size. It is a real example of the thing we keep writing about:
+    <a href="/how-to-write-code-with-ai">writing real code with AI</a> instead of fighting it, and
+    <a href="/how-to-build-an-ai-agent">wiring AI into a product</a> rather than bolting on a chatbot.
+  </p>
+
+  <h2>The honest part</h2>
+  <p>
+    We like StockTools for the same reason we like building here: it is upfront. The data comes from primary filings with
+    the methodology shown, the AI cites what it read and refuses to predict prices or hand you a buy signal, and the
+    footer says the quiet part out loud, these are educational tools, not financial advice, and AI can make mistakes, so
+    check anything that matters. That is the right posture for money.
+  </p>
+
+  <h2>Go poke around</h2>
+  <p>
+    If you research stocks at all, <a href="https://www.stocktools.ai" target="_blank" rel="noopener">StockTools.AI</a> is
+    worth ten minutes. Start on the <a href="https://www.stocktools.ai/flow" target="_blank" rel="noopener">money-flow
+    feed</a> to see who is buying right now, run a company through the
+    <a href="https://www.stocktools.ai/ai/committee" target="_blank" rel="noopener">bull-versus-bear committee</a>, and
+    grab a <a href="https://www.stocktools.ai/tools/position-size-calculator" target="_blank" rel="noopener">position-size
+    calculator</a> for your next trade. It is free, it is filing-backed, and it is a genuinely impressive example of what
+    a small team plus AI can ship. We are proud to have it in the network.
+  </p>
+</BlogPost>
