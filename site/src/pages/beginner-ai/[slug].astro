@@ -10,6 +10,10 @@ const { g } = Astro.props;
 const more = BG_GUIDES.filter((x) => x.slug !== g.slug && x.topic === g.topic).slice(0, 3);
 const fallback = BG_GUIDES.filter((x) => x.slug !== g.slug).slice(0, 3);
 const related = more.length ? more : fallback;
+// Sequential next guide (wraps): guarantees every guide gets a dofollow incoming link from its
+// predecessor, so mid-list guides aren't left as near-orphans by the same-topic "related" logic.
+const gi = BG_GUIDES.findIndex((x) => x.slug === g.slug);
+const nextGuide = BG_GUIDES[(gi + 1) % BG_GUIDES.length];
 const levelUp = BG_LEVELUP[g.slug];
 ---
 <Layout
@@ -46,6 +50,9 @@ const levelUp = BG_LEVELUP[g.slug];
           </a>
         ))}
       </div>
+      {nextGuide && nextGuide.slug !== g.slug && (
+        <a class="ba-all" href={`/beginner-ai/${nextGuide.slug}`}>Next guide: {nextGuide.title} &rarr;</a>
+      )}
       <a class="ba-all" href="/beginner-ai/guides">&larr; Go back to all beginner guides</a>
     </aside>
   </article>

@@ -19,7 +19,7 @@ const schema = {
 ---
 <Layout
   title={`What is ${entry.term}? A plain-English definition | KB Cafe`}
-  description={plain(entry.answer)}
+  description={[entry.answer, entry.example, entry.why].map(plain).filter(Boolean).join(' ')}
   path={`/dictionary/${entry.slug}`}
   sidebar={true}
   crumb={[{ label: 'Dictionary', href: '/dictionary' }, { label: entry.term }]}
