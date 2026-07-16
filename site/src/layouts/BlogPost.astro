@@ -4,11 +4,12 @@ import Share from '../components/Share.astro';
 import ReadingEnhancers from '../components/ReadingEnhancers.astro';
 import { POSTS, fmtDate } from '../data/blog.js';
 
-const { title, description, slug, tag, date } = Astro.props;
+const { title, description, slug, tag, date, seoTitle } = Astro.props;
 const path = `/blog/${slug}`;
 const others = POSTS.filter(p => p.slug !== slug).slice(0, 3);
+// Long post titles keep their full h1; the <title> tag can use a shorter seoTitle so it isn't truncated in search.
 ---
-<Layout title={`${title} | KB Cafe Blog`} description={description} path={path} sidebar={true} crumb={[{label:'Blog', href:'/blog'}, {label: title}]}>
+<Layout title={`${seoTitle || title} | KB Cafe`} description={description} path={path} sidebar={true} crumb={[{label:'Blog', href:'/blog'}, {label: title}]}>
 
   <article class="post">
     <header class="post-head">

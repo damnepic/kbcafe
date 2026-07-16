@@ -15,6 +15,12 @@ const {
 } = Astro.props;
 
 const canonical = new URL(path, Astro.site).href;
+// Search engines show ~155 chars of a meta description; clamp long ones at a word boundary so Google
+// doesn't cut them mid-word (and to clear Ahrefs "meta description too long"). On-page copy is unaffected,
+// this only shortens the <meta> tag. Pages wanting a bespoke short description just pass a shorter one.
+const metaDesc = (description || '').length > 160
+  ? description.slice(0, 155).replace(/\s+\S*$/, '').trim() + '…'
+  : description;
 
 // nav active state: map every inner page to its parent nav item. Tools / references / AI explainers
 // live at top-level slugs (e.g. /prompt-simulator, not /tools/prompt-simulator), so a URL-prefix match
@@ -69,7 +75,7 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{title}</title>
-<meta name="description" content={description} />
+<meta name="description" content={metaDesc} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 <link rel="canonical" href={canonical} />
 <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
@@ -82,7 +88,7 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <meta property="og:title" content={title} />
-<meta property="og:description" content={description} />
+<meta property="og:description" content={metaDesc} />
 <meta property="og:type" content="website" />
 <meta property="og:url" content={canonical} />
 <meta property="og:site_name" content="KB Cafe" />
@@ -225,7 +231,7 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
 
   <footer>
     <a class="foot-brand" href="/" aria-label="KB Cafe, home">
-      <img class="foot-mark" src="/logo.png" width="28" height="28" alt="" />
+      <img class="foot-mark" src="/logo.png" width="28" height="28" alt="KB Cafe" />
       <span>Cafe</span>
     </a>
     <nav class="foot-links">
