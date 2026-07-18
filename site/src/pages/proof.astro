@@ -1,0 +1,235 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Honest "proof of doing". Everything here is computed in the browser from the learner's own
+// localStorage (kb-xp, kb-streak, kb-practice-done, kb-xp-awarded capstones, kbcafe-progress).
+// It is not a certificate we sell and nothing is stored on a server: the point is that the proof
+// is the work you actually did, not a badge for watching videos. The share text is built live in
+// JS from the real numbers, so a crawler sees only the shell.
+const shareUrl = new URL('/learn', Astro.site).href;
+---
+<Layout
+  title="Your proof of doing, earned in your browser | KB Cafe"
+  description="A live summary of what you've actually done at KB Cafe: XP, your streak, graded practice, and capstones. Computed in your browser, not a certificate we sell."
+  path="/proof"
+  sidebar={false}
+>
+  <section class="pf">
+    <div class="eyebrow">☕ Proof of doing</div>
+    <h1>The proof is the <span class="mk">work.</span></h1>
+    <p class="lede">
+      Most courses hand you a certificate for watching the videos. This is the honest version: a live
+      tally of what you actually <em>did</em> here, graded practice and hands-on capstones, computed
+      in your browser from your own activity. No account, nothing on a server, nothing to buy.
+    </p>
+
+    <!-- Filled state: shown once any XP exists -->
+    <div class="pf-card" id="pf-card" hidden>
+      <div class="pf-card-top">
+        <svg class="pf-mark" viewBox="0 0 64 64" aria-hidden="true"><use href="#kb-mark" /></svg>
+        <div class="pf-card-h">
+          <span class="pf-card-eye">KB Cafe · proof of doing</span>
+          <span class="pf-card-t">Here's what I've built so far</span>
+        </div>
+      </div>
+
+      <div class="pf-grid">
+        <div class="pf-tile pf-tile-lead">
+          <span class="pf-ic pf-star"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.1 2.1 0 0 0 1.6 1.16l5.16.76a.53.53 0 0 1 .3.9l-3.74 3.64a2.1 2.1 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.1 2.1 0 0 0-1.97 0L6.4 21.94a.53.53 0 0 1-.77-.56l.88-5.14a2.1 2.1 0 0 0-.61-1.88L2.16 10.72a.53.53 0 0 1 .29-.9l5.17-.76a2.1 2.1 0 0 0 1.6-1.16z"/></svg></span>
+          <b id="pf-xp">0</b><span class="pf-unit">XP earned</span>
+        </div>
+        <div class="pf-tile pf-tile-lead">
+          <span class="pf-ic pf-flame"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></svg></span>
+          <b id="pf-streak">0</b><span class="pf-unit"><span id="pf-streak-u">day streak</span></span>
+        </div>
+        <div class="pf-tile"><b id="pf-prac">0</b><span class="pf-unit">practice exercises solved</span></div>
+        <div class="pf-tile"><b id="pf-caps">0</b><span class="pf-unit">capstones built</span></div>
+        <div class="pf-tile"><b id="pf-pages">0</b><span class="pf-unit">lessons marked done</span></div>
+      </div>
+
+      <p class="pf-cap">Generated in your browser at kbcafe.com. Not stored on any server.</p>
+    </div>
+
+    <div class="pf-share" id="pf-share" hidden>
+      <span class="pf-share-l">Proud of it? Screenshot the card, or share the streak:</span>
+      <div class="pf-btns">
+        <button class="pf-b pf-native" type="button" id="pf-native">&#8599; Share</button>
+        <a class="pf-b" id="pf-x" target="_blank" rel="noopener">Post on X</a>
+        <a class="pf-b" id="pf-reddit" target="_blank" rel="noopener">Reddit</a>
+        <button class="pf-b" type="button" id="pf-copy">Copy link</button>
+      </div>
+    </div>
+
+    <!-- Empty state: shown when there's no XP yet -->
+    <div class="pf-empty" id="pf-empty" hidden>
+      <h2>Nothing to prove yet, that's fine.</h2>
+      <p>Proof shows up here the moment you do something hands-on. Two good places to start:</p>
+      <div class="pf-start">
+        <a class="pf-start-c" href="/learning-path-builder">
+          <span class="pf-start-t">Build a learning path &rarr;</span>
+          <span class="pf-start-d">Say a goal, get a route through the real lessons, tools, and exercises.</span>
+        </a>
+        <a class="pf-start-c" href="/what-is-a-context-window">
+          <span class="pf-start-t">Try a graded lesson &rarr;</span>
+          <span class="pf-start-d">Read a bit, then answer for real. Every solved exercise is +10 XP.</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="pf-note">
+      <h2>What this is, and isn't</h2>
+      <ul>
+        <li><strong>It's yours.</strong> The numbers live only in this browser, on this device. Clear your
+          storage and they're gone. We never see them.</li>
+        <li><strong>It's honest.</strong> XP comes from graded practice you passed and capstones you finished,
+          not from time on a page. There's nothing to inflate.</li>
+        <li><strong>It's not a credential.</strong> No employer awards it, we don't sell it, and it makes no
+          promise about a job. It's a record that you did the work. That's the whole point.</li>
+      </ul>
+    </div>
+
+    <p class="pf-keep" id="pf-keep" hidden>
+      Keep going: pick up a <a href="/learn">learning path</a>, sharpen recall with
+      <a href="/flashcards">flashcards</a>, or browse the <a href="/tools">tools</a>.
+    </p>
+
+    <button class="pf-reset" id="pf-reset" type="button" hidden>Reset my progress on this device</button>
+  </section>
+</Layout>
+
+<style>
+  .pf{max-width:760px;margin:0 auto;padding:40px 0 30px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .pf h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.03;font-size:clamp(36px,5.6vw,56px);margin:0}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.16em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%23c0905a' fill-opacity='.55'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .2em}
+  .lede{margin-top:20px;font-size:18px;line-height:1.6;color:var(--ink-soft);max-width:640px}
+  .lede em{color:var(--ink);font-style:italic}
+
+  /* the shareable card */
+  .pf-card{margin-top:30px;border:1.6px solid var(--coral);border-radius:18px;background:var(--cream);padding:22px 24px 18px;
+    box-shadow:0 18px 44px rgba(238,75,43,.1)}
+  .pf-card[hidden]{display:none}
+  .pf-card-top{display:flex;align-items:center;gap:13px;margin-bottom:20px}
+  .pf-mark{width:38px;height:38px;flex:0 0 auto}
+  .pf-card-h{display:flex;flex-direction:column;gap:3px}
+  .pf-card-eye{font-family:var(--font-mono);font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--coral)}
+  .pf-card-t{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--ink)}
+  .pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pf-tile{background:var(--paper);border:1.4px solid var(--line);border-radius:13px;padding:15px 16px;display:flex;flex-direction:column;gap:2px}
+  .pf-tile b{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:-.02em;color:var(--ink);line-height:1}
+  .pf-tile .pf-unit{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);line-height:1.35}
+  .pf-tile-lead{background:var(--paper-2);border-color:var(--coral)}
+  .pf-tile-lead b{font-size:38px}
+  .pf-tile:last-child{grid-column:1 / -1}
+  .pf-ic{display:inline-flex;width:17px;height:17px;margin-bottom:5px}
+  .pf-ic svg{width:100%;height:100%}
+  .pf-star{color:var(--gold)}.pf-flame{color:var(--coral)}
+  .pf-cap{margin:16px 0 0;font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);opacity:.85}
+
+  .pf-share{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+  .pf-share[hidden]{display:none}
+  .pf-share-l{font-size:14.5px;color:var(--ink-soft)}
+  .pf-btns{display:flex;flex-wrap:wrap;gap:8px}
+  .pf-b{border:1.5px solid var(--line);background:var(--paper);border-radius:9px;padding:8px 14px;font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--ink);text-decoration:none;cursor:pointer;transition:border-color .12s,color .12s}
+  .pf-b:hover{border-color:var(--coral)}
+  #pf-x:hover{border-color:#0b0b0b;color:#0b0b0b}
+  #pf-reddit:hover{border-color:#FF4500;color:#FF4500}
+  .pf-native{background:var(--coral)!important;color:#fff!important;border-color:var(--coral)!important}
+  .pf-native:hover{filter:brightness(.93)}
+
+  .pf-empty{margin-top:30px;border:1.5px dashed var(--line);border-radius:16px;background:var(--paper-2);padding:24px}
+  .pf-empty[hidden]{display:none}
+  .pf-empty h2{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--ink);margin:0 0 8px}
+  .pf-empty p{font-size:15.5px;line-height:1.6;color:var(--ink-soft);margin:0 0 16px}
+  .pf-start{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pf-start-c{display:flex;flex-direction:column;gap:6px;background:var(--paper);border:1.4px solid var(--line);border-radius:13px;padding:15px 16px;text-decoration:none;transition:transform .14s,border-color .14s}
+  .pf-start-c:hover{transform:translateY(-3px);border-color:var(--coral)}
+  .pf-start-t{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink)}
+  .pf-start-d{font-size:13.5px;line-height:1.5;color:var(--ink-soft)}
+
+  .pf-note{margin-top:34px;border-top:1px solid var(--line);padding-top:22px}
+  .pf-note h2{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.01em;color:var(--ink);margin:0 0 12px}
+  .pf-note ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:9px}
+  .pf-note li{font-size:15px;line-height:1.6;color:var(--ink-soft)}
+  .pf-note strong{color:var(--ink)}
+
+  .pf-keep{margin-top:22px;font-size:15px;color:var(--ink-soft)}
+  .pf-keep[hidden]{display:none}
+  .pf-keep a,.pf-note a{color:var(--coral);font-weight:600;text-decoration:none}
+  .pf-keep a:hover,.pf-note a:hover{text-decoration:underline}
+
+  .pf-reset{margin-top:26px;background:none;border:0;padding:0;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);opacity:.7;cursor:pointer;text-decoration:underline}
+  .pf-reset[hidden]{display:none}
+  .pf-reset:hover{color:var(--coral);opacity:1}
+
+  @media(max-width:560px){
+    .pf-grid{grid-template-columns:1fr}
+    .pf-tile:last-child{grid-column:auto}
+    .pf-start{grid-template-columns:1fr}
+  }
+</style>
+
+<script is:inline define:vars={{ shareUrl }}>
+  (function () {
+    function num(k, d) { try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } }
+    function obj(k) { try { return JSON.parse(localStorage.getItem(k) || '{}') || {}; } catch (e) { return {}; } }
+    function arr(k) { try { var v = JSON.parse(localStorage.getItem(k) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+
+    function read() {
+      var xp = num('kb-xp', 0) || 0;
+      var streak = 0; try { var s = JSON.parse(localStorage.getItem('kb-streak') || '{}'); streak = (s && s.n) || 0; } catch (e) {}
+      var prac = 0; var pd = obj('kb-practice-done'); for (var k in pd) { if (pd[k]) prac++; }
+      var caps = 0; var aw = obj('kb-xp-awarded'); for (var a in aw) { if (a.indexOf('capstone:') === 0) caps++; }
+      var pages = arr('kbcafe-progress').length;
+      return { xp: xp, streak: streak, prac: prac, caps: caps, pages: pages };
+    }
+
+    function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+
+    function render() {
+      var d = read();
+      var card = document.getElementById('pf-card'), share = document.getElementById('pf-share'),
+          empty = document.getElementById('pf-empty'), keep = document.getElementById('pf-keep'),
+          reset = document.getElementById('pf-reset');
+      if (d.xp > 0) {
+        set('pf-xp', d.xp); set('pf-streak', d.streak); set('pf-prac', d.prac); set('pf-caps', d.caps); set('pf-pages', d.pages);
+        var su = document.getElementById('pf-streak-u'); if (su) su.textContent = d.streak === 1 ? 'day streak' : 'day streak';
+        card.hidden = false; share.hidden = false; empty.hidden = true; keep.hidden = false; reset.hidden = false;
+        wireShare(d);
+      } else {
+        card.hidden = true; share.hidden = true; empty.hidden = false; keep.hidden = true; reset.hidden = true;
+      }
+    }
+
+    function wireShare(d) {
+      var parts = [d.xp + ' XP'];
+      if (d.streak > 0) parts.push('a ' + d.streak + '-day streak');
+      if (d.prac > 0) parts.push(d.prac + ' hands-on exercises');
+      var text = "I've earned " + parts.join(', ') + ' learning AI at KB Cafe, free and right in my browser.';
+      var u = encodeURIComponent(shareUrl), t = encodeURIComponent(text);
+      var x = document.getElementById('pf-x'); if (x) x.href = 'https://x.com/intent/tweet?text=' + t + '&url=' + u;
+      var rd = document.getElementById('pf-reddit'); if (rd) rd.href = 'https://www.reddit.com/submit?url=' + u + '&title=' + t;
+      var nat = document.getElementById('pf-native');
+      if (nat) nat.onclick = function () {
+        if (navigator.share) { navigator.share({ title: 'KB Cafe', text: text, url: shareUrl }).catch(function () {}); }
+        else { navigator.clipboard.writeText(shareUrl).then(function () { nat.textContent = 'Link copied'; }).catch(function () {}); }
+      };
+      var cp = document.getElementById('pf-copy');
+      if (cp) cp.onclick = function () { navigator.clipboard.writeText(shareUrl).then(function () { cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy link'; }, 1500); }).catch(function () {}); };
+    }
+
+    var reset = document.getElementById('pf-reset');
+    if (reset) reset.addEventListener('click', function () {
+      if (!confirm('Clear all your KB Cafe progress on this device? This cannot be undone.')) return;
+      ['kb-xp', 'kb-streak', 'kb-practice-done', 'kb-xp-awarded', 'kbcafe-progress'].forEach(function (k) {
+        try { localStorage.removeItem(k); } catch (e) {}
+      });
+      try { window.dispatchEvent(new CustomEvent('kb-xp-change')); } catch (e) {}
+      render();
+    });
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render); else render();
+  })();
+</script>

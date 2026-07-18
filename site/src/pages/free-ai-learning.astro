@@ -1,0 +1,184 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Honest free-vs-paid comparison. Built from this session's teardowns of paid AI-learning
+// products. The rule: concede where paid genuinely wins (mentorship, cohorts, funded career
+// switches) and win on what's true for us (free, no account, interactive, current, cited).
+// Compares categories, not one brand, so it stays fair and evergreen; named options get a fair
+// one-liner lower down for the "X alternative" searcher.
+const cell = (v, t) => ({ v, t }); // v: 'yes' | 'mid' | 'no'
+const ROWS = [
+  { f: 'Price', kb: cell('yes', 'Free, always'), boot: cell('no', '~$10k+, often hidden'), course: cell('mid', '$30 to $60 a month'), free: cell('yes', 'Free') },
+  { f: 'Account or sign-up', kb: cell('yes', 'None'), boot: cell('no', 'Application + enrollment'), course: cell('no', 'Required'), free: cell('mid', 'Usually required') },
+  { f: 'Time to start', kb: cell('yes', 'Seconds'), boot: cell('no', 'Days, to a cohort date'), course: cell('mid', 'Minutes'), free: cell('yes', 'Minutes') },
+  { f: 'Hands-on in the browser', kb: cell('yes', 'Tools + graded practice'), boot: cell('yes', 'Real projects'), course: cell('mid', 'Sometimes'), free: cell('no', 'Watch only') },
+  { f: 'Nothing installed or uploaded', kb: cell('yes', 'Runs in your tab'), boot: cell('no', 'Local setup'), course: cell('mid', 'Varies'), free: cell('yes', 'Just video') },
+  { f: 'Current for 2026 models', kb: cell('yes', 'Updated continuously'), boot: cell('mid', 'Varies by cohort'), course: cell('mid', 'Often a version behind'), free: cell('no', 'Hit or miss, often dated') },
+  { f: 'Sources you can check', kb: cell('yes', 'Cited'), boot: cell('no', 'Rarely'), course: cell('no', 'Rarely'), free: cell('no', 'Rarely') },
+  { f: 'Mentor or cohort', kb: cell('no', 'No, bring your own AI'), boot: cell('yes', '1:1 + cohort'), course: cell('no', 'No'), free: cell('no', 'No') },
+  { f: 'Credential', kb: cell('mid', 'Honest proof of doing'), boot: cell('mid', 'Certificate + guarantee fine print'), course: cell('mid', 'Certificate of completion'), free: cell('no', 'None') },
+];
+const BEST = { kb: 'Answering a real question now, building intuition', boot: 'A funded, full-time career switch', course: 'A structured overview', free: 'Casual browsing' };
+const glyph = (v) => v === 'yes' ? '✓' : v === 'mid' ? '~' : '✗';
+---
+<Layout
+  title="Learn AI free: KB Cafe vs paid courses & bootcamps"
+  description="An honest comparison of free, interactive AI learning at KB Cafe versus paid bootcamps, courses, and free videos, and where paid still genuinely wins."
+  path="/free-ai-learning"
+  sidebar={false}
+>
+  <section class="fa">
+    <div class="eyebrow">☕ Free vs paid</div>
+    <h1>Learn AI free, and know exactly what you're <span class="mk">trading.</span></h1>
+    <p class="lede">
+      Paid bootcamps and course subscriptions can be worth it. So can a free afternoon on YouTube. Here's a
+      straight comparison of how KB Cafe stacks up against each, including the places where paying genuinely
+      buys you something we don't offer. No account, no email wall, no upsell at the end.
+    </p>
+
+    <div class="fa-legend">
+      <span><b class="g-yes">✓</b> strong</span>
+      <span><b class="g-mid">~</b> partial or it depends</span>
+      <span><b class="g-no">✗</b> weak or absent</span>
+    </div>
+
+    <div class="fa-wrap">
+      <table class="fa-table">
+        <thead>
+          <tr>
+            <th class="fa-rh"></th>
+            <th class="fa-kb">KB Cafe</th>
+            <th>Coding bootcamp</th>
+            <th>Paid course</th>
+            <th>Free videos</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ROWS.map((r) => (
+            <tr>
+              <th class="fa-rh" scope="row">{r.f}</th>
+              <td class="fa-kb"><span class={`g-${r.kb.v}`}>{glyph(r.kb.v)}</span> {r.kb.t}</td>
+              <td><span class={`g-${r.boot.v}`}>{glyph(r.boot.v)}</span> {r.boot.t}</td>
+              <td><span class={`g-${r.course.v}`}>{glyph(r.course.v)}</span> {r.course.t}</td>
+              <td><span class={`g-${r.free.v}`}>{glyph(r.free.v)}</span> {r.free.t}</td>
+            </tr>
+          ))}
+          <tr class="fa-best">
+            <th class="fa-rh" scope="row">Best for</th>
+            <td class="fa-kb">{BEST.kb}</td>
+            <td>{BEST.boot}</td>
+            <td>{BEST.course}</td>
+            <td>{BEST.free}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Where paying genuinely wins</h2>
+    <p>
+      We won't pretend free beats everything. A good bootcamp buys you three things a free site can't: a
+      <strong>human mentor</strong> who reviews your actual work, a <strong>cohort and deadlines</strong> that
+      drag you past the point where self-study usually stalls, and a <strong>credential</strong> some employers
+      recognize. If you're making a full-time career switch, have the money, and know you learn better with
+      people and pressure, that structure is worth paying for. Just read the fine print first: bootcamp pricing
+      is often hidden until a sales call, and a headline "job guarantee" tends to carry conditions that quietly
+      shrink who actually qualifies.
+    </p>
+
+    <h2>Where KB Cafe wins</h2>
+    <ul class="fa-wins">
+      <li><strong>It's free and instant.</strong> Open a page and you're learning in seconds. No card, no
+        application, no cohort start date.</li>
+      <li><strong>You learn by doing.</strong> Graded practice, in-browser tools, and build-it capstones, not a
+        video you half-watch. You <a href="/proof">keep proof of what you actually did</a>.</li>
+      <li><strong>It stays current.</strong> References track the models and patterns of 2026, not a curriculum
+        frozen when a cohort was written.</li>
+      <li><strong>It's private and cited.</strong> Everything runs in your browser, nothing is uploaded, and the
+        explainers point to real sources you can check.</li>
+      <li><strong>Bring your own AI.</strong> Every exercise has a "check it with your AI" button that hands the
+        task to the assistant you already use, no paywalled tutor bot.</li>
+    </ul>
+
+    <h2>Weighing a specific option?</h2>
+    <p>A fair one-line read on the paid and free routes people compare us to:</p>
+    <ul class="fa-opts">
+      <li><strong>Short paid course platforms</strong> are excellent for a tight, well-produced overview, but
+        most gate the certificate and still leave you watching more than doing.</li>
+      <li><strong>Free intro courses</strong> are a fine on-ramp, though the well-known ones tend to be light and
+        a few model generations out of date.</li>
+      <li><strong>Deep practitioner courses</strong> can be world-class, and also steep enough that many people
+        bounce off without a gentler reference beside them.</li>
+      <li><strong>Coding bootcamps</strong> give you mentorship and a guarantee, at roughly five figures, usually
+        with the price and the guarantee's conditions kept off the public page.</li>
+    </ul>
+    <p class="fa-mid-note">
+      None of those is a mistake. KB Cafe is the free, no-account companion you can open right now, alongside any
+      of them or on its own.
+    </p>
+
+    <div class="fa-cta">
+      <h2>Start free, right now</h2>
+      <div class="fa-cta-grid">
+        <a class="fa-cta-c" href="/learning-path-builder">
+          <span class="fa-cta-t">Build a learning path &rarr;</span>
+          <span class="fa-cta-d">Tell it a goal, get a custom route through the real lessons and tools.</span>
+        </a>
+        <a class="fa-cta-c" href="/learn">
+          <span class="fa-cta-t">Browse the paths &rarr;</span>
+          <span class="fa-cta-d">Five guided tracks, from AI infrastructure to building agents.</span>
+        </a>
+        <a class="fa-cta-c" href="/what-is-a-context-window">
+          <span class="fa-cta-t">Try a graded lesson &rarr;</span>
+          <span class="fa-cta-d">Read a bit, answer for real, and start earning proof of doing.</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .fa{max-width:900px;margin:0 auto;padding:40px 0 30px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .fa h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.04;font-size:clamp(34px,5.2vw,52px);margin:0;max-width:15ch}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.16em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%23c0905a' fill-opacity='.55'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .2em}
+  .lede{margin-top:20px;font-size:18px;line-height:1.62;color:var(--ink-soft);max-width:680px}
+
+  .fa-legend{display:flex;flex-wrap:wrap;gap:18px;margin:26px 0 12px;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+  .fa-legend b{font-size:14px}
+  .g-yes{color:#0f9f82;font-weight:800}
+  .g-mid{color:#c9871f;font-weight:800}
+  .g-no{color:var(--ink-soft);font-weight:800;opacity:.6}
+
+  .fa-wrap{overflow-x:auto;border:1.4px solid var(--line);border-radius:14px;margin-top:8px}
+  .fa-table{border-collapse:collapse;width:100%;min-width:720px;background:var(--paper)}
+  .fa-table th,.fa-table td{text-align:left;padding:12px 14px;font-size:13.5px;line-height:1.4;border-bottom:1px solid var(--line);vertical-align:top}
+  .fa-table thead th{font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--ink);background:var(--paper-2);position:sticky;top:0}
+  .fa-rh{font-family:var(--font-display);font-weight:700!important;color:var(--ink)!important;background:var(--paper-2);white-space:nowrap}
+  .fa-table td{font-family:var(--font-body);color:var(--ink-soft)}
+  .fa-table td span{font-family:var(--font-mono);margin-right:3px}
+  .fa-kb{background:var(--cream)}
+  thead .fa-kb{background:var(--coral);color:#fff!important}
+  .fa-table tbody tr:last-child td,.fa-table tbody tr:last-child th{border-bottom:0}
+  .fa-best th,.fa-best td{font-style:normal;font-size:13px;color:var(--ink);background:rgba(240,240,240,.35)}
+  .fa-best .fa-kb{background:var(--cream);font-weight:600;color:var(--ink)}
+
+  .fa h2{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.02em;color:var(--ink);margin:34px 0 12px}
+  .fa p{font-size:16px;line-height:1.68;color:var(--ink-soft);max-width:680px;margin:0 0 14px}
+  .fa strong{color:var(--ink)}
+  .fa a{color:var(--coral);font-weight:600;text-decoration:none}
+  .fa a:hover{text-decoration:underline}
+  .fa-wins,.fa-opts{margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:10px;max-width:680px}
+  .fa-wins li,.fa-opts li{font-size:15.5px;line-height:1.6;color:var(--ink-soft)}
+  .fa-mid-note{font-size:15.5px}
+
+  .fa-cta{margin-top:40px;border-top:1px solid var(--line);padding-top:24px}
+  .fa-cta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:6px}
+  .fa-cta-c{display:flex;flex-direction:column;gap:6px;background:var(--paper);border:1.4px solid var(--line);border-radius:13px;padding:16px;text-decoration:none;transition:transform .14s,border-color .14s}
+  .fa-cta-c:hover{transform:translateY(-3px);border-color:var(--coral)}
+  .fa-cta-t{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--ink)}
+  .fa-cta-d{font-size:13.5px;line-height:1.5;color:var(--ink-soft)}
+
+  @media(max-width:680px){ .fa-cta-grid{grid-template-columns:1fr} }
+</style>

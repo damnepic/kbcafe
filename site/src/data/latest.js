@@ -1,6 +1,10 @@
 // Homepage "Freshly brewed" strip: a hand-curated list of recent additions worth featuring.
 // Newest first. Append a one-liner when you ship something notable, drop old ones off the bottom.
 export const LATEST = [
+  { title: 'Learn AI free vs paid', href: '/free-ai-learning', tag: 'Guide', date: '2026-07-17',
+    blurb: 'An honest comparison of free, interactive learning here against paid bootcamps and courses, including where paying genuinely wins.' },
+  { title: 'Your proof of doing', href: '/proof', tag: 'New page', date: '2026-07-17',
+    blurb: 'A live tally of what you actually did here, XP, streak, practice, and capstones, generated in your browser. Not a certificate we sell.' },
   { title: 'Learning Path Builder', href: '/learning-path-builder', tag: 'New tool', date: '2026-07-04',
     blurb: 'Say a goal, get a custom route through KB Cafe’s real guides, tools, and hands-on exercises. No signup.' },
   { title: 'How to prompt Claude Fable 5', href: '/how-to-prompt-claude-fable-5', tag: 'Lesson', date: '2026-07-01',
