@@ -57,6 +57,18 @@ const CAPSTONES = {
     ],
     uses: [{ nm: 'AI Coding Prompt Builder', href: '/ai-coding-prompt-builder' }, { nm: 'Context Window Visualizer', href: '/context-window-visualizer' }, { nm: 'Git & version control', href: '/git-version-control' }],
   },
+  careers: {
+    title: 'Run one honest mock interview',
+    brief: 'A finished project is your best proof, but a dry run beats walking in cold. Use the AI you already have as a tireless interviewer, and keep yourself honest. Progress saves on this device.',
+    tasks: [
+      'Paste a real job description into your AI and have it <strong>interview you</strong> on the concepts it lists, one question at a time.',
+      'Answer each out loud, then ask it to name your <strong>weakest</strong> answer and exactly why it was weak.',
+      'Hand it one <a href="/proof">project you built</a> and ask it to poke holes the way a skeptical engineer would.',
+      'Have it rewrite one <strong>resume bullet</strong> to be more specific and measurable, then confirm the number is one you can defend.',
+      'Write down the <strong>one question</strong> that tripped you up, and the answer you will give next time.',
+    ],
+    uses: [{ nm: 'Get Hired guide', href: '/get-hired-in-ai' }, { nm: 'Prompt Optimizer', href: '/prompt-optimizer' }, { nm: 'Your proof of doing', href: '/proof' }],
+  },
 };
 
 export function getStaticPaths() {
@@ -69,7 +81,11 @@ const { p } = Astro.props;
 const resolve = {};
 TOOLS.forEach(t => { if (t.href) resolve[t.href] = { href: t.href, label: t.nm, ds: t.ds, kind: 'Tool' }; });
 AI.forEach(a => { resolve[a.href] = { href: a.href, label: a.nm, ds: a.ds, kind: 'Concept' }; });
-const EXTRA = { '/ai-patterns': { href: '/ai-patterns', label: 'AI Patterns Library', ds: 'Reflection, Router, Judge, Verification, Human-in-the-loop.', kind: 'Concept' } };
+const EXTRA = {
+  '/ai-patterns': { href: '/ai-patterns', label: 'AI Patterns Library', ds: 'Reflection, Router, Judge, Verification, Human-in-the-loop.', kind: 'Concept' },
+  '/get-hired-in-ai': { href: '/get-hired-in-ai', label: 'The Get Hired guide', ds: 'Build real proof, drill the concepts interviews test, and present your work well. Practice plus a portfolio capstone.', kind: 'Concept' },
+  '/proof': { href: '/proof', label: 'Your proof of doing', ds: 'Turn the work you have done here into a shareable record: XP, streak, practice, and capstones.', kind: 'Concept' },
+};
 const get = (h) => resolve[h] || EXTRA[h] || { href: h, label: h, ds: '', kind: 'Concept' };
 const steps = p.steps.map(get);
 const tools = steps.filter(s => s.kind === 'Tool').length;

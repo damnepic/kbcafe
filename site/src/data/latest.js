@@ -1,6 +1,8 @@
 // Homepage "Freshly brewed" strip: a hand-curated list of recent additions worth featuring.
 // Newest first. Append a one-liner when you ship something notable, drop old ones off the bottom.
 export const LATEST = [
+  { title: 'Get hired in AI, free', href: '/get-hired-in-ai', tag: 'Career', date: '2026-07-18',
+    blurb: 'The un-gated version of what a bootcamp charges $10k for: build real proof, drill the concepts interviews test, and present your work well. No job promised.' },
   { title: 'How AI picks the next word', href: '/how-ai-picks-the-next-word', tag: 'New tool', date: '2026-07-18',
     blurb: 'A play-with-it demo of how a model samples each next token. Turn the temperature up and watch it get wild, or down to greedy. No account.' },
   { title: 'Learn AI free vs paid', href: '/free-ai-learning', tag: 'Guide', date: '2026-07-17',

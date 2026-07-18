@@ -1,0 +1,194 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Practice from '../components/Practice.astro';
+import Capstone from '../components/Capstone.astro';
+import Deeper from '../components/Deeper.astro';
+
+// Wave C of the buildmap: the free, un-gated "get hired" track. It gives away the career layer a
+// bootcamp charges five figures for, done the KB Cafe way: no job promise (nobody can honestly make
+// one), just the three things you actually control, practiced. Interview questions run through the
+// Practice engine; the portfolio Capstone is the "proof of doing" made concrete.
+const CONCEPTS_Q = [
+  { type: 'choice', q: 'An interviewer asks why <strong>RAG</strong> often beats fine-tuning for a company knowledge base. Best answer?',
+    options: ['It adds current, private facts at query time and is easy to update', 'It is always cheaper than fine-tuning', 'It makes the model itself larger and smarter'], answer: 0,
+    why: 'RAG grounds answers in documents you can update anytime. Fine-tuning changes a model&rsquo;s <em>behavior</em> and bakes knowledge in slowly, so it&rsquo;s the wrong tool for &ldquo;answer from our latest docs.&rdquo;' },
+  { type: 'choice', q: 'What actually happens when a model &ldquo;calls a tool&rdquo;?',
+    options: ['It returns a structured request; your code runs the function', 'The model executes the function itself', 'The tool edits the model&rsquo;s weights'], answer: 0,
+    why: 'The model only <em>asks</em>. It emits a function name and JSON arguments; your code decides whether and how to run it, then feeds the result back.' },
+  { type: 'input', q: 'One word: the unit of text a model reads, and is billed on.',
+    accept: ['token', 'tokens'], placeholder: 'one word',
+    why: 'Tokens. Roughly ¾ of a word each. They fill the <a href="/what-is-a-context-window">context window</a> and are what you pay for.' },
+  { type: 'choice', q: 'Why can the exact same prompt give a different answer each time?',
+    options: ['Above temperature 0, the next word is a weighted random draw', 'The model has a bug', 'The wording secretly changed'], answer: 0,
+    why: 'A model samples each next token from a probability distribution. See it live in <a href="/how-ai-picks-the-next-word">how AI picks the next word</a>. Set temperature to 0 for deterministic output.' },
+  { type: 'choice', q: 'A model states a false fact with total confidence. What&rsquo;s the term, and the first-line fix?',
+    options: ['A hallucination; ground it with retrieval and evals', 'Overfitting; add more layers', 'Latency; upgrade the GPU'], answer: 0,
+    why: 'It&rsquo;s a <a href="/what-is-an-ai-hallucination">hallucination</a>. You reduce it by grounding answers in real sources (RAG) and checking output with <a href="/what-are-ai-evals">evals</a>, not by trusting the confident tone.' },
+];
+const PRESENT_Q = [
+  { type: 'choice', q: 'Which resume bullet lands hardest?',
+    options: ['Built a RAG support bot that cut first-response time 40% (measured over 3 months)', 'Made an AI chatbot using cutting-edge technology', 'Passionate about AI and machine learning'], answer: 0,
+    why: 'Specific, measured, and honest beats buzzwords every time. Name what you built, the result, and how you know.' },
+  { type: 'choice', q: 'The interviewer asks about a tool you&rsquo;ve never used. Best move?',
+    options: ['Say how you&rsquo;d learn it fast, and relate it to something you do know', 'Pretend you know it and hope', 'Change the subject'], answer: 0,
+    why: 'Nobody knows everything. Showing how you ramp up on something new, tied to real experience, reads as senior. Bluffing gets found out in the follow-up.' },
+  { type: 'choice', q: '&ldquo;Tell me about a project that failed.&rdquo; The strongest framing?',
+    options: ['What broke, what you learned, and what you changed after', 'You&rsquo;ve never really failed at anything', 'It was the requirements&rsquo; fault'], answer: 0,
+    why: 'They&rsquo;re testing self-awareness, not perfection. Own the failure, then show the lesson and the concrete change. That is exactly what a portfolio project can prove.' },
+];
+const CAP_TASKS = [
+  'Pick <strong>one real problem</strong> you actually want solved and build a small working project for it, not a tutorial clone.',
+  'Write a <strong>README a stranger can follow</strong>: what it does, why, how to run it, and a screenshot or a live link.',
+  'Deploy it somewhere <strong>public</strong>. A URL a recruiter can click beats a repo nobody runs.',
+  'Put an <strong>honest number</strong> in the description: what it improved or handles, measured, not guessed.',
+  'Pin it on your GitHub profile and link it from your <strong>resume and LinkedIn</strong>, so the proof is one click away.',
+];
+const CAP_USES = [{ nm: 'Your proof of doing', href: '/proof' }, { nm: 'Learn to build an agent', href: '/how-to-build-an-ai-agent' }, { nm: 'Prompt Optimizer', href: '/prompt-optimizer' }];
+---
+<Layout
+  title="Get hired in AI or dev: a free prep track | KB Cafe"
+  description="Prepare for an AI or developer job the honest way and for free: build real proof, drill the concepts interviews test, and present your work well. No account."
+  path="/get-hired-in-ai"
+  sidebar={false}
+>
+  <article class="gh">
+    <div class="eyebrow">☕ Career · Get hired</div>
+    <h1>Get hired, without the <span class="mk">$10k bootcamp.</span></h1>
+    <p class="lede">
+      Bootcamps charge five figures for career prep and dress it up with a &ldquo;job guarantee.&rdquo; Here
+      is the same preparation, un-gated and free. No one can honestly promise you a job, so this page won&rsquo;t.
+      What it does is drill the three things you actually control: <strong>proof</strong> you can do the work,
+      the <strong>concepts</strong> interviews test, and how you <strong>present</strong> yourself.
+    </p>
+
+    <h2>The honest deal</h2>
+    <p>
+      A recruiter has minutes and a stack of applicants. You can&rsquo;t control the market, the budget, or who
+      else applied. You <em>can</em> control whether, in those minutes, you look like someone who ships. That
+      comes down to three things, and every one of them is free to build.
+    </p>
+    <ol class="gh-three">
+      <li><strong>Proof.</strong> A real project someone can click, not a certificate that says you watched videos.</li>
+      <li><strong>Fluency.</strong> The handful of concepts that come up in every AI and dev interview, answered cold.</li>
+      <li><strong>Presentation.</strong> A resume, GitHub, and answers that are specific, measured, and honest.</li>
+    </ol>
+
+    <h2>1. Build proof that you can do the work</h2>
+    <p>
+      This is the one that actually moves the needle, and the one bootcamps gate behind tuition. You do not
+      need permission or a cohort to build it. One finished, deployed, honestly-described project beats three
+      half-done tutorials and a paid certificate. Keep the <a href="/proof">proof of what you&rsquo;ve done</a>
+      here as you go, then turn it into the real thing:
+    </p>
+
+    <Capstone id="get-hired-portfolio" title="Ship one portfolio-ready project" brief="A recruiter should be able to click one link and see that you can build. This is that link. Progress saves on this device." tasks={CAP_TASKS} uses={CAP_USES} />
+
+    <h2>2. Know the concepts cold</h2>
+    <p>
+      Whatever the role, the screen usually probes the same fundamentals. If you&rsquo;ve worked through KB
+      Cafe&rsquo;s <a href="/learn">learning paths</a>, you already know these. Prove it to yourself, these are
+      the kinds of questions that actually come up:
+    </p>
+
+    <Practice set="gh-concepts" title="Concepts interviews actually test" items={CONCEPTS_Q} />
+
+    <h2>3. Present yourself like someone who ships</h2>
+    <p>
+      Same work, two candidates, different framing, and one gets the call. Presentation is a skill you can
+      practice. A few rules that carry most of the weight:
+    </p>
+    <ul class="gh-list">
+      <li><strong>Be specific and measured.</strong> &ldquo;Cut response time 40%&rdquo; beats &ldquo;improved
+        performance.&rdquo; Numbers you can back up read as real.</li>
+      <li><strong>Make your GitHub the portfolio.</strong> A pinned repo with a clean README and a live link
+        does more than a list of skills. Delete or hide the abandoned experiments.</li>
+      <li><strong>Match the words to the job post.</strong> If they say &ldquo;RAG&rdquo; and &ldquo;evals,&rdquo;
+        and you&rsquo;ve done both, say so in their words.</li>
+      <li><strong>Never bluff.</strong> &ldquo;I haven&rsquo;t used that, here&rsquo;s how I&rsquo;d pick it
+        up&rdquo; beats a bluff that collapses on the follow-up question.</li>
+    </ul>
+
+    <Practice set="gh-present" title="Spot the stronger answer" items={PRESENT_Q} />
+
+    <h2>4. Walk into the interview knowing the shape</h2>
+    <p>Most AI and dev loops are some mix of these. None should be a surprise:</p>
+    <ul class="gh-list">
+      <li><strong>Recruiter screen.</strong> Fit and motivation. Have a two-sentence story for why this role.</li>
+      <li><strong>Technical or take-home.</strong> Coding or a small build. Think out loud, state your
+        assumptions, and get something working before you polish it.</li>
+      <li><strong>Concept and system questions.</strong> The fundamentals from section 2, plus &ldquo;how would
+        you design X.&rdquo; It&rsquo;s fine to ask clarifying questions first.</li>
+      <li><strong>Behavioral.</strong> Real stories, not slogans. Keep three ready: a win, a failure with a
+        lesson, and a conflict you worked through.</li>
+    </ul>
+
+    <h2>Prep with the AI you already have</h2>
+    <p>
+      You don&rsquo;t need a paid coach. The assistant you use every day is a tireless mock interviewer. Paste
+      the job description and ask it to grill you on the concepts. Have it review a resume bullet and push you
+      to make it more specific. Use the <a href="/prompt-optimizer">Prompt Optimizer</a> to sharpen the ask.
+      It&rsquo;s the same &ldquo;bring your own AI&rdquo; idea behind KB Cafe&rsquo;s
+      <a href="/learn">practice exercises</a>, applied to your job hunt.
+    </p>
+
+    <Deeper title="Why a &ldquo;job guarantee&rdquo; is usually smaller than it looks">
+      <p>
+        Guaranteed-job marketing is the bootcamp industry&rsquo;s hook, and the fine print tends to quietly
+        shrink who qualifies. Common conditions: apply to a set number of jobs every week, keep a minimum
+        attendance, hit deadlines, decline no &ldquo;reasonable&rdquo; offer, and, often, <em>not</em> take the
+        upfront discount if you want the guarantee at all. Pricing is usually hidden until a sales call.
+      </p>
+      <p>
+        None of that makes bootcamps a scam, some are excellent, and a mentor plus a cohort is worth real money
+        to some people. But read the terms before you read the promise, and compare honestly first. We laid the
+        options out side by side in <a href="/free-ai-learning">free vs paid AI learning</a>.
+      </p>
+    </Deeper>
+
+    <div class="gh-cta">
+      <h2>Start now, free</h2>
+      <div class="gh-cta-grid">
+        <a class="gh-cta-c" href="/learn-ai-careers">
+          <span class="gh-cta-t">Follow the Get Hired path &rarr;</span>
+          <span class="gh-cta-d">This guide plus the concept refreshers, in order, with progress saved.</span>
+        </a>
+        <a class="gh-cta-c" href="/proof">
+          <span class="gh-cta-t">See your proof of doing &rarr;</span>
+          <span class="gh-cta-d">Turn the work you&rsquo;ve done here into a shareable record.</span>
+        </a>
+        <a class="gh-cta-c" href="/free-ai-learning">
+          <span class="gh-cta-t">Free vs paid, compared &rarr;</span>
+          <span class="gh-cta-d">Where a paid bootcamp is worth it, and where it isn&rsquo;t.</span>
+        </a>
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .gh{max-width:740px;margin:0 auto;padding:40px 0 30px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);margin-bottom:16px}
+  .gh h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1.03;font-size:clamp(34px,5.2vw,52px);margin:0}
+  .mk{position:relative;white-space:nowrap;display:inline-block;padding-bottom:.16em;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M1 10 C 40 4 70 5 110 8 C 150 11 180 9 199 6 L 198 12 C 165 15 130 14 95 12 C 60 10 30 12 2 14 Z' fill='%23c0905a' fill-opacity='.55'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% .2em}
+  .lede{margin-top:20px;font-size:18px;line-height:1.62;color:var(--ink-soft)}
+  .gh h2{font-family:var(--font-display);font-weight:800;font-size:25px;letter-spacing:-.02em;color:var(--ink);margin:34px 0 12px}
+  .gh p{font-size:16.5px;line-height:1.7;color:var(--ink-soft);margin:0 0 15px}
+  .gh strong{color:var(--ink)}
+  .gh a{color:var(--coral);font-weight:600;text-decoration:none}
+  .gh a:hover{text-decoration:underline}
+  .gh em{color:var(--ink-soft)}
+  .gh-three{counter-reset:none;margin:0 0 8px;padding-left:22px;display:flex;flex-direction:column;gap:9px}
+  .gh-three li{font-size:16.5px;line-height:1.6;color:var(--ink-soft)}
+  .gh-list{margin:0 0 16px;padding-left:22px;display:flex;flex-direction:column;gap:10px}
+  .gh-list li{font-size:16px;line-height:1.6;color:var(--ink-soft)}
+
+  .gh-cta{margin-top:40px;border-top:1px solid var(--line);padding-top:24px}
+  .gh-cta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:6px}
+  .gh-cta-c{display:flex;flex-direction:column;gap:6px;background:var(--paper);border:1.4px solid var(--line);border-radius:13px;padding:16px;text-decoration:none;transition:transform .14s,border-color .14s}
+  .gh-cta-c:hover{transform:translateY(-3px);border-color:var(--coral)}
+  .gh-cta-t{font-family:var(--font-display);font-weight:800;font-size:15.5px;color:var(--ink)}
+  .gh-cta-d{font-size:13.5px;line-height:1.5;color:var(--ink-soft)}
+  @media(max-width:680px){ .gh-cta-grid{grid-template-columns:1fr} }
+</style>

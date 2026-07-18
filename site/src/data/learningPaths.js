@@ -35,6 +35,12 @@ export const LEARNING_PATHS = [
     intro: '<span class="lpp-primer-h">New to the lingo?</span> A model can <a class="kb-term" href="/dictionary/hallucination">hallucinate</a> code that does not exist, and it knows nothing past its <a class="kb-term" href="/dictionary/training-cutoff">training cutoff</a>. You steer it with a clear <a class="kb-term" href="/dictionary/system-prompt">system prompt</a> inside its <a class="kb-term" href="/dictionary/context-window">context window</a>, and a <a class="kb-term" href="/dictionary/coding-agent">coding agent</a> can run and fix its own code. Hover any underlined word for a quick definition, or click to learn more.',
     steps: ['/how-to-write-code-with-ai', '/ai-coding-prompt-builder', '/what-is-a-context-window', '/context-window-visualizer', '/what-is-tool-calling'],
   },
+  {
+    id: 'careers', title: 'Get Hired in AI', shortTitle: 'to Get Hired', tag: 'Career',
+    route: '/learn-ai-careers', minutes: 45, outcome: 'I want to land a job building with AI',
+    blurb: 'The free version of what a bootcamp charges five figures for: build real proof, refresh the concepts a screen will probe, and learn to present your work well. No job promised, just the parts you control.',
+    steps: ['/get-hired-in-ai', '/what-is-a-context-window', '/what-is-rag', '/what-is-tool-calling', '/what-are-ai-evals', '/how-ai-picks-the-next-word', '/proof'],
+  },
 ];
 
 // reverse helper: which paths include a given href
