@@ -1,0 +1,318 @@
+---
+import ToolPage from '../layouts/ToolPage.astro';
+import Deeper from '../components/Deeper.astro';
+
+// "See the mechanism" demo (buildmap #4): a language model writes one token at a time by sampling
+// from a probability distribution. This makes temperature, top-k, and top-p visible and playable.
+// The distributions are hand-set example logits (not a real model), clearly framed as an illustration,
+// so the whole thing runs client-side with no API and no cost. The math is honest: real softmax,
+// real top-k/top-p filtering, real weighted sampling.
+const PROMPTS = [
+  { id: 'weather', text: 'The weather today is', toks: [
+    ['sunny', 3.2], ['warm', 2.6], ['nice', 2.3], ['cloudy', 1.9], ['cold', 1.6], ['perfect', 1.1], ['rainy', 0.8], ['grim', -0.3] ] },
+  { id: 'food', text: 'My favorite food is', toks: [
+    ['pizza', 3.0], ['sushi', 2.7], ['pasta', 2.4], ['tacos', 2.0], ['ramen', 1.7], ['chocolate', 1.3], ['cereal', 0.6], ['everything', 0.2] ] },
+  { id: 'meeting', text: 'The meeting was', toks: [
+    ['productive', 2.8], ['long', 2.6], ['cancelled', 2.2], ['boring', 2.0], ['useful', 1.6], ['tense', 1.2], ['a', 0.7], ['pointless', 0.3] ] },
+];
+---
+<ToolPage
+  title="How AI picks the next word: temperature & sampling | KB Cafe"
+  description="See how a language model chooses each next word: a live, in-browser demo of the probability distribution, temperature, and top-k / top-p sampling. Nothing uploaded."
+  path="/how-ai-picks-the-next-word"
+  eyebrow="AI Explained · Tool"
+  h1="How AI picks the next word"
+  tagline="A model writes one token at a time by sampling from a list of candidates. Turn the temperature up and down and watch it get predictable or wild, right in your browser."
+>
+  <div class="row nw-prompts" id="nw-prompts">
+    <button class="chip active" data-p="weather">The weather today is…</button>
+    <button class="chip" data-p="food">My favorite food is…</button>
+    <button class="chip" data-p="meeting">The meeting was…</button>
+  </div>
+
+  <div class="nw-sentence" id="nw-sentence">
+    <span id="nw-text">The weather today is</span> <span class="nw-blank" id="nw-blank">____</span>
+  </div>
+
+  <div class="nw-controls">
+    <div class="nw-ctrl">
+      <div class="nw-ctrl-h"><label for="nw-temp">Temperature</label><output id="nw-temp-v">0.80</output></div>
+      <input type="range" id="nw-temp" min="0" max="2" step="0.05" value="0.8" />
+      <div class="nw-scale"><span>0 · greedy</span><span>2 · wild</span></div>
+    </div>
+    <div class="nw-ctrl">
+      <div class="nw-ctrl-h"><label for="nw-topk">Top-k</label><output id="nw-topk-v">8</output></div>
+      <input type="range" id="nw-topk" min="1" max="8" step="1" value="8" />
+      <div class="nw-scale"><span>1 · strict</span><span>8 · all</span></div>
+    </div>
+    <div class="nw-ctrl">
+      <div class="nw-ctrl-h"><label for="nw-topp">Top-p</label><output id="nw-topp-v">1.00</output></div>
+      <input type="range" id="nw-topp" min="0.05" max="1" step="0.05" value="1" />
+      <div class="nw-scale"><span>0.05 · narrow</span><span>1.00 · off</span></div>
+    </div>
+  </div>
+
+  <div class="nw-dist-head">
+    <span class="nw-dist-t">The model's next-word odds</span>
+    <span class="nw-flag" id="nw-greedy" hidden>Greedy: always the top word</span>
+  </div>
+  <div class="nw-dist" id="nw-dist"></div>
+
+  <div class="row nw-actions">
+    <button class="btn" id="nw-sample">Sample a word</button>
+    <button class="btn ghost" id="nw-sample50">Sample 50&times;</button>
+    <button class="btn ghost" id="nw-reset">Reset</button>
+  </div>
+
+  <div class="nw-tally" id="nw-tally" hidden>
+    <div class="nw-tally-h"><span id="nw-tally-n">0 samples</span><span class="nw-tally-hint">what the sampler actually drew</span></div>
+    <div id="nw-tally-rows"></div>
+  </div>
+
+  <Fragment slot="explainer">
+    <h2>What you're looking at</h2>
+    <p>
+      A language model doesn&rsquo;t plan a sentence and type it out. It predicts <strong>one
+      <a href="/dictionary/token">token</a> at a time</strong>: for the blank above, it produces a
+      <strong>probability</strong> for every word it might say next, then <strong>picks one</strong>, adds it
+      to the text, and does the whole thing again for the word after that. The bars are those probabilities.
+      Everything you change with the sliders changes how that pick is made.
+    </p>
+    <p class="note">
+      The odds here are a fixed illustration, not a live model, so the demo can run entirely in your browser
+      with nothing uploaded. A real model computes them across tens of thousands of tokens, but the mechanism,
+      probability then sample, is exactly this.
+    </p>
+
+    <h2>The three dials</h2>
+    <ul>
+      <li><strong>Temperature</strong> flattens or sharpens the odds. Low temperature makes the top word
+        dominate (safe, repetitive); high temperature evens everyone out (surprising, sometimes nonsense).
+        At <strong>0</strong> it&rsquo;s <em>greedy</em>: it always takes the single most likely word, so the
+        same prompt gives the same answer every time.</li>
+      <li><strong>Top-k</strong> keeps only the <code>k</code> most likely words and ignores the rest, so a
+        long tail of weird options can never be chosen.</li>
+      <li><strong>Top-p</strong> (nucleus) keeps the smallest group of top words whose odds add up to
+        <code>p</code>, then samples from just those. It adapts: a confident step keeps few words, an
+        uncertain one keeps more.</li>
+    </ul>
+
+    <p>
+      This is why the same prompt can give different answers, and why &ldquo;make it more creative&rdquo;
+      usually means &ldquo;raise the temperature.&rdquo; It&rsquo;s also why a model can state something wrong
+      so fluently: a plausible-sounding but false word can simply win the draw. See
+      <a href="/what-is-an-ai-hallucination">AI hallucinations</a> for that failure mode.
+    </p>
+
+    <Deeper title="The softmax that turns scores into odds">
+      <p>
+        The model doesn&rsquo;t emit probabilities directly. It emits a raw score (a <strong>logit</strong>)
+        for each candidate word, and <strong>softmax</strong> squashes those scores into positive numbers that
+        add up to 1. Temperature <code>T</code> is a divisor applied before the exponent:
+      </p>
+      <p class="formula">p(word i) = exp(logit_i / T) / Σ exp(logit_j / T)</p>
+      <p>
+        Small <code>T</code> makes the gaps between logits bigger after dividing, so the top word&rsquo;s share
+        balloons toward 1 (that&rsquo;s greedy in the limit). Large <code>T</code> shrinks the gaps, pushing
+        every word toward the same share. Top-k and top-p then zero out the words you excluded and the rest are
+        re-scaled to add back up to 1 before the draw.
+      </p>
+    </Deeper>
+
+    <h2>FAQ</h2>
+    <details class="faq"><summary>Is this a real language model?</summary>
+      <p>No, and it doesn&rsquo;t pretend to be. The candidate words and their scores are hand-picked so you can play with the mechanism. A real model produces the same kind of distribution over its full vocabulary; the temperature, top-k, and top-p math shown here is the real thing.</p>
+    </details>
+    <details class="faq"><summary>Why do I get a different word each time?</summary>
+      <p>Because above temperature 0 the pick is a weighted random draw, not a lookup. The most likely word wins most often, but any word with odds above zero can come up. Set temperature to 0 to make it deterministic.</p>
+    </details>
+    <details class="faq"><summary>What temperature should I use in practice?</summary>
+      <p>Lower (near 0 to 0.3) for factual, structured, or code output where you want consistency; higher (0.7 to 1.0) for brainstorming and creative writing. Above ~1.2 most models start to wander. Exact ranges vary by provider.</p>
+    </details>
+
+    <h3>Related</h3>
+    <p>
+      Count the <a href="/token-counter">tokens</a> a model reads, see what a <a href="/what-is-a-context-window">context
+      window</a> holds, or watch a vague <a href="/prompt-simulator">prompt force the model to guess</a>.
+    </p>
+  </Fragment>
+</ToolPage>
+
+<style is:global>
+  .nw-prompts{margin-bottom:18px;gap:8px}
+  .nw-sentence{font-family:var(--font-display);font-weight:700;font-size:clamp(20px,3.2vw,26px);letter-spacing:-.01em;color:var(--ink);
+    background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:22px;line-height:1.35}
+  .nw-blank{display:inline-block;min-width:3ch;text-align:center;color:var(--coral-deep);border-bottom:3px solid var(--coral);padding:0 6px;transition:background .2s}
+  .nw-blank.pop{background:rgba(238,75,43,.14);border-radius:6px 6px 0 0}
+
+  .nw-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+  .nw-ctrl{display:flex;flex-direction:column;gap:7px;background:var(--paper-2);border:1.4px solid var(--line);border-radius:13px;padding:13px 15px}
+  .nw-ctrl-h{display:flex;align-items:baseline;justify-content:space-between}
+  .nw-ctrl-h label{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .nw-ctrl-h output{font-family:var(--font-display);font-weight:800;font-size:19px;color:var(--coral-deep)}
+  .nw-ctrl input[type=range]{width:100%;accent-color:var(--coral);cursor:pointer}
+  .nw-scale{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);opacity:.75}
+
+  .nw-dist-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .nw-dist-t{font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .nw-flag{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:#b07d16;background:rgba(244,180,35,.16);border:1px solid rgba(244,180,35,.4);border-radius:20px;padding:3px 10px}
+  .nw-flag[hidden]{display:none}
+  .nw-dist{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
+  .nw-row{display:grid;grid-template-columns:96px 1fr 52px;align-items:center;gap:12px}
+  .nw-w{font-family:var(--font-mono);font-size:13.5px;font-weight:600;color:var(--ink);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nw-track{height:22px;background:var(--paper-2);border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+  .nw-bar{height:100%;background:linear-gradient(90deg,#ff6a3d,#e23a1d);border-radius:6px;transition:width .25s ease}
+  .nw-pct{font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--ink-soft);text-align:right}
+  .nw-row.nw-cut .nw-w{color:var(--ink-soft);opacity:.5;text-decoration:line-through}
+  .nw-row.nw-cut .nw-bar{background:var(--line)}
+  .nw-row.nw-cut .nw-pct{opacity:.45}
+  .nw-row.nw-hit .nw-bar{background:linear-gradient(90deg,#16a37e,#0f8a69)}
+  .nw-row.nw-hit .nw-w{color:#0b7a63}
+
+  .nw-actions{margin-bottom:20px;gap:10px}
+  .nw-tally{border:1.5px solid var(--line);border-radius:14px;background:var(--cream);padding:15px 17px}
+  .nw-tally[hidden]{display:none}
+  .nw-tally-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .nw-tally-h span:first-child{font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--ink)}
+  .nw-tally-hint{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);opacity:.8}
+  .nw-trow{display:grid;grid-template-columns:96px 1fr 44px;align-items:center;gap:12px;margin-bottom:5px}
+  .nw-tw{font-family:var(--font-mono);font-size:12.5px;color:var(--ink);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nw-ttrack{height:14px;background:var(--paper-2);border-radius:5px;overflow:hidden}
+  .nw-tbar{height:100%;background:var(--ink);opacity:.55;border-radius:5px}
+  .nw-tc{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--ink-soft);text-align:right}
+
+  @media(max-width:620px){
+    .nw-controls{grid-template-columns:1fr}
+    .nw-row{grid-template-columns:78px 1fr 46px;gap:9px}
+    .nw-trow{grid-template-columns:78px 1fr 40px;gap:9px}
+  }
+</style>
+
+<script is:inline define:vars={{ PROMPTS }}>
+  (function () {
+    function init() {
+      var $ = function (id) { return document.getElementById(id); };
+      var PMAP = {}; PROMPTS.forEach(function (p) { PMAP[p.id] = p; });
+      var curId = 'weather';
+      var temp = 0.8, topk = 8, topp = 1.0;
+      var tally = {}, total = 0;
+
+      function cur() { return PMAP[curId]; }
+
+      function softmax(logits, T) {
+        if (T <= 0.02) { // greedy: all weight on the single argmax
+          var mx = -Infinity, mi = 0;
+          logits.forEach(function (l, i) { if (l > mx) { mx = l; mi = i; } });
+          return logits.map(function (_, i) { return i === mi ? 1 : 0; });
+        }
+        var scaled = logits.map(function (l) { return l / T; });
+        var m = Math.max.apply(null, scaled);
+        var ex = scaled.map(function (s) { return Math.exp(s - m); });
+        var sum = ex.reduce(function (a, b) { return a + b; }, 0);
+        return ex.map(function (e) { return e / sum; });
+      }
+
+      // apply top-k then top-p (nucleus), then renormalize. Returns probs aligned to original order.
+      function filtered(probs) {
+        var idx = probs.map(function (p, i) { return { i: i, p: p }; });
+        idx.sort(function (a, b) { return b.p - a.p; });
+        var keepK = {};
+        idx.slice(0, topk).forEach(function (o) { keepK[o.i] = true; });
+        var nucleus = {}, cum = 0;
+        for (var j = 0; j < idx.length; j++) {
+          var o = idx[j];
+          if (!keepK[o.i]) continue;
+          nucleus[o.i] = true; cum += o.p;
+          if (cum >= topp - 1e-9) break;
+        }
+        var out = probs.map(function (p, i) { return nucleus[i] ? p : 0; });
+        var s = out.reduce(function (a, b) { return a + b; }, 0) || 1;
+        return out.map(function (p) { return p / s; });
+      }
+
+      function compute() {
+        var toks = cur().toks;
+        var base = softmax(toks.map(function (t) { return t[1]; }), temp);
+        var fin = filtered(base);
+        return toks.map(function (t, i) { return { w: t[0], p: fin[i], i: i }; });
+      }
+
+      function renderDist(hitWord) {
+        var rows = compute();
+        // sort by prob desc, but keep cut (0) rows at the bottom in original score order
+        var live = rows.filter(function (r) { return r.p > 0; }).sort(function (a, b) { return b.p - a.p; });
+        var cut = rows.filter(function (r) { return r.p === 0; });
+        var ordered = live.concat(cut);
+        var html = ordered.map(function (r) {
+          var pct = Math.round(r.p * 100);
+          var cls = 'nw-row' + (r.p === 0 ? ' nw-cut' : '') + (hitWord && r.w === hitWord ? ' nw-hit' : '');
+          var label = r.p === 0 ? 'cut' : pct + '%';
+          return '<div class="' + cls + '"><span class="nw-w">' + r.w + '</span>' +
+            '<div class="nw-track"><div class="nw-bar" style="width:' + (r.p * 100) + '%"></div></div>' +
+            '<span class="nw-pct">' + label + '</span></div>';
+        }).join('');
+        $('nw-dist').innerHTML = html;
+        $('nw-greedy').hidden = !(temp <= 0.02);
+      }
+
+      function draw() {
+        var rows = compute();
+        var r = Math.random(), c = 0, pick = rows[0];
+        for (var i = 0; i < rows.length; i++) { c += rows[i].p; if (r <= c) { pick = rows[i]; break; } }
+        return pick.w;
+      }
+
+      function renderTally() {
+        var box = $('nw-tally');
+        if (total === 0) { box.hidden = true; return; }
+        box.hidden = false;
+        $('nw-tally-n').textContent = total + (total === 1 ? ' sample' : ' samples');
+        var words = Object.keys(tally).sort(function (a, b) { return tally[b] - tally[a]; });
+        var max = tally[words[0]] || 1;
+        $('nw-tally-rows').innerHTML = words.map(function (w) {
+          var n = tally[w];
+          return '<div class="nw-trow"><span class="nw-tw">' + w + '</span>' +
+            '<div class="nw-ttrack"><div class="nw-tbar" style="width:' + (n / max * 100) + '%"></div></div>' +
+            '<span class="nw-tc">' + n + '</span></div>';
+        }).join('');
+      }
+
+      function sampleOnce() {
+        var w = draw();
+        tally[w] = (tally[w] || 0) + 1; total++;
+        var blank = $('nw-blank');
+        blank.textContent = w; blank.classList.remove('pop'); void blank.offsetWidth; blank.classList.add('pop');
+        renderDist(w); renderTally();
+      }
+
+      function sampleMany(n) {
+        for (var i = 0; i < n; i++) { var w = draw(); tally[w] = (tally[w] || 0) + 1; total++; }
+        $('nw-blank').textContent = cur().toks[0][0]; // show something plausible in the blank
+        renderDist(); renderTally();
+      }
+
+      function setPrompt(id) {
+        curId = id; tally = {}; total = 0;
+        $('nw-text').textContent = cur().text;
+        $('nw-blank').textContent = '____'; $('nw-blank').classList.remove('pop');
+        renderDist(); renderTally();
+      }
+
+      // wire controls
+      $('nw-prompts').addEventListener('click', function (e) {
+        var b = e.target.closest('.chip'); if (!b) return;
+        document.querySelectorAll('#nw-prompts .chip').forEach(function (c) { c.classList.remove('active'); });
+        b.classList.add('active'); setPrompt(b.dataset.p);
+      });
+      $('nw-temp').addEventListener('input', function (e) { temp = +e.target.value; $('nw-temp-v').textContent = temp.toFixed(2); renderDist(); });
+      $('nw-topk').addEventListener('input', function (e) { topk = +e.target.value; $('nw-topk-v').textContent = topk; renderDist(); });
+      $('nw-topp').addEventListener('input', function (e) { topp = +e.target.value; $('nw-topp-v').textContent = topp.toFixed(2); renderDist(); });
+      $('nw-sample').addEventListener('click', function () { sampleOnce(); });
+      $('nw-sample50').addEventListener('click', function () { sampleMany(50); });
+      $('nw-reset').addEventListener('click', function () { tally = {}; total = 0; $('nw-blank').textContent = '____'; $('nw-blank').classList.remove('pop'); renderDist(); renderTally(); });
+
+      renderDist();
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  })();
+</script>

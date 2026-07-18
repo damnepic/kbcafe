@@ -1,5 +1,6 @@
 ---
 import AiPage from '../layouts/AiPage.astro';
+import Deeper from '../components/Deeper.astro';
 ---
 <AiPage
   title="What is RAG (Retrieval-Augmented Generation)?, explained | KB Cafe"
@@ -39,6 +40,23 @@ import AiPage from '../layouts/AiPage.astro';
       <a href="/what-is-a-context-window">context window</a> alongside the question.</li>
     <li><strong>Generate</strong>: the model answers using those chunks, and can <strong>cite</strong> them.</li>
   </ul>
+
+  <Deeper title="What &ldquo;retrieve the closest chunks&rdquo; actually means">
+    <p>
+      &ldquo;Closest&rdquo; is literal geometry. Every chunk was turned into an
+      <a href="/what-are-embeddings">embedding</a> (a vector), and so is the question. Retrieval scores the
+      question against each chunk with <strong>cosine similarity</strong> and keeps the
+      <strong>top <code>k</code></strong>, the handful whose meaning points closest to the question.
+    </p>
+    <p>
+      Two knobs decide quality. <strong><code>k</code></strong> is how many chunks you pull: too few and the
+      answer&rsquo;s source is missing; too many and you flood the
+      <a href="/what-is-a-context-window">context window</a> with noise. A <strong>vector database</strong>
+      makes this fast with <strong>approximate nearest-neighbor</strong> search, so it never compares against
+      all million vectors one by one. Many systems then <strong>rerank</strong>: a second, slower model
+      re-scores those top <code>k</code> for true relevance before they go into the prompt.
+    </p>
+  </Deeper>
 
   <h2>RAG vs fine-tuning</h2>
   <p>

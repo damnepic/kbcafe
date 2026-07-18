@@ -1,5 +1,6 @@
 ---
 import AiPage from '../layouts/AiPage.astro';
+import Deeper from '../components/Deeper.astro';
 ---
 <AiPage
   title="What are embeddings?, vectors, similarity &amp; semantic search | KB Cafe"
@@ -44,6 +45,24 @@ import AiPage from '../layouts/AiPage.astro';
     also used. To find the best matches for a query, you embed the query the same way and look for its
     <strong>nearest neighbors</strong> in the vector space.
   </p>
+
+  <Deeper title="How cosine similarity actually works">
+    <p>
+      Once two things are vectors, &ldquo;similar&rdquo; is just an angle. <strong>Cosine similarity</strong>
+      is the cosine of the angle between them: <code>1.0</code> means they point the exact same way,
+      <code>0</code> means they&rsquo;re unrelated (at a right angle). You get it from the
+      <strong>dot product</strong> divided by the two lengths:
+    </p>
+    <p class="formula">cos(A, B) = (A · B) / (|A| |B|)   where   A · B = a₁b₁ + a₂b₂ + … + aₙbₙ</p>
+    <p>
+      The trick is that it measures <em>direction, not size</em>. A short note and a long article on the same
+      topic still point the same way, so they score as similar, which is exactly what you want for meaning.
+      Picture it in 2D: &ldquo;dog&rdquo; at <code>[2, 1]</code> and &ldquo;puppy&rdquo; at <code>[3, 1.5]</code>
+      lie along the same line (cosine ≈ 1.0), while &ldquo;tax form&rdquo; at <code>[-1, 2]</code> sits at a
+      wide angle (cosine near 0). Nearest-neighbor search is just that, one score per candidate, keep the
+      highest.
+    </p>
+  </Deeper>
 
   <h2>Where the vectors live</h2>
   <p>

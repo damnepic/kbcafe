@@ -1,0 +1,42 @@
+---
+// Progressive-disclosure "go deeper" block. The buildmap's layered-depth fold-in: beginners get a
+// clean explanation, and the curious can open the mechanism (the math, the why) without a wall in
+// their face. Collapsed by default. Drop it inside any prose slot (AiPage / ReferencePage / ToolPage):
+//   <Deeper title="How closeness is actually measured">... html ...</Deeper>
+// The slotted content renders inside `.prose`, so it inherits the page's prose typography.
+const { title = 'Go deeper', label = 'Under the hood', open = false } = Astro.props;
+---
+<details class="deeper" open={open}>
+  <summary class="deeper-sum">
+    <span class="deeper-ic" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8.5 12 14l10-5.5L12 3Z"/><path d="M2 15.5 12 21l10-5.5"/><path d="M2 12 12 17.5 22 12"/></svg>
+    </span>
+    <span class="deeper-txt">
+      <span class="deeper-eye">{label}</span>
+      <span class="deeper-t" set:html={title} />
+    </span>
+    <span class="deeper-hint">optional</span>
+    <svg class="deeper-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="deeper-body"><slot /></div>
+</details>
+
+<style is:global>
+  .deeper{border:1.5px solid var(--line);border-left:3px solid var(--gold);border-radius:14px;background:var(--paper-2);margin:22px 0;overflow:hidden}
+  .deeper[open]{background:var(--cream)}
+  .deeper > .deeper-sum{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;list-style:none;user-select:none}
+  .deeper > .deeper-sum::-webkit-details-marker{display:none}
+  .deeper-ic{display:inline-flex;width:22px;height:22px;flex:0 0 auto;color:#b07d16}
+  .deeper-ic svg{width:100%;height:100%}
+  .deeper-txt{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+  .deeper-eye{font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#b07d16}
+  .deeper-t{font-family:var(--font-display);font-weight:800;font-size:16.5px;letter-spacing:-.01em;color:var(--ink);line-height:1.2}
+  .deeper-hint{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:3px 9px;flex:0 0 auto}
+  .deeper-chev{width:18px;height:18px;flex:0 0 auto;color:var(--ink-soft);transition:transform .2s}
+  .deeper[open] .deeper-chev{transform:rotate(180deg)}
+  .deeper-body{padding:2px 18px 6px;border-top:1px solid var(--line)}
+  .deeper-body > :first-child{margin-top:14px}
+  /* a compact "formula" line for the occasional bit of math, monospace and scrollable */
+  .deeper-body .formula{font-family:var(--font-mono);font-size:13.5px;line-height:1.7;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin:0 0 14px;overflow-x:auto;color:var(--ink);white-space:pre}
+  @media(max-width:560px){ .deeper-hint{display:none} .deeper-t{font-size:15.5px} }
+</style>

@@ -1,6 +1,7 @@
 ---
 import AiPage from '../layouts/AiPage.astro';
 import Practice from '../components/Practice.astro';
+import Deeper from '../components/Deeper.astro';
 const TC_P = [
   { type: 'choice', q: 'When a model makes a tool call, what does it actually return?',
     options: ['A structured request: a function name plus JSON arguments', 'The final answer as plain text', 'The result of running the function'], answer: 0,
@@ -46,6 +47,23 @@ const TC_P = [
     That last loop, call a tool, read the result, decide what&rsquo;s next, repeated until the task is
     done, is the core of an <strong>agent</strong>.
   </p>
+
+  <Deeper title="What the API actually sends back and forth">
+    <p>
+      A tool call is not magic, it is a few messages in a list. When the model decides to use a tool, its
+      reply is not prose, it is a structured message naming the function and its JSON arguments. You run the
+      function, append the result as another message, and call the model again:
+    </p>
+    <p class="formula">1. assistant → tool_call: get_weather(&#123; "city": "Miami" &#125;)
+2. your code runs get_weather("Miami") → &#123; "tempF": 88 &#125;
+3. tool      → &#123; "tempF": 88 &#125;
+4. assistant → "It's 88°F and sunny in Miami."</p>
+    <p>
+      The &ldquo;loop&rdquo; is just your code appending messages and re-calling the model until it stops
+      asking for tools and writes a plain answer. Nothing runs on the model&rsquo;s side, which is exactly
+      why <strong>you</strong> stay in control of what each call is allowed to do.
+    </p>
+  </Deeper>
 
   <Practice set="tc-flow" title="Check your understanding" items={TC_P} />
 

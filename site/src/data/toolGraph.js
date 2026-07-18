@@ -33,6 +33,11 @@ export const TOOL_GRAPH = {
     related: ['/context-window-visualizer', '/context-budget-analyzer', '/llm-cost-calculator'],
     next: '/context-budget-analyzer',
   },
+  '/how-ai-picks-the-next-word': {
+    learn: ['/what-is-an-ai-hallucination', '/what-are-reasoning-models'],
+    related: ['/token-counter', '/prompt-simulator'],
+    next: '/token-counter',
+  },
   '/context-window-visualizer': {
     learn: ['/what-is-a-context-window'],
     related: ['/token-counter', '/context-budget-analyzer', '/agent-memory-simulator'],

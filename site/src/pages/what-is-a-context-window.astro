@@ -1,5 +1,6 @@
 ---
 import AiPage from '../layouts/AiPage.astro';
+import Deeper from '../components/Deeper.astro';
 ---
 <AiPage
   title="What is a context window?, tokens, limits &amp; how to manage it | KB Cafe"
@@ -50,6 +51,23 @@ import AiPage from '../layouts/AiPage.astro';
       context; facts buried in the middle of a huge prompt are more likely to be missed. Bigger is not
       automatically better.</li>
   </ul>
+
+  <Deeper title="Why doubling the context can quadruple the cost">
+    <p>
+      Inside the model, <strong>attention</strong> lets every token look at every other token to work out
+      what matters. With <code>n</code> tokens in the window, that is <code>n × n</code> comparisons:
+    </p>
+    <p class="formula">attention work ≈ n²   (n = tokens in the window)</p>
+    <p>
+      So the cost does not grow with the length of the text, it grows with the <em>square</em> of it. Twice
+      the tokens is roughly four times the work; ten times the tokens is a hundred times. That is the real
+      reason a huge prompt is slow and expensive, and part of why facts get
+      <strong>&ldquo;lost in the middle&rdquo;</strong>: one buried sentence competes for attention against
+      every other token at once. Modern models soften the exact <code>n²</code> with tricks like
+      sliding-window and flash attention, but the instinct holds, <strong>relevant-and-short beats
+      large-and-noisy</strong>.
+    </p>
+  </Deeper>
 
   <h2>How context limits are managed</h2>
   <ul>

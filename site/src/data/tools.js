@@ -6,6 +6,7 @@ export const TOOLS = [
   { cat:"encoding", ctl:"Encoding",    nm:"base64 encode/decode", ds:"Encode or decode Base64, incl. URL-safe.",      color:"c-gold",  href:"/base64" },
   { cat:"time",     ctl:"Time & Cron", nm:"cron generator",    ds:"Build & read crontab expressions, in plain English.", color:"c-gold", href:"/cron-generator" },
   { cat:"ai",       ctl:"AI",          nm:"token counter",     ds:"Count tokens with the real OpenAI tokenizers.",    color:"c-coral", href:"/token-counter" },
+  { cat:"ai",       ctl:"AI",          nm:"next-word sampler", ds:"Watch a model pick the next token, and what temperature does.", color:"c-gold", href:"/how-ai-picks-the-next-word" },
   { cat:"ai",       ctl:"AI",          nm:"context window viz", ds:"See what fills a model's context budget.",         color:"c-ink",   href:"/context-window-visualizer" },
   { cat:"ai",       ctl:"AI",          nm:"context budget analyzer", ds:"Find which files eat your context window.",   color:"c-gold",  href:"/context-budget-analyzer" },
   { cat:"ai",       ctl:"AI",          nm:"structured output builder", ds:"Schemas for OpenAI, Anthropic, Gemini & JSON Schema.", color:"c-coral", href:"/structured-output-builder" },
