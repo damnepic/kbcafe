@@ -149,7 +149,12 @@ const UI_ICONS = {
   <!-- HERO (value-prop) -->
   <section class="hero-redo">
     <h1 class="hr-title">Build with AI,<br><span class="hr-grad">don&rsquo;t just read about it.</span></h1>
-    <p class="hr-sub">Interactive tools, plain-English guides, and step-by-step paths that help you build AI apps, agents, and automations right in your browser.</p>
+    {/* The subhead now opens with a plain "X is a Y" sentence, and that is the fix rather
+        than a style change. Asked what this site is, Google AI Mode answered "coffee-related
+        businesses" (measured 2026-08-13), because the headline is a promise and the old
+        subhead listed features: between them, nothing on the page ever said what KB Cafe
+        IS. The category sentence goes first, in the position an engine weighs most. */}
+    <p class="hr-sub"><strong>KB Cafe is a free AI knowledge base for developers.</strong> Interactive tools, plain-English guides, and step-by-step paths that help you build AI apps, agents, and automations right in your browser.</p>
     <div class="hr-cta">
       <a class="hr-btn hr-btn-pri" href="/reference">Explore the Knowledge Base <span aria-hidden="true">→</span></a>
       <a class="hr-btn hr-btn-gho" href="/search">Search {toolCount} tools</a>

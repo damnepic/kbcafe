@@ -1,16 +1,68 @@
 ---
 import SimplePage from '../layouts/SimplePage.astro';
+
+/*
+ * The disambiguation FAQ. The first entry exists because an engine got it wrong out loud:
+ * asked about this site on 2026-08-13, Google AI Mode replied that Kbcafe "most commonly
+ * refers to one of a few popular coffee-related businesses". Answering the confusion in
+ * plain words on the page is the only version of that fix a machine can actually read.
+ *
+ * One array feeds both the visible list and the FAQPage JSON-LD below, because Google
+ * requires marked-up Q/A to be visible and a second copy is how the two start to disagree.
+ */
+const FAQ = [
+  {
+    q: 'Is KB Cafe a coffee shop?',
+    a: 'No. KB Cafe is a website: a free AI knowledge base and toolkit for software developers, at kbcafe.com. The name is a pun on Knowledge Base, and there is no physical location, no menu and no coffee.',
+  },
+  {
+    q: 'What is KB Cafe for?',
+    a: 'Learning and building with AI. It has interactive tools that run in your browser, plain-English explainers on how modern AI works (context windows, RAG, MCP, embeddings, agents), guided learning paths, and quick developer references.',
+  },
+  {
+    q: 'Does it cost anything, and do I need an account?',
+    a: 'No to both. Everything is free and there is nothing to sign up for. The tools run entirely client-side, so nothing you paste is uploaded anywhere.',
+  },
+  {
+    q: 'Is this the same kbcafe.com from the 2000s?',
+    a: 'Same domain, rebuilt. kbcafe.com was a developer resource in the early-to-mid 2000s, known for RSS and feed tooling and a deep shelf of C++, C# and .NET how-tos. The feed tools are still here; the rest is written for how developers work now.',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
 ---
 <SimplePage
   title="About KB Cafe: the interactive AI knowledge base"
-  description="KB Cafe is a developer's knowledge base, café-warm: fast, private, client-side tools and clear references for developers and people learning to build with AI."
+  description="KB Cafe is a free AI knowledge base and toolkit for developers: fast, private, client-side tools and clear references for people building with AI. Not a coffee shop."
   path="/about"
   h1="About KB Cafe"
 >
+  {/* ORDER MATTERS HERE, and it was the bug. The old opening was "KB Cafe is a developer's
+      knowledge base, café-warm", immediately followed by a paragraph explaining the coffee
+      metaphor. Read by a machine deciding what this brand IS, the strongest signals on the
+      page were the word café and an explanation of café-ness. Google AI Mode duly answered
+      that Kbcafe "most commonly refers to one of a few popular coffee-related businesses"
+      (measured 2026-08-13, cited in 0 of 7 buyer questions).
+
+      The brand story is not deleted, it is DEMOTED below an unambiguous category sentence.
+      The metaphor is still ours; it just no longer speaks first. */}
   <p>
-    KB Cafe is a developer&rsquo;s knowledge base, café-warm. <strong>KB</strong> is for Knowledge Base, the
-    substance, the tools and references; <strong>Cafe</strong> is for the delivery: warm, fast, and made to be
-    used, not wrestled with.
+    <strong>KB Cafe is a free AI knowledge base and toolkit for software developers.</strong> It is a
+    website, not a café: interactive tools, plain-English explainers on how modern AI actually works,
+    and quick references, all running in your browser.
+  </p>
+  <p>
+    The name is a pun rather than a menu. <strong>KB</strong> is for Knowledge Base, the substance, the
+    tools and references; <strong>Cafe</strong> is for the delivery: warm, fast, and made to be used,
+    not wrestled with.
   </p>
   <p>
     The domain has roots: <code>kbcafe.com</code> was a go-to developer resource in the early-to-mid 2000s,
@@ -34,5 +86,26 @@ import SimplePage from '../layouts/SimplePage.astro';
     with filler. The goal is simple: be the place developers cite when they need to explain how something works.
   </p>
 
+  <h2>Common questions</h2>
+  <dl class="faq">
+    {FAQ.map((f) => (
+      <div>
+        <dt>{f.q}</dt>
+        <dd set:html={f.a} />
+      </div>
+    ))}
+  </dl>
+
   <p class="muted">Part of the family with <a href="https://yank.info">yank.info</a>. Read the <a href="/blog">blog</a> for the thinking behind the rebuild, or the story of <a href="/iBLOGthere4iM">the RSS blog that used to live here</a>.</p>
+
+  {/* FAQPage, built from the SAME array the list above renders, because Google requires the
+      marked-up Q/A to be visible on the page and two copies would eventually disagree.
+      In the body rather than the head on purpose: JSON-LD is read anywhere in the document,
+      and SimplePage has no head slot to thread this through. */}
+  <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
 </SimplePage>
+
+<style is:global>
+  .simple .prose .faq dt{font-weight:700;color:var(--ink);margin-top:16px}
+  .simple .prose .faq dd{margin:6px 0 0;font-size:16.5px;line-height:1.7;color:var(--ink-soft)}
+</style>

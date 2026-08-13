@@ -61,9 +61,41 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
 
 // Structured data. Sitewide: brand Organization + WebSite with a SearchAction (eligible for the sitelinks search box).
 // Per-page: a BreadcrumbList from the same trail the visible crumb uses (SERP breadcrumb = better CTR). Head-only, no pixels change.
+//
+// ENTITY DISAMBIGUATION, and it is not theoretical. Measured 2026-08-13: Google AI Mode was
+// asked seven buyer questions about this site and cited it in ZERO of them, and its own words
+// were "Kbcafe (or KB Café) most commonly refers to one of a few popular coffee-related
+// businesses". The name collides with real cafés, and the old block gave an engine nothing to
+// break the tie with: a name, a URL and a logo, no description and no category.
+//
+// Four things the old block did not do:
+//   1. @id on both nodes, with WebSite.publisher pointing at the Organization. That turns two
+//      loose objects into one connected graph, which is what an engine resolves an entity from.
+//   2. A description leading with the CATEGORY, never the name. "A free knowledge base for
+//      developers building with AI" cannot be read as a coffee shop.
+//   3. alternateName covering every spelling an engine has actually produced for us, including
+//      the accented "KB Café", so each variant resolves here instead of to a café.
+//   4. knowsAbout, the subject matter. The strongest available signal for what a site is ABOUT
+//      when its name is ambiguous.
+//
+// NO sameAs. It is the single most valuable field for this problem and we do not have one: this
+// brand has no social profiles to point at. An invented or borrowed URL would be worse than the
+// gap, so the gap stays honest and is named here as the top thing an owner can fix.
 const siteRoot = new URL('/', Astro.site).href;
-const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'KB Cafe', url: siteRoot, logo: new URL('/logo.png', Astro.site).href };
-const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'KB Cafe', url: siteRoot,
+const ORG_ID = siteRoot + '#organization';
+const BRAND_DESC = 'KB Cafe is a free knowledge base and toolkit for developers building with AI: interactive tools, plain-English explainers and quick references, all running in the browser.';
+const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', '@id': ORG_ID,
+  name: 'KB Cafe',
+  alternateName: ['KBCafe', 'KB Café', 'kbcafe.com', 'KB Cafe knowledge base'],
+  description: BRAND_DESC,
+  url: siteRoot,
+  logo: new URL('/logo.png', Astro.site).href,
+  knowsAbout: ['Artificial intelligence', 'Large language models', 'AI agents', 'Retrieval-augmented generation', 'Model Context Protocol', 'Prompt engineering', 'Software development', 'Developer tools'] };
+const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': siteRoot + '#website',
+  name: 'KB Cafe', alternateName: 'KB Cafe, the interactive AI knowledge base',
+  description: BRAND_DESC, url: siteRoot, inLanguage: 'en',
+  publisher: { '@id': ORG_ID },
+  about: [{ '@type': 'Thing', name: 'Artificial intelligence' }, { '@type': 'Thing', name: 'Software development' }],
   potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: siteRoot + 'search?q={search_term_string}' }, 'query-input': 'required name=search_term_string' } };
 const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   itemListElement: [{ '@type': 'ListItem', position: 1, name: 'KB Cafe', item: siteRoot },
