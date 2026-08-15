@@ -88,6 +88,9 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', '@id'
   name: 'KB Cafe',
   alternateName: ['KBCafe', 'KB Café', 'kbcafe.com', 'KB Cafe knowledge base'],
   description: BRAND_DESC,
+  // schema.org's field for exactly the measured failure above: says out loud what the
+  // name does NOT mean. Added 2026-08-15 (the portfolio entity sweep flagged its absence).
+  disambiguatingDescription: 'KB Cafe is the developer knowledge base at kbcafe.com. It is not a coffee shop, a café, or a restaurant.',
   url: siteRoot,
   logo: new URL('/logo.png', Astro.site).href,
   knowsAbout: ['Artificial intelligence', 'Large language models', 'AI agents', 'Retrieval-augmented generation', 'Model Context Protocol', 'Prompt engineering', 'Software development', 'Developer tools'] };
