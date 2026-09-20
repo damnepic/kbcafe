@@ -74,7 +74,10 @@ const ogImage = new URL(OG_PAGES.has(seg) ? `/og/${seg}.png` : '/og.png', Astro.
 //   2. A description leading with the CATEGORY, never the name. "A free knowledge base for
 //      developers building with AI" cannot be read as a coffee shop.
 //   3. alternateName covering every spelling an engine has actually produced for us, including
-//      the accented "KB Café", so each variant resolves here instead of to a café.
+//      the accented "KB Café", so each variant resolves here instead of to a café. The domain
+//      spelling is NOT among them (2026-09-20): Google picks the SERP site name from these
+//      candidates, so listing "kbcafe.com" invites it to print the domain over the brand. The
+//      WebSite node's alternateName was also a tagline, which is not what the field is for.
 //   4. knowsAbout, the subject matter. The strongest available signal for what a site is ABOUT
 //      when its name is ambiguous.
 //
@@ -86,7 +89,7 @@ const ORG_ID = siteRoot + '#organization';
 const BRAND_DESC = 'KB Cafe is a free knowledge base and toolkit for developers building with AI: interactive tools, plain-English explainers and quick references, all running in the browser.';
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', '@id': ORG_ID,
   name: 'KB Cafe',
-  alternateName: ['KBCafe', 'KB Café', 'kbcafe.com', 'KB Cafe knowledge base'],
+  alternateName: ['KBCafe', 'KB Café', 'KB Cafe knowledge base'],
   description: BRAND_DESC,
   // schema.org's field for exactly the measured failure above: says out loud what the
   // name does NOT mean. Added 2026-08-15 (the portfolio entity sweep flagged its absence).
@@ -95,7 +98,7 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', '@id'
   logo: new URL('/logo.png', Astro.site).href,
   knowsAbout: ['Artificial intelligence', 'Large language models', 'AI agents', 'Retrieval-augmented generation', 'Model Context Protocol', 'Prompt engineering', 'Software development', 'Developer tools'] };
 const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': siteRoot + '#website',
-  name: 'KB Cafe', alternateName: 'KB Cafe, the interactive AI knowledge base',
+  name: 'KB Cafe', alternateName: ['KBCafe', 'KB Café'],
   description: BRAND_DESC, url: siteRoot, inLanguage: 'en',
   publisher: { '@id': ORG_ID },
   about: [{ '@type': 'Thing', name: 'Artificial intelligence' }, { '@type': 'Thing', name: 'Software development' }],
