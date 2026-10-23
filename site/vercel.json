@@ -115,27 +115,27 @@
     { "source": "/articles/complus.1.design.patterns.html", "destination": "/software-design-patterns", "permanent": true },
     { "source": "/articles/complus.1.design.patterns", "destination": "/software-design-patterns", "permanent": true },
 
-    { "source": "/articles", "destination": "/", "permanent": true },
-    { "source": "/articles.htm", "destination": "/", "permanent": true },
-    { "source": "/articles/:path*", "destination": "/", "permanent": true },
+    { "source": "/articles", "destination": "/reference", "permanent": true },
+    { "source": "/articles.htm", "destination": "/reference", "permanent": true },
+    { "source": "/articles/:path*", "destination": "/reference", "permanent": true },
     { "source": "/csharp/:path+", "destination": "/csharp", "permanent": true },
-    { "source": "/quality/:path*", "destination": "/", "permanent": true },
+    { "source": "/quality/:path*", "destination": "/reference", "permanent": true },
 
     { "source": "/iBLOGthere4iM/:path+", "destination": "/iBLOGthere4iM", "permanent": true },
     { "source": "/iblogthere4im", "destination": "/iBLOGthere4iM", "permanent": true },
     { "source": "/iblogthere4im/:path+", "destination": "/iBLOGthere4iM", "permanent": true },
-    { "source": "/iBLOGthere4IM", "destination": "/", "permanent": true },
-    { "source": "/iBLOGthere4IM/:path*", "destination": "/", "permanent": true },
+    { "source": "/iBLOGthere4IM", "destination": "/iBLOGthere4iM", "permanent": true },
+    { "source": "/iBLOGthere4IM/:path*", "destination": "/iBLOGthere4iM", "permanent": true },
 
     { "source": "/search.aspx", "destination": "/", "permanent": true },
     { "source": "/search.aspx/:path*", "destination": "/", "permanent": true },
     { "source": "/tags.aspx", "destination": "/", "permanent": true },
     { "source": "/tags.aspx/:path*", "destination": "/", "permanent": true },
-    { "source": "/blogs.aspx/:path*", "destination": "/", "permanent": true },
+    { "source": "/blogs.aspx/:path*", "destination": "/iBLOGthere4iM", "permanent": true },
     { "source": "/adwords", "destination": "/", "permanent": true },
     { "source": "/adwords/:path*", "destination": "/", "permanent": true },
     { "source": "/spam", "destination": "/iBLOGthere4iM", "permanent": true },
     { "source": "/spam/:path+", "destination": "/iBLOGthere4iM", "permanent": true },
-    { "source": "/network.aspx", "destination": "/", "permanent": true }
+    { "source": "/network.aspx", "destination": "/iBLOGthere4iM", "permanent": true }
   ]
 }
