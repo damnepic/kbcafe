@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { readFileSync } from 'node:fs';
+import { isNoindexed } from './src/data/noindex.js';
 
 // Per-page lastmod for the sitemap, from a committed git-date map (regenerate with: node scripts/gen-lastmod.cjs).
 // Committed because Vercel's shallow clone has no per-file history; falls back gracefully if the file is missing.
@@ -23,6 +24,8 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   integrations: [sitemap({
+    // pages held out of search (src/data/noindex.js) stay out of the sitemap too
+    filter: (url) => !isNoindexed(new URL(url).pathname),
     serialize(item) {
       const lm = lastmodFor(item.url);
       if (lm) item.lastmod = lm;   // priority/changefreq are ignored by Google, so we don't set them

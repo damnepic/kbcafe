@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar.astro';
 import { TOOLS } from '../data/tools.js';
 import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
+import { isNoindexed } from '../data/noindex.js';
 const {
   title = 'KB Cafe, a developer’s knowledge base',
   description = 'Fast, clean developer tools and quick references, freshly brewed. Everything runs in your browser: nothing uploaded, nothing tracked.',
@@ -15,6 +16,8 @@ const {
 } = Astro.props;
 
 const canonical = new URL(path, Astro.site).href;
+// noindex prop = experimental page (also nofollow); noindex.js list = live page held out of search
+const robots = noindex ? 'noindex, nofollow' : isNoindexed(path) ? 'noindex, follow' : null;
 // Search engines show ~155 chars of a meta description; clamp long ones at a word boundary so Google
 // doesn't cut them mid-word (and to clear Ahrefs "meta description too long"). On-page copy is unaffected,
 // this only shortens the <meta> tag. Pages wanting a bespoke short description just pass a shorter one.
@@ -114,7 +117,7 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{title}</title>
 <meta name="description" content={metaDesc} />
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+{robots && <meta name="robots" content={robots} />}
 <link rel="canonical" href={canonical} />
 <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
 <script type="application/ld+json" set:html={JSON.stringify(siteLd)} />
@@ -286,7 +289,7 @@ const crumbLd = trail ? { '@context': 'https://schema.org', '@type': 'Breadcrumb
       <a href="/feeds" aria-label="Feeds" title="Feeds"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="19" r="2.2"/><path d="M3 11a10 10 0 0 1 10 10h-3A7 7 0 0 0 3 14v-3Zm0-6a16 16 0 0 1 16 16h-3A13 13 0 0 0 3 8V5Z"/></svg></a>
       <a href="/contact" aria-label="Contact" title="Contact"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3 7 9 6 9-6"/></svg></a>
     </div>
-    <div class="foot-copy">&copy; 1999-2026 KB Cafe &middot; part of the family with <a href="https://yank.info" target="_blank" rel="noopener noreferrer">yank.info</a></div>
+    <div class="foot-copy">&copy; 2026 KB Cafe &middot; part of the family with <a href="https://yank.info" target="_blank" rel="noopener noreferrer">yank.info</a></div>
   </footer>
 </div>
 <script is:inline>
