@@ -5,6 +5,7 @@ import PathNav from '../components/PathNav.astro';
 import Continuation from '../components/Continuation.astro';
 import QuizShare from '../components/QuizShare.astro';
 import ReadingEnhancers from '../components/ReadingEnhancers.astro';
+import Byline from '../components/Byline.astro';
 import { AI, titleFor } from '../data/ai.js';
 import { TOOLS } from '../data/tools.js';
 import { TOOL_GRAPH } from '../data/toolGraph.js';
@@ -32,6 +33,7 @@ const appearsIn = pathsWith(path);
       <div class="eyebrow">{eyebrow}</div>
       <h1 set:html={h1} />
       <p class="tagline">{tagline}</p>
+      <Byline path={path} headline={h1} />
     </header>
     <div id="pn-top"></div>
     <div class="prose">

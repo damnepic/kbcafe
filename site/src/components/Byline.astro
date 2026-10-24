@@ -1,0 +1,33 @@
+---
+// "By Javier Paltro · Updated <date>" under a lesson or post title, plus its Article/BlogPosting
+// JSON-LD. Before 2026-10-23 no page said who wrote it, which gives a new site nothing to earn trust
+// with. The updated date is the page's last commit (src/data/lastmod.json, the sitemap's source).
+import { AUTHOR } from '../data/author.js';
+import { fmtDate } from '../data/blog.js';
+import LM from '../data/lastmod.json';
+
+const { path, headline, kind = 'Article', published = null } = Astro.props;
+const updated = LM.exact?.[path] || null;
+const showUpdated = updated && updated !== published;
+const plain = (s) => (s || '').replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': kind,
+  headline: plain(headline),
+  author: { '@type': 'Person', name: AUTHOR.name, url: AUTHOR.url },
+  publisher: { '@id': new URL('/', Astro.site).href + '#organization' },
+  mainEntityOfPage: new URL(path, Astro.site).href,
+  ...(published ? { datePublished: published } : {}),
+  ...(updated || published ? { dateModified: updated || published } : {}),
+};
+---
+<p class="byline">
+  By <a href="/about#author">{AUTHOR.name}</a>{showUpdated && <> &middot; Updated <time datetime={updated}>{fmtDate(updated)}</time></>}
+</p>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+
+<style>
+  .byline{margin-top:14px;font-size:14px;color:var(--ink-soft)}
+  .byline a{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
+  .byline a:hover{text-decoration-color:var(--coral)}
+</style>

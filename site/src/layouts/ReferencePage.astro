@@ -4,6 +4,7 @@ import Share from '../components/Share.astro';
 import ReadingEnhancers from '../components/ReadingEnhancers.astro';
 import Continuation from '../components/Continuation.astro';
 import QuizShare from '../components/QuizShare.astro';
+import Byline from '../components/Byline.astro';
 import { REFERENCE } from '../data/reference.js';
 import { TOOLS } from '../data/tools.js';
 
@@ -42,6 +43,7 @@ const guides = related.length ? related : others;
       <div class="eyebrow">{eyebrow}</div>
       <h1>{h1}</h1>
       <p class="tagline">{tagline}</p>
+      <Byline path={path} headline={h1} />
     </header>
 
     <div class="prose">
