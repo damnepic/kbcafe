@@ -1,9 +1,30 @@
 ---
 import BlogPost from '../../layouts/BlogPost.astro';
+import BlankedFilesLab from '../../components/BlankedFilesLab.astro';
+
+// brace-bearing code samples live in consts: Astro reads { } in markup as expressions
+const REPRO = `foreach ($f in 'a.txt','b.txt') {
+  $c = $null
+  $c = (Get-Content $f -Raw) -replace '(Reference', 'Knowledge Base'
+  Set-Content -Path $f -Value $c -NoNewline
+}
+# The regular expression pattern (Reference is not valid.  (printed twice)
+# a.txt 0 bytes
+# b.txt 0 bytes`;
+const GUARD = `$ErrorActionPreference = 'Stop'
+foreach ($f in 'a.txt','b.txt') {
+  $new = (Get-Content $f -Raw) -replace '(Reference', 'Knowledge Base'
+  if ([string]::IsNullOrEmpty($new)) { throw "Refusing to write empty file: $f" }
+  Set-Content -Path $f -Value $new -NoNewline
+}`;
+const HOOK = `#!/bin/sh
+git diff --cached --name-only --diff-filter=AM | while read -r f; do
+  if [ ! -s "$f" ]; then echo "Refusing to commit empty file: $f"; exit 1; fi
+done`;
 ---
 <BlogPost
   title="How an AI Agent Blanked 26 Files, and the One Question That Saved Me"
-  description="A build-in-public postmortem: an AI coding agent null-wrote 26 of my source files. Why git only saved half, how I rebuilt the rest from build output and verified every byte, and the rule I locked in so it cannot happen again."
+  description="An AI coding agent blanked 26 source files. Read the postmortem, then practice the recovery in a browser lab: find the damage, restore the files, and verify them."
   slug="ai-agent-blanked-26-files"
   tag="Build in Public"
   date="2026-06-20"
@@ -16,6 +37,12 @@ import BlogPost from '../../layouts/BlogPost.astro';
     from, so here&rsquo;s exactly what happened, and what to do if you run into something similar in
     your own AI coding (or vibe coding) travels.
   </p>
+  <p>
+    You can also practice the recovery. <a href="#recovery-lab">The lab below</a> blanks a sample project
+    and walks you through finding the damage, restoring the files, and proving they came back.
+  </p>
+
+  <BlankedFilesLab />
 
   <h2>The mistake</h2>
   <p>
@@ -73,8 +100,14 @@ import BlogPost from '../../layouts/BlogPost.astro';
     metadata, the prose, and (for the interactive tools) the inline JavaScript straight out of the HTML,
     and rebuild the original file around it. Crucially, nothing was accepted on faith. Every rebuilt
     file was rendered and compared byte-for-byte against the saved baseline, and only kept when the
-    comparison was clean. Ten articles came back identical. Three interactive tools came back
-    identical, form handlers and all.
+    comparison was clean. Ten articles came back identical. The markup and form handlers of the three
+    interactive tools came back identical too.
+  </p>
+  <p>
+    <strong>Correction, added 2026-10-31:</strong> this post used to say the three tools came back identical,
+    full stop. They did not. The comparison covered their markup and JavaScript, but the rebuild from page HTML
+    dropped their scoped styles. The tools rendered with tiny, unstyled inputs until the styles were restored the
+    next day (<code>6a9f2f4</code> and <code>9499168</code>). A check only proves what it compares.
   </p>
 
   <h2>How close it actually came</h2>
@@ -125,6 +158,56 @@ import BlogPost from '../../layouts/BlogPost.astro';
     cleanest on the site.
   </p>
 
+  <h2>What the record shows, and what it does not</h2>
+  <p>
+    The session log from that night no longer exists, so here is how far each part of this story can be
+    checked today.
+  </p>
+  <ul>
+    <li>
+      <strong>In git history:</strong> commit <code>e3d7b89</code> (June 20, 2026, 04:46) recovers 13 named pages
+      &ldquo;overwritten by a bad local edit&rdquo; and commits 32 previously untracked files.
+      <code>3028656</code> converts those 13 pages back to clean source.
+    </li>
+    <li>
+      <strong>Recorded only here:</strong> the total of 26 files and the agent&rsquo;s explanation of them. The
+      commits name the 13 rebuilt pages, not the 13 restored by <code>git checkout</code>, and the exchanges above
+      are the copies kept here.
+    </li>
+    <li>
+      <strong>Likely, not proven:</strong> the exact command. It was not kept, so the cause above rests on the
+      agent&rsquo;s account.
+    </li>
+    <li>
+      <strong>Reproduced on 2026-10-31:</strong> this kind of failure, on two sample files in Windows PowerShell 5.1.
+      That shows the mechanism is real. It does not show this was the original command.
+    </li>
+  </ul>
+  <pre><code set:text={REPRO} /></pre>
+  <p>
+    The unclosed bracket makes the replace fail, <code>$c</code> stays empty, and the loop writes that emptiness to
+    every file. PowerShell printed the error each time, and the loop kept going anyway.
+  </p>
+
+  <h2>If this happens to you: the recovery steps</h2>
+  <ol>
+    <li><strong>Stop the agent.</strong> No build and no deploy. Either one can replace your cleanest copy.</li>
+    <li><strong>Copy the last good build</strong> somewhere a rebuild cannot reach: <code>cp -r dist ../dist-safe</code></li>
+    <li>
+      <strong>Measure the damage.</strong> <code>find src -type f -size 0</code> lists blank files, and
+      <code>git ls-files -o --exclude-standard</code> lists files git has never seen. In PowerShell, list blank files
+      with <code>Get-ChildItem src -Recurse -File | Where-Object Length -eq 0</code>
+    </li>
+    <li><strong>Restore what has a commit:</strong> <code>git restore path/to/file</code>. Then <code>git diff --exit-code</code> confirms it matches.</li>
+    <li>
+      <strong>Rebuild the rest from your safe copy.</strong> Git answers
+      <code>did not match any file(s) known to git</code> for anything uncommitted. With no build, try the live
+      site, your host&rsquo;s past deployments, and your editor&rsquo;s local history.
+    </li>
+    <li><strong>Compare the new output with the safe copy,</strong> stylesheets and scripts included, not only the page text.</li>
+    <li><strong>Commit everything,</strong> and only then build and deploy.</li>
+  </ol>
+
   <h2>What I learned and changed to avoid this critical mistake in the future</h2>
   <p>
     One rule, locked in and automatic: commit and push after every deploy. If it is live, it is in git.
@@ -133,6 +216,16 @@ import BlogPost from '../../layouts/BlogPost.astro';
     often&rdquo; is the most ignored best practice in software. It took watching a malformed one-liner
     blank two dozen files to make it actually stick.
   </p>
+  <p>
+    Two small guards are worth copying, both tested on sample files. This write stops on the first error, and it
+    left both files intact when given the same broken pattern:
+  </p>
+  <pre><code set:text={GUARD} /></pre>
+  <p>
+    This <code>.git/hooks/pre-commit</code> rejects an empty file at commit time. Adjust it if your project keeps
+    intentionally empty files.
+  </p>
+  <pre><code set:text={HOOK} /></pre>
   <p>
     The takeaways from this event: as good as AI has become, it can still make critical mistakes. It is
     worth staying in the loop and watching what it&rsquo;s doing in real time, instead of blindly

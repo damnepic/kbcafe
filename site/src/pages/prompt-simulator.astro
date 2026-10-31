@@ -10,6 +10,7 @@ const SAMPLE = `write me a landing page`;
   h1="Prompt Simulator"
   tagline="Paste a prompt and watch what the AI is forced to guess. Every blank you leave, audience, goal, tone, length, format, the model fills in for you, differently each time. This is why vague prompts disappoint."
 >
+  <p class="ps-disclose"><strong>Not a live model.</strong> This checks your prompt with pattern matching, and the guesses it shows are illustrations, not real AI output.</p>
   <div class="pane">
     <div class="pane-label"><span>Your prompt</span><span class="ps-actions"><button class="link-btn" id="sample">sample</button><button class="link-btn" id="clear">clear</button></span></div>
     <textarea id="in" class="ta" spellcheck="false" data-sample={SAMPLE} placeholder="Try a vague one, like “write me a landing page”…"></textarea>
@@ -59,6 +60,7 @@ const SAMPLE = `write me a landing page`;
 </ToolPage>
 
 <style is:global> /* JS-created elements need unscoped CSS, see context-budget-analyzer */
+  .ps-disclose{margin:0 0 14px;padding:10px 13px;border-left:3px solid var(--gold);border-radius:0 9px 9px 0;background:#fdf6df;font-size:14px;line-height:1.5}
   .link-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);background:none;border:0;cursor:pointer}
   .link-btn:hover{color:var(--coral-deep);text-decoration:underline}
   .ps-actions{display:flex;gap:14px}.ta{min-height:120px}

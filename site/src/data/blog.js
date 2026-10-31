@@ -24,7 +24,7 @@ export const POSTS = [
     excerpt: "A complete, no-jargon guide to AI for people with zero background, plus an easy way to share it with anyone who wants to learn the simplest way possible." },
   { slug: "ai-agent-blanked-26-files", title: "How an AI Agent Blanked 26 Files, and the One Question That Saved Me",
     date: "2026-06-20", tag: "Build in Public",
-    excerpt: "A postmortem: an AI coding agent null-wrote 26 of my source files. Why git only saved half, how I rebuilt the rest from build output and verified every byte, and the rule I locked in." },
+    excerpt: "An AI coding agent blanked 26 source files. Why git only saved half, what the rebuild missed, and a browser lab where you can practice the recovery yourself." },
   { slug: "building-the-prompt-optimizer", title: "How We Built the Prompt Optimizer: Six Tools Into One",
     date: "2026-06-19", tag: "Build in Public",
     excerpt: "We turned six focused prompt tools into one flagship, without deleting any of them. The real product decision behind composing tools into a mega-tool." },

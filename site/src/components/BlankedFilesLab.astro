@@ -1,0 +1,373 @@
+---
+// Recovery lab for /blog/ai-agent-blanked-26-files. Everything runs on sample files held in memory:
+// no command is executed, nothing leaves the browser. The hashes in the verify step are real
+// SHA-256 digests of the sample output. The page around it carries the evidence and the steps, so
+// nothing here is the only copy of the lesson.
+---
+<section class="bl-lab" id="recovery-lab" aria-labelledby="bl-title">
+  <div class="bl-head">
+    <span class="bl-eye">Recovery lab</span>
+    <h2 id="bl-title">Blank the files, then get them back</h2>
+    <p class="bl-sub">
+      Five steps on a small sample project. <strong>This is a reconstruction:</strong> the files and
+      terminal output are samples built to match the incident, and no real commands run.
+    </p>
+  </div>
+  <ol class="bl-steps" id="bl-steps"></ol>
+  <div class="bl-panel" id="bl-panel" aria-live="polite">
+    <noscript><p>The lab needs JavaScript. Every recovery step is also written out below.</p></noscript>
+  </div>
+</section>
+
+<script is:inline>
+(function () {
+  var root = document.getElementById('bl-panel');
+  var stepsEl = document.getElementById('bl-steps');
+  if (!root || !stepsEl) return;
+
+  var STYLE = '.whois{display:grid;gap:8px}\n.whois input{width:100%;padding:12px}\n';
+  var ORIGINALS = {
+    'src/pages/index.astro': { tracked: true, blanked: false, markup: '<h1>Sample site</h1>\n<p>Three short pages.</p>' },
+    'src/pages/http.astro': { tracked: true, blanked: true, markup: '<h1>HTTP</h1>\n<p>A request, then a response.</p>' },
+    'src/pages/cron.astro': { tracked: true, blanked: true, markup: '<h1>Cron</h1>\n<p>Five fields set the schedule.</p>' },
+    'src/pages/dns.astro': { tracked: false, blanked: true, markup: '<h1>DNS</h1>\n<p>A name resolves to an address.</p>' },
+    'src/pages/whois.astro': { tracked: false, blanked: true, markup: '<h1>Whois</h1>\n<form class="whois"><input name="domain"></form>', css: STYLE }
+  };
+  var PATHS = Object.keys(ORIGINALS);
+  var STEP_NAMES = ['Inspect', 'Identify', 'Choose', 'Restore', 'Prevent'];
+  var CHECKLIST = [
+    'Run git status before any bulk edit, and commit anything marked ??',
+    'Make the script stop on its first error',
+    'Refuse to write a file when the new content is empty',
+    'Add the pre-commit hook that rejects empty files',
+    'Copy the last good build somewhere a rebuild cannot reach',
+    'After a bulk edit, list zero-byte files before you build',
+    'When something goes wrong, stop the agent before it builds or deploys',
+    'Compare restored pages against the baseline, stylesheets included'
+  ];
+
+  function sourceOf(path) {
+    var f = ORIGINALS[path];
+    return '---\n// ' + path + '\n---\n' + f.markup + (f.css ? '\n<style>\n' + f.css + '</style>' : '') + '\n';
+  }
+  function outName(path) { return 'dist/' + path.replace('src/pages/', '').replace('.astro', '.html'); }
+  function cssName(path) { return 'dist/_astro/' + path.replace('src/pages/', '').replace('.astro', '.css'); }
+  // A tiny stand-in for a build: markup goes to HTML, a style block goes to a separate stylesheet.
+  function buildOne(path, source) {
+    var rebuilt = source.indexOf('<!-- rebuilt from dist -->') === 0;
+    if (rebuilt) return { html: source.replace('<!-- rebuilt from dist -->\n', ''), css: '' };
+    if (!source) return { html: '', css: '' };
+    var body = source.split('---\n')[2] || '';
+    var m = body.match(/\n<style>\n([\s\S]*?)<\/style>/);
+    return { html: body.replace(/\n<style>[\s\S]*?<\/style>/, '').trim(), css: m ? m[1] : '' };
+  }
+
+  var S;
+  function fresh() {
+    var ws = {}, dist = {}, css = {}, base = {};
+    PATHS.forEach(function (p) {
+      var out = buildOne(p, sourceOf(p));
+      base[p] = out;
+      dist[p] = out.html;
+      css[p] = out.css;
+      ws[p] = ORIGINALS[p].blanked ? '' : sourceOf(p);
+    });
+    return {
+      step: 0, view: 'after', open: 'src/pages/http.astro', ws: ws, dist: dist, css: css, base: base,
+      cssRecovered: {}, safe: null, ranStatus: false, ranFind: false, quiz: {}, quizDone: false,
+      have: {}, frozen: false, firstMove: null, log: [], verify: null
+    };
+  }
+  S = fresh();
+
+  function h(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === 'on') { e.addEventListener('click', attrs.on); }
+      else if (k === 'text') { e.textContent = attrs.text; }
+      else if (attrs[k] !== false && attrs[k] != null) { e.setAttribute(k, attrs[k]); }
+    });
+    (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return e;
+  }
+  function btn(label, on, cls, disabled) { return h('button', { type: 'button', 'class': 'bl-btn ' + (cls || ''), on: on, disabled: disabled ? 'disabled' : null, text: label }); }
+  function cmd(label, on, disabled) { return btn('$ ' + label, on, 'bl-cmd', disabled); }
+  function term(lines, id) { return h('pre', { 'class': 'bl-term', id: id || null, text: lines.join('\n') }); }
+  function note(text, kind) { return h('p', { 'class': 'bl-note ' + (kind || ''), text: text }); }
+  function para(text) { return h('p', { text: text }); }
+  function go(n) { S.step = n; render(); var top = document.getElementById('recovery-lab'); if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ behavior: 'smooth' }); }
+  function nav(canNext, label) {
+    return h('div', { 'class': 'bl-nav' }, [
+      S.step > 0 ? btn('Back', function () { go(S.step - 1); }, 'bl-ghost') : null,
+      S.step < 4 ? btn(label || 'Next step', function () { go(S.step + 1); }, 'bl-pri', !canNext) : null
+    ]);
+  }
+  function bytes(s) { return new Blob([s]).size; }
+
+  function fileRows(view) {
+    return PATHS.map(function (p) {
+      var content = view === 'before' ? sourceOf(p) : S.ws[p];
+      var n = bytes(content);
+      var row = h('button', { type: 'button', 'class': 'bl-file' + (S.open === p ? ' on' : '') + (n === 0 ? ' zero' : ''), 'aria-pressed': S.open === p ? 'true' : 'false', on: function () { S.open = p; render(); } }, [
+        h('span', { 'class': 'bl-fname', text: p }),
+        h('span', { 'class': 'bl-ftag', text: ORIGINALS[p].tracked ? 'committed' : 'never committed' }),
+        h('span', { 'class': 'bl-fsize', text: n + ' bytes' })
+      ]);
+      return row;
+    });
+  }
+
+  function diffFor(p) {
+    if (!ORIGINALS[p].tracked) {
+      return ['$ git diff -- ' + p, '(no output)', '', 'Git has no earlier version of this file to compare.'];
+    }
+    if (S.ws[p] === sourceOf(p)) return ['$ git diff -- ' + p, '(no output: matches the last commit)'];
+    var out = ['$ git diff -- ' + p, '--- a/' + p, '+++ b/' + p];
+    sourceOf(p).trim().split('\n').forEach(function (l) { out.push('-' + l); });
+    return out;
+  }
+
+  function stepInspect() {
+    var content = S.view === 'before' ? sourceOf(S.open) : S.ws[S.open];
+    return [
+      h('h3', { text: 'Step 1: Inspect the project' }),
+      para('A find-and-replace script looped over the pages. Compare the project before and after it ran, and open a few files.'),
+      h('div', { 'class': 'bl-toggle', role: 'group', 'aria-label': 'Project state' }, [
+        btn('Before the script', function () { S.view = 'before'; render(); }, S.view === 'before' ? 'on' : ''),
+        btn('After the script', function () { S.view = 'after'; render(); }, S.view === 'after' ? 'on' : '')
+      ]),
+      h('div', { 'class': 'bl-files' }, fileRows(S.view)),
+      term([content || '(this file is empty: 0 bytes)'], 'bl-view'),
+      S.view === 'after' ? note('A blank source file is not a syntax error. A build would succeed and produce empty pages.', 'warn') : null,
+      nav(true)
+    ];
+  }
+
+  function stepIdentify() {
+    var blanks = PATHS.filter(function (p) { return ORIGINALS[p].blanked; });
+    var out = [
+      h('h3', { text: 'Step 2: Identify the damage' }),
+      para('Run both checks, then read a diff. Notice what git status can and cannot tell you.'),
+      h('div', { 'class': 'bl-cmds' }, [
+        cmd('git status --short', function () { S.ranStatus = true; render(); }),
+        cmd('find src -type f -size 0', function () { S.ranFind = true; render(); })
+      ])
+    ];
+    if (S.ranStatus) out.push(term(['$ git status --short', ' M src/pages/cron.astro', ' M src/pages/http.astro', '?? src/pages/dns.astro', '?? src/pages/whois.astro']));
+    if (S.ranStatus) out.push(note('The ?? lines look the same whether those files are healthy or blank. Git has never seen their contents.'));
+    if (S.ranFind) out.push(term(['$ find src -type f -size 0'].concat(blanks)));
+    out.push(h('div', { 'class': 'bl-files' }, fileRows('after')));
+    out.push(term(diffFor(S.open), 'bl-diff'));
+    if (S.ranStatus && S.ranFind) {
+      out.push(h('fieldset', { 'class': 'bl-quiz' }, [h('legend', { text: 'Which blank files can git restore?' })].concat(blanks.map(function (p) {
+        var cb = h('input', { type: 'checkbox', checked: S.quiz[p] ? 'checked' : null });
+        cb.addEventListener('change', function () { S.quiz[p] = cb.checked; S.quizDone = false; });
+        return h('label', {}, [cb, ' ' + p]);
+      })).concat([btn('Check my answer', function () { S.quizDone = true; render(); }, 'bl-ghost')])));
+      if (S.quizDone) {
+        var right = blanks.every(function (p) { return !!S.quiz[p] === ORIGINALS[p].tracked; });
+        out.push(note(right ? 'Correct. http and cron have commits. dns and whois have never been committed, so git cannot help them.' : 'Not quite. Git can only restore files with a commit: look for the M lines in git status.', right ? 'good' : 'warn'));
+        out.push(nav(right));
+        return out;
+      }
+    }
+    out.push(nav(false));
+    return out;
+  }
+
+  function adviceFor(have) {
+    if (have.commit && have.build) return 'Copy the build first, restore committed files from git, then rebuild the rest from the copy.';
+    if (have.commit) return 'Restore from git, then check for files that were never committed. Those need another source.';
+    if (have.build) return 'Copy the build first, then rebuild source from it. You will get working pages, not your original source.';
+    if (have.history) return 'Check your hosting provider\'s earlier deployments and download the output before anything replaces it.';
+    if (have.live) return 'Stop deploying. Save the live pages now, because the next deploy can replace your only copy.';
+    if (have.editor) return 'Look through your editor\'s local history. Save each version you find to a new folder before you change anything.';
+    return 'Tick what you have. If the honest answer is nothing, check the disk backups you may have, and stop writing to that drive.';
+  }
+
+  function stepChoose() {
+    var options = [['commit', 'A git commit containing the files'], ['build', 'The last good build folder'], ['live', 'The live site, not yet redeployed'], ['history', 'Past deployments at your host'], ['editor', 'Editor local history']];
+    var out = [
+      h('h3', { text: 'Step 3: Choose a recovery approach' }),
+      para('What you can recover depends on what still exists. Tick what you would have in your own project.'),
+      h('div', { 'class': 'bl-have' }, options.map(function (o) {
+        var cb = h('input', { type: 'checkbox', checked: S.have[o[0]] ? 'checked' : null });
+        cb.addEventListener('change', function () { S.have[o[0]] = cb.checked; render(); });
+        return h('label', {}, [cb, ' ' + o[1]]);
+      })),
+      note(adviceFor(S.have)),
+      h('h4', { text: 'In this sample you have commits for two files and a good dist folder. What is your first move?' }),
+      h('div', { 'class': 'bl-cmds' }, [
+        cmd('npm run build', function () { S.firstMove = 'build'; PATHS.forEach(function (p) { var o = buildOne(p, S.ws[p]); S.dist[p] = o.html; S.css[p] = o.css; }); render(); }, S.frozen),
+        cmd('git add -A && git commit -m "wip"', function () { S.firstMove = 'commit'; render(); }, S.frozen),
+        cmd('cp -r dist ../dist-safe', function () { S.firstMove = 'copy'; S.frozen = true; S.safe = { html: Object.assign({}, S.dist), css: Object.assign({}, S.css) }; render(); }, S.frozen)
+      ])
+    ];
+    if (S.firstMove === 'build') {
+      out.push(term(['$ npm run build', 'Build complete. 5 pages.', '', 'dist/http.html    0 bytes', 'dist/cron.html    0 bytes', 'dist/dns.html     0 bytes', 'dist/whois.html   0 bytes']));
+      out.push(note('The build succeeded, and it replaced the only copy of dns and whois with empty pages. This is the step the "STOP" prevented. Start the lab again to take another route.', 'bad'));
+      out.push(btn('Start over', function () { S = fresh(); S.step = 2; render(); }, 'bl-ghost'));
+    } else if (S.firstMove === 'commit') {
+      out.push(note('That records the blank files as your newest commit and adds blank dns and whois to history. Git can still reach http and cron one commit back, but you have made the record harder to read. Nothing was gained. Try another move.', 'warn'));
+    } else if (S.firstMove === 'copy') {
+      out.push(note('Good. The clean output is now outside the build\'s reach, so a later build cannot destroy it.', 'good'));
+    }
+    out.push(nav(S.frozen));
+    return out;
+  }
+
+  function runVerify() {
+    var names = PATHS;
+    var enc = function (s) { return crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)).then(function (d) { return Array.prototype.map.call(new Uint8Array(d), function (b) { return ('0' + b.toString(16)).slice(-2); }).join(''); }); };
+    var jobs = [];
+    names.forEach(function (p) {
+      var o = buildOne(p, S.ws[p]);
+      var css = S.cssRecovered[p] ? S.safe.css[p] : o.css;
+      jobs.push(Promise.all([enc(o.html), enc(S.base[p].html), enc(css), enc(S.base[p].css)]).then(function (r) {
+        return { path: p, h: r[0], html: r[0] === r[1], css: r[2] === r[3], original: S.ws[p] === sourceOf(p), hasCss: !!S.base[p].css };
+      }));
+    });
+    Promise.all(jobs).then(function (rows) { S.verify = rows; render(); });
+  }
+
+  function stepRestore() {
+    var cmds = h('div', { 'class': 'bl-cmds' }, [
+      cmd('git restore src/pages/http.astro src/pages/cron.astro', function () { ['src/pages/http.astro', 'src/pages/cron.astro'].forEach(function (p) { S.ws[p] = sourceOf(p); }); S.log.push(['$ git restore src/pages/http.astro src/pages/cron.astro', 'Restored 2 files from the last commit.']); S.verify = null; render(); }),
+      cmd('git restore src/pages/dns.astro', function () { S.log.push(['$ git restore src/pages/dns.astro', "error: pathspec 'src/pages/dns.astro' did not match any file(s) known to git"]); render(); }),
+      cmd('rebuild dns and whois from ../dist-safe', function () { ['src/pages/dns.astro', 'src/pages/whois.astro'].forEach(function (p) { S.ws[p] = '<!-- rebuilt from dist -->\n' + S.safe.html[p]; }); S.log.push(['$ rebuild dns and whois from ../dist-safe', 'Rebuilt 2 source files from their rendered HTML.']); S.verify = null; render(); }),
+      cmd('copy stylesheet from ../dist-safe/_astro/whois.css', function () { S.cssRecovered['src/pages/whois.astro'] = true; S.log.push(['$ copy stylesheet from ../dist-safe/_astro/whois.css', 'Copied ' + cssName('src/pages/whois.astro').replace('dist/', '') + ' back into the source.']); S.verify = null; render(); })
+    ]);
+    var out = [
+      h('h3', { text: 'Step 4: Restore, then verify' }),
+      para('Restore each file from the best source it has. Then compare the output against the clean copy.'),
+      cmds
+    ];
+    if (S.log.length) out.push(term(S.log.map(function (l) { return l.join('\n'); }).join('\n\n').split('\n')));
+    out.push(btn('Verify against the baseline', runVerify, 'bl-pri'));
+    var pass = false;
+    if (S.verify) {
+      out.push(h('div', { 'class': 'bl-tablewrap' }, [h('table', { 'class': 'bl-table' }, [
+        h('thead', {}, [h('tr', {}, ['File', 'HTML', 'Stylesheet', 'Source', 'SHA-256 of HTML'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
+        h('tbody', {}, S.verify.map(function (r) {
+          return h('tr', {}, [
+            h('th', { scope: 'row', text: r.path.replace('src/pages/', '') }),
+            h('td', { 'class': r.html ? 'ok' : 'no', text: r.html ? 'match' : 'DIFFERENT' }),
+            h('td', { 'class': r.css ? 'ok' : 'no', text: r.hasCss ? (r.css ? 'match' : 'MISSING') : 'none needed' }),
+            h('td', { 'class': r.original ? 'ok' : 'warn', text: r.original ? 'original' : (r.html ? 'rebuilt copy' : 'blank') }),
+            h('td', { 'class': 'bl-hash', text: r.h.slice(0, 12) })
+          ]);
+        }))
+      ])]));
+      pass = S.verify.every(function (r) { return r.html && r.css; });
+      var cssOnly = !pass && S.verify.every(function (r) { return r.html; });
+      if (cssOnly) out.push(note('Every page\'s HTML matches, and whois still has no stylesheet. The real recovery missed exactly this: three restored tools looked broken until the next day. Recover the stylesheet and verify again.', 'warn'));
+      else if (!pass) out.push(note('Some pages still do not match the baseline. Keep restoring.', 'warn'));
+      else out.push(note('All output matches the baseline. dns and whois are working copies rebuilt from HTML, though. Their original source is gone: only a commit would have saved it.', 'good'));
+    }
+    out.push(nav(pass, 'Last step'));
+    return out;
+  }
+
+  function loadChecks() { try { return JSON.parse(localStorage.getItem('kb-blanked-lab') || '{}'); } catch (e) { return {}; } }
+  function saveChecks(v) { try { localStorage.setItem('kb-blanked-lab', JSON.stringify(v)); } catch (e) {} }
+  function stepPrevent() {
+    var saved = loadChecks();
+    var done = CHECKLIST.filter(function (_, i) { return saved[i]; }).length;
+    return [
+      h('h3', { text: 'Step 5: Apply this to your own project' }),
+      para('Your ticks stay in this browser. Exact commands for each item are written out below the lab.'),
+      h('div', { 'class': 'bl-have bl-check' }, CHECKLIST.map(function (t, i) {
+        var cb = h('input', { type: 'checkbox', checked: saved[i] ? 'checked' : null });
+        cb.addEventListener('change', function () { saved[i] = cb.checked; saveChecks(saved); render(); });
+        return h('label', {}, [cb, ' ' + t]);
+      })),
+      h('p', { 'class': 'bl-count', text: done + ' of ' + CHECKLIST.length + ' done' }),
+      h('div', { 'class': 'bl-cmds' }, [
+        btn('Copy checklist', function (ev) {
+          var txt = CHECKLIST.map(function (t) { return '- [ ] ' + t; }).join('\n');
+          var b = ev.target;
+          if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { b.textContent = 'Copied'; }, function () { b.textContent = 'Copy failed'; });
+        }, 'bl-ghost'),
+        btn('Run the lab again', function () { S = fresh(); render(); }, 'bl-ghost')
+      ]),
+      nav(false)
+    ];
+  }
+
+  var RENDER = [stepInspect, stepIdentify, stepChoose, stepRestore, stepPrevent];
+  function render() {
+    stepsEl.textContent = '';
+    STEP_NAMES.forEach(function (n, i) {
+      stepsEl.appendChild(h('li', { 'class': i === S.step ? 'on' : (i < S.step ? 'done' : ''), 'aria-current': i === S.step ? 'step' : null }, [h('span', { text: String(i + 1) }), ' ' + n]));
+    });
+    root.textContent = '';
+    RENDER[S.step]().forEach(function (e) { if (e) root.appendChild(e); });
+  }
+  render();
+})();
+</script>
+
+<style is:global>
+  /* JS-created elements need unscoped CSS, so everything here carries the bl- prefix */
+  .bl-lab{scroll-margin-top:84px;margin:30px 0;border:1.4px solid var(--line);border-radius:18px;background:var(--cream);overflow:hidden}
+  .bl-head{padding:22px 22px 8px}
+  .bl-eye{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .prose .bl-head h2,.bl-head h2{margin:8px 0 8px;font-family:var(--font-display);font-size:clamp(24px,4vw,31px);line-height:1.12;letter-spacing:-.02em}
+  .prose .bl-sub,.bl-sub{margin:0;font-size:15px;color:var(--ink-soft)}
+  .bl-steps{display:flex;gap:4px;list-style:none;margin:14px 0 0;padding:0 22px;flex-wrap:wrap}
+  .prose .bl-steps li,.bl-steps li{margin:0;padding:6px 10px;border-radius:99px;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);background:var(--paper)}
+  .bl-steps li::marker{content:''}
+  .bl-steps li span{font-weight:700}
+  .bl-steps li.on{background:var(--ink);color:#fff}
+  .bl-steps li.done{background:#dff3ea;color:#0b6b52}
+  .bl-panel{padding:18px 22px 22px}
+  .prose .bl-panel h3,.bl-panel h3{margin:0 0 8px;font-family:var(--font-display);font-size:20px}
+  .prose .bl-panel h4,.bl-panel h4{margin:18px 0 8px;font-size:15px;font-family:var(--font-body);font-weight:700}
+  .prose .bl-panel p,.bl-panel p{margin:0 0 12px;font-size:15px;line-height:1.55}
+  .bl-btn{font:600 14px/1.3 var(--font-body);min-height:44px;padding:9px 14px;border-radius:10px;border:1.2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;text-align:left}
+  .bl-btn:hover:not([disabled]){border-color:var(--coral)}
+  .bl-btn:focus-visible,.bl-file:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+  .bl-btn[disabled]{opacity:.45;cursor:not-allowed}
+  .bl-btn.bl-pri{background:var(--coral);border-color:var(--coral);color:#fff}
+  .bl-btn.bl-pri:hover:not([disabled]){background:var(--coral-deep)}
+  .bl-btn.bl-cmd{font-family:var(--font-mono);font-size:12.5px;font-weight:500;overflow-wrap:anywhere}
+  .bl-btn.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .bl-toggle,.bl-cmds,.bl-nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+  .bl-nav{justify-content:space-between;margin:16px 0 0}
+  .bl-nav .bl-pri:only-child{margin-left:auto}
+  .bl-files{display:grid;gap:6px;margin:0 0 12px}
+  .bl-file{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;min-height:44px;width:100%;padding:8px 12px;border:1.2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);cursor:pointer;text-align:left;font-size:13px}
+  .bl-file.on{border-color:var(--ink)}
+  .bl-file.zero .bl-fsize{color:var(--coral-deep);font-weight:700}
+  .bl-fname{font-family:var(--font-mono);overflow-wrap:anywhere}
+  .bl-ftag{font-size:12px;color:var(--ink-soft)}
+  .bl-fsize{font-family:var(--font-mono);font-size:12px;white-space:nowrap}
+  .bl-term{margin:0 0 12px;padding:13px 15px;border-radius:11px;background:#141210;color:#e7dfd1;font:12.5px/1.6 var(--font-mono);overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+  .prose .bl-note,.bl-note{padding:10px 13px;border-left:3px solid var(--line);background:var(--paper);border-radius:0 9px 9px 0;font-size:14px}
+  .bl-note.good{border-color:#0f9f82;background:#e8f7f1}
+  .bl-note.warn{border-color:var(--gold);background:#fdf6df}
+  .bl-note.bad{border-color:var(--coral);background:#fdeae5}
+  .bl-quiz{margin:0 0 12px;padding:12px 14px;border:1.2px solid var(--line);border-radius:11px}
+  .bl-quiz legend{padding:0 6px;font-weight:700;font-size:14px}
+  .bl-quiz label,.bl-have label{display:flex;gap:9px;align-items:flex-start;min-height:32px;padding:4px 0;font-size:14px;overflow-wrap:anywhere}
+  .bl-quiz input,.bl-have input{margin-top:3px;flex:0 0 auto}
+  .bl-quiz .bl-btn{margin-top:8px}
+  .bl-have{margin:0 0 12px}
+  .prose .bl-count,.bl-count{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+  .bl-tablewrap{overflow-x:auto;margin:12px 0}
+  .bl-table{width:100%;border-collapse:collapse;font-size:13px}
+  .bl-table th,.bl-table td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  .bl-table thead th{font-size:12px;color:var(--ink-soft)}
+  .bl-table .ok{color:#0b6b52;font-weight:600}
+  .bl-table .no{color:var(--coral-deep);font-weight:700}
+  .bl-table .warn{color:#8a6100;font-weight:600}
+  .bl-hash{font-family:var(--font-mono);font-size:12px}
+  @media (max-width:560px){
+    .bl-head,.bl-panel{padding-left:16px;padding-right:16px}
+    .bl-steps{padding:0 16px}
+    .bl-file{grid-template-columns:1fr auto}
+    .bl-ftag{grid-row:2;grid-column:1}
+    .bl-fsize{grid-row:1/3;grid-column:2}
+    .bl-btn.bl-cmd,.bl-nav .bl-btn{width:100%}
+  }
+</style>
