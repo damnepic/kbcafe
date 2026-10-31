@@ -2,6 +2,20 @@
 
 Newest first. Each entry with a restore tag can be undone with `git revert <tag>..<last commit>`.
 
+## 2026-10-31: the homepage leads with the labs
+
+Restore tag: `restore/2026-10-31-before-homepage-subtraction`
+
+- The hero reads "Learn to fix what AI builds", and its buttons go to the recovery lab and the labs section.
+  The opening "KB Cafe is a free AI knowledge base" sentence stays, because it is the entity fix.
+- The homepage is now the hero, two labs, a short "Why these labs exist", three tools and a row of links.
+  Removed from it, with every destination page kept: counts, goal cards, "New on the menu", dictionary band,
+  featured tools, AI toolkit, lower search, AI Explained, Popular Tools, newsletter form and GitHub card.
+- The newsletter form had no backend, so it is gone until one exists. The footer's "X, coming soon" icon is gone.
+- Term of the day moved to `/dictionary`. The header nav is Labs, Tools, Learn, About, Study and Search.
+- Six old links to the removed `/#menu` anchor now point at `/tools`. The homepage description no longer says
+  "nothing tracked", which did not match the site's Plausible analytics.
+
 ## 2026-10-31: the second lab, a guard test that cannot fail
 
 Restore tag: `restore/2026-10-31-before-second-lab`

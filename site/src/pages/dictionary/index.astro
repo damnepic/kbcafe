@@ -2,9 +2,11 @@
 import Layout from '../../layouts/Layout.astro';
 import { DICT, byKind, KIND_META, KIND_ORDER, POPULAR, findTerm } from '../../data/dictionary.js';
 import ItemListLd from '../../components/ItemListLd.astro';
-import { plain } from '../../data/plainText.js';
+import { plain, clip } from '../../data/plainText.js';
 
 const gloss = (e) => { const p = plain(e.answer).replace(/^An?\s+|^The\s+/i, ''); return p.length > 52 ? p.slice(0, 52).replace(/\s+\S*$/, '') + '…' : p; };
+// Term of the day: compact pool, the day-seeded pick happens client-side (rotates daily, no rebuild).
+const totdTerms = DICT.map(d => ({ t: d.term, s: d.slug, a: clip(plain(d.answer), 96) }));
 const built = KIND_ORDER.filter((k) => byKind(k).length > 0);
 const soon = KIND_ORDER.filter((k) => byKind(k).length === 0);
 
@@ -39,6 +41,7 @@ const schema = {
       AI, coding, startup, and internet terms explained for beginners: one sentence, an example,
       and where to go next. Hit a word you don&rsquo;t know in a lesson? Look it up, then get back to it.
     </p>
+    <a class="totd" id="totd" href="/dictionary" hidden></a>
 
     <div class="dh-toolbar">
       <div class="dh-search">
@@ -197,6 +200,30 @@ const schema = {
     })();
   </script>
 </Layout>
+
+<script is:inline define:vars={{ totdTerms }}>
+  (function () {
+    try {
+      var el = document.getElementById('totd'); if (!el || !totdTerms.length) return;
+      var day = Math.floor(Date.now() / 86400000);          // day-seeded: same all day, rotates daily
+      var t = totdTerms[day % totdTerms.length];
+      el.href = '/dictionary/' + t.s;
+      el.innerHTML = '<span class="e">☕ Term of the day</span><b>' + t.t + '</b><span class="d">' + t.a + '</span><span class="go">Look it up →</span>';
+      el.hidden = false;
+    } catch (e) {}
+  })();
+</script>
+
+<style is:global>
+  /* global because the script builds its children with innerHTML, which scoped styles cannot reach */
+  .totd[hidden]{display:none}
+  .totd{display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap;margin:6px 0 18px;max-width:100%;background:var(--cream);border:1.4px solid var(--line);border-radius:18px;padding:8px 18px;text-decoration:none;font-size:13.5px;color:var(--ink);transition:border-color .15s}
+  .totd:hover{border-color:var(--coral)}
+  .totd .e{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+  .totd b{font-family:var(--font-display);font-weight:800}
+  .totd .d{color:var(--ink-soft)}
+  .totd .go{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--coral)}
+</style>
 
 <style>
   .dh{padding:40px 0 24px;max-width:900px}
