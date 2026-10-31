@@ -5,6 +5,7 @@ import { AI_SUB, AI_SUB_META, AI_SUB_ORDER } from '../data/toolMeta.js';
 import { AI } from '../data/ai.js';
 import { REFERENCE } from '../data/reference.js';
 import { DICT, findTerm } from '../data/dictionary.js';
+import { plain, clip } from '../data/plainText.js';
 import { LATEST } from '../data/latest.js';
 import { BG_GUIDES } from '../data/beginnerGuides.js';
 import { POSTS } from '../data/blog.js';
@@ -17,7 +18,7 @@ const menuItems = [
 ].sort((a, b) => b.date.localeCompare(a.date));
 const freshItems = menuItems.slice(0, 9);
 // Term of the day: compact dictionary pool, the day-seeded pick happens client-side (rotates daily, no rebuild).
-const totdTerms = DICT.map(d => ({ t: d.term, s: d.slug, a: (d.answer || '').replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 96) }));
+const totdTerms = DICT.map(d => ({ t: d.term, s: d.slug, a: clip(plain(d.answer), 96) }));
 
 // inline icons (white stroke on colored squares)
 const I = {

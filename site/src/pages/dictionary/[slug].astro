@@ -1,13 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { DICT, findTerm, KIND_META } from '../../data/dictionary.js';
+import { plain } from '../../data/plainText.js';
 
 export function getStaticPaths() {
   return DICT.map((t) => ({ params: { slug: t.slug }, props: { entry: t } }));
 }
 const { entry } = Astro.props;
 const k = KIND_META[entry.kind];
-const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
 const related = (entry.related || []).map(findTerm).filter(Boolean);
 const schema = {
   '@context': 'https://schema.org',
@@ -19,7 +19,7 @@ const schema = {
 ---
 <Layout
   title={`What is ${entry.term}? A plain-English definition | KB Cafe`}
-  description={[entry.answer, entry.example, entry.why].map(plain).filter(Boolean).join(' ')}
+  description={[entry.answer, entry.example, entry.why].map((s) => plain(s)).filter(Boolean).join(' ')}
   path={`/dictionary/${entry.slug}`}
   sidebar={true}
   crumb={[{ label: 'Dictionary', href: '/dictionary' }, { label: entry.term }]}

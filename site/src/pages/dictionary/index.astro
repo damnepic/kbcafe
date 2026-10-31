@@ -2,8 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import { DICT, byKind, KIND_META, KIND_ORDER, POPULAR, findTerm } from '../../data/dictionary.js';
 import ItemListLd from '../../components/ItemListLd.astro';
+import { plain } from '../../data/plainText.js';
 
-const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
 const gloss = (e) => { const p = plain(e.answer).replace(/^An?\s+|^The\s+/i, ''); return p.length > 52 ? p.slice(0, 52).replace(/\s+\S*$/, '') + '…' : p; };
 const built = KIND_ORDER.filter((k) => byKind(k).length > 0);
 const soon = KIND_ORDER.filter((k) => byKind(k).length === 0);

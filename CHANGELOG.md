@@ -10,6 +10,12 @@ Restore tag: `restore/2026-10-31-before-homepage-repositioning`
   a correction, recovery steps and two tested guards (`570aac7`).
 - The homepage features the lab under the hero, and its counts now say "30 AI tools" and "all 48 tools".
 - The Prompt Simulator states beside the tool that it uses pattern matching, not a live model.
+- The full lab was run on production at desktop and phone widths, including the destructive build,
+  hash verification and reset: 44 checks passed, no JavaScript errors.
+- Term of the day, dictionary descriptions and Article headlines keep their apostrophes and quotes,
+  and term previews end at a sentence or word boundary. One shared helper, `site/src/data/plainText.js`,
+  replaces the four copies that turned entities into spaces. Restore tag:
+  `restore/2026-10-31-before-text-fix`.
 
 ## 2026-10-24: author byline and bio
 
