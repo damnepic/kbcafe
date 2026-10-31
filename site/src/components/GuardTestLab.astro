@@ -1,0 +1,346 @@
+---
+// Guard test lab for /blog/the-test-that-could-never-fail. The regexes here are real and run in the
+// browser on sample text, including the broken one, which is built from a JavaScript string the same
+// way the bug is made. The page around it carries the evidence and the steps, so nothing here is the
+// only copy of the lesson.
+---
+<section class="tl-lab" id="guard-lab" aria-labelledby="tl-title">
+  <div class="tl-head">
+    <span class="tl-eye">Verification lab</span>
+    <h2 id="tl-title">Break a guard test, then prove it works</h2>
+    <p class="tl-sub">
+      Five steps on one small guard. <strong>This is a reconstruction:</strong> the guard and the sample text are
+      built to show the bug, and every result comes from a real regex running in your browser.
+    </p>
+  </div>
+  <ol class="tl-steps" id="tl-steps"></ol>
+  <div class="tl-panel" id="tl-panel" aria-live="polite">
+    <noscript><p>The lab needs JavaScript. The bug and the fix are also written out below.</p></noscript>
+  </div>
+</section>
+
+<script is:inline>
+(function () {
+  var root = document.getElementById('tl-panel');
+  var stepsEl = document.getElementById('tl-steps');
+  if (!root || !stepsEl) return;
+
+  // The two strings the whole lab turns on. In JavaScript source, one backslash makes a backspace and
+  // two make a backslash followed by a b.
+  var ONE = '\b';
+  var TWO = '\\b';
+  var B = String.fromCharCode(92);
+  var BROKEN = new RegExp(ONE + 'agents?' + ONE, 'i');
+  var FIXED = /\bagents?\b/i;
+  var LOOSE = /agents?/i;
+
+  var CLEAN = 'Pick a character and make it yours.';
+  var FORBIDDEN = 'Built by our agents in a weekend.';
+  var SUBSTRING = 'A chemist mixes a reagent.';
+  var STEP_NAMES = ['Run', 'Plant', 'Inspect', 'Repair', 'Confirm'];
+  var REPAIRS = {
+    same: {
+      code: 'new RegExp("' + B + 'bagents?' + B + 'b", "i")',
+      rx: new RegExp(ONE + 'agents?' + ONE, 'i'),
+      ok: false,
+      msg: 'That is the same mistake again. In a JavaScript string, one backslash and a b make a backspace, so the forbidden word still gets through.',
+      kind: 'bad'
+    },
+    none: {
+      code: '/agents?/i',
+      rx: LOOSE,
+      ok: false,
+      msg: 'This catches the forbidden word, and it also fails a clean sentence, because "agent" sits inside "reagent". The word boundary is what stops that.',
+      kind: 'warn'
+    },
+    str: {
+      code: 'new RegExp("' + B + B + 'bagents?' + B + B + 'b", "i")',
+      rx: new RegExp(TWO + 'agents?' + TWO, 'i'),
+      ok: true,
+      msg: 'Repaired. The doubled backslash gives RegExp the two characters it needs: a backslash and a b.',
+      kind: 'good'
+    },
+    lit: {
+      code: '/' + B + 'bagents?' + B + 'b/i',
+      rx: FIXED,
+      ok: true,
+      msg: 'Repaired. A regex literal needs no doubling, because no string stands between your typing and the regex.',
+      kind: 'good'
+    }
+  };
+  var REPAIR_ORDER = ['same', 'none', 'str', 'lit'];
+
+  var S;
+  function fresh() {
+    return {
+      step: 0, text1: CLEAN, ran1: null, text2: CLEAN, ran2: null, revealed: false, quiz: null, quizDone: false,
+      repair: null, neg: FORBIDDEN, pos: CLEAN, confirm: null
+    };
+  }
+  S = fresh();
+
+  function h(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === 'on') { e.addEventListener('click', attrs.on); }
+      else if (k === 'text') { e.textContent = attrs.text; }
+      else if (attrs[k] !== false && attrs[k] != null) { e.setAttribute(k, attrs[k]); }
+    });
+    (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return e;
+  }
+  function btn(label, on, cls, disabled) { return h('button', { type: 'button', 'class': 'tl-btn ' + (cls || ''), on: on, disabled: disabled ? 'disabled' : null, text: label }); }
+  function term(lines) { return h('pre', { 'class': 'tl-term', text: lines.join('\n') }); }
+  function note(text, kind) { return h('p', { 'class': 'tl-note ' + (kind || ''), text: text }); }
+  function para(text) { return h('p', { text: text }); }
+  function field(label, value, on) {
+    var t = h('textarea', { rows: '2', 'class': 'tl-input', spellcheck: 'false', 'aria-label': label });
+    t.value = value;
+    t.addEventListener('input', function () { on(t.value); });
+    return h('label', { 'class': 'tl-field' }, [h('span', { text: label }), t]);
+  }
+  function result(pass) { return h('p', { 'class': 'tl-res ' + (pass ? 'pass' : 'fail'), text: 'Guard ' + (pass ? 'PASSED' : 'FAILED') }); }
+  function go(n) { S.step = n; render(); var top = document.getElementById('guard-lab'); if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ behavior: 'smooth' }); }
+  function nav(canNext) {
+    return h('div', { 'class': 'tl-nav' }, [
+      S.step > 0 ? btn('Back', function () { go(S.step - 1); }, 'tl-ghost') : null,
+      S.step < 4 ? btn('Next step', function () { go(S.step + 1); }, 'tl-pri', !canNext) : null
+    ]);
+  }
+  function cp(s) { return s.split('').map(function (c) { return 'U+' + ('000' + c.charCodeAt(0).toString(16).toUpperCase()).slice(-4); }).join(' '); }
+  function guardCode(rxText) { return ['function guard(page) {', '  return !pattern.test(page);', '}', '', 'const pattern = ' + rxText + ';']; }
+  function table(heads, rows) {
+    return h('div', { 'class': 'tl-tablewrap' }, [h('table', { 'class': 'tl-table' }, [
+      h('thead', {}, [h('tr', {}, heads.map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
+      h('tbody', {}, rows.map(function (r) {
+        return h('tr', {}, r.map(function (c, i) {
+          var o = typeof c === 'string' ? { text: c } : c;
+          return h(i === 0 ? 'th' : 'td', { scope: i === 0 ? 'row' : null, 'class': o.cls || null, text: o.text });
+        }));
+      }))
+    ])]);
+  }
+
+  function stepRun() {
+    var out = [
+      h('h3', { text: 'Step 1: Run the guard on clean text' }),
+      para('This guard keeps one word, "agent" or "agents", off a public page. It passes when the pattern finds nothing. Run it on text that should pass.'),
+      term(guardCode('/' + BROKEN.source + '/i')),
+      field('Page text', S.text1, function (v) { S.text1 = v; S.ran1 = null; }),
+      btn('Run the guard', function () { S.ran1 = { pass: !BROKEN.test(S.text1), hasWord: FIXED.test(S.text1) }; render(); }, 'tl-pri')
+    ];
+    if (S.ran1) {
+      out.push(result(S.ran1.pass));
+      out.push(note(S.ran1.hasWord ? 'That text contains the word. Put clean text in for now: the next step is where the word goes in.' : 'A green result on clean text. So far this looks like a working test.', S.ran1.hasWord ? 'warn' : 'good'));
+    }
+    out.push(nav(S.ran1 && S.ran1.pass && !S.ran1.hasWord));
+    return out;
+  }
+
+  function stepPlant() {
+    var at = S.text2.toLowerCase().indexOf('agent');
+    var out = [
+      h('h3', { text: 'Step 2: Plant the forbidden word' }),
+      para('A test earns trust by failing when it should. Put the word in the page and run the same guard.'),
+      field('Page text', S.text2, function (v) { S.text2 = v; S.ran2 = null; }),
+      h('div', { 'class': 'tl-row' }, [
+        btn('Plant the word', function () { S.text2 = FORBIDDEN; S.ran2 = null; render(); }, 'tl-ghost'),
+        btn('Run the guard', function () { S.ran2 = { pass: !BROKEN.test(S.text2), hasWord: FIXED.test(S.text2), at: S.text2.toLowerCase().indexOf('agent') }; render(); }, 'tl-pri')
+      ])
+    ];
+    if (S.ran2) {
+      out.push(result(S.ran2.pass));
+      if (S.ran2.hasWord) out.push(note('The guard passed. A plain text search finds "agent" at position ' + S.ran2.at + ', so the word is on the page, and the guard missed it.', 'bad'));
+      else out.push(note('There is no forbidden word in that text yet, so a pass proves nothing. Plant the word and run it again.', 'warn'));
+    } else if (at < 0) {
+      out.push(note('Nothing to catch yet.'));
+    }
+    out.push(nav(S.ran2 && S.ran2.pass && S.ran2.hasWord));
+    return out;
+  }
+
+  function stepInspect() {
+    var src = BROKEN.source;
+    var out = [
+      h('h3', { text: 'Step 3: Inspect the pattern' }),
+      para('In many editors the pattern reads as "agents?" and nothing else, and some fonts draw a small box at each end. Count what is really in it.'),
+      term(['pattern.source         ' + src, 'characters in agents?  7', 'pattern.source.length  ' + src.length]),
+      btn('Show every character', function () { S.revealed = true; render(); }, 'tl-pri')
+    ];
+    if (S.revealed) {
+      out.push(table(['Position', 'Character', 'Code point'], src.split('').map(function (c, i) {
+        var bad = c.charCodeAt(0) === 8;
+        return [String(i), { text: bad ? '(invisible)' : c, cls: bad ? 'no' : null }, { text: cp(c), cls: bad ? 'no' : null }];
+      })));
+      var picks = [['bs', 'A backspace character, U+0008'], ['wb', 'A regex word boundary'], ['sp', 'A space']];
+      out.push(h('fieldset', { 'class': 'tl-quiz' }, [h('legend', { text: 'What is at position 0?' })].concat(picks.map(function (p) {
+        var r = h('input', { type: 'radio', name: 'tl-q', checked: S.quiz === p[0] ? 'checked' : null });
+        r.addEventListener('change', function () { S.quiz = p[0]; S.quizDone = false; });
+        return h('label', {}, [r, ' ' + p[1]]);
+      })).concat([btn('Check my answer', function () { S.quizDone = true; render(); }, 'tl-ghost')])));
+      if (S.quizDone) {
+        if (S.quiz === 'bs') {
+          out.push(note('Correct. A word boundary would take two characters here, a backslash and a b. This is one.', 'good'));
+          out.push(h('h4', { text: 'Three things that look alike' }));
+          out.push(table(['Written as', 'What it is', 'Length', 'Code points'], [
+            ['JavaScript string "' + B + 'b"', 'One backspace character', String(ONE.length), cp(ONE)],
+            ['JavaScript string "' + B + B + 'b"', 'A backslash and a b, ready to hand to RegExp', String(TWO.length), cp(TWO)],
+            ['Regex /' + B + 'b/', 'A word boundary: a position between a word character and anything else. It matches no characters.', String(/\b/.source.length), cp(/\b/.source)]
+          ]));
+          out.push(para('Your browser computed those lengths just now. Here is what the broken pattern does match:'));
+          out.push(table(['Text', 'Broken pattern finds it?'], [
+            ['agent', { text: String(BROKEN.test('agent')), cls: 'no' }],
+            ['agent wrapped in two backspace characters', { text: String(BROKEN.test(ONE + 'agent' + ONE)), cls: 'ok' }]
+          ]));
+          out.push(note('It only finds the word between two literal backspace characters, and no real page has those.'));
+        } else {
+          out.push(note('Not quite. Read the code point in the table: U+0008 is the backspace control character.', 'warn'));
+        }
+      }
+    }
+    out.push(nav(S.revealed && S.quizDone && S.quiz === 'bs'));
+    return out;
+  }
+
+  function stepRepair() {
+    var out = [
+      h('h3', { text: 'Step 4: Repair the word boundary' }),
+      para('Pick a fix. Each one is compiled and run against the same three sentences.'),
+      h('div', { 'class': 'tl-opts' }, REPAIR_ORDER.map(function (k) {
+        return btn(REPAIRS[k].code, function () { S.repair = k; S.confirm = null; render(); }, 'tl-code' + (S.repair === k ? ' on' : ''));
+      }))
+    ];
+    if (S.repair) {
+      var r = REPAIRS[S.repair];
+      var rows = [
+        [FORBIDDEN, 'should fail', r.rx.test(FORBIDDEN)],
+        [CLEAN, 'should pass', r.rx.test(CLEAN)],
+        [SUBSTRING, 'should pass', r.rx.test(SUBSTRING)]
+      ];
+      out.push(table(['Page text', 'Expected', 'Guard'], rows.map(function (x) {
+        var wantFail = x[1] === 'should fail';
+        var right = x[2] === wantFail;
+        return [x[0], x[1], { text: x[2] ? 'FAILED' : 'PASSED', cls: right ? 'ok' : 'no' }];
+      })));
+      out.push(note(r.msg, r.kind));
+      out.push(h('h4', { text: 'What the word boundary changes' }));
+      out.push(table(['Text', '/agents?/i', '/' + B + 'bagents?' + B + 'b/i'], ['agent', 'agents', 'Agent,', 'reagent', 'agentic'].map(function (w) {
+        return [w, LOOSE.test(w) ? 'match' : 'no match', FIXED.test(w) ? 'match' : 'no match'];
+      })));
+      out.push(note('The boundary stops the match inside "reagent". It also lets "agentic" through, so a word you want to catch needs its own entry in the pattern.'));
+    }
+    out.push(nav(S.repair && REPAIRS[S.repair].ok));
+    return out;
+  }
+
+  function runConfirm() {
+    var fixed = REPAIRS[S.repair].rx;
+    S.confirm = {
+      brokenNeg: BROKEN.test(S.neg), brokenPos: BROKEN.test(S.pos),
+      fixedNeg: fixed.test(S.neg), fixedPos: fixed.test(S.pos)
+    };
+    render();
+  }
+  function stepConfirm() {
+    if (!S.repair || !REPAIRS[S.repair].ok) { S.step = 3; return stepRepair(); }
+    var out = [
+      h('h3', { text: 'Step 5: Confirm it in both directions' }),
+      para('A guard needs two checks: forbidden text must fail it, and clean text must pass it. Edit either sentence if you like. Your repair: ' + REPAIRS[S.repair].code),
+      field('Forbidden text: the guard must fail', S.neg, function (v) { S.neg = v; S.confirm = null; }),
+      field('Clean text: the guard must pass', S.pos, function (v) { S.pos = v; S.confirm = null; }),
+      btn('Run both checks', runConfirm, 'tl-pri')
+    ];
+    if (S.confirm) {
+      var c = S.confirm;
+      var cell = function (matched, wantMatch) { return { text: (matched ? 'FAILED' : 'PASSED') + (matched === wantMatch ? ', as it should' : ', which is wrong'), cls: matched === wantMatch ? 'ok' : 'no' }; };
+      out.push(table(['Guard', 'Forbidden text', 'Clean text'], [
+        ['Broken pattern', cell(c.brokenNeg, true), cell(c.brokenPos, false)],
+        ['Your repair', cell(c.fixedNeg, true), cell(c.fixedPos, false)]
+      ]));
+      var done = c.fixedNeg && !c.fixedPos;
+      if (done) {
+        out.push(note('Lab complete. The broken guard passed on the clean text too, so that check alone could not tell the two apart. Only the forbidden-text check shows the difference.', 'good'));
+        out.push(h('p', {}, [h('a', { href: '/blog/ai-agent-blanked-26-files#recovery-lab', text: 'Next, try the recovery lab: an agent blanks your files and you get them back.' })]));
+      } else if (!c.fixedNeg) {
+        out.push(note('The guard passed on your forbidden text. Does that sentence still contain "agent" or "agents" as a whole word?', 'warn'));
+      } else {
+        out.push(note('The guard failed on your clean text. Does that sentence contain "agent" or "agents" as a whole word?', 'warn'));
+      }
+    }
+    out.push(h('div', { 'class': 'tl-row' }, [btn('Run the lab again', function () { S = fresh(); render(); }, 'tl-ghost')]));
+    out.push(nav(false));
+    return out;
+  }
+
+  var RENDER = [stepRun, stepPlant, stepInspect, stepRepair, stepConfirm];
+  function render() {
+    var kids = RENDER[S.step]();
+    stepsEl.textContent = '';
+    STEP_NAMES.forEach(function (n, i) {
+      stepsEl.appendChild(h('li', { 'class': i === S.step ? 'on' : (i < S.step ? 'done' : ''), 'aria-current': i === S.step ? 'step' : null }, [h('span', { text: String(i + 1) }), ' ' + n]));
+    });
+    root.textContent = '';
+    kids.forEach(function (e) { if (e) root.appendChild(e); });
+  }
+  render();
+})();
+</script>
+
+<style is:global>
+  /* JS-created elements need unscoped CSS, so everything here carries the tl- prefix */
+  .tl-lab{scroll-margin-top:84px;margin:30px 0;border:1.4px solid var(--line);border-radius:18px;background:var(--cream);overflow:hidden}
+  .tl-head{padding:22px 22px 8px}
+  .tl-eye{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+  .prose .tl-head h2,.tl-head h2{margin:8px 0 8px;font-family:var(--font-display);font-size:clamp(24px,4vw,31px);line-height:1.12;letter-spacing:-.02em}
+  .prose .tl-sub,.tl-sub{margin:0;font-size:15px;color:var(--ink-soft)}
+  .tl-steps{display:flex;gap:4px;list-style:none;margin:14px 0 0;padding:0 22px;flex-wrap:wrap}
+  .prose .tl-steps li,.tl-steps li{margin:0;padding:6px 10px;border-radius:99px;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);background:var(--paper)}
+  .tl-steps li::marker{content:''}
+  .tl-steps li span{font-weight:700}
+  .tl-steps li.on{background:var(--ink);color:#fff}
+  .tl-steps li.done{background:#dff3ea;color:#0b6b52}
+  .tl-panel{padding:18px 22px 22px}
+  .prose .tl-panel h3,.tl-panel h3{margin:0 0 8px;font-family:var(--font-display);font-size:20px}
+  .prose .tl-panel h4,.tl-panel h4{margin:18px 0 8px;font-size:15px;font-family:var(--font-body);font-weight:700}
+  .prose .tl-panel p,.tl-panel p{margin:0 0 12px;font-size:15px;line-height:1.55}
+  .tl-btn{font:600 14px/1.3 var(--font-body);min-height:44px;padding:9px 14px;border-radius:10px;border:1.2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;text-align:left}
+  .tl-btn:hover:not([disabled]){border-color:var(--coral)}
+  .tl-btn:focus-visible,.tl-input:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+  .tl-btn[disabled]{opacity:.45;cursor:not-allowed}
+  .tl-btn.tl-pri{background:var(--coral);border-color:var(--coral);color:#fff}
+  .tl-btn.tl-pri:hover:not([disabled]){background:var(--coral-deep)}
+  .tl-btn.tl-code{font-family:var(--font-mono);font-size:12.5px;font-weight:500;overflow-wrap:anywhere}
+  .tl-btn.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .tl-row,.tl-nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+  .tl-opts{display:grid;gap:8px;margin:0 0 12px}
+  .tl-nav{justify-content:space-between;margin:16px 0 0}
+  .tl-nav .tl-pri:only-child{margin-left:auto}
+  .tl-field{display:block;margin:0 0 12px;font-size:14px;font-weight:600}
+  .tl-field span{display:block;margin-bottom:5px}
+  .tl-input{display:block;width:100%;box-sizing:border-box;padding:10px 12px;border:1.2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:14px/1.45 var(--font-mono);resize:vertical}
+  .tl-term{margin:0 0 12px;padding:13px 15px;border-radius:11px;background:#141210;color:#e7dfd1;font:12.5px/1.6 var(--font-mono);overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+  .prose .tl-res,.tl-res{display:inline-block;margin:12px 0;padding:6px 12px;border-radius:8px;font-family:var(--font-mono);font-size:13px;font-weight:700}
+  .tl-res.pass{background:#dff3ea;color:#0b6b52}
+  .tl-res.fail{background:#fdeae5;color:var(--coral-deep)}
+  .prose .tl-note,.tl-note{padding:10px 13px;border-left:3px solid var(--line);background:var(--paper);border-radius:0 9px 9px 0;font-size:14px}
+  .tl-note.good{border-color:#0f9f82;background:#e8f7f1}
+  .tl-note.warn{border-color:var(--gold);background:#fdf6df}
+  .tl-note.bad{border-color:var(--coral);background:#fdeae5}
+  .tl-quiz{margin:0 0 12px;padding:12px 14px;border:1.2px solid var(--line);border-radius:11px}
+  .tl-quiz legend{padding:0 6px;font-weight:700;font-size:14px}
+  .tl-quiz label{display:flex;gap:9px;align-items:flex-start;min-height:32px;padding:4px 0;font-size:14px;overflow-wrap:anywhere}
+  .tl-quiz input{margin-top:3px;flex:0 0 auto}
+  .tl-quiz .tl-btn{margin-top:8px}
+  .tl-tablewrap{overflow-x:auto;margin:12px 0}
+  .tl-table{width:100%;border-collapse:collapse;font-size:13px}
+  .tl-table th,.tl-table td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  .tl-table thead th{font-size:12px;color:var(--ink-soft)}
+  .tl-table tbody th{font-weight:500}
+  .tl-table .ok{color:#0b6b52;font-weight:600}
+  .tl-table .no{color:var(--coral-deep);font-weight:700}
+  @media (max-width:560px){
+    .tl-head,.tl-panel{padding-left:16px;padding-right:16px}
+    .tl-steps{padding:0 16px}
+    .tl-row .tl-btn,.tl-nav .tl-btn{width:100%}
+  }
+</style>

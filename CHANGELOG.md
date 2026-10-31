@@ -2,6 +2,16 @@
 
 Newest first. Each entry with a restore tag can be undone with `git revert <tag>..<last commit>`.
 
+## 2026-10-31: the second lab, a guard test that cannot fail
+
+Restore tag: `restore/2026-10-31-before-second-lab`
+
+- New post `/blog/the-test-that-could-never-fail` with a five-step browser lab: run a guard, plant a forbidden
+  word, find the backspace character in the pattern, repair the word boundary, and confirm in both directions.
+  Every result comes from a real regex. The incident and the reconstruction are labeled separately.
+- The homepage features both labs side by side under "Learn to fix what AI builds", and the two labs link to
+  each other.
+
 ## 2026-10-31: the first recovery lab
 
 Restore tag: `restore/2026-10-31-before-homepage-repositioning`

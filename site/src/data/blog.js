@@ -1,6 +1,9 @@
 // KB Cafe blog, a forward-looking dev blog (NOT a restore of the 450+ dated
 // 2003-2009 posts, which stay as section redirects). Newest first.
 export const POSTS = [
+  { slug: "the-test-that-could-never-fail", title: "The Test That Could Never Fail",
+    date: "2026-10-31", tag: "Build in Public",
+    excerpt: "A regex word boundary became an invisible backspace, so a guard test kept passing. Plant a forbidden word in a browser lab, find the hidden character, and prove your repair works in both directions." },
   { slug: "building-stocktools-ai", title: "How We Used AI to Build a Stock Research Site",
     date: "2026-07-04", tag: "Build in Public",
     excerpt: "What AI wrote, how a written decision log kept the coding agent coherent, and why every AI answer on StockTools.AI cites the SEC filing it came from." },

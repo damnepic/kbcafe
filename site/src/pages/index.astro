@@ -171,26 +171,38 @@ const UI_ICONS = {
     <a class="totd" id="totd" href="/dictionary" hidden></a>
   </section>
 
-  <!-- Featured lab: the first "fix what AI builds" lab, drawn from a real incident -->
+  <!-- Featured labs: "fix what AI builds", each drawn from a real incident -->
   <section class="lab-feat" aria-labelledby="lab-feat-h">
-    <div class="lf-copy">
-      <span class="lf-eye">Hands-on lab</span>
-      <h2 id="lab-feat-h">Your AI agent just blanked your files. Can you get them back?</h2>
-      <p>Learn to fix what AI builds. Practice the recovery from a real incident on a sample project: find the damage, restore what you can, and prove it came back. It runs in your browser.</p>
-      <div class="lf-cta">
-        <a class="hr-btn hr-btn-pri" href="/blog/ai-agent-blanked-26-files#recovery-lab">Start the lab <span aria-hidden="true">&rarr;</span></a>
-        <a class="hr-btn hr-btn-gho" href="/blog/ai-agent-blanked-26-files">Read what happened</a>
-      </div>
+    <div class="lf-head">
+      <span class="lf-eye">Hands-on labs</span>
+      <h2 id="lab-feat-h">Learn to fix what AI builds</h2>
+      <p>Recover when AI damages something, and verify when AI says something works. Each lab starts from a real incident and runs in your browser.</p>
     </div>
-    <pre class="lf-term" aria-hidden="true"><code>$ find src -type f -size 0
-src/pages/http.astro
-src/pages/cron.astro
-src/pages/dns.astro
-src/pages/whois.astro
-
-$ git restore src/pages/dns.astro
+    <div class="lf-grid">
+      <article class="lf-card">
+        <h3>Your AI agent just blanked your files. Can you get them back?</h3>
+        <p>Find the damage on a sample project, restore what you can, and prove it came back.</p>
+        <pre class="lf-term" aria-hidden="true"><code>$ git restore src/pages/dns.astro
 error: pathspec 'src/pages/dns.astro'
 did not match any file(s) known to git</code></pre>
+        <div class="lf-cta">
+          <a class="hr-btn hr-btn-pri" href="/blog/ai-agent-blanked-26-files#recovery-lab">Start the lab <span aria-hidden="true">&rarr;</span></a>
+          <a class="hr-btn hr-btn-gho" href="/blog/ai-agent-blanked-26-files">Read what happened</a>
+        </div>
+      </article>
+      <article class="lf-card">
+        <h3>Your test passed. Can it actually fail?</h3>
+        <p>Plant a forbidden word, watch the guard miss it, find the invisible character, and repair the regex.</p>
+        <pre class="lf-term" aria-hidden="true"><code>$ cat -A guard.test.js
+/^Hagents?^H/i
+$ node --test guard.test.js
+# pass 1  # fail 0</code></pre>
+        <div class="lf-cta">
+          <a class="hr-btn hr-btn-pri" href="/blog/the-test-that-could-never-fail#guard-lab">Start the lab <span aria-hidden="true">&rarr;</span></a>
+          <a class="hr-btn hr-btn-gho" href="/blog/the-test-that-could-never-fail">Read what happened</a>
+        </div>
+      </article>
+    </div>
   </section>
 
   <!-- TRIAGE: what are you trying to do? -->
@@ -574,13 +586,17 @@ did not match any file(s) known to git</code></pre>
     .db-feats{flex-wrap:wrap;gap:14px;margin-top:24px}}
 
   /* HERO (outcome-first, centered intro) */
-  .lab-feat{max-width:1120px;margin:34px auto 0;display:grid;grid-template-columns:1.15fr 1fr;gap:28px;align-items:center;padding:28px;border:1.4px solid var(--line);border-radius:22px;background:var(--cream);box-shadow:0 14px 40px rgba(45,30,16,.07)}
+  .lab-feat{max-width:1120px;margin:34px auto 0;padding:28px;border:1.4px solid var(--line);border-radius:22px;background:var(--cream);box-shadow:0 14px 40px rgba(45,30,16,.07)}
+  .lf-head{max-width:720px;margin-bottom:22px}
   .lf-eye{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
-  .lab-feat h2{margin:10px 0 12px;font-family:var(--font-display);font-weight:800;font-size:clamp(25px,3.2vw,36px);line-height:1.1;letter-spacing:-.025em}
-  .lab-feat p{margin:0 0 18px;font-size:16px;line-height:1.55;color:var(--ink-soft)}
-  .lf-cta{display:flex;flex-wrap:wrap;gap:10px}
-  .lf-term{margin:0;padding:18px;border-radius:14px;background:#141210;color:#e7dfd1;font:12.5px/1.65 var(--font-mono);white-space:pre-wrap;overflow-wrap:anywhere}
-  @media (max-width:780px){.lab-feat{grid-template-columns:1fr;padding:20px;gap:20px}}
+  .lab-feat h2{margin:10px 0 10px;font-family:var(--font-display);font-weight:800;font-size:clamp(25px,3.2vw,36px);line-height:1.1;letter-spacing:-.025em}
+  .lab-feat p{margin:0;font-size:16px;line-height:1.55;color:var(--ink-soft)}
+  .lf-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .lf-card{display:flex;flex-direction:column;gap:14px;min-width:0;padding:20px;border:1.2px solid var(--line);border-radius:16px;background:#fff}
+  .lab-feat h3{margin:0;font-family:var(--font-display);font-weight:800;font-size:21px;line-height:1.2;letter-spacing:-.015em}
+  .lf-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
+  .lf-term{margin:0;padding:14px 16px;border-radius:12px;background:#141210;color:#e7dfd1;font:12.5px/1.65 var(--font-mono);white-space:pre-wrap;overflow-wrap:anywhere}
+  @media (max-width:780px){.lab-feat{padding:20px}.lf-grid{grid-template-columns:1fr}}
   .hero-o{margin:40px 0 0;text-align:center}
   .hero-q{font-family:var(--font-display);font-weight:700;font-size:clamp(27px,3.5vw,45px);line-height:1.05;letter-spacing:-.035em;color:var(--ink);white-space:nowrap}
   .o-sub{color:var(--ink-soft);font-size:17.5px;line-height:1.55;margin:18px auto 28px;max-width:780px}

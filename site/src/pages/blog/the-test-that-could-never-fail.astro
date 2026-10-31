@@ -1,0 +1,157 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+import GuardTestLab from '../../components/GuardTestLab.astro';
+
+// String.raw keeps every backslash in these samples: in a plain template literal, the sequence this
+// post is about would turn into the very backspace character it warns against.
+const REPAIRED = String.raw`assert.doesNotMatch(visible, /\bagents?\b|ledger|research|tokens?\b|budget|USD|implementation|prototype|bake-off/i);`;
+const SCAN = `node -e "for (const f of process.argv.slice(1)) require('fs').readFileSync(f).forEach((b, i) => { if (b < 9 || b === 11 || b === 12 || (b > 13 && b < 32)) console.log(f, 'byte', i, 'value', b) })" test/*.js`;
+const BOTH_WAYS = String.raw`import { test } from 'node:test';
+import assert from 'node:assert/strict';
+
+const FORBIDDEN = /\bagents?\b/i;
+
+test('the guard catches a forbidden word', () => {
+  assert.match('Built by our agents in a weekend.', FORBIDDEN);
+});
+
+test('the guard leaves clean text alone', () => {
+  assert.doesNotMatch('Pick a character and make it yours.', FORBIDDEN);
+  assert.doesNotMatch('A chemist mixes a reagent.', FORBIDDEN);
+});`;
+const PROBE_BAD = String.raw`b.count(b'\b')       # what arrived in the file: counts backspaces
+# reported 0`;
+const PROBE_GOOD = String.raw`b.count(bytes([92, 98]))   # a backslash and a b, built from numbers
+# reported 7`;
+---
+<BlogPost
+  title="The Test That Could Never Fail"
+  description="A regex word boundary became an invisible backspace, so a guard test kept passing. Reproduce the bug in a browser lab, repair it, and prove the test can fail."
+  slug="the-test-that-could-never-fail"
+  tag="Build in Public"
+  date="2026-10-31"
+>
+  <p>
+    A passing test tells you very little until you have seen it fail. On October 21, 2026, a guard test on
+    <a href="https://moi.me">Moi</a>, another product I build, was meant to keep development language off a public
+    page. Its word boundaries had been written through a Python string, and each <code>\b</code> turned into one
+    backspace character. Most editors show a backspace as nothing at all, so a regex like that can read as correct
+    while it no longer looks for what it was written to find.
+  </p>
+  <p>
+    AI agents write a lot of tests now, and a green check is easy to accept without a second look.
+    <a href="#guard-lab">The lab below</a> lets you plant a forbidden word, watch the guard miss it, find the hidden
+    character, and prove your repair works in both directions.
+  </p>
+
+  <GuardTestLab />
+
+  <h2>Why the test stayed green</h2>
+  <p>
+    A guard like this passes when its pattern finds nothing. Break the pattern so it can never match, and the guard
+    passes forever. Most bugs make a test go red. This one removes the test&rsquo;s ability to go red, so nothing
+    tells you to look.
+  </p>
+  <p>Three things look alike here, and only one of them is a word boundary:</p>
+  <ul>
+    <li>
+      <strong>A backspace character, U+0008.</strong> One invisible control character. In a regex it matches only
+      a real backspace, which ordinary page text does not contain.
+    </li>
+    <li>
+      <strong>A word boundary, <code>\b</code> in a regex.</strong> A position between a word character and anything
+      else. It matches no characters at all. <code>/\bagents?\b/i</code> finds &ldquo;agent&rdquo; and leaves
+      &ldquo;reagent&rdquo; alone.
+    </li>
+    <li>
+      <strong>The string <code>"\\b"</code>.</strong> When you build a regex from a JavaScript string, the string gets
+      read first. <code>"\b"</code> becomes a backspace before <code>RegExp</code> ever sees it, and
+      <code>"\\b"</code> becomes the backslash and b that <code>RegExp</code> needs. Python strings behave the same way.
+    </li>
+  </ul>
+
+  <h2>What the record shows, and what it does not</h2>
+  <p>
+    Moi&rsquo;s repository is private, so the record is quoted here. This is how far each part can be checked.
+  </p>
+  <ul>
+    <li>
+      <strong>In git history:</strong> commit <code>c0f06af</code> (October 21, 2026) says it &ldquo;repairs the test
+      that keeps development language off the public page: its word boundaries had been written as backspace bytes,
+      so it could never match.&rdquo; The project&rsquo;s notes record the same lesson under escapes written through
+      Python heredocs.
+    </li>
+    <li>
+      <strong>The repaired line, as committed:</strong> it is below, and it is still in Moi&rsquo;s test suite.
+    </li>
+    <li>
+      <strong>Not in git history:</strong> the broken line itself. It was repaired before it was ever committed. I
+      checked four versions of the test file and found no backspace bytes in any of them. So I cannot show you the
+      original pattern, and I cannot recheck the words &ldquo;could never match&rdquo;: in the repaired line, only some
+      alternatives use boundaries, and I do not know what the broken one looked like.
+    </li>
+    <li>
+      <strong>Not confirmed:</strong> how the bug was noticed. A private note of mine credits a test that deliberately
+      broke the code, and I could not find that in the session logs I searched. I am not claiming it.
+    </li>
+    <li>
+      <strong>Reconstruction:</strong> the lab. Its one-word guard and sample sentences are mine. Its regexes are real.
+    </li>
+  </ul>
+  <pre><code set:text={REPAIRED} /></pre>
+
+  <h2>A separate reproduction, ten days later</h2>
+  <p>
+    This is a different event from the one above, and it happened while I was checking the record for this post. On October 31, 2026, my
+    AI agent wrote a small Python script to count word boundaries in that test file. It typed a doubled backslash
+    into a shell heredoc, and one backslash arrived in the file. I did not isolate which layer dropped it.
+  </p>
+  <pre><code set:text={PROBE_BAD} /></pre>
+  <p>
+    The script ran without complaint and printed a false zero. The agent then rewrote it to build the bytes from
+    numbers, and got the true count:
+  </p>
+  <pre><code set:text={PROBE_GOOD} /></pre>
+  <p>
+    It was not a one-off in my projects either: session logs from October 7, 2026 show an agent finding the same
+    backspace in a regex in a different repository, using <code>cat -A</code>.
+  </p>
+
+  <h2>Check your own guards</h2>
+  <ol>
+    <li>
+      <strong>Scan for control characters.</strong> Source files rarely have a reason to contain them. Tabs and line
+      endings are allowed here, and a clean tree prints nothing. This one needs a shell that expands the wildcard, and it
+      uses no backslashes, so it cannot fall into the trap it looks for:
+      <pre><code set:text={SCAN} /></pre>
+    </li>
+    <li>
+      <strong>Look at a suspect line with <code>cat -A</code>.</strong> A backspace shows up as <code>^H</code>,
+      and your editor may show nothing at all.
+    </li>
+    <li>
+      <strong>Test the guard in both directions.</strong> One input it must catch, and one it must leave alone. With a
+      backspace in the pattern, the first test below fails, which is exactly what you want from it:
+      <pre><code set:text={BOTH_WAYS} /></pre>
+    </li>
+    <li>
+      <strong>Break the code once on purpose.</strong> Plant the thing the guard forbids, watch it go red, then take
+      it back out.
+    </li>
+    <li>
+      <strong>When a script writes code, keep backslashes out of nested strings.</strong> Use a raw string, or the
+      editor directly. Regex literals avoid one layer of escaping.
+    </li>
+    <li>
+      <strong>Distrust a surprising zero.</strong> If a count, a match or a test result is suspiciously clean, count it
+      a second way.
+    </li>
+  </ol>
+
+  <h2>The first lab</h2>
+  <p>
+    This lab is about checking what an AI agent says worked. The other is about recovering when one damages something:
+    <a href="/blog/ai-agent-blanked-26-files#recovery-lab">an agent blanks your files, and you get them back</a>. Both
+    come down to the same line from that postmortem: a check only proves what it compares.
+  </p>
+</BlogPost>
