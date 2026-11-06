@@ -11,7 +11,7 @@ import BlogPost from '../../layouts/BlogPost.astro';
 >
   <p>
     KB Cafe is a build-in-public shop: we use AI to build real sites, then write about how it went. One of the biggest
-    so far is <a href="https://stocktools.ai" target="_blank" rel="noopener">StockTools.AI</a>, a free stock-research
+    so far is StockTools.AI, a free stock-research
     site built on public SEC filings. This post is about the building, not a feature tour: what AI did, what kept it on
     track, and the two design choices we would reuse on any AI product.
   </p>
@@ -44,7 +44,7 @@ import BlogPost from '../../layouts/BlogPost.astro';
     The research features run on the Anthropic Claude API and follow one rule: every conclusion traces back to the
     exact filing it came from. The house motto is &ldquo;conclusion left, evidence right.&rdquo; The Research Brief
     gives a plain-English overview of a ticker built only from filings and market data, with no price predictions.
-    The <a href="https://stocktools.ai/ai/committee" target="_blank" rel="noopener">Research Committee</a> has a bull, a
+    The Research Committee has a bull, a
     bear, a risk manager, and a portfolio manager argue a stock from its filings, then stops without a buy or sell
     call. That is the use of AI we like best: it stress-tests what you already think instead of telling you what to
     think.

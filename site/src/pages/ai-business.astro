@@ -10,7 +10,7 @@ const STAGES = [
 
 const PORTFOLIO = [
   { nm: 'KB Cafe', ds: 'This site. An aged dev-domain restored into a knowledge base + tools. Read the full teardown.', href: '/case-studies/kbcafe', tag: 'Case study #1' },
-  { nm: 'stocktools.ai', ds: 'A free, filing-backed stock-research platform: Congress trades, insider buys, whale 13Fs, CEO pay, and AI research, built with AI on SEC data.', href: 'https://www.stocktools.ai', tag: 'Live' },
+  { nm: 'stocktools.ai', ds: 'A free, filing-backed stock-research platform: Congress trades, insider buys, whale 13Fs, CEO pay, and AI research, built with AI on SEC data.', href: null, tag: 'Live' },
   { nm: 'astrologybay.com', ds: 'A restored Buzzle-era astrology domain on the same aged-domain playbook.', href: 'https://astrologybay.com', tag: 'Live' },
   { nm: 'catnames.com', ds: 'An expired domain, rebuilt as a custom cat-naming site with its own tools.', href: 'https://catnames.com', tag: 'Live' },
   { nm: 'combovideos.com', ds: 'A fighting-game combo hub and archive. The deepest engineering build of the set.', href: 'https://combovideos.com', tag: 'Live' },
@@ -107,7 +107,7 @@ const ICONS = {
             <span class="port-ds">{p.ds}</span>
           </a>
         ) : (
-          <div class="port-card soon">
+          <div class={p.tag === 'Coming' ? 'port-card soon' : 'port-card static'}>
             <span class="port-tag">{p.tag}</span>
             <span class="port-nm">{p.nm}</span>
             <span class="port-ds">{p.ds}</span>
@@ -188,7 +188,7 @@ const ICONS = {
 
   .port{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 10px}
   .port-card{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:14px;border:1.5px solid var(--line);background:var(--cream);text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s,border-color .15s}
-  .port-card:not(.soon):hover{transform:translateY(-3px);box-shadow:6px 7px 0 rgba(30,24,19,.08);border-color:var(--ink)}
+  .port-card:not(.soon):not(.static):hover{transform:translateY(-3px);box-shadow:6px 7px 0 rgba(30,24,19,.08);border-color:var(--ink)}
   .port-card.soon{background:var(--paper-2);border-style:dashed}
   .port-tag{font-family:var(--font-mono);font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--coral);width:fit-content}
   .port-card.soon .port-tag{color:var(--ink-soft)}
